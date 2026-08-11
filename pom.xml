@@ -10,4 +10,27 @@
         <maven.compiler.release>21</maven.compiler.release>
         <exec.mainClass>com.edext.EdEXT</exec.mainClass>
     </properties>
+    
+    <dependencies>
+    <!-- Conector JDBC oficial de MariaDB -->
+    <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+        <version>3.3.3</version>
+    </dependency>
+
+    <!-- Implementación de JPA (Hibernate ORM) -->
+    <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>6.4.4.Final</version>
+    </dependency>
+
+    <!-- Jakarta Persistence API -->
+    <dependency>
+        <groupId>jakarta.persistence</groupId>
+        <artifactId>jakarta.persistence-api</artifactId>
+        <version>3.1.0</version>
+    </dependency>
+</dependencies>
 </project>
