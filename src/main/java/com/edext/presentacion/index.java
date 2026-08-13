@@ -5,6 +5,8 @@ public class index extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(index.class.getName());
     private javax.swing.JInternalFrame ventanaAltaUsuario;
+    private javax.swing.JInternalFrame ventanaConsultaUsuario;
+    
     /**
      * Creates new form index
      */
@@ -28,6 +30,7 @@ public class index extends javax.swing.JFrame {
         miInstituto = new javax.swing.JMenuItem();
         mUsuarios = new javax.swing.JMenu();
         miAltaUsuario = new javax.swing.JMenuItem();
+        miConsultaUsuario = new javax.swing.JMenuItem();
         mCursos = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -57,6 +60,11 @@ public class index extends javax.swing.JFrame {
         miAltaUsuario.addActionListener(this::miAltaUsuarioActionPerformed);
         mUsuarios.add(miAltaUsuario);
 
+        miConsultaUsuario.setFont(new java.awt.Font("Liberation Sans", 0, 15)); // NOI18N
+        miConsultaUsuario.setText("Constulta Usuario");
+        miConsultaUsuario.addActionListener(this::miConsultaUsuarioActionPerformed);
+        mUsuarios.add(miConsultaUsuario);
+
         mbIndex.add(mUsuarios);
 
         mCursos.setText("Cursos");
@@ -85,7 +93,7 @@ public class index extends javax.swing.JFrame {
         this.dpIndex.add(internalFrame);
         internalFrame.setVisible(true);
     }//GEN-LAST:event_miInstitutoActionPerformed
-
+    //abrir menu Nuevo Usuario
     private void miAltaUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAltaUsuarioActionPerformed
         // Si la ventana ya existe y sigue abierta
         if (ventanaAltaUsuario != null && ventanaAltaUsuario.isDisplayable()) {
@@ -121,6 +129,41 @@ public class index extends javax.swing.JFrame {
         );
 
     }//GEN-LAST:event_miAltaUsuarioActionPerformed
+    //Abrir menuCosnulta usuario
+    private void miConsultaUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miConsultaUsuarioActionPerformed
+        // Si la ventana ya existe y sigue abierta
+        if (ventanaConsultaUsuario != null && ventanaConsultaUsuario.isDisplayable()) {
+            try {
+                ventanaConsultaUsuario.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+                
+            }
+            //trae la ventana al frente
+            ventanaConsultaUsuario.toFront();
+            return;
+        }
+
+        // Crear la ventana solamente si no existe
+        ventanaConsultaUsuario = new javax.swing.JInternalFrame(
+                "Consulta Usuario", true, true, false, false);
+
+        ventanaConsultaUsuario.getContentPane().add(new ConsultaUsuario());
+        ventanaConsultaUsuario.pack();
+
+        dpIndex.add(ventanaConsultaUsuario);
+        ventanaConsultaUsuario.setVisible(true);
+
+        // Cuando se cierre, se libera la referencia
+        ventanaConsultaUsuario.addInternalFrameListener(
+                new javax.swing.event.InternalFrameAdapter() {
+                    @Override
+                    public void internalFrameClosed(
+                            javax.swing.event.InternalFrameEvent e) {
+                        ventanaConsultaUsuario = null;
+                    }
+                }
+        );
+    }//GEN-LAST:event_miConsultaUsuarioActionPerformed
 
     /**
      * @param args the command line arguments
@@ -154,6 +197,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenu mUsuarios;
     private javax.swing.JMenuBar mbIndex;
     private javax.swing.JMenuItem miAltaUsuario;
+    private javax.swing.JMenuItem miConsultaUsuario;
     private javax.swing.JMenuItem miInstituto;
     // End of variables declaration//GEN-END:variables
 }
