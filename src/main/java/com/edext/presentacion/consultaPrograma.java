@@ -15,6 +15,7 @@ public class consultaPrograma extends javax.swing.JPanel {
      */
     public consultaPrograma() {
         initComponents();
+        cargarDatos();
     }
 
     /**
@@ -46,6 +47,7 @@ public class consultaPrograma extends javax.swing.JPanel {
         lblPrograma.setText("Programa de formacion:");
 
         cbPrograma.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbPrograma.addActionListener(this::cbProgramaActionPerformed);
 
         tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -123,21 +125,22 @@ public class consultaPrograma extends javax.swing.JPanel {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(22, 71, Short.MAX_VALUE)
+                                .addGap(22, 55, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblFin)
-                                        .addGap(53, 53, 53)
-                                        .addComponent(txtFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                             .addComponent(lblRegistro)
-                                            .addGap(18, 18, 18)
-                                            .addComponent(txtRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addGap(18, 18, 18))
+                                        .addGroup(layout.createSequentialGroup()
                                             .addComponent(lblInicio)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(txtInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblFin)
+                                        .addGap(37, 37, 37)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(txtFin, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                                    .addComponent(txtInicio, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtRegistro, javax.swing.GroupLayout.Alignment.LEADING))))
                         .addGap(96, 96, 96))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblCursos)
@@ -177,6 +180,14 @@ public class consultaPrograma extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cbProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProgramaActionPerformed
+        cargarDatos();
+    }//GEN-LAST:event_cbProgramaActionPerformed
+
+    private void cargarDatos(){        
+        String programa = cbPrograma.getSelectedItem().toString();
+        txtNombre.setText(programa);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cbPrograma;

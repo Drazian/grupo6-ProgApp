@@ -4,6 +4,8 @@
  */
 package com.edext.presentacion;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author pipo
@@ -15,6 +17,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
      */
     public agregarCursoPrograma() {
         initComponents();
+        cargarDatos();
     }
 
     /**
@@ -36,6 +39,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         lblSeleccionarCurso = new javax.swing.JLabel();
 
         cbPrograma.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbPrograma.addActionListener(this::cbProgramaActionPerformed);
 
         lblPrograma.setText("Seleccionar Programa de Formacion:");
 
@@ -65,6 +69,11 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        tbl.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbl);
 
         lblCurso.setText("Curso seleccionado:");
@@ -72,6 +81,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         txtCurso.setEditable(false);
 
         btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(this::btnAgregarActionPerformed);
 
         lblSeleccionarCurso.setText("Seleccionar curso:");
 
@@ -127,6 +137,41 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                 .addGap(0, 14, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMouseClicked
+        int filaSeleccionada = tbl.getSelectedRow();
+        
+        if (filaSeleccionada != -1){
+            String curso = tbl.getValueAt(filaSeleccionada,0).toString();
+            txtCurso.setText(curso);
+        }
+    }//GEN-LAST:event_tblMouseClicked
+
+    private void cbProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProgramaActionPerformed
+        cargarDatos();
+    }//GEN-LAST:event_cbProgramaActionPerformed
+
+    private void cargarDatos(){
+        txtCurso.setText("");
+    }
+    
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        try{
+            String programa = cbPrograma.getSelectedItem().toString();
+            String curso = txtCurso.getText().trim();
+        
+            if (curso.isEmpty()||programa.isEmpty()){
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un curso y un Programa de Formacion validos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            JOptionPane.showMessageDialog(this, "Curso '"+curso+"' agregado con éxito al programa de formacion '"+programa+"'.","Éxito",JOptionPane.INFORMATION_MESSAGE);
+
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Error al agregar curso a programa de formacion: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }//GEN-LAST:event_btnAgregarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
