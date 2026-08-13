@@ -4,12 +4,13 @@ package com.edext.presentacion;
 public class index extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(index.class.getName());
-
+    private javax.swing.JInternalFrame ventanaAltaUsuario;
     /**
      * Creates new form index
      */
     public index() {
         initComponents();
+        
     }
 
     /**
@@ -26,6 +27,7 @@ public class index extends javax.swing.JFrame {
         mInstitutos = new javax.swing.JMenu();
         miInstituto = new javax.swing.JMenuItem();
         mUsuarios = new javax.swing.JMenu();
+        miAltaUsuario = new javax.swing.JMenuItem();
         mCursos = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -50,6 +52,11 @@ public class index extends javax.swing.JFrame {
         mbIndex.add(mInstitutos);
 
         mUsuarios.setText("Usuarios");
+
+        miAltaUsuario.setText("Nuevo Usuario");
+        miAltaUsuario.addActionListener(this::miAltaUsuarioActionPerformed);
+        mUsuarios.add(miAltaUsuario);
+
         mbIndex.add(mUsuarios);
 
         mCursos.setText("Cursos");
@@ -78,6 +85,42 @@ public class index extends javax.swing.JFrame {
         this.dpIndex.add(internalFrame);
         internalFrame.setVisible(true);
     }//GEN-LAST:event_miInstitutoActionPerformed
+
+    private void miAltaUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAltaUsuarioActionPerformed
+        // Si la ventana ya existe y sigue abierta
+        if (ventanaAltaUsuario != null && ventanaAltaUsuario.isDisplayable()) {
+            try {
+                ventanaAltaUsuario.setSelected(true);
+            } catch (java.beans.PropertyVetoException e) {
+                
+            }
+            //trae la ventana al frente
+            ventanaAltaUsuario.toFront();
+            return;
+        }
+
+        // Crear la ventana solamente si no existe
+        ventanaAltaUsuario = new javax.swing.JInternalFrame(
+                "Nuevo Usuario", true, true, false, false);
+
+        ventanaAltaUsuario.getContentPane().add(new AltaUsuario());
+        ventanaAltaUsuario.pack();
+
+        dpIndex.add(ventanaAltaUsuario);
+        ventanaAltaUsuario.setVisible(true);
+
+        // Cuando se cierre, se libera la referencia
+        ventanaAltaUsuario.addInternalFrameListener(
+                new javax.swing.event.InternalFrameAdapter() {
+                    @Override
+                    public void internalFrameClosed(
+                            javax.swing.event.InternalFrameEvent e) {
+                        ventanaAltaUsuario = null;
+                    }
+                }
+        );
+
+    }//GEN-LAST:event_miAltaUsuarioActionPerformed
 
     /**
      * @param args the command line arguments
@@ -110,6 +153,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenu mInstitutos;
     private javax.swing.JMenu mUsuarios;
     private javax.swing.JMenuBar mbIndex;
+    private javax.swing.JMenuItem miAltaUsuario;
     private javax.swing.JMenuItem miInstituto;
     // End of variables declaration//GEN-END:variables
 }
