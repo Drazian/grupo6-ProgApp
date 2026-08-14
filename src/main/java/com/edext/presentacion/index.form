@@ -61,6 +61,29 @@
             <Property name="text" type="java.lang.String" value="Cursos"/>
           </Properties>
         </Menu>
+        <Menu class="javax.swing.JMenu" name="mPrograma">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="ProgramaFormacion"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="miAgregarPrograma">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Agregar curso a programa"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miAgregarProgramaActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="miConsultaPrograma">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Consulta Programa"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miConsultaProgramaActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
       </SubComponents>
     </Menu>
   </NonVisualComponents>

@@ -34,6 +34,9 @@ public class index extends javax.swing.JFrame {
         miConsultaUsuario = new javax.swing.JMenuItem();
         miModificarUsuario = new javax.swing.JMenuItem();
         mCursos = new javax.swing.JMenu();
+        mPrograma = new javax.swing.JMenu();
+        miAgregarPrograma = new javax.swing.JMenuItem();
+        miConsultaPrograma = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,6 +79,18 @@ public class index extends javax.swing.JFrame {
 
         mCursos.setText("Cursos");
         mbIndex.add(mCursos);
+
+        mPrograma.setText("ProgramaFormacion");
+
+        miAgregarPrograma.setText("Agregar curso a programa");
+        miAgregarPrograma.addActionListener(this::miAgregarProgramaActionPerformed);
+        mPrograma.add(miAgregarPrograma);
+
+        miConsultaPrograma.setText("Consulta Programa");
+        miConsultaPrograma.addActionListener(this::miConsultaProgramaActionPerformed);
+        mPrograma.add(miConsultaPrograma);
+
+        mbIndex.add(mPrograma);
 
         setJMenuBar(mbIndex);
 
@@ -208,6 +223,22 @@ public class index extends javax.swing.JFrame {
 
     }//GEN-LAST:event_miModificarUsuarioActionPerformed
 
+    private void miAgregarProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAgregarProgramaActionPerformed
+        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Agregar curso a programa",true,true,true,true);
+        internalFrame.getContentPane().add(new agregarCursoPrograma());
+        internalFrame.pack();
+        this.dpIndex.add(internalFrame);
+        internalFrame.setVisible(true);
+    }//GEN-LAST:event_miAgregarProgramaActionPerformed
+
+    private void miConsultaProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miConsultaProgramaActionPerformed
+        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Consulta programas",true,true,true,true);
+        internalFrame.getContentPane().add(new consultaPrograma());
+        internalFrame.pack();
+        this.dpIndex.add(internalFrame);
+        internalFrame.setVisible(true);
+    }//GEN-LAST:event_miConsultaProgramaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -237,10 +268,13 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JDesktopPane dpIndex;
     private javax.swing.JMenu mCursos;
     private javax.swing.JMenu mInstitutos;
+    private javax.swing.JMenu mPrograma;
     private javax.swing.JMenu mUsuarios;
     private javax.swing.JMenuBar mbIndex;
     private javax.swing.JMenuItem miAltaUsuario;
     private javax.swing.JMenuItem miConsultaUsuario;
+    private javax.swing.JMenuItem miAgregarPrograma;
+    private javax.swing.JMenuItem miConsultaPrograma;
     private javax.swing.JMenuItem miInstituto;
     private javax.swing.JMenuItem miModificarUsuario;
     // End of variables declaration//GEN-END:variables
