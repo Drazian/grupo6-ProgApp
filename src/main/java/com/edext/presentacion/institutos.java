@@ -119,6 +119,11 @@ public class institutos extends javax.swing.JPanel {
     private void btnCrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActionPerformed
         try{
         String nombre=txtNombre.getText().trim();
+
+        if (nombre.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Debe elegir un nombre para el nuevo Instituto", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         
         IControlador ic = Fabrica.getInstance().getIControlador();
         ic.crearInstituto(nombre);
@@ -127,6 +132,7 @@ public class institutos extends javax.swing.JPanel {
         
         cargarTabla();
         txtNombre.setText("");
+        
         
         } catch (Exception e){
             JOptionPane.showMessageDialog(this, "Error al guardar en la base de datos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
@@ -139,18 +145,18 @@ public class institutos extends javax.swing.JPanel {
             
             if (nombre.isEmpty()){
                 JOptionPane.showMessageDialog(this, "Debe seleccionar un Instituto para eliminar", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            
+                
             int respuesta = JOptionPane.showConfirmDialog(this, "¿Está seguro de que desea eliminar el Instituto '"+nombre+"'?","Confirmar eliminación",JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (respuesta == JOptionPane.YES_OPTION){
                 IControlador ic = Fabrica.getInstance().getIControlador();
                 ic.eliminarInstituto(nombre);
+                JOptionPane.showMessageDialog(this, "Instituto '"+nombre+"' eliminado con éxito.","Éxito",JOptionPane.INFORMATION_MESSAGE);
+                cargarTabla();
+                txtNombre.setText("");                    
             }
             
-            JOptionPane.showMessageDialog(this, "Instituto '"+nombre+"' eliminado con éxito.","Éxito",JOptionPane.INFORMATION_MESSAGE);
-            
-            cargarTabla();
-            txtNombre.setText("");
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al eliminar Instituto: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }
