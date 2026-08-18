@@ -34,6 +34,9 @@ public class index extends javax.swing.JFrame {
         miConsultaUsuario = new javax.swing.JMenuItem();
         miModificarUsuario = new javax.swing.JMenuItem();
         mCursos = new javax.swing.JMenu();
+        altaCurso = new javax.swing.JMenuItem();
+        editarCurso = new javax.swing.JMenuItem();
+        consultaCurso = new javax.swing.JMenuItem();
         mPrograma = new javax.swing.JMenu();
         miAgregarPrograma = new javax.swing.JMenuItem();
         miConsultaPrograma = new javax.swing.JMenuItem();
@@ -78,6 +81,19 @@ public class index extends javax.swing.JFrame {
         mbIndex.add(mUsuarios);
 
         mCursos.setText("Cursos");
+
+        altaCurso.setText("Alta");
+        altaCurso.addActionListener(this::altaCursoActionPerformed);
+        mCursos.add(altaCurso);
+
+        editarCurso.setText("Editar");
+        editarCurso.addActionListener(this::editarCursoActionPerformed);
+        mCursos.add(editarCurso);
+
+        consultaCurso.setText("Consulta");
+        consultaCurso.addActionListener(this::consultaCursoActionPerformed);
+        mCursos.add(consultaCurso);
+
         mbIndex.add(mCursos);
 
         mPrograma.setText("ProgramaFormacion");
@@ -239,6 +255,27 @@ public class index extends javax.swing.JFrame {
         internalFrame.setVisible(true);
     }//GEN-LAST:event_miConsultaProgramaActionPerformed
 
+    private void altaCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_altaCursoActionPerformed
+        altaCurso ventanaAlta = new altaCurso();
+        ventanaAlta.setSize(600, 500);
+        this.dpIndex.add(ventanaAlta);
+        ventanaAlta.setVisible(true);
+    }//GEN-LAST:event_altaCursoActionPerformed
+
+    private void editarCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarCursoActionPerformed
+        editarCurso ventanaEditar = new editarCurso();
+        ventanaEditar.setSize(600, 500);
+        this.dpIndex.add(ventanaEditar);
+        ventanaEditar.setVisible(true);
+    }//GEN-LAST:event_editarCursoActionPerformed
+
+    private void consultaCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consultaCursoActionPerformed
+        consultaCurso ventanaConsulta = new consultaCurso();
+        ventanaConsulta.setSize(600, 500);
+        this.dpIndex.add(ventanaConsulta);
+        ventanaConsulta.setVisible(true);
+    }//GEN-LAST:event_consultaCursoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -265,16 +302,19 @@ public class index extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem altaCurso;
+    private javax.swing.JMenuItem consultaCurso;
     private javax.swing.JDesktopPane dpIndex;
+    private javax.swing.JMenuItem editarCurso;
     private javax.swing.JMenu mCursos;
     private javax.swing.JMenu mInstitutos;
     private javax.swing.JMenu mPrograma;
     private javax.swing.JMenu mUsuarios;
     private javax.swing.JMenuBar mbIndex;
-    private javax.swing.JMenuItem miAltaUsuario;
-    private javax.swing.JMenuItem miConsultaUsuario;
     private javax.swing.JMenuItem miAgregarPrograma;
+    private javax.swing.JMenuItem miAltaUsuario;
     private javax.swing.JMenuItem miConsultaPrograma;
+    private javax.swing.JMenuItem miConsultaUsuario;
     private javax.swing.JMenuItem miInstituto;
     private javax.swing.JMenuItem miModificarUsuario;
     // End of variables declaration//GEN-END:variables
