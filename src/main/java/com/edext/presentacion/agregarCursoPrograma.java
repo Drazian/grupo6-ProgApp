@@ -4,6 +4,8 @@
  */
 package com.edext.presentacion;
 
+import com.edext.logica.Fabrica;
+import com.edext.logica.IControlador;
 import javax.swing.JOptionPane;
 
 /**
@@ -17,7 +19,8 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
      */
     public agregarCursoPrograma() {
         initComponents();
-        cargarDatos();
+        cargarProgramas();
+        cargarCursos();
     }
 
     /**
@@ -148,15 +151,53 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     }//GEN-LAST:event_tblMouseClicked
 
     private void cbProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProgramaActionPerformed
-        cargarDatos();
+        cargarCursos();
     }//GEN-LAST:event_cbProgramaActionPerformed
 
-    private void cargarDatos(){
-        txtCurso.setText("");
+    private void cargarProgramas(){
+        //TODO: cargar lista de nombres de programas.
+        try{
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            //List<DtProgramas> lista = ic.listarProgramas();
+            //cbPrograma.removeAllItems();
+            //for (DtProgramas aux: lista){
+            //  cbPrograma.addItem(aux.getNombre());
+            //}
+        
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Error al obtener lista de Programas de Formacion: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void cargarCursos(){
+        try{
+            txtCurso.setText(""); 
+
+            //TODO: cargar cursos
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            //List<DtCurso> lista = ic.listarCursos();
+            //DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+            //model.setRowCount(0);
+            //for (DtCurso aux: lista){
+                //  model.addRow(new Object[]{aux.getNombre()});
+                // //Falta agregar para el resto de atributos.
+            //}
+            
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Error al obtener Cursos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+        
     }
     
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try{
+            
+            
+            if (cbPrograma.getItemCount() < 0){
+                //Si no hay ningun programa creado, no hay donde agregar un curso.
+                return;
+            }
+            
             String programa = cbPrograma.getSelectedItem().toString();
             String curso = txtCurso.getText().trim();
         
@@ -164,6 +205,10 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(this, "Debe seleccionar un curso y un Programa de Formacion validos", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            //TODO: crear funcion de agregar programa en controlador.
+            //ic.agregarCursoPrograma(programa, curso);
             
             JOptionPane.showMessageDialog(this, "Curso '"+curso+"' agregado con éxito al programa de formacion '"+programa+"'.","Éxito",JOptionPane.INFORMATION_MESSAGE);
 

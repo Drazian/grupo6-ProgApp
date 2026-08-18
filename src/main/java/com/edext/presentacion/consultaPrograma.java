@@ -4,6 +4,10 @@
  */
 package com.edext.presentacion;
 
+import com.edext.logica.Fabrica;
+import com.edext.logica.IControlador;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author pipo
@@ -15,7 +19,8 @@ public class consultaPrograma extends javax.swing.JPanel {
      */
     public consultaPrograma() {
         initComponents();
-        cargarDatos();
+        cargarProgramas();
+        cargarCursos();
     }
 
     /**
@@ -181,14 +186,73 @@ public class consultaPrograma extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProgramaActionPerformed
-        cargarDatos();
+        try{            
+            //TODO: cargar labels
+            if (cbPrograma.getItemCount() < 0){
+            //Si no hay ningun programa creado, no hay nada que cargar.
+            return;
+            }            
+            
+            
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            String programa = cbPrograma.getSelectedItem().toString();
+            //DtPrograma aux = ic.encontrarPrograma(programa);
+            txtNombre.setText("");
+            txaDescripcion.setText("");
+            txtRegistro.setText("");
+            txtInicio.setText("");
+            txtFin.setText("");
+            cargarCursos();
+            
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Error al obtener los datos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+        
     }//GEN-LAST:event_cbProgramaActionPerformed
-
-    private void cargarDatos(){        
-        String programa = cbPrograma.getSelectedItem().toString();
-        txtNombre.setText(programa);
+  
+        private void cargarProgramas(){
+        //TODO: cargar lista de nombres de programas.
+        try{
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            //List<DtProgramas> lista = ic.listarProgramas();
+            //cbPrograma.removeAllItems();
+            //for (DtProgramas aux: lista){
+            //  cbPrograma.addItem(aux.getNombre());
+            //}
+        
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Error al obtener lista de Programas de Formacion: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+        
+    private void cargarCursos(){
+        try{ 
+            
+            if (cbPrograma.getItemCount() < 0){
+                //Si no hay ningun programa creado, no hay curso asociado que cargar.
+                return;
+            }
+            
+            String programa = cbPrograma.getSelectedItem().toString();
+            
+            //TODO: cargar cursos en base al programa
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            //List<DtCurso> lista = ic.listarCursosdelPrograma(programa);
+            //DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+            //model.setRowCount(0);
+            //for (DtCurso aux: lista){
+                //  model.addRow(new Object[]{aux.getNombre()});
+                // //Falta agregar para el resto de atributos.
+            //}
+            
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Error al obtener Cursos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+        
     }
 
+        
+       
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cbPrograma;
     private javax.swing.JScrollPane jScrollPane1;
