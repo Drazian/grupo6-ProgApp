@@ -1,5 +1,8 @@
 package com.edext.presentacion;
 
+import java.awt.Component;
+import javax.swing.JDesktopPane;
+
 
 public class index extends javax.swing.JFrame {
     
@@ -34,7 +37,10 @@ public class index extends javax.swing.JFrame {
         miConsultaUsuario = new javax.swing.JMenuItem();
         miModificarUsuario = new javax.swing.JMenuItem();
         mCursos = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMConsultaEdicionCurso = new javax.swing.JMenuItem();
         mPrograma = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
         miAgregarPrograma = new javax.swing.JMenuItem();
         miConsultaPrograma = new javax.swing.JMenuItem();
 
@@ -78,9 +84,22 @@ public class index extends javax.swing.JFrame {
         mbIndex.add(mUsuarios);
 
         mCursos.setText("Cursos");
+
+        jMenuItem2.setText("Inscripcion a edicion");
+        jMenuItem2.addActionListener(this::jMenuItem2ActionPerformed);
+        mCursos.add(jMenuItem2);
+
+        jMConsultaEdicionCurso.setText("Consulta de Edicion");
+        jMConsultaEdicionCurso.addActionListener(this::jMConsultaEdicionCursoActionPerformed);
+        mCursos.add(jMConsultaEdicionCurso);
+
         mbIndex.add(mCursos);
 
         mPrograma.setText("ProgramaFormacion");
+
+        jMenuItem3.setText("Crear Programa");
+        jMenuItem3.addActionListener(this::jMenuItem3ActionPerformed);
+        mPrograma.add(jMenuItem3);
 
         miAgregarPrograma.setText("Agregar curso a programa");
         miAgregarPrograma.addActionListener(this::miAgregarProgramaActionPerformed);
@@ -239,6 +258,18 @@ public class index extends javax.swing.JFrame {
         internalFrame.setVisible(true);
     }//GEN-LAST:event_miConsultaProgramaActionPerformed
 
+    private void jMConsultaEdicionCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMConsultaEdicionCursoActionPerformed
+        cargarPanel("Consulta de Edicion de Curso", new consultaEdicionCurso(),false);
+    }//GEN-LAST:event_jMConsultaEdicionCursoActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        cargarPanel("Inscripcion a Edicion de Curso", new inscripcionEdicionCurso(), false);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        cargarPanel("Crear Programa de Formacion", new crearProgramaFormacion(), false);
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -264,17 +295,29 @@ public class index extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> new index().setVisible(true));
     }
 
+    private void cargarPanel(String titulo, Component panel, Boolean resizable){
+        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame(titulo,resizable,true,true,true);
+        internalFrame.getContentPane().add(panel);
+        internalFrame.pack();
+        this.dpIndex.add(internalFrame);
+        this.dpIndex.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE); // Modo de renderizado
+        internalFrame.setVisible(true);        
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDesktopPane dpIndex;
+    private javax.swing.JMenuItem jMConsultaEdicionCurso;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenu mCursos;
     private javax.swing.JMenu mInstitutos;
     private javax.swing.JMenu mPrograma;
     private javax.swing.JMenu mUsuarios;
     private javax.swing.JMenuBar mbIndex;
-    private javax.swing.JMenuItem miAltaUsuario;
-    private javax.swing.JMenuItem miConsultaUsuario;
     private javax.swing.JMenuItem miAgregarPrograma;
+    private javax.swing.JMenuItem miAltaUsuario;
     private javax.swing.JMenuItem miConsultaPrograma;
+    private javax.swing.JMenuItem miConsultaUsuario;
     private javax.swing.JMenuItem miInstituto;
     private javax.swing.JMenuItem miModificarUsuario;
     // End of variables declaration//GEN-END:variables
