@@ -37,6 +37,9 @@ public class index extends javax.swing.JFrame {
         miConsultaUsuario = new javax.swing.JMenuItem();
         miModificarUsuario = new javax.swing.JMenuItem();
         mCursos = new javax.swing.JMenu();
+        altaCurso = new javax.swing.JMenuItem();
+        editarCurso = new javax.swing.JMenuItem();
+        consultaCurso = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMConsultaEdicionCurso = new javax.swing.JMenuItem();
         mPrograma = new javax.swing.JMenu();
@@ -85,6 +88,17 @@ public class index extends javax.swing.JFrame {
 
         mCursos.setText("Cursos");
 
+        altaCurso.setText("Alta");
+        altaCurso.addActionListener(this::altaCursoActionPerformed);
+        mCursos.add(altaCurso);
+
+        editarCurso.setText("Editar");
+        editarCurso.addActionListener(this::editarCursoActionPerformed);
+        mCursos.add(editarCurso);
+
+        consultaCurso.setText("Consulta");
+        consultaCurso.addActionListener(this::consultaCursoActionPerformed);
+        mCursos.add(consultaCurso);
         jMenuItem2.setText("Inscripcion a edicion");
         jMenuItem2.addActionListener(this::jMenuItem2ActionPerformed);
         mCursos.add(jMenuItem2);
@@ -258,6 +272,26 @@ public class index extends javax.swing.JFrame {
         internalFrame.setVisible(true);
     }//GEN-LAST:event_miConsultaProgramaActionPerformed
 
+    private void altaCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_altaCursoActionPerformed
+        altaCurso ventanaAlta = new altaCurso();
+        ventanaAlta.setSize(600, 500);
+        this.dpIndex.add(ventanaAlta);
+        ventanaAlta.setVisible(true);
+    }//GEN-LAST:event_altaCursoActionPerformed
+
+    private void editarCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarCursoActionPerformed
+        editarCurso ventanaEditar = new editarCurso();
+        ventanaEditar.setSize(600, 500);
+        this.dpIndex.add(ventanaEditar);
+        ventanaEditar.setVisible(true);
+    }//GEN-LAST:event_editarCursoActionPerformed
+
+    private void consultaCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consultaCursoActionPerformed
+        consultaCurso ventanaConsulta = new consultaCurso();
+        ventanaConsulta.setSize(600, 500);
+        this.dpIndex.add(ventanaConsulta);
+        ventanaConsulta.setVisible(true);
+    }//GEN-LAST:event_consultaCursoActionPerformed
     private void jMConsultaEdicionCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMConsultaEdicionCursoActionPerformed
         cargarPanel("Consulta de Edicion de Curso", new consultaEdicionCurso(),false);
     }//GEN-LAST:event_jMConsultaEdicionCursoActionPerformed
@@ -305,7 +339,10 @@ public class index extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem altaCurso;
+    private javax.swing.JMenuItem consultaCurso;
     private javax.swing.JDesktopPane dpIndex;
+    private javax.swing.JMenuItem editarCurso;
     private javax.swing.JMenuItem jMConsultaEdicionCurso;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
