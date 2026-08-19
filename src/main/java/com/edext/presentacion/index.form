@@ -34,9 +34,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="miConsultaUsuario">
               <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Liberation Sans" size="15" style="0"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="Constulta Usuario"/>
               </Properties>
               <Events>
@@ -45,9 +42,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="miModificarUsuario">
               <Properties>
-                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-                  <Font name="Liberation Sans" size="15" style="0"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="Modificar Usuario"/>
               </Properties>
               <Events>
@@ -63,7 +57,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="altaCurso">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Alta"/>
+                <Property name="text" type="java.lang.String" value="Alta curso"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="altaCursoActionPerformed"/>
@@ -71,7 +65,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="editarCurso">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Editar"/>
+                <Property name="text" type="java.lang.String" value="Editar curso"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editarCursoActionPerformed"/>
@@ -79,10 +73,12 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="consultaCurso">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Consulta"/>
+                <Property name="text" type="java.lang.String" value="Consulta curso"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="consultaCursoActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Inscripcion a edicion"/>

@@ -192,7 +192,6 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try{
             
-            
             if (cbPrograma.getItemCount() < 0){
                 //Si no hay ningun programa creado, no hay donde agregar un curso.
                 return;

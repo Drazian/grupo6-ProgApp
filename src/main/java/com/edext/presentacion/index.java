@@ -74,12 +74,10 @@ public class index extends javax.swing.JFrame {
         miAltaUsuario.addActionListener(this::miAltaUsuarioActionPerformed);
         mUsuarios.add(miAltaUsuario);
 
-        miConsultaUsuario.setFont(new java.awt.Font("Liberation Sans", 0, 15)); // NOI18N
         miConsultaUsuario.setText("Constulta Usuario");
         miConsultaUsuario.addActionListener(this::miConsultaUsuarioActionPerformed);
         mUsuarios.add(miConsultaUsuario);
 
-        miModificarUsuario.setFont(new java.awt.Font("Liberation Sans", 0, 15)); // NOI18N
         miModificarUsuario.setText("Modificar Usuario");
         miModificarUsuario.addActionListener(this::miModificarUsuarioActionPerformed);
         mUsuarios.add(miModificarUsuario);
@@ -88,17 +86,18 @@ public class index extends javax.swing.JFrame {
 
         mCursos.setText("Cursos");
 
-        altaCurso.setText("Alta");
+        altaCurso.setText("Alta curso");
         altaCurso.addActionListener(this::altaCursoActionPerformed);
         mCursos.add(altaCurso);
 
-        editarCurso.setText("Editar");
+        editarCurso.setText("Editar curso");
         editarCurso.addActionListener(this::editarCursoActionPerformed);
         mCursos.add(editarCurso);
 
-        consultaCurso.setText("Consulta");
+        consultaCurso.setText("Consulta curso");
         consultaCurso.addActionListener(this::consultaCursoActionPerformed);
         mCursos.add(consultaCurso);
+
         jMenuItem2.setText("Inscripcion a edicion");
         jMenuItem2.addActionListener(this::jMenuItem2ActionPerformed);
         mCursos.add(jMenuItem2);

@@ -193,7 +193,6 @@ public class consultaPrograma extends javax.swing.JPanel {
             return;
             }            
             
-            
             IControlador ic = Fabrica.getInstance().getIControlador();
             String programa = cbPrograma.getSelectedItem().toString();
             //DtPrograma aux = ic.encontrarPrograma(programa);
