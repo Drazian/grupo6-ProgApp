@@ -3,6 +3,9 @@
   <persistence-unit name="edext" transaction-type="RESOURCE_LOCAL">
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>com.edext.persistencia.Instituto</class>
+    <class>com.edext.persistencia.Usuario</class>
+    <class>com.edext.persistencia.Docente</class>
+    <class>com.edext.persistencia.Estudiante</class>
     <properties>
       <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/edext"/>
       <property name="jakarta.persistence.jdbc.user" value="pipo"/>
