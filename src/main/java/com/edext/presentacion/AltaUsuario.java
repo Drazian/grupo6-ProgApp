@@ -5,10 +5,20 @@
 package com.edext.presentacion;
 
 import com.edext.datatypes.DtInstituto;
+import com.edext.datatypes.DtUsuario;
+import com.edext.datatypes.TipoUsuario;
 import com.edext.logica.Fabrica;
+import com.edext.logica.GestorImagenes;
 import com.edext.logica.IControlador;
+import java.awt.Image;
+import java.io.File;
+import java.util.Date;
 import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;//para que no de error al cargar el formulario la imagen generica por el ancho
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 /**
@@ -20,13 +30,16 @@ public class AltaUsuario extends javax.swing.JPanel {
     /**
      * Creates new form AltaUsuarioN
      */
+    
+    private File imagenSeleccionada;
+    
     public AltaUsuario() {
         initComponents();
         lblInstituto.setVisible(false);
         cbInstitutos.setVisible(false);
-        cbNickname.setVisible(false);
         btnGuardarCambios.setVisible(false);
         cargarInstitutos();
+        SwingUtilities.invokeLater(() -> {cargarImagenGenerica();}); 
     }
     public AltaUsuario(int modoModificar) {
         initComponents();
@@ -37,6 +50,22 @@ public class AltaUsuario extends javax.swing.JPanel {
         txtEmail.setEnabled(false);
 
 
+    }
+    //carga una imagen generica de usuario en el formulario
+    private void cargarImagenGenerica() {
+        imagenSeleccionada = new File("imagenes/usr.png");
+
+        ImageIcon icono = new ImageIcon(imagenSeleccionada.getAbsolutePath());
+
+        Image imagen = icono.getImage();
+
+        Image imagenEscalada = imagen.getScaledInstance(
+            lblImagen.getWidth(),
+            lblImagen.getHeight(),
+            Image.SCALE_SMOOTH
+        );
+
+        lblImagen.setIcon(new ImageIcon(imagenEscalada));
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -65,7 +94,6 @@ public class AltaUsuario extends javax.swing.JPanel {
         lblImagen = new javax.swing.JLabel();
         btnAgregarImagen = new javax.swing.JButton();
         btnGuardarCambios = new javax.swing.JButton();
-        cbNickname = new javax.swing.JComboBox<>();
 
         txtApellido.addActionListener(this::txtApellidoActionPerformed);
 
@@ -89,21 +117,20 @@ public class AltaUsuario extends javax.swing.JPanel {
         lblFechaDeNacimiento.setText("Fecha de Nacimiento");
 
         btnAceptar.setText("Aceptar");
+        btnAceptar.addActionListener(this::btnAceptarActionPerformed);
 
         btnCancelar.setText("Cancelar");
         btnCancelar.addActionListener(this::btnCancelarActionPerformed);
 
         lblImagen.setBackground(new java.awt.Color(102, 204, 255));
         lblImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblImagen.setText("Imagen");
         lblImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
 
         btnAgregarImagen.setText("Agregar Imagen");
+        btnAgregarImagen.addActionListener(this::btnAgregarImagenActionPerformed);
 
         btnGuardarCambios.setText("Guardar Cambios");
         btnGuardarCambios.addActionListener(this::btnGuardarCambiosActionPerformed);
-
-        cbNickname.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -112,38 +139,6 @@ public class AltaUsuario extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblNickname, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblNombre, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(10, 10, 10))
-                            .addComponent(lblApellido))
-                        .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cbNickname, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(1, 1, 1)
-                                .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtNickname)
-                                    .addComponent(txtNombre))
-                                .addGap(4, 4, 4)))
-                        .addGap(38, 38, 38)
-                        .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblEmail)
-                                .addGap(32, 32, 32)
-                                .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblFechaDeNacimiento)
-                                .addGap(6, 6, 6)
-                                .addComponent(dchFechaDeNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(40, 40, 40)
-                        .addComponent(btnAgregarImagen))
                     .addComponent(chbDocente)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblInstituto)
@@ -154,7 +149,41 @@ public class AltaUsuario extends javax.swing.JPanel {
                         .addGap(18, 18, 18)
                         .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(btnGuardarCambios, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnGuardarCambios, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblEmail)
+                                        .addGap(32, 32, 32)
+                                        .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblFechaDeNacimiento)
+                                        .addGap(6, 6, 6)
+                                        .addComponent(dchFechaDeNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(40, 40, 40))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblNickname, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblNombre, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGap(10, 10, 10))
+                                    .addComponent(lblApellido))
+                                .addGap(6, 6, 6)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtNickname)
+                                            .addComponent(txtNombre))
+                                        .addGap(35, 35, 35))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(1, 1, 1)
+                                        .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(31, 31, 31)))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnAgregarImagen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addGap(14, 14, 14))
         );
         layout.setVerticalGroup(
@@ -162,9 +191,6 @@ public class AltaUsuario extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -175,14 +201,15 @@ public class AltaUsuario extends javax.swing.JPanel {
                                 .addGap(24, 24, 24)
                                 .addComponent(lblApellido, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtNickname)
-                                    .addComponent(cbNickname))
+                                .addComponent(txtNickname)
                                 .addGap(11, 11, 11)
                                 .addComponent(txtNombre)
                                 .addGap(18, 18, 18)
                                 .addComponent(txtApellido)))
-                        .addGap(19, 19, 19)))
+                        .addGap(19, 19, 19))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -260,6 +287,134 @@ public class AltaUsuario extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnGuardarCambiosActionPerformed
 
+    private void limpiarCampos() {
+        txtNickname.setText("");
+        txtEmail.setText("");
+        txtNombre.setText("");
+        txtApellido.setText("");
+
+        dchFechaDeNacimiento.setDate(null);
+
+        chbDocente.setSelected(false);
+
+        cbInstitutos.setSelectedIndex(0);
+
+        cargarImagenGenerica();
+    }
+    private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
+        
+        IControlador ic = Fabrica.getInstance().getIControlador();
+        String nickname = txtNickname.getText().trim();
+        String email = txtEmail.getText().trim();
+        String nombre = txtNombre.getText().trim();
+        String apellido = txtApellido.getText().trim();
+
+        Date fNacimiento = dchFechaDeNacimiento.getDate();
+
+        // Validar campos de texto
+        if (nickname.isEmpty() || email.isEmpty()
+                || nombre.isEmpty() || apellido.isEmpty()) {
+
+            JOptionPane.showMessageDialog(this,"Debe completar todos los campos obligatorios.","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Validar fecha
+        if (fNacimiento == null) {
+            JOptionPane.showMessageDialog(this,"Debe seleccionar una fecha de nacimiento.", "Error",JOptionPane.ERROR_MESSAGE );
+            return;
+        }
+
+        String instituto = null;
+        TipoUsuario tipo;
+
+        if (chbDocente.isSelected()) {
+            tipo = TipoUsuario.DOCENTE;
+            instituto = cbInstitutos.getSelectedItem().toString();
+        } else {
+            tipo = TipoUsuario.ESTUDIANTE;
+        }
+        
+        try {
+            if (ic.existeUsuario(nickname)) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ya existe un usuario con el nickname '" + nickname + "'.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+            if (ic.existeEmail(email)) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ya existe un usuario con el email '" + email + "'.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,ex.getMessage(),"ERROR",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+
+            String imagen = GestorImagenes.guardarImagen(
+                imagenSeleccionada,
+                nickname
+            );
+
+            DtUsuario dtUsuario = new DtUsuario(
+                nickname,
+                email,
+                nombre,
+                apellido,
+                imagen,
+                fNacimiento,
+                instituto,
+                tipo
+            );
+
+            ic.crearUsuario(dtUsuario);
+            limpiarCampos();
+            JOptionPane.showMessageDialog(this,"Usuario creado correctamente.","Alta de usuario",JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(this,ex.getMessage(),"ERROR",JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }//GEN-LAST:event_btnAceptarActionPerformed
+    //seleccionar imagen desde archivo
+    private void btnAgregarImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarImagenActionPerformed
+        JFileChooser selector = new JFileChooser();
+        
+    
+        FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imágenes (PNG, JPG)","png", "jpg");
+        selector.setFileFilter(filtro);
+        
+        int resultado = selector.showOpenDialog(this);
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+
+            imagenSeleccionada = selector.getSelectedFile();
+
+            ImageIcon icono = new ImageIcon(imagenSeleccionada.getAbsolutePath());
+
+            Image imagen = icono.getImage();
+
+            Image imagenEscalada = imagen.getScaledInstance(
+                lblImagen.getWidth(),
+                lblImagen.getHeight(),
+                Image.SCALE_SMOOTH
+            );
+
+            lblImagen.setIcon(new ImageIcon(imagenEscalada));
+        }        
+    }//GEN-LAST:event_btnAgregarImagenActionPerformed
+
        
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -268,7 +423,6 @@ public class AltaUsuario extends javax.swing.JPanel {
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnGuardarCambios;
     private javax.swing.JComboBox<String> cbInstitutos;
-    private javax.swing.JComboBox<String> cbNickname;
     private javax.swing.JCheckBox chbDocente;
     private com.toedter.calendar.JDateChooser dchFechaDeNacimiento;
     private javax.swing.JLabel lblApellido;

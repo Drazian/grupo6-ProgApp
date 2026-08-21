@@ -1,0 +1,71 @@
+
+package com.edext.datatypes;
+
+import java.util.Date;
+
+/**
+ *
+ * @author Diego
+ */
+public class DtUsuario {
+    
+   
+    private String nickname;
+    private String email;
+    private String nombre;
+    private String apellido;
+    private String imagen;
+    private Date fNacimiento;
+    private String instituto;
+    private TipoUsuario tipoUsuario;
+
+    public DtUsuario(String nickname, String email, String nombre, String apellido, String imagen, Date fNacimiento, String instituto, TipoUsuario tipoUsuario) {
+        this.nickname = nickname;
+        this.email = email;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.imagen = imagen;
+        this.fNacimiento = fNacimiento;
+        this.instituto = instituto;
+        this.tipoUsuario = tipoUsuario;
+    }
+    
+    
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public Date getfNacimiento() {
+        return fNacimiento;
+    }
+
+    public String getInstituto() {
+        return instituto;
+    }
+
+    public TipoUsuario getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+ 
+    
+    
+    
+}
