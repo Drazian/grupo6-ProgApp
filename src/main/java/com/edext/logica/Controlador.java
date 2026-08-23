@@ -10,11 +10,44 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import javax.swing.JOptionPane;
 
 public class Controlador implements IControlador {
     private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("edext");
     
+    @Override
+    public void modificarUsuario(DtUsuario usuario)throws Exception{
+        EntityManager em = emf.createEntityManager();
+        
+        try{
+            em.getTransaction().begin();
+            
+            Usuario usuarioModificado = em.find(Usuario.class, usuario.getNickname());
+            usuarioModificado.setApellido(usuario.getApellido());
+            usuarioModificado.setNombre(usuario.getNombre());
+            usuarioModificado.setfNacimiento(usuario.getfNacimiento());
+            usuarioModificado.setImagen(usuario.getImagen());
+            
+            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
+                Instituto instituto = em.find(Instituto.class,usuario.getInstituto());
+                ((Docente) usuarioModificado).setInstituto(instituto);
+            
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+
+            throw e;   
+        }finally{
+            em.close();
+        }
+    }
     @Override
     public void crearUsuario(DtUsuario usuario) throws Exception{
         EntityManager em = emf.createEntityManager();
@@ -115,6 +148,31 @@ public class Controlador implements IControlador {
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
     
+    @Override
+    public List<DtUsuario> listarUsuarios(){
+        EntityManager em = emf.createEntityManager();
+        
+        try{
+           List <DtUsuario> resultado = new ArrayList<>();
+           List<Usuario> listAux = em.createQuery("SELECT u FROM Usuario u", Usuario.class).getResultList();
+           
+           for(Usuario aux: listAux){
+               
+               if (aux instanceof Docente){
+                  resultado.add(new DtUsuario(aux.getNickname(), aux.getEmail(), aux.getNombre(), 
+                          aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), ((Docente) aux).getInstituto().getNombre()                     , TipoUsuario.DOCENTE));
+                  
+               }else{
+                   resultado.add(new DtUsuario(aux.getNickname(), aux.getEmail(), aux.getNombre(), 
+                          aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), null, TipoUsuario.ESTUDIANTE));
+               }
+               
+           }
+            return resultado;
+        }finally {
+            em.close();
+        }
+    }
     @Override
     public List<DtInstituto> listarInstitutos() throws Exception{
         EntityManager em = emf.createEntityManager();

@@ -39,21 +39,22 @@ public class AltaUsuario extends javax.swing.JPanel {
         cbInstitutos.setVisible(false);
         btnGuardarCambios.setVisible(false);
         cargarInstitutos();
-        SwingUtilities.invokeLater(() -> {cargarImagenGenerica();}); 
+        SwingUtilities.invokeLater(() -> {cargarImagen("usr.png");}); 
     }
-    public AltaUsuario(int modoModificar) {
+    public AltaUsuario(int modificar) {
         initComponents();
         lblInstituto.setVisible(false);
         cbInstitutos.setVisible(false);
-        txtNickname.setVisible(false);
+        txtNickname.setEnabled(false);
         btnAceptar.setVisible(false);
         txtEmail.setEnabled(false);
-
-
+        chbDocente.setVisible(false);
+        cargarInstitutos();
     }
     //carga una imagen generica de usuario en el formulario
-    private void cargarImagenGenerica() {
-        imagenSeleccionada = new File("imagenes/usr.png");
+    private void cargarImagen(String s) {
+        
+        File imagenSeleccionada = new File("imagenes",s);
 
         ImageIcon icono = new ImageIcon(imagenSeleccionada.getAbsolutePath());
 
@@ -284,7 +285,70 @@ public class AltaUsuario extends javax.swing.JPanel {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnGuardarCambiosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarCambiosActionPerformed
-        // TODO add your handling code here:
+        String nickname = txtNickname.getText().trim();
+        String email = txtEmail.getText().trim();
+        String nombre = txtNombre.getText().trim();
+        String apellido = txtApellido.getText().trim();
+
+        Date fNacimiento = dchFechaDeNacimiento.getDate();
+
+        if ((fNacimiento == null)  || nombre.isEmpty() || apellido.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Debe completar todos los campos.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        String instituto = null;
+        TipoUsuario tipo;
+
+        if (chbDocente.isSelected()) {
+            tipo = TipoUsuario.DOCENTE;
+            instituto = cbInstitutos.getSelectedItem().toString();
+        } else {
+            tipo = TipoUsuario.ESTUDIANTE;
+        }
+
+        try {
+
+            String imagen = GestorImagenes.guardarImagen(imagenSeleccionada,nickname);
+
+    
+
+            DtUsuario usuarioModificado = new DtUsuario(
+                nickname,
+                email,
+                nombre,
+                apellido,
+                imagen,
+                fNacimiento,
+                instituto,
+                tipo
+            );
+
+            IControlador ic = Fabrica.getInstance().getIControlador();
+
+            ic.modificarUsuario(usuarioModificado);
+
+            JOptionPane.showMessageDialog(
+                this,
+                "Usuario modificado correctamente.",
+                "Modificar usuario",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                ex.getMessage(),
+                "ERROR",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }//GEN-LAST:event_btnGuardarCambiosActionPerformed
 
     private void limpiarCampos() {
@@ -299,7 +363,34 @@ public class AltaUsuario extends javax.swing.JPanel {
 
         cbInstitutos.setSelectedIndex(0);
 
-        cargarImagenGenerica();
+        cargarImagen("usr.png");
+    }
+    
+    public void cargarFormulario (DtUsuario usuario){
+        this.txtNickname.setText(usuario.getNickname());
+        this.txtEmail.setText(usuario.getEmail());
+        this.txtNombre.setText(usuario.getNombre());
+        this.txtApellido.setText(usuario.getApellido());
+        this.dchFechaDeNacimiento.setDate(usuario.getfNacimiento());
+        
+        if(usuario.getTipoUsuario() == TipoUsuario.DOCENTE){
+            chbDocente.setVisible(true);
+            chbDocente.setSelected(true);
+            chbDocente.setEnabled(false);
+            lblInstituto.setVisible(true);
+            cbInstitutos.setVisible(true);
+            cbInstitutos.setSelectedItem(usuario.getInstituto());
+            
+        }else {
+
+            chbDocente.setSelected(false);
+            chbDocente.setVisible(false);
+            lblInstituto.setVisible(false);
+            cbInstitutos.setVisible(false);
+        }   
+        cargarImagen(usuario.getImagen());
+        
+        imagenSeleccionada = new File("imagenes", usuario.getImagen());
     }
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
         
