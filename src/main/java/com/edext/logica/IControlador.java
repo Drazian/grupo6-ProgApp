@@ -11,5 +11,8 @@ public interface IControlador {
     void crearUsuario(DtUsuario usuario) throws Exception;
     boolean existeUsuario(String nickname) throws Exception;
     boolean existeEmail(String email) throws Exception;
+    List<DtUsuario> listarUsuarios()throws Exception;
+
+    public void modificarUsuario(DtUsuario usuarioModificado)throws Exception;
     
 }

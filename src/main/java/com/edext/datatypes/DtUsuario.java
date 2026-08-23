@@ -64,7 +64,12 @@ public class DtUsuario {
         return tipoUsuario;
     }
 
- 
+    
+
+    @Override
+    public String toString() {
+       return nickname;
+    }
     
     
     

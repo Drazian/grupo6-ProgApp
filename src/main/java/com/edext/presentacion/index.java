@@ -9,7 +9,7 @@ public class index extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(index.class.getName());
     private javax.swing.JInternalFrame ventanaAltaUsuario;
     private javax.swing.JInternalFrame ventanaConsultaUsuario;
-    private javax.swing.JInternalFrame ventanaAltaUsuarioModificar;
+    private javax.swing.JInternalFrame ventanaModificarUsuario;
     
     /**
      * Creates new form index
@@ -220,39 +220,37 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_miConsultaUsuarioActionPerformed
 
     private void miModificarUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miModificarUsuarioActionPerformed
-             // Si la ventana ya existe y sigue abierta
-        if (ventanaAltaUsuarioModificar != null && ventanaAltaUsuarioModificar.isDisplayable()) {
+            // Si la ventana ya existe y sigue abierta
+        if (ventanaModificarUsuario != null && ventanaModificarUsuario.isDisplayable()) {
             try {
-                ventanaAltaUsuarioModificar.setSelected(true);
+                ventanaModificarUsuario.setSelected(true);
             } catch (java.beans.PropertyVetoException e) {
-                
             }
-            //trae la ventana al frente
-            ventanaAltaUsuarioModificar.toFront();
+
+            ventanaModificarUsuario.toFront();
             return;
         }
 
         // Crear la ventana solamente si no existe
-        ventanaAltaUsuarioModificar = new javax.swing.JInternalFrame(
+        ventanaModificarUsuario = new javax.swing.JInternalFrame(
                 "Modificar Usuario", true, true, false, false);
 
-        ventanaAltaUsuarioModificar.getContentPane().add(new AltaUsuario(1));
-        ventanaAltaUsuarioModificar.pack();
+        ventanaModificarUsuario.getContentPane().add(new ModificarUsuario());
+        ventanaModificarUsuario.pack();
 
-        dpIndex.add(ventanaAltaUsuarioModificar);
-        ventanaAltaUsuarioModificar.setVisible(true);
+        dpIndex.add(ventanaModificarUsuario);
+        ventanaModificarUsuario.setVisible(true);
 
-        // Cuando se cierre, se libera la referencia
-        ventanaAltaUsuarioModificar.addInternalFrameListener(
+        // Cuando se cierre, liberar la referencia
+        ventanaModificarUsuario.addInternalFrameListener(
                 new javax.swing.event.InternalFrameAdapter() {
                     @Override
                     public void internalFrameClosed(
                             javax.swing.event.InternalFrameEvent e) {
-                        ventanaAltaUsuarioModificar = null;
+                        ventanaModificarUsuario = null;
                     }
                 }
         );
-
     }//GEN-LAST:event_miModificarUsuarioActionPerformed
 
     private void miAgregarProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAgregarProgramaActionPerformed
