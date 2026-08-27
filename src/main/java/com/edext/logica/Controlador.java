@@ -32,8 +32,14 @@ public class Controlador implements IControlador {
             usuarioModificado.setImagen(usuario.getImagen());
             
             if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
-                Instituto instituto = em.find(Instituto.class,usuario.getInstituto());
-                ((Docente) usuarioModificado).setInstituto(instituto);
+                List<Instituto> institutos = new ArrayList<>();
+                
+                for(String aux: usuario.getInstitutos()){
+                    Instituto instituto = em.find(Instituto.class,aux);
+                    institutos.add(instituto);
+                }
+                        
+                ((Docente) usuarioModificado).setInstitutos(institutos);
             
             }
             em.getTransaction().commit();
@@ -73,10 +79,19 @@ public class Controlador implements IControlador {
             }
             
             Usuario nuevoUsuario;
-
+            
             if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
-                Instituto instituto = em.find(Instituto.class,usuario.getInstituto());
-                
+                List<Instituto> institutos = new ArrayList<>();
+
+                for (String nombre : usuario.getInstitutos()) {
+                    Instituto instituto = em.find(Instituto.class, nombre);
+                    
+                    if (instituto == null) {
+                        throw new Exception("No existe el instituto '" + nombre + "'.");
+                    }
+                    
+                    institutos.add(instituto);
+                }
                 nuevoUsuario = new Docente(
                     usuario.getNickname(),
                     usuario.getEmail(),
@@ -84,7 +99,7 @@ public class Controlador implements IControlador {
                     usuario.getApellido(),
                     usuario.getfNacimiento(),
                     usuario.getImagen(),
-                    instituto
+                    institutos
                 );
             } else {
                 nuevoUsuario = new Estudiante(
@@ -159,8 +174,14 @@ public class Controlador implements IControlador {
            for(Usuario aux: listAux){
                
                if (aux instanceof Docente){
+                  List<String> institutos =  new ArrayList<>();
+                  
+                  for (Instituto instituto : ((Docente) aux).getInstitutos()) {
+                      institutos.add(instituto.getNombre());
+                  }
                   resultado.add(new DtUsuario(aux.getNickname(), aux.getEmail(), aux.getNombre(), 
-                          aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), ((Docente) aux).getInstituto().getNombre()                     , TipoUsuario.DOCENTE));
+                          aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), 
+                          institutos , TipoUsuario.DOCENTE));
                   
                }else{
                    resultado.add(new DtUsuario(aux.getNickname(), aux.getEmail(), aux.getNombre(), 
@@ -173,6 +194,7 @@ public class Controlador implements IControlador {
             em.close();
         }
     }
+    
     @Override
     public List<DtInstituto> listarInstitutos() throws Exception{
         EntityManager em = emf.createEntityManager();

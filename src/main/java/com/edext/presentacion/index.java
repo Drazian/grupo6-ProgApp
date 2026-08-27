@@ -164,10 +164,13 @@ public class index extends javax.swing.JFrame {
         // Crear la ventana solamente si no existe
         ventanaAltaUsuario = new javax.swing.JInternalFrame(
                 "Nuevo Usuario", true, true, false, false);
+        
+        AltaUsuario formulario = new AltaUsuario();
 
-        ventanaAltaUsuario.getContentPane().add(new AltaUsuario());
+        ventanaAltaUsuario.getContentPane().add(formulario);
+        
         ventanaAltaUsuario.pack();
-
+        
         dpIndex.add(ventanaAltaUsuario);
         ventanaAltaUsuario.setVisible(true);
 

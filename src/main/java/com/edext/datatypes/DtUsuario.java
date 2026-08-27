@@ -2,6 +2,7 @@
 package com.edext.datatypes;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -16,17 +17,17 @@ public class DtUsuario {
     private String apellido;
     private String imagen;
     private Date fNacimiento;
-    private String instituto;
+    private List<String> institutos;
     private TipoUsuario tipoUsuario;
 
-    public DtUsuario(String nickname, String email, String nombre, String apellido, String imagen, Date fNacimiento, String instituto, TipoUsuario tipoUsuario) {
+    public DtUsuario(String nickname, String email, String nombre, String apellido, String imagen, Date fNacimiento, List<String> institutos, TipoUsuario tipoUsuario) {
         this.nickname = nickname;
         this.email = email;
         this.nombre = nombre;
         this.apellido = apellido;
         this.imagen = imagen;
         this.fNacimiento = fNacimiento;
-        this.instituto = instituto;
+        this.institutos = institutos;
         this.tipoUsuario = tipoUsuario;
     }
     
@@ -56,8 +57,8 @@ public class DtUsuario {
         return fNacimiento;
     }
 
-    public String getInstituto() {
-        return instituto;
+    public List<String> getInstitutos() {
+        return institutos;
     }
 
     public TipoUsuario getTipoUsuario() {

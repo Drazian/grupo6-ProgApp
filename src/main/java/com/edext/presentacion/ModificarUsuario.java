@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -27,11 +28,12 @@ public class ModificarUsuario extends javax.swing.JPanel {
     
     public ModificarUsuario() {
         initComponents();
-        
-        formularioUsuario = new AltaUsuario(1);
 
         panModificar.setLayout(new BorderLayout());
+
+        formularioUsuario = new AltaUsuario(1);
         panModificar.add(formularioUsuario, BorderLayout.CENTER);
+
         listarUsuarios();
         
     }
@@ -84,7 +86,7 @@ public class ModificarUsuario extends javax.swing.JPanel {
         panModificar.setLayout(panModificarLayout);
         panModificarLayout.setHorizontalGroup(
             panModificarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 482, Short.MAX_VALUE)
+            .addGap(0, 427, Short.MAX_VALUE)
         );
         panModificarLayout.setVerticalGroup(
             panModificarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -98,7 +100,8 @@ public class ModificarUsuario extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panModificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(panModificar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -109,16 +112,30 @@ public class ModificarUsuario extends javax.swing.JPanel {
 
     private void lisUsuarioValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lisUsuarioValueChanged
         
-        if (!evt.getValueIsAdjusting()) {
+        if (evt.getValueIsAdjusting()) {
+            return;
+        }
 
-            int indice = lisUsuario.getSelectedIndex();
+        int indice = lisUsuario.getSelectedIndex();
 
-            if (indice != -1) {
-                DtUsuario usuario = usuarios.get(indice);
+        if (indice == -1) {
+            return;
+        }
 
-                formularioUsuario.cargarFormulario(usuario);
-            }
-        }        
+        DtUsuario usuario = usuarios.get(indice);
+
+        panModificar.removeAll();
+
+        formularioUsuario = new AltaUsuario(1);
+
+        panModificar.add(formularioUsuario, BorderLayout.CENTER);
+
+        panModificar.revalidate();
+        panModificar.repaint();
+
+        SwingUtilities.invokeLater(() -> {
+            formularioUsuario.cargarFormulario(usuario);
+        });       
     }//GEN-LAST:event_lisUsuarioValueChanged
 
 

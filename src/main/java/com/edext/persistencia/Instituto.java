@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 public class Instituto {
     @Id
     private String nombre;
+    
 
     public Instituto(){}
     public Instituto(String nombre){
