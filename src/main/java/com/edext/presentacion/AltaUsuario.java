@@ -12,10 +12,13 @@ import com.edext.logica.GestorImagenes;
 import com.edext.logica.IControlador;
 import java.awt.Image;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;//para que no de error al cargar el formulario la imagen generica por el ancho
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -35,21 +38,54 @@ public class AltaUsuario extends javax.swing.JPanel {
     
     public AltaUsuario() {
         initComponents();
+        imagenSeleccionada = new File ("imagenes/usr.png");
         lblInstituto.setVisible(false);
         cbInstitutos.setVisible(false);
+        btnAgregarInstituto.setVisible(false);
+        btnQuitarInstituto.setVisible(false);
+        lisInstitutos.setVisible(false);
         btnGuardarCambios.setVisible(false);
+        scpInstituos.setVisible(false);
         cargarInstitutos();
+        
+        DefaultListModel<String> model = new DefaultListModel<>();
+        lisInstitutos.setModel(model);
         SwingUtilities.invokeLater(() -> {cargarImagen("usr.png");}); 
     }
-    public AltaUsuario(int modificar) {
+    // Constructor i = 1 ModificarUsuario , i = 2 ConsultaUsuario
+    public AltaUsuario(int i) {
         initComponents();
+        
         lblInstituto.setVisible(false);
         cbInstitutos.setVisible(false);
         txtNickname.setEnabled(false);
         btnAceptar.setVisible(false);
         txtEmail.setEnabled(false);
         chbDocente.setVisible(false);
+        lisInstitutos.setVisible(false);
+        btnAgregarInstituto.setVisible(false);
+        btnQuitarInstituto.setVisible(false);
+        scpInstituos.setEnabled(false);
+        cbInstitutos.setEnabled(false);
+        btnAgregarInstituto.setVisible(false);
+        btnQuitarInstituto.setVisible(false);
+        lisInstitutos.setEnabled(false);
+        
+        DefaultListModel<String> model = new DefaultListModel<>();
+        lisInstitutos.setModel(model);
+        
         cargarInstitutos();
+        if (i ==2){  
+            //Falta Obtener Cursos y cargar en las Tablas correspondientes
+            txtApellido.setEnabled(false);
+            txtNombre.setEnabled(false);
+            dchFechaDeNacimiento.setEnabled(false);
+            btnGuardarCambios.setVisible(false);
+            btnAgregarImagen.setVisible(false);
+            btnCancelar.setText("Volver");
+
+        }
+        
     }
     //carga una imagen generica de usuario en el formulario
     private void cargarImagen(String s) {
@@ -67,6 +103,8 @@ public class AltaUsuario extends javax.swing.JPanel {
         );
 
         lblImagen.setIcon(new ImageIcon(imagenEscalada));
+        
+        
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -95,6 +133,10 @@ public class AltaUsuario extends javax.swing.JPanel {
         lblImagen = new javax.swing.JLabel();
         btnAgregarImagen = new javax.swing.JButton();
         btnGuardarCambios = new javax.swing.JButton();
+        scpInstituos = new javax.swing.JScrollPane();
+        lisInstitutos = new javax.swing.JList<>();
+        btnAgregarInstituto = new javax.swing.JButton();
+        btnQuitarInstituto = new javax.swing.JButton();
 
         txtApellido.addActionListener(this::txtApellidoActionPerformed);
 
@@ -133,6 +175,16 @@ public class AltaUsuario extends javax.swing.JPanel {
         btnGuardarCambios.setText("Guardar Cambios");
         btnGuardarCambios.addActionListener(this::btnGuardarCambiosActionPerformed);
 
+        scpInstituos.setViewportView(lisInstitutos);
+
+        btnAgregarInstituto.setText("=>");
+        btnAgregarInstituto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAgregarInstituto.addActionListener(this::btnAgregarInstitutoActionPerformed);
+
+        btnQuitarInstituto.setText("X");
+        btnQuitarInstituto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnQuitarInstituto.addActionListener(this::btnQuitarInstitutoActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -140,17 +192,6 @@ public class AltaUsuario extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chbDocente)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblInstituto)
-                        .addGap(18, 18, 18)
-                        .addComponent(cbInstitutos, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnAceptar, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnGuardarCambios, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -182,10 +223,31 @@ public class AltaUsuario extends javax.swing.JPanel {
                                         .addGap(1, 1, 1)
                                         .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(31, 31, 31)))))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnAgregarImagen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addGap(14, 14, 14))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnAgregarImagen)
+                            .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnAceptar, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnGuardarCambios))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(chbDocente)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblInstituto)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(cbInstitutos, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(btnAgregarInstituto, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addComponent(scpInstituos, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnQuitarInstituto, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addGap(21, 21, 21))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,8 +271,8 @@ public class AltaUsuario extends javax.swing.JPanel {
                                 .addComponent(txtApellido)))
                         .addGap(19, 19, 19))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -221,24 +283,34 @@ public class AltaUsuario extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFechaDeNacimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGap(6, 6, 6))
-                            .addComponent(dchFechaDeNacimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(dchFechaDeNacimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chbDocente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(22, 22, 22)
-                        .addComponent(btnAgregarImagen)))
-                .addGap(12, 12, 12)
-                .addComponent(chbDocente)
-                .addGap(12, 12, 12)
+                        .addComponent(btnAgregarImagen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(48, 48, 48)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(lblInstituto))
-                    .addComponent(cbInstitutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(lblInstituto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(cbInstitutos))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnAgregarInstituto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(scpInstituos, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnQuitarInstituto, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnAceptar)
-                    .addComponent(btnCancelar)
-                    .addComponent(btnGuardarCambios))
-                .addGap(53, 53, 53))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAceptar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnGuardarCambios, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(86, 86, 86))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -268,13 +340,8 @@ public class AltaUsuario extends javax.swing.JPanel {
     }//GEN-LAST:event_txtApellidoActionPerformed
     //Mostrar Institutos solo si el nuevo usuario es docente
     private void chbDocenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chbDocenteActionPerformed
-        if(chbDocente.isSelected()){
-            lblInstituto.setVisible(true);
-            cbInstitutos.setVisible(true);
-        }else{
-            lblInstituto.setVisible(false);
-            cbInstitutos.setVisible(false); 
-        }
+      
+        mostrarInstitutos(chbDocente.isSelected());
 
     }//GEN-LAST:event_chbDocenteActionPerformed
 
@@ -302,12 +369,29 @@ public class AltaUsuario extends javax.swing.JPanel {
             return;
         }
 
-        String instituto = null;
+        List<String> institutos = new ArrayList<>();
+        
         TipoUsuario tipo;
-
+        
+        DefaultListModel<String> model = (DefaultListModel<String>) lisInstitutos.getModel();
+        
         if (chbDocente.isSelected()) {
             tipo = TipoUsuario.DOCENTE;
-            instituto = cbInstitutos.getSelectedItem().toString();
+            
+            if (model.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El docente debe tener al menos un instituto.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+            
+            for (int i = 0; i < model.getSize(); i++) {
+                institutos.add(model.getElementAt(i));
+            }
+            
         } else {
             tipo = TipoUsuario.ESTUDIANTE;
         }
@@ -325,7 +409,7 @@ public class AltaUsuario extends javax.swing.JPanel {
                 apellido,
                 imagen,
                 fNacimiento,
-                instituto,
+                institutos,
                 tipo
             );
 
@@ -351,7 +435,7 @@ public class AltaUsuario extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnGuardarCambiosActionPerformed
 
-    private void limpiarCampos() {
+    public void limpiarCampos() {
         txtNickname.setText("");
         txtEmail.setText("");
         txtNombre.setText("");
@@ -362,35 +446,76 @@ public class AltaUsuario extends javax.swing.JPanel {
         chbDocente.setSelected(false);
 
         cbInstitutos.setSelectedIndex(0);
+        
+        lisInstitutos.setVisible(false);
+        btnAgregarInstituto.setVisible(false);
+        btnQuitarInstituto.setVisible(false);
+        scpInstituos.setVisible(false);
+        lblInstituto.setVisible(false);
+        cbInstitutos.setVisible(false);
+        
+        
+        ((DefaultListModel<String>) lisInstitutos.getModel()).clear();
 
         cargarImagen("usr.png");
     }
     
+    private void mostrarInstitutos(boolean mostrar) {
+        lblInstituto.setVisible(mostrar);
+        cbInstitutos.setVisible(mostrar);
+        btnAgregarInstituto.setVisible(mostrar);
+        btnQuitarInstituto.setVisible(mostrar);
+        lisInstitutos.setVisible(mostrar);
+        scpInstituos.setVisible(mostrar);
+
+        revalidate();
+        repaint();
+
+    }
     public void cargarFormulario (DtUsuario usuario){
-        this.txtNickname.setText(usuario.getNickname());
-        this.txtEmail.setText(usuario.getEmail());
-        this.txtNombre.setText(usuario.getNombre());
-        this.txtApellido.setText(usuario.getApellido());
-        this.dchFechaDeNacimiento.setDate(usuario.getfNacimiento());
-        
-        if(usuario.getTipoUsuario() == TipoUsuario.DOCENTE){
+        txtNickname.setText(usuario.getNickname());
+        txtEmail.setText(usuario.getEmail());
+        txtNombre.setText(usuario.getNombre());
+        txtApellido.setText(usuario.getApellido());
+        dchFechaDeNacimiento.setDate(usuario.getfNacimiento());
+
+        chbDocente.setEnabled(false);
+
+        DefaultListModel<String> model =
+                (DefaultListModel<String>) lisInstitutos.getModel();
+
+        if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
+
             chbDocente.setVisible(true);
             chbDocente.setSelected(true);
-            chbDocente.setEnabled(false);
+
             lblInstituto.setVisible(true);
             cbInstitutos.setVisible(true);
-            cbInstitutos.setSelectedItem(usuario.getInstituto());
-            
-        }else {
+            lisInstitutos.setVisible(true);
+            scpInstituos.setVisible(true);
+            btnAgregarInstituto.setVisible(true);
+            btnQuitarInstituto.setVisible(true);
 
-            chbDocente.setSelected(false);
+            for (String instituto : usuario.getInstitutos()) {
+                model.addElement(instituto);
+            }
+
+        } else {
+
             chbDocente.setVisible(false);
+
             lblInstituto.setVisible(false);
             cbInstitutos.setVisible(false);
-        }   
+            lisInstitutos.setVisible(false);
+            scpInstituos.setVisible(false);
+            btnAgregarInstituto.setVisible(false);
+            btnQuitarInstituto.setVisible(false);
+        }
+
         cargarImagen(usuario.getImagen());
-        
-        imagenSeleccionada = new File("imagenes", usuario.getImagen());
+
+        imagenSeleccionada =
+                new File("imagenes", usuario.getImagen()); 
     }
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
         
@@ -416,15 +541,32 @@ public class AltaUsuario extends javax.swing.JPanel {
             return;
         }
 
-        String instituto = null;
+        List<String> institutos = new ArrayList<>();
         TipoUsuario tipo;
 
         if (chbDocente.isSelected()) {
             tipo = TipoUsuario.DOCENTE;
-            instituto = cbInstitutos.getSelectedItem().toString();
+            DefaultListModel<String> model = (DefaultListModel<String>) lisInstitutos.getModel();
+
+            for (int i = 0; i < model.getSize(); i++) {
+                institutos.add(model.getElementAt(i));
+            }
+            
+            if (institutos.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Debe seleccionar al menos un instituto.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
         } else {
             tipo = TipoUsuario.ESTUDIANTE;
         }
+        
+        
         
         try {
             if (ic.existeUsuario(nickname)) {
@@ -463,7 +605,7 @@ public class AltaUsuario extends javax.swing.JPanel {
                 apellido,
                 imagen,
                 fNacimiento,
-                instituto,
+                institutos,
                 tipo
             );
 
@@ -485,7 +627,8 @@ public class AltaUsuario extends javax.swing.JPanel {
     
         FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imágenes (PNG, JPG)","png", "jpg");
         selector.setFileFilter(filtro);
-        
+        int ancho = 124;
+        int alto = 116;
         int resultado = selector.showOpenDialog(this);
 
         if (resultado == JFileChooser.APPROVE_OPTION) {
@@ -503,16 +646,62 @@ public class AltaUsuario extends javax.swing.JPanel {
             );
 
             lblImagen.setIcon(new ImageIcon(imagenEscalada));
+            
+                // Mantener el tamaño del JLabel
+            lblImagen.setPreferredSize(
+                    new java.awt.Dimension(ancho, alto)
+            );
+            lblImagen.setMinimumSize(
+                    new java.awt.Dimension(ancho, alto)
+            );
+            lblImagen.setMaximumSize(
+                    new java.awt.Dimension(ancho, alto)
+            );
+
+            revalidate();
+            repaint();
         }        
     }//GEN-LAST:event_btnAgregarImagenActionPerformed
+
+    private void btnAgregarInstitutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarInstitutoActionPerformed
+        
+        Object seleccionado = cbInstitutos.getSelectedItem();
+
+        if (seleccionado == null) {
+            return;
+        }
+
+        String instituto = seleccionado.toString();
+        DefaultListModel<String> model = (DefaultListModel<String>) lisInstitutos.getModel();
+
+        // Evitar duplicados
+        if (!model.contains(instituto)) {
+            model.addElement(instituto);
+        }
+    }//GEN-LAST:event_btnAgregarInstitutoActionPerformed
+
+    
+    
+    private void btnQuitarInstitutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitarInstitutoActionPerformed
+        int indice = lisInstitutos.getSelectedIndex();
+
+        if (indice != -1) {
+            DefaultListModel<String> model =
+                (DefaultListModel<String>) lisInstitutos.getModel();
+
+            model.remove(indice);
+        }
+    }//GEN-LAST:event_btnQuitarInstitutoActionPerformed
 
        
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAceptar;
     private javax.swing.JButton btnAgregarImagen;
+    private javax.swing.JButton btnAgregarInstituto;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnGuardarCambios;
+    private javax.swing.JButton btnQuitarInstituto;
     private javax.swing.JComboBox<String> cbInstitutos;
     private javax.swing.JCheckBox chbDocente;
     private com.toedter.calendar.JDateChooser dchFechaDeNacimiento;
@@ -523,6 +712,8 @@ public class AltaUsuario extends javax.swing.JPanel {
     private javax.swing.JLabel lblInstituto;
     private javax.swing.JLabel lblNickname;
     private javax.swing.JLabel lblNombre;
+    private javax.swing.JList<String> lisInstitutos;
+    private javax.swing.JScrollPane scpInstituos;
     private javax.swing.JTextField txtApellido;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtNickname;
