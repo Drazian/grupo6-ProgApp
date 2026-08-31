@@ -1,4 +1,5 @@
 package com.edext.logica;
+import com.edext.datatypes.DTPrograma;
 import com.edext.datatypes.DtInstituto;
 import com.edext.datatypes.DtUsuario;
 
@@ -15,4 +16,5 @@ public interface IControlador {
 
     public void modificarUsuario(DtUsuario usuarioModificado)throws Exception;
     
+    boolean setCrearProgramaFormacion(DTPrograma programa) throws Exception;
 }
