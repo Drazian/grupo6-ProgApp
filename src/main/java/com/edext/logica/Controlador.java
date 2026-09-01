@@ -2,11 +2,15 @@ package com.edext.logica;
 import com.edext.datatypes.DTPrograma;
 import com.edext.datatypes.DtInstituto;
 import com.edext.datatypes.DtUsuario;
+import com.edext.datatypes.DtCurso;
+import com.edext.datatypes.DtEdicionCurso;
 import com.edext.datatypes.TipoUsuario;
 import com.edext.persistencia.Docente;
 import com.edext.persistencia.Estudiante;
 import com.edext.persistencia.Instituto;
 import com.edext.persistencia.Usuario;
+import com.edext.persistencia.Curso;
+import com.edext.persistencia.EdicionCurso;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -249,6 +253,176 @@ public class Controlador implements IControlador {
 
     
     @Override
+    public void altaCurso(DtCurso curso, String nombreInstituto) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        
+        try {
+            em.getTransaction().begin();
+
+            // 1. Validar que el curso no exista previamente
+            Curso existe = em.find(Curso.class, curso.getNombre());
+            if (existe != null) {
+                throw new Exception("Ya existe un curso registrado con el nombre '" + curso.getNombre() + "'.");
+            }
+
+            // 2. Obtener el Instituto seleccionado
+            Instituto instituto = em.find(Instituto.class, nombreInstituto);
+            if (instituto == null) {
+                throw new Exception("El instituto '" + nombreInstituto + "' no existe en la base de datos.");
+            }
+
+            // 3. Resolver los cursos previos
+            List<Curso> previas = new ArrayList<>();
+            if (curso.getPrevias() != null && !curso.getPrevias().isEmpty()) {
+                for (String nombrePrevia : curso.getPrevias()) {
+                    Curso previa = em.find(Curso.class, nombrePrevia);
+                    if (previa == null) {
+                        throw new Exception("No se encontró el curso previo '" + nombrePrevia + "'.");
+                    }
+                    previas.add(previa);
+                }
+            }
+
+            // 4. Crear la entidad y persistir
+            Curso nuevoCurso = new Curso(
+                curso.getNombre(),
+                curso.getDescripcion(),
+                curso.getDuracion(),
+                curso.getCantidadHoras(),
+                curso.getCreditos(),
+                curso.getUrl(),
+                curso.getFechaRegistro(),
+                instituto,
+                previas
+            );
+
+            em.persist(nuevoCurso);
+            em.getTransaction().commit();
+            
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<String> listarNombresCursos() throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            // Consulta rápida para cargar el JList de "Previas" en la interfaz
+            return em.createQuery("SELECT c.nombre FROM Curso c", String.class).getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    @Override
+    public List<String> listarCursosPorInstituto(String nombreInstituto) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT c.nombre FROM Curso c WHERE c.instituto.nombre = :inst", String.class)
+                     .setParameter("inst", nombreInstituto)
+                     .getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public com.edext.datatypes.DtConsultaCurso obtenerDatosCurso(String nombreCurso) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            Curso c = em.find(Curso.class, nombreCurso);
+            if (c == null) throw new Exception("El curso no existe.");
+
+            // Buscar las ediciones asociadas a este curso
+            List<String> ediciones = em.createQuery("SELECT e.nombre FROM EdicionCurso e WHERE e.curso.nombre = :curso", String.class)
+                                       .setParameter("curso", nombreCurso)
+                                       .getResultList();
+
+            // TODO: Cuando mapees la entidad ProgramaFormacion, haz la consulta real aquí.
+            List<String> programas = new java.util.ArrayList<>(); 
+
+            return new com.edext.datatypes.DtConsultaCurso(
+                c.getNombre(), c.getDescripcion(), c.getDuracion(),
+                c.getCantidadHoras(), c.getCreditos(), c.getUrl(), c.getFechaRegistro(),
+                ediciones, programas
+            );
+        } finally {
+            em.close();
+        }
+    }
+    
+    @Override
+    public List<String> listarDocentes() throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT d.nickname FROM Docente d", String.class).getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+@Override
+    public void altaEdicionCurso(String nombreCurso, com.edext.datatypes.DtEdicionCurso dt) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            // 1. Verificar unicidad del nombre de la edición
+            EdicionCurso existe = em.find(EdicionCurso.class, dt.getNombre());
+            if (existe != null) {
+                throw new Exception("Ya existe una Edición de Curso con el nombre: " + dt.getNombre());
+            }
+
+            // 2. Buscar el curso padre al que pertenece esta edición
+            Curso curso = em.find(Curso.class, nombreCurso);
+            if (curso == null) {
+                throw new Exception("El curso seleccionado no existe en la base de datos.");
+            }
+
+            // 3. Crear la nueva edición y pasarle los datos del Datatype
+            EdicionCurso nuevaEdicion = new EdicionCurso();
+            nuevaEdicion.setNombre(dt.getNombre());
+            nuevaEdicion.setFechaInicio(dt.getFechaInicio());
+            nuevaEdicion.setFechaFin(dt.getFechaFin());
+            
+            if (dt.getCupo() != null) {
+                nuevaEdicion.setCupo(dt.getCupo());
+            }
+            
+            // Guardamos la fecha y vinculamos el curso
+            nuevaEdicion.setFechaPublicacion(dt.getFechaPublicacion()); 
+            nuevaEdicion.setCurso(curso); 
+
+            // 4. Buscar los docentes en la base de datos y asignarlos
+            java.util.List<Docente> docentesAsignados = new java.util.ArrayList<>();
+            for (String nick : dt.getDocentes()) {
+                Docente d = em.find(Docente.class, nick);
+                if (d != null) {
+                    docentesAsignados.add(d);
+                }
+            }
+            
+            // Asignamos la lista de docentes a la entidad
+            nuevaEdicion.setDocentes(docentesAsignados);
+
+            // 5. Persistir en la base de datos
+            em.persist(nuevaEdicion);
+            em.getTransaction().commit();
+            
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
     public boolean setCrearProgramaFormacion(DTPrograma programa) throws Exception {
         boolean flag=false;
         CreaPograFormaHelper manage=new CreaPograFormaHelper(emf, programa);

@@ -6,13 +6,15 @@
     <class>com.edext.persistencia.Usuario</class>
     <class>com.edext.persistencia.Docente</class>
     <class>com.edext.persistencia.Estudiante</class>
+    <class>com.edext.persistencia.Curso</class>
+    <class>com.edext.persistencia.EdicionCurso</class>
     <properties>
       <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/edext"/>
       <property name="jakarta.persistence.jdbc.user" value="pipo"/>
       <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
       <property name="jakarta.persistence.jdbc.password" value="pipo"/>
       <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
-      <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+      <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
     </properties>
   </persistence-unit>
 </persistence>

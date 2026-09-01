@@ -77,7 +77,7 @@ public class index extends javax.swing.JFrame {
         miAltaUsuario.addActionListener(this::miAltaUsuarioActionPerformed);
         mUsuarios.add(miAltaUsuario);
 
-        miConsultaUsuario.setText("Constulta Usuario");
+        miConsultaUsuario.setText("Consulta Usuario");
         miConsultaUsuario.addActionListener(this::miConsultaUsuarioActionPerformed);
         mUsuarios.add(miConsultaUsuario);
 
