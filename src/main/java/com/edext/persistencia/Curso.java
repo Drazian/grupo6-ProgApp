@@ -1,14 +1,18 @@
 package com.edext.persistencia;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.ManyToMany;
 import java.util.Date;
 import java.util.List;
 
 @Entity
+@Table(name="Curso") // Aporte de Draco conservado
 public class Curso {
+    
     @Id
     private String nombre;
     private String descripcion;
@@ -16,6 +20,8 @@ public class Curso {
     private int cantidadHoras;
     private int creditos;
     private String url;
+    
+    @Column(nullable=false) // Aporte de Draco conservado
     private Date fechaRegistro;
 
     @ManyToOne

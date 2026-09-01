@@ -1,4 +1,5 @@
 package com.edext.logica;
+import com.edext.datatypes.DTPrograma;
 import com.edext.datatypes.DtInstituto;
 import com.edext.datatypes.DtUsuario;
 import com.edext.datatypes.DtCurso;
@@ -249,6 +250,7 @@ public class Controlador implements IControlador {
             em.close();
         }
     }
+
     
     @Override
     public void altaCurso(DtCurso curso, String nombreInstituto) throws Exception {
@@ -421,5 +423,19 @@ public class Controlador implements IControlador {
         } finally {
             em.close();
         }
+    public boolean setCrearProgramaFormacion(DTPrograma programa) throws Exception {
+        boolean flag=false;
+        CreaPograFormaHelper manage=new CreaPograFormaHelper(emf, programa);
+        try {
+            flag=manage.validate();
+            if(flag)
+                flag=manage.persist();
+        } catch (Exception e) {
+            flag=false;
+        }finally{
+            manage.kill();
+            manage=null;
+        }
+        return flag;
     }
 }

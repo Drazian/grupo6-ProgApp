@@ -1,4 +1,5 @@
 package com.edext.logica;
+import com.edext.datatypes.DTPrograma;
 import com.edext.datatypes.DtInstituto;
 import com.edext.datatypes.DtUsuario;
 import com.edext.datatypes.DtCurso;
@@ -25,4 +26,5 @@ public interface IControlador {
     
     List<String> listarDocentes() throws Exception;
     void altaEdicionCurso(String nombreCurso, com.edext.datatypes.DtEdicionCurso dt) throws Exception;
+    boolean setCrearProgramaFormacion(DTPrograma programa) throws Exception;
 }
