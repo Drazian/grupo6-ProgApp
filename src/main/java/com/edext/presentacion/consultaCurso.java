@@ -4,17 +4,57 @@
  */
 package com.edext.presentacion;
 
+import com.edext.datatypes.DtConsultaCurso;
+import com.edext.datatypes.DtInstituto;
+import com.edext.logica.Fabrica;
+import com.edext.logica.IControlador;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Guzman
  */
 public class consultaCurso extends javax.swing.JInternalFrame {
 
+    private IControlador control;
+
     /**
      * Creates new form consultaCurso
      */
     public consultaCurso() {
         initComponents();
+        
+        // Inicializar la conexión con la lógica y cargar datos
+        control = Fabrica.getInstance().getIControlador();
+        cargarInstitutos();
+    }
+    
+    private void cargarInstitutos() {
+        try {
+            institutoSeleccion.removeAllItems();
+            institutoSeleccion.addItem("Seleccione un Instituto...");
+            List<DtInstituto> institutos = control.listarInstitutos();
+            for (DtInstituto i : institutos) {
+                institutoSeleccion.addItem(i.getNombre());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar institutos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void limpiarCampos() {
+        textoNombre.setText("");
+        textoDescripcion.setText("");
+        textoDuracion.setText("");
+        textoHoras.setText("");
+        textoCreditos.setText("");
+        textoURL.setText("");
+        textoFechaAlta.setText("");
+        jList1.setModel(new DefaultListModel<>());
+        jList2.setModel(new DefaultListModel<>());
     }
 
     /**
@@ -38,7 +78,6 @@ public class consultaCurso extends javax.swing.JInternalFrame {
         urlLabel = new javax.swing.JLabel();
         fechaAltaLabel = new javax.swing.JLabel();
         textoNombre = new javax.swing.JTextField();
-        textoDescripcion = new javax.swing.JTextField();
         textoDuracion = new javax.swing.JTextField();
         textoHoras = new javax.swing.JTextField();
         textoCreditos = new javax.swing.JTextField();
@@ -53,49 +92,106 @@ public class consultaCurso extends javax.swing.JInternalFrame {
         jList2 = new javax.swing.JList<>();
         verDetalleButton = new javax.swing.JButton();
         cerrarButton = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        textoDescripcion = new javax.swing.JTextArea();
 
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
         setTitle("Consulta Curso");
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         institutoLabel.setText("Seleccionar Instituto:");
+        institutoLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        institutoLabel.setMinimumSize(null);
+        getContentPane().add(institutoLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
 
         institutoSeleccion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        institutoSeleccion.setMaximumSize(new java.awt.Dimension(200, 22));
+        institutoSeleccion.setMinimumSize(null);
+        institutoSeleccion.addActionListener(this::institutoSeleccionActionPerformed);
+        getContentPane().add(institutoSeleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 20, 150, -1));
 
         cursoLabel.setText("Seleccionar Curso:");
+        cursoLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        cursoLabel.setMinimumSize(null);
+        getContentPane().add(cursoLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 20, -1, -1));
 
         cursoSeleccion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cursoSeleccion.setMaximumSize(new java.awt.Dimension(200, 22));
+        cursoSeleccion.setMinimumSize(null);
+        cursoSeleccion.addActionListener(this::cursoSeleccionActionPerformed);
+        getContentPane().add(cursoSeleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 20, 170, -1));
 
         nombreLabel.setText("Nombre:");
+        nombreLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        nombreLabel.setMinimumSize(null);
+        getContentPane().add(nombreLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, -1));
 
         descripcionLabel.setText("Descripcion:");
+        descripcionLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        descripcionLabel.setMinimumSize(null);
+        getContentPane().add(descripcionLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, -1, -1));
 
         duracionLabel.setText("Duracion:");
+        duracionLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        duracionLabel.setMinimumSize(null);
+        getContentPane().add(duracionLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, -1, -1));
 
         horasLabel.setText("Horas:");
+        horasLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        horasLabel.setMinimumSize(null);
+        getContentPane().add(horasLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 60, -1, -1));
 
         creditosLabel.setText("Creditos:");
+        creditosLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        creditosLabel.setMinimumSize(null);
+        getContentPane().add(creditosLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 90, -1, -1));
 
         urlLabel.setText("URL:");
+        urlLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        urlLabel.setMinimumSize(null);
+        getContentPane().add(urlLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 120, -1, -1));
 
         fechaAltaLabel.setText("Fecha de Alta:");
+        fechaAltaLabel.setMaximumSize(new java.awt.Dimension(200, 22));
+        fechaAltaLabel.setMinimumSize(null);
+        getContentPane().add(fechaAltaLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 150, -1, -1));
 
         textoNombre.setEditable(false);
-
-        textoDescripcion.setEditable(false);
+        textoNombre.setMaximumSize(new java.awt.Dimension(200, 22));
+        textoNombre.setMinimumSize(null);
+        getContentPane().add(textoNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 210, -1));
 
         textoDuracion.setEditable(false);
+        textoDuracion.setMaximumSize(new java.awt.Dimension(200, 22));
+        textoDuracion.setMinimumSize(null);
+        getContentPane().add(textoDuracion, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 180, 90, -1));
 
         textoHoras.setEditable(false);
+        textoHoras.setMaximumSize(new java.awt.Dimension(200, 22));
+        textoHoras.setMinimumSize(null);
+        getContentPane().add(textoHoras, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 60, 160, -1));
 
         textoCreditos.setEditable(false);
+        textoCreditos.setMaximumSize(new java.awt.Dimension(200, 22));
+        textoCreditos.setMinimumSize(null);
+        getContentPane().add(textoCreditos, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 90, 160, -1));
 
         textoURL.setEditable(false);
+        textoURL.setMaximumSize(new java.awt.Dimension(200, 22));
+        textoURL.setMinimumSize(null);
+        getContentPane().add(textoURL, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 120, 180, -1));
 
         textoFechaAlta.setEditable(false);
+        textoFechaAlta.setMaximumSize(new java.awt.Dimension(200, 22));
+        textoFechaAlta.setMinimumSize(null);
         textoFechaAlta.addActionListener(this::textoFechaAltaActionPerformed);
+        getContentPane().add(textoFechaAlta, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 150, 130, -1));
+
+        listasAsociadas.setMaximumSize(new java.awt.Dimension(200, 22));
+        listasAsociadas.setMinimumSize(null);
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -110,15 +206,15 @@ public class consultaCurso extends javax.swing.JInternalFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(66, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(162, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         listasAsociadas.addTab("Ediciones", jPanel1);
@@ -136,133 +232,105 @@ public class consultaCurso extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(208, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         listasAsociadas.addTab("Programas de Formacion", jPanel2);
 
+        getContentPane().add(listasAsociadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 240, -1, -1));
+
         verDetalleButton.setText("Ver Detalle");
+        verDetalleButton.setMaximumSize(new java.awt.Dimension(200, 22));
+        verDetalleButton.setMinimumSize(null);
+        verDetalleButton.addActionListener(this::verDetalleButtonActionPerformed);
+        getContentPane().add(verDetalleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 430, -1, -1));
 
         cerrarButton.setText("Cerrar");
+        cerrarButton.setMaximumSize(new java.awt.Dimension(200, 22));
+        cerrarButton.setMinimumSize(null);
+        cerrarButton.addActionListener(this::cerrarButtonActionPerformed);
+        getContentPane().add(cerrarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 430, -1, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(horasLabel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(textoHoras))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(duracionLabel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(textoDuracion))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(descripcionLabel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(textoDescripcion)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(textoFechaAlta, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(institutoLabel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(institutoSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(nombreLabel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(textoNombre)
-                                        .addGap(6, 6, 6)))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(fechaAltaLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                            .addComponent(cursoLabel)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(cursoSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                            .addComponent(creditosLabel)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(textoCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                            .addGap(6, 6, 6)
-                                            .addComponent(urlLabel)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(textoURL, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                        .addGap(93, 93, 93))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(listasAsociadas)
-                        .addGap(174, 174, 174))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(verDetalleButton)
-                        .addGap(12, 12, 12)
-                        .addComponent(cerrarButton)
-                        .addGap(37, 37, 37))))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(13, 13, 13)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(institutoLabel)
-                    .addComponent(institutoSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cursoLabel)
-                    .addComponent(cursoSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(nombreLabel)
-                    .addComponent(creditosLabel)
-                    .addComponent(textoNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textoCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(descripcionLabel)
-                    .addComponent(urlLabel)
-                    .addComponent(textoDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textoURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(duracionLabel)
-                    .addComponent(fechaAltaLabel)
-                    .addComponent(textoDuracion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textoFechaAlta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(horasLabel)
-                    .addComponent(textoHoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(listasAsociadas, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(verDetalleButton)
-                    .addComponent(cerrarButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        textoDescripcion.setColumns(20);
+        textoDescripcion.setLineWrap(true);
+        textoDescripcion.setRows(5);
+        textoDescripcion.setWrapStyleWord(true);
+        jScrollPane3.setViewportView(textoDescripcion);
+
+        getContentPane().add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, 180, 70));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void institutoSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_institutoSeleccionActionPerformed
+        if (institutoSeleccion.getSelectedIndex() > 0) {
+            String instSeleccionado = (String) institutoSeleccion.getSelectedItem();
+            try {
+                cursoSeleccion.removeAllItems();
+                cursoSeleccion.addItem("Seleccione un Curso...");
+                List<String> cursos = control.listarCursosPorInstituto(instSeleccionado);
+                for (String c : cursos) {
+                    cursoSeleccion.addItem(c);
+                }
+                limpiarCampos();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            cursoSeleccion.removeAllItems();
+            limpiarCampos();
+        }
+    }//GEN-LAST:event_institutoSeleccionActionPerformed
+
+    private void cursoSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cursoSeleccionActionPerformed
+        if (cursoSeleccion.getSelectedItem() != null && cursoSeleccion.getSelectedIndex() > 0) {
+            String cursoSeleccionado = (String) cursoSeleccion.getSelectedItem();
+            try {
+                DtConsultaCurso dt = control.obtenerDatosCurso(cursoSeleccionado);
+                
+                textoNombre.setText(dt.getNombre());
+                textoDescripcion.setText(dt.getDescripcion());
+                textoDuracion.setText(dt.getDuracion());
+                textoHoras.setText(String.valueOf(dt.getCantidadHoras()));
+                textoCreditos.setText(String.valueOf(dt.getCreditos()));
+                textoURL.setText(dt.getUrl());
+                
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                textoFechaAlta.setText(sdf.format(dt.getFechaRegistro()));
+
+                DefaultListModel<String> modEdiciones = new DefaultListModel<>();
+                for (String ed : dt.getEdiciones()) modEdiciones.addElement(ed);
+                jList1.setModel(modEdiciones);
+
+                DefaultListModel<String> modProgramas = new DefaultListModel<>();
+                for (String pr : dt.getProgramas()) modProgramas.addElement(pr);
+                jList2.setModel(modProgramas);
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_cursoSeleccionActionPerformed
+
     private void textoFechaAltaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textoFechaAltaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_textoFechaAltaActionPerformed
+
+    private void verDetalleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verDetalleButtonActionPerformed
+        JOptionPane.showMessageDialog(this, "Esta función se implementará al desarrollar los casos de uso correspondientes.", "Información", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_verDetalleButtonActionPerformed
+
+    private void cerrarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cerrarButtonActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_cerrarButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -282,10 +350,11 @@ public class consultaCurso extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane listasAsociadas;
     private javax.swing.JLabel nombreLabel;
     private javax.swing.JTextField textoCreditos;
-    private javax.swing.JTextField textoDescripcion;
+    private javax.swing.JTextArea textoDescripcion;
     private javax.swing.JTextField textoDuracion;
     private javax.swing.JTextField textoFechaAlta;
     private javax.swing.JTextField textoHoras;
