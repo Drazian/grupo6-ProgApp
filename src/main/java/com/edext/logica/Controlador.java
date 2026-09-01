@@ -423,6 +423,7 @@ public class Controlador implements IControlador {
         } finally {
             em.close();
         }
+    }    
     public boolean setCrearProgramaFormacion(DTPrograma programa) throws Exception {
         boolean flag=false;
         CreaPograFormaHelper manage=new CreaPograFormaHelper(emf, programa);
