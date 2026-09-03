@@ -11,9 +11,11 @@ import com.edext.persistencia.Instituto;
 import com.edext.persistencia.Usuario;
 import com.edext.persistencia.Curso;
 import com.edext.persistencia.EdicionCurso;
+import com.edext.persistencia.ProgramaFormacion;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -367,7 +369,7 @@ public class Controlador implements IControlador {
         }
     }
 
-@Override
+    @Override
     public void altaEdicionCurso(String nombreCurso, com.edext.datatypes.DtEdicionCurso dt) throws Exception {
         EntityManager em = emf.createEntityManager();
         try {
@@ -424,6 +426,8 @@ public class Controlador implements IControlador {
             em.close();
         }
     }    
+    
+    @Override
     public boolean setCrearProgramaFormacion(DTPrograma programa) throws Exception {
         boolean flag=false;
         CreaPograFormaHelper manage=new CreaPograFormaHelper(emf, programa);
@@ -439,4 +443,81 @@ public class Controlador implements IControlador {
         }
         return flag;
     }
+
+    @Override
+    public void agregarProgramaCurso(String programa, String curso) throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            ProgramaFormacion auxPrograma = em.find(ProgramaFormacion.class,programa);
+            Curso auxCurso = em.find(Curso.class, curso);
+        
+            if (auxPrograma == null || auxCurso == null){
+                throw new Exception("El Programa de Formacion y el Curso deben de existir");
+            }
+            
+            if (auxPrograma.getCursos().contains(auxCurso)){
+                throw new Exception("El curso '" + curso + "' ya pertenece al programa '" + programa + "'.");
+            }
+            
+            auxPrograma.agregarCurso(auxCurso);
+            em.getTransaction().commit();
+            
+        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+    }
+
+    @Override
+    public List<DTPrograma> listarProgramas() throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try{
+            List<DTPrograma> resultado = new ArrayList<>();
+            
+            List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
+            for (ProgramaFormacion aux: listaAux){
+                resultado.add(new DTPrograma(0,aux.getNombre(), aux.getDescripcion(),aux.getFechaRegistro(),aux.getFechaInicio(),aux.getFechaFin()));
+            }
+            
+            return resultado;          
+        
+        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+    }
+
+    
+    
+    
+    @Override
+    public List<DtCurso> listarCursos() throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try{
+            List<DtCurso> resultado = new ArrayList<>();
+            
+            List<Curso> listaAux = em.createQuery("SELECT i FROM Curso i", Curso.class).getResultList();
+            for (Curso aux: listaAux){
+                resultado.add(new DtCurso(aux.getNombre(),aux.getDescripcion(), aux.getDuracion(),aux.getCantidadHoras(), aux.getCreditos(), aux.getUrl(), aux.getFechaRegistro()));
+            }
+            
+            return resultado;          
+        
+        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+    }
+
+
+    @Override
+    public DTPrograma buscarPrograma(String nombre) throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try{
+            ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
+            
+            if (programa == null){
+                throw new Exception("No existe ningún programa con el nombre: " + nombre);
+            }
+            
+            return new DTPrograma(0, programa.getNombre(), programa.getDescripcion(), programa.getFechaRegistro(), programa.getFechaInicio(), programa.getFechaFin());
+        
+        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+    }
+
+
+
+
 }

@@ -4,8 +4,10 @@
  */
 package com.edext.presentacion;
 
+import com.edext.datatypes.DTPrograma;
 import com.edext.logica.Fabrica;
 import com.edext.logica.IControlador;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -191,16 +193,21 @@ public class consultaPrograma extends javax.swing.JPanel {
             if (cbPrograma.getItemCount() < 0){
             //Si no hay ningun programa creado, no hay nada que cargar.
             return;
-            }            
+            }
+            
+            if (cbPrograma.getSelectedItem() == null){
+                //Validamos que haya un item seleccionado.
+                return;
+            }
             
             IControlador ic = Fabrica.getInstance().getIControlador();
             String programa = cbPrograma.getSelectedItem().toString();
-            //DtPrograma aux = ic.encontrarPrograma(programa);
-            txtNombre.setText("");
-            txaDescripcion.setText("");
-            txtRegistro.setText("");
-            txtInicio.setText("");
-            txtFin.setText("");
+            DTPrograma aux = ic.buscarPrograma(programa);
+            txtNombre.setText(aux.getNombre());
+            txaDescripcion.setText(aux.getDescripcion());
+            txtRegistro.setText(aux.getFechaRegistro().toString());
+            txtInicio.setText(aux.getFechaInicio().toString());
+            txtFin.setText(aux.getFechaFin().toString());
             cargarCursos();
             
         }catch(Exception e){
@@ -212,12 +219,12 @@ public class consultaPrograma extends javax.swing.JPanel {
         private void cargarProgramas(){
         //TODO: cargar lista de nombres de programas.
         try{
-            IControlador ic = Fabrica.getInstance().getIControlador();
-            //List<DtProgramas> lista = ic.listarProgramas();
-            //cbPrograma.removeAllItems();
-            //for (DtProgramas aux: lista){
-            //  cbPrograma.addItem(aux.getNombre());
-            //}
+            IControlador ic = Fabrica.getInstance().getIControlador();           
+            List<DTPrograma> lista = ic.listarProgramas();
+            cbPrograma.removeAllItems();
+            for (DTPrograma aux : lista){
+                cbPrograma.addItem(aux.getNombre());
+            }
         
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al obtener lista de Programas de Formacion: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
@@ -229,6 +236,11 @@ public class consultaPrograma extends javax.swing.JPanel {
             
             if (cbPrograma.getItemCount() < 0){
                 //Si no hay ningun programa creado, no hay curso asociado que cargar.
+                return;
+            }
+                       
+            if (cbPrograma.getSelectedItem() == null){
+                //Validamos que haya un item seleccionado.
                 return;
             }
             
