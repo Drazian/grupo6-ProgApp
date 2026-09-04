@@ -27,17 +27,6 @@ public class DtCurso {
         this.previas = previas;
     }
     
-   public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, 
-                int creditos, String url, Date fechaRegistro) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras;
-        this.creditos = creditos;
-        this.url = url;
-        this.fechaRegistro = fechaRegistro;
-    }
-
     public String getNombre() { return nombre; }
     public String getDescripcion() { return descripcion; }
     public String getDuracion() { return duracion; }
