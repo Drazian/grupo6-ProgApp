@@ -489,11 +489,28 @@ public class Controlador implements IControlador {
     public List<DtCurso> listarCursos() throws Exception{
         EntityManager em = emf.createEntityManager();
         try{
-            List<DtCurso> resultado = new ArrayList<>();
+            List<DtCurso> resultado = new ArrayList<>();         
             
             List<Curso> listaAux = em.createQuery("SELECT i FROM Curso i", Curso.class).getResultList();
-            for (Curso aux: listaAux){
-                resultado.add(new DtCurso(aux.getNombre(),aux.getDescripcion(), aux.getDuracion(),aux.getCantidadHoras(), aux.getCreditos(), aux.getUrl(), aux.getFechaRegistro()));
+            for (Curso aux : listaAux) {
+                // Extraer solo los nombres de la lista de previas
+                List<String> nombresPrevias = new ArrayList<>();
+                if (aux.getPrevias() != null) {
+                    for (Curso previa : aux.getPrevias()) {
+                        nombresPrevias.add(previa.getNombre());
+                    }
+                }
+            
+                resultado.add(new DtCurso(
+                    aux.getNombre(),
+                    aux.getDescripcion(),
+                    aux.getDuracion(),
+                    aux.getCantidadHoras(),
+                    aux.getCreditos(),
+                    aux.getUrl(),
+                    aux.getFechaRegistro(),
+                    nombresPrevias // Se envía la lista mapeada
+                ));
             }
             
             return resultado;          
@@ -501,6 +518,44 @@ public class Controlador implements IControlador {
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
 
+    @Override
+    public List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try{
+            ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
+            
+            if (programa == null) {
+                throw new Exception("El programa '" + nombre + "' no existe.");
+            }
+            
+            List<DtCurso> resultado = new ArrayList<>();
+            
+            for (Curso aux : programa.getCursos()) {
+                // Extraer solo los nombres de la lista de previas
+                List<String> nombresPrevias = new ArrayList<>();
+                if (aux.getPrevias() != null) {
+                    for (Curso previa : aux.getPrevias()) {
+                        nombresPrevias.add(previa.getNombre());
+                    }
+                }
+
+                resultado.add(new DtCurso(
+                    aux.getNombre(),
+                    aux.getDescripcion(),
+                    aux.getDuracion(),
+                    aux.getCantidadHoras(),
+                    aux.getCreditos(),
+                    aux.getUrl(),
+                    aux.getFechaRegistro(),
+                    nombresPrevias // Se envía la lista mapeada
+                ));
+            }
+            
+            return resultado;
+        
+        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+    }
+    
 
     @Override
     public DTPrograma buscarPrograma(String nombre) throws Exception{

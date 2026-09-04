@@ -52,20 +52,20 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
 
         tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"A1", null, null, null, null, null, null},
-                {"A2", null, null, null, null, null, null},
-                {"A3", null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {"A1", null, null, null, null, null, null, null},
+                {"A2", null, null, null, null, null, null, null},
+                {"A3", null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Nombre", "Descripcion", "Duracion", "Horas", "Creditos", "Registro", "URL"
+                "Nombre", "Descripcion", "Duracion", "Horas", "Creditos", "Registro", "URL", "Previas"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -97,20 +97,17 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblPrograma)
                                 .addGap(18, 18, 18)
-                                .addComponent(cbPrograma, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 126, Short.MAX_VALUE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lblSeleccionarCurso)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(cbPrograma, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblSeleccionarCurso))
+                        .addGap(0, 126, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -180,7 +177,11 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
             List<DtCurso> lista = ic.listarCursos();
             DefaultTableModel model = (DefaultTableModel) tbl.getModel();
             model.setRowCount(0);
-            for (DtCurso aux: lista){
+            for (DtCurso aux: lista){               
+                String strPrevias = (aux.getPrevias() != null && !aux.getPrevias().isEmpty()) 
+                                        ? String.join(", ", aux.getPrevias()) 
+                                        : "---";
+                
                 model.addRow(new Object[]{
                         aux.getNombre(),
                         aux.getDescripcion(),
@@ -188,7 +189,8 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                         aux.getCantidadHoras(),
                         aux.getCreditos(),
                         aux.getFechaRegistro(),
-                        aux.getUrl()
+                        aux.getUrl(),
+                        strPrevias
                     });   
             }
             

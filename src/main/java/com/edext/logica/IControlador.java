@@ -31,6 +31,7 @@ public interface IControlador {
     void agregarProgramaCurso(String programa, String curso) throws Exception;
     List<DTPrograma> listarProgramas() throws Exception;
     List<DtCurso> listarCursos() throws Exception;
+    List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception;
     
     DTPrograma buscarPrograma(String nombre) throws Exception;
     
