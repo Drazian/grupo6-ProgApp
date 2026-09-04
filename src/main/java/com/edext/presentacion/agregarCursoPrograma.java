@@ -6,7 +6,11 @@ package com.edext.presentacion;
 
 import com.edext.logica.Fabrica;
 import com.edext.logica.IControlador;
+import java.util.List;
 import javax.swing.JOptionPane;
+import com.edext.datatypes.DTPrograma;
+import com.edext.datatypes.DtCurso;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -48,20 +52,20 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
 
         tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"A1", null, null, null, null, null, null},
-                {"A2", null, null, null, null, null, null},
-                {"A3", null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {"A1", null, null, null, null, null, null, null},
+                {"A2", null, null, null, null, null, null, null},
+                {"A3", null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Nombre", "Descripcion", "Duracion", "Horas", "Creditos", "Registro", "URL"
+                "Nombre", "Descripcion", "Duracion", "Horas", "Creditos", "Registro", "URL", "Previas"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -93,20 +97,17 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblPrograma)
                                 .addGap(18, 18, 18)
-                                .addComponent(cbPrograma, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 126, Short.MAX_VALUE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lblSeleccionarCurso)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(cbPrograma, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblSeleccionarCurso))
+                        .addGap(0, 126, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -155,14 +156,13 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     }//GEN-LAST:event_cbProgramaActionPerformed
 
     private void cargarProgramas(){
-        //TODO: cargar lista de nombres de programas.
         try{
             IControlador ic = Fabrica.getInstance().getIControlador();
-            //List<DtProgramas> lista = ic.listarProgramas();
-            //cbPrograma.removeAllItems();
-            //for (DtProgramas aux: lista){
-            //  cbPrograma.addItem(aux.getNombre());
-            //}
+            List<DTPrograma> lista = ic.listarProgramas();
+            cbPrograma.removeAllItems();
+            for (DTPrograma aux : lista){
+                cbPrograma.addItem(aux.getNombre());
+            }
         
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al obtener lista de Programas de Formacion: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
@@ -172,16 +172,27 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     private void cargarCursos(){
         try{
             txtCurso.setText(""); 
-
-            //TODO: cargar cursos
+            
             IControlador ic = Fabrica.getInstance().getIControlador();
-            //List<DtCurso> lista = ic.listarCursos();
-            //DefaultTableModel model = (DefaultTableModel) tbl.getModel();
-            //model.setRowCount(0);
-            //for (DtCurso aux: lista){
-                //  model.addRow(new Object[]{aux.getNombre()});
-                // //Falta agregar para el resto de atributos.
-            //}
+            List<DtCurso> lista = ic.listarCursos();
+            DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+            model.setRowCount(0);
+            for (DtCurso aux: lista){               
+                String strPrevias = (aux.getPrevias() != null && !aux.getPrevias().isEmpty()) 
+                                        ? String.join(", ", aux.getPrevias()) 
+                                        : "---";
+                
+                model.addRow(new Object[]{
+                        aux.getNombre(),
+                        aux.getDescripcion(),
+                        aux.getDuracion(),
+                        aux.getCantidadHoras(),
+                        aux.getCreditos(),
+                        aux.getFechaRegistro(),
+                        aux.getUrl(),
+                        strPrevias
+                    });   
+            }
             
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al obtener Cursos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
@@ -206,8 +217,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
             }
             
             IControlador ic = Fabrica.getInstance().getIControlador();
-            //TODO: crear funcion de agregar programa en controlador.
-            //ic.agregarCursoPrograma(programa, curso);
+            ic.agregarProgramaCurso(programa, curso);
             
             JOptionPane.showMessageDialog(this, "Curso '"+curso+"' agregado con éxito al programa de formacion '"+programa+"'.","Éxito",JOptionPane.INFORMATION_MESSAGE);
 

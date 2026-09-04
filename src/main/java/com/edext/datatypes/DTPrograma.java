@@ -21,7 +21,7 @@ public class DTPrograma {
     public DTPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin){
         this(null , nombre, descripcion, fechaRegistro, fechaInicio, fechaFin);
     }
-    
+      
     public DTPrograma(Integer id, String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin){
         this.id=id;
         this.nombre=nombre;

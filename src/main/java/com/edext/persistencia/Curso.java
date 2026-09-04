@@ -8,6 +8,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.ManyToMany;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name="Curso") // Aporte de Draco conservado
@@ -63,4 +64,18 @@ public class Curso {
     public void setInstituto(Instituto instituto) { this.instituto = instituto; }
     public List<Curso> getPrevias() { return previas; }
     public void setPrevias(List<Curso> previas) { this.previas = previas; }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Curso that = (Curso) o;
+        return Objects.equals(nombre, that.nombre);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre);
+    }
+    
 }
