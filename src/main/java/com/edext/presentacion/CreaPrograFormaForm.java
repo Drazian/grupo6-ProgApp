@@ -35,7 +35,7 @@ public class CreaPrograFormaForm extends javax.swing.JPanel {
         reloj=new cronometroHelper(400, jPError, jLErrorMsg, jBCreate);
         jPError.setVisible(false);
         jPNuevo.setVisible(false);
-        fecha.assignFormato(jFfechaFin);
+        fecha.assignFormato(jFfechaFin);//
         fecha.assignFormato(jFfechaInicio);
         fecha.assignFormato(jFfechaPublic);
         jLista.setListData(Values.getList());
@@ -299,7 +299,7 @@ public class CreaPrograFormaForm extends javax.swing.JPanel {
         if(jPNuevo.isVisible()){
             String tmp=jFfechaInicio.getText();
             if(fechaValidate(tmp, "Fecha de Inicio")){
-                fechaInicio=Utils.str2LocalDate(tmp);
+                fechaInicio=Utils.Cast.valueOf(tmp);
             }
             refresh();
         }
@@ -308,7 +308,7 @@ public class CreaPrograFormaForm extends javax.swing.JPanel {
     private void jFfechaFinFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFfechaFinFocusLost
         if(jPNuevo.isVisible()){
             String tmp=jFfechaFin.getText();
-            if(fechaValidate(tmp, "Fecha de Finalizacion")) fechaFin=Utils.str2LocalDate(tmp);
+            if(fechaValidate(tmp, "Fecha de Finalizacion")) fechaFin=Utils.Cast.valueOf(tmp);
             refresh();
         }
     }//GEN-LAST:event_jFfechaFinFocusLost
@@ -317,7 +317,7 @@ public class CreaPrograFormaForm extends javax.swing.JPanel {
         if(jPNuevo.isVisible()){
             String tmp=jFfechaPublic.getText();
             if(fechaValidate(tmp, "Fecha de Publicacion")){
-                fechaRegistro=Utils.str2LocalDate(tmp);
+                fechaRegistro=Utils.Cast.valueOf(tmp);
             }
             refresh();
         }
@@ -337,16 +337,16 @@ public class CreaPrograFormaForm extends javax.swing.JPanel {
 
     private void jDfechaInicioPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDfechaInicioPropertyChange
         if(jPNuevo.isVisible()){
-            fechaInicio=Utils.date2locatDate(jDfechaInicio.getDate());
-            fechaValidate(fechaInicio, Utils.date2locatDate(jDfechaFin.getDate()), jFfechaInicio, IZQ_DER);
+            fechaInicio=Utils.Cast.valueOf(jDfechaInicio.getDate());
+            fechaValidate(fechaInicio, Utils.Cast.valueOf(jDfechaFin.getDate()), jFfechaInicio, IZQ_DER);
             refresh();
         }
     }//GEN-LAST:event_jDfechaInicioPropertyChange
 
     private void jDfechaFinPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDfechaFinPropertyChange
         if(jPNuevo.isVisible()){
-            fechaFin=Utils.date2locatDate(jDfechaFin.getDate());
-            fechaValidate(fechaFin, Utils.date2locatDate(jDfechaInicio.getDate()), jFfechaFin, DER_IZQ);
+            fechaFin=Utils.Cast.valueOf(jDfechaFin.getDate());
+            fechaValidate(fechaFin, Utils.Cast.valueOf(jDfechaInicio.getDate()), jFfechaFin, DER_IZQ);
             refresh();
         }
     }//GEN-LAST:event_jDfechaFinPropertyChange
@@ -354,7 +354,7 @@ public class CreaPrograFormaForm extends javax.swing.JPanel {
     private void jDfechaPublicPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDfechaPublicPropertyChange
         if(jPNuevo.isVisible()){
             if(jDfechaPublic.getDate()!=null){
-                fechaRegistro=Utils.date2locatDate(jDfechaPublic.getDate());
+                fechaRegistro=Utils.Cast.valueOf(jDfechaPublic.getDate());
                 jFfechaPublic.setText(Utils.Fecha.assignFormato(fechaRegistro));
                 reloj.alarm(false, "Fecha de Publicacion");
             }

@@ -7,14 +7,14 @@ import java.util.Objects;
  *
  * @author vdraco
  */
-public class InscripEdMolde implements Serializable {
+public class InscripEditMolde implements Serializable {
  
     private String estudiante; 
     private String edicion;   
     
-    public InscripEdMolde(){}
+    public InscripEditMolde(){}
     
-    public InscripEdMolde(String estudiante, String edicion){
+    public InscripEditMolde(String estudiante, String edicion){
         this.estudiante=estudiante;
         this.edicion=edicion;
     }
@@ -29,7 +29,7 @@ public class InscripEdMolde implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        InscripEdMolde that = (InscripEdMolde) o;
+        InscripEditMolde that = (InscripEditMolde) o;
         return Objects.equals(estudiante, that.estudiante) && 
                Objects.equals(edicion, that.edicion);
     }
@@ -38,5 +38,4 @@ public class InscripEdMolde implements Serializable {
     public int hashCode() {
         return Objects.hash(estudiante, edicion);
     }
-    
 }

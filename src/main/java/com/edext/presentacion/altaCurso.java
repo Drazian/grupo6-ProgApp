@@ -10,6 +10,7 @@ import com.edext.logica.Fabrica;
 import com.edext.logica.IControlador;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -259,7 +260,7 @@ public class altaCurso extends javax.swing.JInternalFrame {
             List<String> previasSeleccionadas = listaPrevias.getSelectedValuesList();
 
             // Armar Datatype y enviar a la lógica
-            DtCurso dt = new DtCurso(nombre, descripcion, duracion, horas, creditos, url, fechaAlta, previasSeleccionadas);
+            DtCurso dt = new DtCurso(nombre, descripcion, duracion, horas, creditos, url, fechaAlta, new DtInstituto(instSeleccionado), new HashSet<>(previasSeleccionadas));
             control.altaCurso(dt, instSeleccionado);
 
             JOptionPane.showMessageDialog(this, "El curso '" + nombre + "' fue creado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);

@@ -1,16 +1,17 @@
 package com.edext.logica;
-import com.edext.datatypes.DTPrograma;
+
+import com.edext.datatypes.DtPrograma;
 import com.edext.datatypes.DtInstituto;
 import com.edext.datatypes.DtUsuario;
 import com.edext.datatypes.DtCurso;
-import com.edext.datatypes.DtEdicionCurso;
+import com.edext.datatypes.DtEdicion;
 import com.edext.datatypes.TipoUsuario;
 import com.edext.persistencia.Docente;
 import com.edext.persistencia.Estudiante;
 import com.edext.persistencia.Instituto;
 import com.edext.persistencia.Usuario;
 import com.edext.persistencia.Curso;
-import com.edext.persistencia.EdicionCurso;
+import com.edext.persistencia.Edicion;
 import com.edext.persistencia.ProgramaFormacion;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -276,7 +277,7 @@ public class Controlador implements IControlador {
             // 3. Resolver los cursos previos
             List<Curso> previas = new ArrayList<>();
             if (curso.getPrevias() != null && !curso.getPrevias().isEmpty()) {
-                for (String nombrePrevia : curso.getPrevias()) {
+                for (String nombrePrevia : curso.getListPrevias()) {
                     Curso previa = em.find(Curso.class, nombrePrevia);
                     if (previa == null) {
                         throw new Exception("No se encontró el curso previo '" + nombrePrevia + "'.");
@@ -341,12 +342,10 @@ public class Controlador implements IControlador {
             Curso c = em.find(Curso.class, nombreCurso);
             if (c == null) throw new Exception("El curso no existe.");
 
-            // Buscar las ediciones asociadas a este curso
-            List<String> ediciones = em.createQuery("SELECT e.nombre FROM EdicionCurso e WHERE e.curso.nombre = :curso", String.class)
+             List<String> ediciones = em.createQuery("SELECT e.nombre FROM Edicion e WHERE e.curso.nombre = :curso", String.class)
                                        .setParameter("curso", nombreCurso)
                                        .getResultList();
-
-            // TODO: Cuando mapees la entidad ProgramaFormacion, haz la consulta real aquí.
+             
             List<String> programas = new java.util.ArrayList<>(); 
 
             return new com.edext.datatypes.DtConsultaCurso(
@@ -370,13 +369,13 @@ public class Controlador implements IControlador {
     }
 
     @Override
-    public void altaEdicionCurso(String nombreCurso, com.edext.datatypes.DtEdicionCurso dt) throws Exception {
+    public void altaEdicionCurso(String nombreCurso, com.edext.datatypes.DtEdicion dt) throws Exception {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
 
             // 1. Verificar unicidad del nombre de la edición
-            EdicionCurso existe = em.find(EdicionCurso.class, dt.getNombre());
+            Edicion existe = em.find(Edicion.class, dt.getNombre());
             if (existe != null) {
                 throw new Exception("Ya existe una Edición de Curso con el nombre: " + dt.getNombre());
             }
@@ -388,7 +387,7 @@ public class Controlador implements IControlador {
             }
 
             // 3. Crear la nueva edición y pasarle los datos del Datatype
-            EdicionCurso nuevaEdicion = new EdicionCurso();
+            Edicion nuevaEdicion = new Edicion();
             nuevaEdicion.setNombre(dt.getNombre());
             nuevaEdicion.setFechaInicio(dt.getFechaInicio());
             nuevaEdicion.setFechaFin(dt.getFechaFin());
@@ -402,8 +401,8 @@ public class Controlador implements IControlador {
             nuevaEdicion.setCurso(curso); 
 
             // 4. Buscar los docentes en la base de datos y asignarlos
-            java.util.List<Docente> docentesAsignados = new java.util.ArrayList<>();
-            for (String nick : dt.getDocentes()) {
+            Set<Docente> docentesAsignados = new HashSet<>();
+            for (String nick : dt.getNameDocentes()) {
                 Docente d = em.find(Docente.class, nick);
                 if (d != null) {
                     docentesAsignados.add(d);
@@ -428,7 +427,7 @@ public class Controlador implements IControlador {
     }    
     
     @Override
-    public boolean setCrearProgramaFormacion(DTPrograma programa) throws Exception {
+    public boolean setCrearProgramaFormacion(DtPrograma programa) throws Exception {
         boolean flag=false;
         CreaPograFormaHelper manage=new CreaPograFormaHelper(emf, programa);
         try {
@@ -467,14 +466,14 @@ public class Controlador implements IControlador {
     }
 
     @Override
-    public List<DTPrograma> listarProgramas() throws Exception{
+    public List<DtPrograma> listarProgramas() throws Exception{
         EntityManager em = emf.createEntityManager();
         try{
-            List<DTPrograma> resultado = new ArrayList<>();
+            List<DtPrograma> resultado = new ArrayList<>();
             
             List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
             for (ProgramaFormacion aux: listaAux){
-                resultado.add(new DTPrograma(0,aux.getNombre(), aux.getDescripcion(),aux.getFechaRegistro(),aux.getFechaInicio(),aux.getFechaFin()));
+                resultado.add(new DtPrograma(aux.getNombre(), aux.getDescripcion(),aux.getFechaRegistro(),aux.getFechaInicio(),aux.getFechaFin()));
             }
             
             return resultado;          
@@ -494,22 +493,22 @@ public class Controlador implements IControlador {
             List<Curso> listaAux = em.createQuery("SELECT i FROM Curso i", Curso.class).getResultList();
             for (Curso aux : listaAux) {
                 // Extraer solo los nombres de la lista de previas
-                List<String> nombresPrevias = new ArrayList<>();
+                Set<String> nombresPrevias = new HashSet<>();
                 if (aux.getPrevias() != null) {
                     for (Curso previa : aux.getPrevias()) {
                         nombresPrevias.add(previa.getNombre());
                     }
                 }
-            
                 resultado.add(new DtCurso(
-                    aux.getNombre(),
-                    aux.getDescripcion(),
-                    aux.getDuracion(),
-                    aux.getCantidadHoras(),
-                    aux.getCreditos(),
-                    aux.getUrl(),
-                    aux.getFechaRegistro(),
-                    nombresPrevias // Se envía la lista mapeada
+                                        aux.getNombre(),
+                                        aux.getDescripcion(),
+                                        aux.getDuracion(),
+                                        aux.getCantidadHoras(),
+                                        aux.getCreditos(),
+                                        aux.getUrl(),
+                                        aux.getFechaRegistro(),
+                                        new DtInstituto(aux.getInstituto().getNombre()),
+                                        nombresPrevias // Se envía la lista mapeada
                 ));
             }
             
@@ -519,7 +518,7 @@ public class Controlador implements IControlador {
     }
 
     @Override
-    public List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception{
+    public List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception{//
         EntityManager em = emf.createEntityManager();
         try{
             ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
@@ -532,7 +531,7 @@ public class Controlador implements IControlador {
             
             for (Curso aux : programa.getCursos()) {
                 // Extraer solo los nombres de la lista de previas
-                List<String> nombresPrevias = new ArrayList<>();
+                Set<String> nombresPrevias = new HashSet<>();
                 if (aux.getPrevias() != null) {
                     for (Curso previa : aux.getPrevias()) {
                         nombresPrevias.add(previa.getNombre());
@@ -540,14 +539,15 @@ public class Controlador implements IControlador {
                 }
 
                 resultado.add(new DtCurso(
-                    aux.getNombre(),
-                    aux.getDescripcion(),
-                    aux.getDuracion(),
-                    aux.getCantidadHoras(),
-                    aux.getCreditos(),
-                    aux.getUrl(),
-                    aux.getFechaRegistro(),
-                    nombresPrevias // Se envía la lista mapeada
+                                        aux.getNombre(),
+                                        aux.getDescripcion(),
+                                        aux.getDuracion(),
+                                        aux.getCantidadHoras(),
+                                        aux.getCreditos(),
+                                        aux.getUrl(),
+                                        aux.getFechaRegistro(),
+                                        new DtInstituto(aux.getInstituto().getNombre()),
+                                        nombresPrevias // Se envía la lista mapeada
                 ));
             }
             
@@ -556,9 +556,8 @@ public class Controlador implements IControlador {
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
     
-
     @Override
-    public DTPrograma buscarPrograma(String nombre) throws Exception{
+    public DtPrograma buscarPrograma(String nombre) throws Exception{
         EntityManager em = emf.createEntityManager();
         try{
             ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
@@ -567,7 +566,7 @@ public class Controlador implements IControlador {
                 throw new Exception("No existe ningún programa con el nombre: " + nombre);
             }
             
-            return new DTPrograma(0, programa.getNombre(), programa.getDescripcion(), programa.getFechaRegistro(), programa.getFechaInicio(), programa.getFechaFin());
+            return new DtPrograma(programa.getNombre(), programa.getDescripcion(), programa.getFechaRegistro(), programa.getFechaInicio(), programa.getFechaFin()); 
         
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }

@@ -1,9 +1,9 @@
 package com.edext.logica;
-import com.edext.datatypes.DTPrograma;
+import com.edext.datatypes.DtPrograma;
 import com.edext.datatypes.DtInstituto;
 import com.edext.datatypes.DtUsuario;
 import com.edext.datatypes.DtCurso;
-import com.edext.datatypes.DtEdicionCurso;
+import com.edext.datatypes.DtEdicion;
 
 import java.util.List;
 
@@ -25,16 +25,15 @@ public interface IControlador {
     com.edext.datatypes.DtConsultaCurso obtenerDatosCurso(String nombreCurso) throws Exception;
     
     List<String> listarDocentes() throws Exception;
-    void altaEdicionCurso(String nombreCurso, com.edext.datatypes.DtEdicionCurso dt) throws Exception;
-    boolean setCrearProgramaFormacion(DTPrograma programa) throws Exception;
+    void altaEdicionCurso(String nombreCurso, com.edext.datatypes.DtEdicion dt) throws Exception;
+    
+    boolean setCrearProgramaFormacion(DtPrograma programa) throws Exception;
       
     void agregarProgramaCurso(String programa, String curso) throws Exception;
-    List<DTPrograma> listarProgramas() throws Exception;
+    List<DtPrograma> listarProgramas() throws Exception;
     List<DtCurso> listarCursos() throws Exception;
     List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception;
     
-    DTPrograma buscarPrograma(String nombre) throws Exception;
-    
-    
-    
+    DtPrograma buscarPrograma(String nombre) throws Exception;
+     
 }

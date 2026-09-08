@@ -1,9 +1,11 @@
 package com.edext.tools;
 //************************* Capa Presentacion **********************************
-import com.edext.datatypes.DTPrograma;
+import com.edext.datatypes.DtPrograma;
+import com.edext.datatypes.DtInstituto;
 import com.edext.logica.Fabrica;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -13,8 +15,8 @@ import java.util.TreeSet;
  */
 public class CreaProgFormaHelper{
  
-    private DTPrograma dtPrograma;
-    private final Set<String> listData = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    private Set<String> listData = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    //private List<String> listaData=new ArrayList<>();
      
     public CreaProgFormaHelper(){
         
@@ -30,6 +32,7 @@ public class CreaProgFormaHelper{
     }
     
     public String[] getList(){
+        setLista();
         return listData.toArray(String[]::new);
     }
     public Set<String> getLista(){
@@ -45,15 +48,34 @@ public class CreaProgFormaHelper{
         return listData.contains(nombre);
     }
     
+    public void setLista(){
+        listData.clear();
+        try {
+            for(DtPrograma dto : getListProgram()) listData.add(dto.getNombre());
+            
+        } catch (Exception e) {
+        }
+{
+            
+        }
+    }
+    
+    
+    
     //******************** Pipeline Presentacion -> Logica *********************
     
     public boolean setData(String nom, String desc, LocalDate fReg, LocalDate fStart, LocalDate fEnd) throws Exception{
-        return sendData(new DTPrograma(nom, desc, fReg, fStart, fEnd));
+        return sendData(new DtPrograma(nom, desc, fReg, fStart, fEnd));
     }
     
-    private boolean sendData(DTPrograma DTO) throws Exception{
-        Fabrica pipeline=Fabrica.getInstance() ;
+    private boolean sendData(DtPrograma DTO) throws Exception{
+        Fabrica pipeline=Fabrica.getInstance();
         return pipeline.getIControlador().setCrearProgramaFormacion(DTO);
+    }
+    
+    private List<DtPrograma> getListProgram() throws Exception{
+        Fabrica pipeline=Fabrica.getInstance();
+        return pipeline.getIControlador().listarProgramas();
     }
     //**************************************************************************
 //   private boolean validateData(DTPrograma DTO){

@@ -1,10 +1,14 @@
 package com.edext.tools;
 //************************* Capa Presentacion **********************************
 import java.awt.Component;
+import java.awt.Dimension;
 import java.beans.PropertyVetoException;
+import javax.swing.DefaultDesktopManager;
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import org.tinylog.Logger;
 
 /**
  *
@@ -12,6 +16,8 @@ import javax.swing.JPanel;
  */
 public class indexHelper {
     private JDesktopPane dpIndex;
+    private boolean limitMin;
+    private boolean activeScroll;
     
     public indexHelper(JDesktopPane obj){
         this.dpIndex=obj;
@@ -55,14 +61,69 @@ public class indexHelper {
                     internalFrame.getContentPane().add(panel);
                     internalFrame.pack();
                     this.dpIndex.add(internalFrame);
-                    if(!rendOnDrag)  this.dpIndex.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE); // Modo de renderizado
+                    if(!rendOnDrag)  this.dpIndex.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
                     internalFrame.setVisible(true);   
                 }else if(panel instanceof JInternalFrame){
                     // para implementar
                 }
-            }catch(Exception ex){
-                System.err.println("Error al cargar el Panel <" + titulo + ">");
-                System.err.println(ex);}
+            }catch(Exception ex){ Logger.debug("Error al cargar el Panel <{}> - Error : {}", titulo, ex.getMessage()); }
         }
+    }
+    
+    public void assignScroll(){
+        dpIndex.addContainerListener(new java.awt.event.ContainerAdapter(){
+            @Override
+            public void componentAdded(java.awt.event.ContainerEvent e){
+                if(e.getChild() instanceof JInternalFrame iframe){
+                    iframe.addComponentListener(new java.awt.event.ComponentAdapter() {
+                        @Override
+                        public void componentMoved(java.awt.event.ComponentEvent evt){ refreshPane(); 
+                        }
+                        @Override
+                        public void componentResized(java.awt.event.ComponentEvent evt){ refreshPane(); }
+                    });
+                }
+            }
+        });
+        dpIndex.setDesktopManager(new DefaultDesktopManager(){
+            @Override
+            public void dragFrame(JComponent f, int newX, int newY){
+                if(limitMin){
+                    if (newX < 0) newX = 0;
+                    if (newY < 0) newY = 0;
+                }
+                super.dragFrame(f, newX, newY);
+            }
+        });
+    } 
+    
+    private void refreshPane(){
+        if(activeScroll){
+            int maxX = 0, maxY = 0, rightX, bottomY;
+            for(Component c : dpIndex.getComponents())
+                if(c instanceof JInternalFrame){
+                    rightX = c.getX() + c.getWidth();
+                    bottomY = c.getY() + c.getHeight();
+                    if(rightX > maxX) maxX = rightX;
+                    if(bottomY > maxY) maxY = bottomY;
+                }
+            Dimension d = new Dimension(maxX, maxY);
+            dpIndex.setPreferredSize(d);
+            dpIndex.revalidate();
+            dpIndex.repaint();
+        }
+    }
+    
+    public void setScroll(boolean modo){
+        activeScroll=modo;
+    }
+    public void setLimiteMin(boolean modo){
+        this.limitMin=modo;
+    }
+    public boolean isLimiteMin(){
+        return limitMin;
+    }
+    public boolean isScrollActive(){
+        return activeScroll;
     }
 }

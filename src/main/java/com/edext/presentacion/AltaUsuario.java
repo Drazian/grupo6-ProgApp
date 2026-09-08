@@ -144,7 +144,6 @@ public class AltaUsuario extends javax.swing.JPanel {
         chbDocente.addActionListener(this::chbDocenteActionPerformed);
 
         dchFechaDeNacimiento.setDateFormatString("d M y");
-        dchFechaDeNacimiento.setDebugGraphicsOptions(javax.swing.DebugGraphics.LOG_OPTION);
         dchFechaDeNacimiento.setMaxSelectableDate(new java.util.Date(1798776104000L));
 
         lblInstituto.setText("Instituto");

@@ -8,7 +8,7 @@ import com.edext.logica.Fabrica;
 import com.edext.logica.IControlador;
 import java.util.List;
 import javax.swing.JOptionPane;
-import com.edext.datatypes.DTPrograma;
+import com.edext.datatypes.DtPrograma;
 import com.edext.datatypes.DtCurso;
 import javax.swing.table.DefaultTableModel;
 
@@ -158,9 +158,9 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     private void cargarProgramas(){
         try{
             IControlador ic = Fabrica.getInstance().getIControlador();
-            List<DTPrograma> lista = ic.listarProgramas();
+            List<DtPrograma> lista = ic.listarProgramas();
             cbPrograma.removeAllItems();
-            for (DTPrograma aux : lista){
+            for (DtPrograma aux : lista){
                 cbPrograma.addItem(aux.getNombre());
             }
         
@@ -178,8 +178,8 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
             DefaultTableModel model = (DefaultTableModel) tbl.getModel();
             model.setRowCount(0);
             for (DtCurso aux: lista){               
-                String strPrevias = (aux.getPrevias() != null && !aux.getPrevias().isEmpty()) 
-                                        ? String.join(", ", aux.getPrevias()) 
+                String strPrevias = (aux.getListPrevias()!= null && !aux.getListPrevias().isEmpty()) 
+                                        ? String.join(", ", aux.getListPrevias()) 
                                         : "---";
                 
                 model.addRow(new Object[]{

@@ -4,7 +4,7 @@
  */
 package com.edext.presentacion;
 
-import com.edext.datatypes.DTPrograma;
+import com.edext.datatypes.DtPrograma;
 import com.edext.datatypes.DtCurso;
 import com.edext.logica.Fabrica;
 import com.edext.logica.IControlador;
@@ -204,7 +204,7 @@ public class consultaPrograma extends javax.swing.JPanel {
             
             IControlador ic = Fabrica.getInstance().getIControlador();
             String programa = cbPrograma.getSelectedItem().toString();
-            DTPrograma aux = ic.buscarPrograma(programa);
+            DtPrograma aux = ic.buscarPrograma(programa);
             txtNombre.setText(aux.getNombre());
             txaDescripcion.setText(aux.getDescripcion());
             txtRegistro.setText(aux.getFechaRegistro().toString());
@@ -222,9 +222,9 @@ public class consultaPrograma extends javax.swing.JPanel {
         //TODO: cargar lista de nombres de programas.
         try{
             IControlador ic = Fabrica.getInstance().getIControlador();           
-            List<DTPrograma> lista = ic.listarProgramas();
+            List<DtPrograma> lista = ic.listarProgramas();
             cbPrograma.removeAllItems();
-            for (DTPrograma aux : lista){
+            for (DtPrograma aux : lista){
                 cbPrograma.addItem(aux.getNombre());
             }
         
@@ -254,8 +254,8 @@ public class consultaPrograma extends javax.swing.JPanel {
             DefaultTableModel model = (DefaultTableModel) tbl.getModel();
             model.setRowCount(0);
             for (DtCurso aux: lista){
-                String strPrevias = (aux.getPrevias() != null && !aux.getPrevias().isEmpty()) 
-                                        ? String.join(", ", aux.getPrevias()) 
+                String strPrevias = (aux.getListPrevias() != null && !aux.getListPrevias().isEmpty()) 
+                                        ? String.join(", ", aux.getListPrevias()) 
                                         : "---";
                 
                 model.addRow(new Object[]{
