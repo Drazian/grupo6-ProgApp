@@ -1,8 +1,6 @@
 package com.edext.presentacion;
 
 import com.edext.tools.indexHelper;
-import java.awt.Component;
-import javax.swing.JDesktopPane;
 
 
 public class index extends javax.swing.JFrame {
@@ -11,7 +9,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JInternalFrame ventanaAltaUsuario;
     private javax.swing.JInternalFrame ventanaConsultaUsuario;
     private javax.swing.JInternalFrame ventanaModificarUsuario;
-    private indexHelper form;
+    private final indexHelper form;
     
     /**
      * Creates new form index
@@ -19,7 +17,9 @@ public class index extends javax.swing.JFrame {
     public index() {
         initComponents();
         form=new indexHelper(dpIndex);
-        
+        form.assignScroll();
+        form.setScroll(true);
+        form.setLimiteMin(true);
     }
 
     /**
@@ -31,6 +31,7 @@ public class index extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
         dpIndex = new javax.swing.JDesktopPane();
         mbIndex = new javax.swing.JMenuBar();
         mInstitutos = new javax.swing.JMenu();
@@ -51,17 +52,28 @@ public class index extends javax.swing.JFrame {
         miConsultaPrograma = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(320, 180));
+        setPreferredSize(new java.awt.Dimension(990, 580));
+
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(320, 180));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(950, 520));
+
+        dpIndex.setDoubleBuffered(true);
+        dpIndex.setMinimumSize(new java.awt.Dimension(320, 180));
+        dpIndex.setPreferredSize(new java.awt.Dimension(950, 520));
 
         javax.swing.GroupLayout dpIndexLayout = new javax.swing.GroupLayout(dpIndex);
         dpIndex.setLayout(dpIndexLayout);
         dpIndexLayout.setHorizontalGroup(
             dpIndexLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 993, Short.MAX_VALUE)
+            .addGap(0, 950, Short.MAX_VALUE)
         );
         dpIndexLayout.setVerticalGroup(
             dpIndexLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 610, Short.MAX_VALUE)
+            .addGap(0, 520, Short.MAX_VALUE)
         );
+
+        jScrollPane1.setViewportView(dpIndex);
 
         mInstitutos.setText("Institutos");
 
@@ -133,11 +145,11 @@ public class index extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(dpIndex)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 798, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(dpIndex)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
         );
 
         pack();
@@ -296,17 +308,23 @@ public class index extends javax.swing.JFrame {
         ventanaConsulta.setVisible(true);
     }//GEN-LAST:event_consultaCursoActionPerformed
     private void jmConsultaEdicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmConsultaEdicionActionPerformed
-        form.cargarPanel("Consulta de Edicion de Curso", new consultaEdicionCurso(), true, false);
+        form.cargarPanel("Consulta de Edicion de Curso", new consultaEdicionCurso(), true, true);
     }//GEN-LAST:event_jmConsultaEdicionActionPerformed
 
     private void jmInscripcionEdicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmInscripcionEdicionActionPerformed
-        form.cargarPanel("Inscripcion a Edicion de Curso", new inscripcionEdicionCurso(), true, false);
+        form.cargarPanel("Inscripcion a Edicion de Curso", new inscripcionEdicionCurso(), true, true);
     }//GEN-LAST:event_jmInscripcionEdicionActionPerformed
 
     private void jmCrearProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmCrearProgramaActionPerformed
-        form.cargarPanel("Crear Programa de Formacion", new CreaPrograFormaForm(), true, false);
+        form.cargarPanel("Crear Programa de Formacion", new CreaPrograFormaForm(), true, true);
     }//GEN-LAST:event_jmCrearProgramaActionPerformed
 
+    
+
+
+    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -338,6 +356,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenuItem consultaCurso;
     private javax.swing.JDesktopPane dpIndex;
     private javax.swing.JMenuItem editarCurso;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenuItem jmConsultaEdicion;
     private javax.swing.JMenuItem jmCrearPrograma;
     private javax.swing.JMenuItem jmInscripcionEdicion;

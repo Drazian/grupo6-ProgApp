@@ -3,6 +3,7 @@ package com.edext.persistencia;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.ManyToMany;
@@ -29,6 +30,7 @@ public class Curso {
     private Instituto instituto;
 
     @ManyToMany
+    @JoinTable(name="Previas")    // Para mejorar la legibilidad externa
     private List<Curso> previas;
 
     public Curso() {}

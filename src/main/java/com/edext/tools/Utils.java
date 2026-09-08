@@ -39,23 +39,29 @@ public class Utils {
         public static boolean isCoherente(LocalDate fecha1, LocalDate fecha2){
             return fecha1.isBefore(fecha2);
         }   
+
+    }
+    
+    public final class Cast{
+
+        public static LocalDate valueOf(Date fecha){
+            return fecha!=null?fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate():null;
+        }
         
-    }
+        public static Date valueOf(LocalDate fecha){
+            return  fecha!=null?java.sql.Date.valueOf(fecha):null;
+        }
 
-    public static LocalDate date2locatDate(Date fecha){
-        return fecha!=null?fecha.toInstant().atZone(ZoneId.systemDefault()).toLocalDate():null;
-    }
+        public static LocalDate valueOf(String fecha){
+            try{ return LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd/MM/yy")); }
+            catch (Exception e) { return null; }
+        }
 
-    public static LocalDate str2LocalDate(String fecha){
-        LocalDate ret=null;
-        try{
-            ret=LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd/MM/yy"));
-        } catch (Exception e) {}
-        return ret;
-    }
+        public static Integer parse(String cadena){
+            try { return Integer.valueOf(cadena); }
+            catch (NumberFormatException e) { return null; }
+        }
 
-    public static int str2Int(String cadena){
-        return Integer.parseInt(cadena);
     }
 
 }

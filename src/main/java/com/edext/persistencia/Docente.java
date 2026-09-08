@@ -5,6 +5,7 @@ import java.util.Date;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class Docente extends Usuario {
 
     @ManyToMany
+    @JoinTable(name="Pertenece")    // Para mejorar la legibilidad externa
     private List<Instituto> institutos;
 
     public Docente() {

@@ -1,13 +1,13 @@
 package com.edext.persistencia;
 
-import java.time.LocalDate;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -15,9 +15,9 @@ import java.util.Objects;
  * @author vdraco
  */
 @Entity
-@IdClass(InscripEditMolde.class)
-@Table(name="InscripcionEdicion")
-public class InscripcionEdicion {
+@IdClass(InscripProgMolde.class)
+@Table(name="InscripcionPrograma")
+public class InscripcionPrograma {
     
     @Id
     @ManyToOne
@@ -28,29 +28,29 @@ public class InscripcionEdicion {
     @Id 
     @ManyToOne
     @JoinColumn(nullable=false)
-    private Edicion edicion;
+    private ProgramaFormacion programa;
 
-    public InscripcionEdicion(){}
+    public InscripcionPrograma(){}
     
-    public InscripcionEdicion(Estudiante estudiante, Edicion edicion, LocalDate fechaInscripcion){
+    public InscripcionPrograma(Estudiante estudiante, ProgramaFormacion programa, LocalDate fechaInscripcion){
         this.fechaInscripcion=fechaInscripcion;
         this.estudiante=estudiante;
-        this.edicion=edicion;
+        this.programa=programa;
     }
     
-    public void setEdicion(Edicion edicion){ this.edicion=edicion; }
+    public void setProgramaFormacion(ProgramaFormacion programa){ this.programa=programa; }
     public void setEstudiante(Estudiante estudiante){ this.estudiante=estudiante; }
     public void setFechaInscripcion(LocalDate fechaInscripcion){ this.fechaInscripcion=fechaInscripcion; }
 
     public LocalDate getFechaInscripcion(){ return this.fechaInscripcion; }
     public Estudiante getEstudiante(){return this.estudiante; }
-    public Edicion getEdicion(){ return this.edicion; }
+    public ProgramaFormacion getProgramaFormacion(){ return this.programa; }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 17 * hash + Objects.hashCode(this.estudiante);
-        hash = 17 * hash + Objects.hashCode(this.edicion);
+        int hash = 7;
+        hash = 41 * hash + Objects.hashCode(this.estudiante);
+        hash = 41 * hash + Objects.hashCode(this.programa);
         return hash;
     }
 
@@ -59,9 +59,9 @@ public class InscripcionEdicion {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        final InscripcionEdicion other = (InscripcionEdicion) obj;
+        final InscripcionPrograma other = (InscripcionPrograma) obj;
         if (!Objects.equals(this.estudiante, other.estudiante)) return false;
-        return Objects.equals(this.edicion, other.edicion);
+        return Objects.equals(this.programa, other.programa);
     }
-   
+
 }

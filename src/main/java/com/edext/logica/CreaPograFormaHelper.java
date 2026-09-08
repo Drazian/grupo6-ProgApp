@@ -1,6 +1,6 @@
 package com.edext.logica;
 //**************************** Capa Logica *************************************
-import com.edext.datatypes.DTPrograma;
+import com.edext.datatypes.DtPrograma;
 import com.edext.persistencia.ProgramaFormacion;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -12,11 +12,11 @@ import jakarta.persistence.EntityTransaction;
  */
 public class CreaPograFormaHelper{
     private final EntityManagerFactory DB;
-    private DTPrograma DTO;
+    private DtPrograma DTO;
     private EntityManager db;
     private EntityTransaction hiloTransaction;
     
-    public CreaPograFormaHelper(EntityManagerFactory obj, DTPrograma dto){
+    public CreaPograFormaHelper(EntityManagerFactory obj, DtPrograma dto){
         DB=obj;
         DTO=dto;
     }
@@ -61,10 +61,10 @@ public class CreaPograFormaHelper{
     }
     
     private ProgramaFormacion toEntity(){
-        return new ProgramaFormacion(DTO.getNombre(), DTO.getDescripcion(), DTO.getFechaRegistro(), DTO.getFechaInicio(), DTO.getFechaFin());
+        return new ProgramaFormacion(DTO.getNombre(), DTO.getDescripcion(), DTO.getFechaRegistro(), DTO.getFechaInicio(), DTO.getFechaFin(), null);
     }
     
-    private boolean validateData(DTPrograma DTO){
+    private boolean validateData(DtPrograma DTO){
         boolean flag=true, flag2=true;
         if(isExist(DTO.getNombre())) flag=false;
         if(flag) if(DTO.getFechaRegistro()==null) flag=false;

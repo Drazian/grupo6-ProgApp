@@ -4,12 +4,18 @@
  */
 package com.edext.presentacion;
 
-import com.edext.datatypes.DtEdicionCurso;
+import com.edext.datatypes.DtCurso;
+import com.edext.datatypes.DtEdicion;
 import com.edext.datatypes.DtInstituto;
+import com.edext.datatypes.DtUsuario;
+import com.edext.datatypes.TipoUsuario;
 import com.edext.logica.Fabrica;
 import com.edext.logica.IControlador;
+import com.edext.tools.Utils;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -20,7 +26,7 @@ import javax.swing.JOptionPane;
  */
 public class editarCurso extends javax.swing.JInternalFrame {
 
-    private IControlador control;
+    private final IControlador control;
 
     /**
      * Creates new form editarCurso
@@ -234,17 +240,28 @@ public class editarCurso extends javax.swing.JInternalFrame {
             
             Integer cupo = null;
             if (!textoCupos.getText().trim().isEmpty()) {
-                cupo = Integer.parseInt(textoCupos.getText());
+                cupo = Integer.valueOf(textoCupos.getText());
             }
 
+            
             // Capturar la lista de docentes seleccionados (con Ctrl+Clic)
             List<String> docentesSel = listaDocentes.getSelectedValuesList();
             if (docentesSel.isEmpty()) {
                 throw new Exception("Debe seleccionar al menos un docente.");
             }
 
+            List<DtUsuario> docentes=new ArrayList<>(); // Agregado para realizar el cast a DTO
+            for (String nomDocente : docentesSel) {
+                docentes.add(new DtUsuario(nomDocente, null, null, null, null, null, new ArrayList<>(), TipoUsuario.DOCENTE));
+            }
+            
             // Construir el Datatype y mandarlo a la lógica
-            DtEdicionCurso dt = new DtEdicionCurso(textoNombreEdicion.getText().trim(), dIni, dFin, cupo, dAlta, docentesSel);
+            DtEdicion dt = new DtEdicion(
+                    textoNombreEdicion.getText().trim(), cupo, Utils.Cast.valueOf(dIni), Utils.Cast.valueOf(dFin), Utils.Cast.valueOf(dAlta), 
+                    new DtCurso(title, null, null, 0, 0, null, null, 
+                            new DtInstituto(seleccionInstituto.getSelectedItem().toString()), new HashSet<>()), 
+                    docentes);
+            
             control.altaEdicionCurso((String) seleccionCurso.getSelectedItem(), dt);
             
             JOptionPane.showMessageDialog(this, "Edición registrada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
