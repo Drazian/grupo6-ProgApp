@@ -58,9 +58,9 @@ public class AltaUsuario extends javax.swing.JPanel {
         
         lblInstituto.setVisible(false);
         cbInstitutos.setVisible(false);
-        txtNickname.setEnabled(false);
+        txtNickname.setEditable(false);
         btnAceptar.setVisible(false);
-        txtEmail.setEnabled(false);
+        txtEmail.setEditable(false);
         chbDocente.setVisible(false);
         lisInstitutos.setVisible(false);
         btnAgregarInstituto.setVisible(false);
@@ -77,8 +77,8 @@ public class AltaUsuario extends javax.swing.JPanel {
         cargarInstitutos();
         if (i ==2){  
             //Falta Obtener Cursos y cargar en las Tablas correspondientes
-            txtApellido.setEnabled(false);
-            txtNombre.setEnabled(false);
+            txtApellido.setEditable(false);
+            txtNombre.setEditable(false);
             dchFechaDeNacimiento.setEnabled(false);
             btnGuardarCambios.setVisible(false);
             btnAgregarImagen.setVisible(false);
@@ -89,12 +89,15 @@ public class AltaUsuario extends javax.swing.JPanel {
     }
     //carga una imagen generica de usuario en el formulario
     private void cargarImagen(String s) {
-        
-        File imagenSeleccionada = new File("imagenes",s);
-
-        ImageIcon icono = new ImageIcon(imagenSeleccionada.getAbsolutePath());
+        File archivo = new File("imagenes", s);
+        ImageIcon icono = new ImageIcon(archivo.getAbsolutePath());
 
         Image imagen = icono.getImage();
+
+        if (lblImagen.getWidth() <= 0 || lblImagen.getHeight() <= 0) {
+            SwingUtilities.invokeLater(() -> cargarImagen(s));
+            return;
+        }
 
         Image imagenEscalada = imagen.getScaledInstance(
             lblImagen.getWidth(),
@@ -102,8 +105,7 @@ public class AltaUsuario extends javax.swing.JPanel {
             Image.SCALE_SMOOTH
         );
 
-        lblImagen.setIcon(new ImageIcon(imagenEscalada));
-        
+        lblImagen.setIcon(new ImageIcon(imagenEscalada));       
         
     }
     /**
@@ -444,7 +446,9 @@ public class AltaUsuario extends javax.swing.JPanel {
 
         chbDocente.setSelected(false);
 
-        cbInstitutos.setSelectedIndex(0);
+        if (cbInstitutos.getItemCount() > 0) {
+            cbInstitutos.setSelectedIndex(0);
+        }
         
         lisInstitutos.setVisible(false);
         btnAgregarInstituto.setVisible(false);
@@ -455,7 +459,7 @@ public class AltaUsuario extends javax.swing.JPanel {
         
         
         ((DefaultListModel<String>) lisInstitutos.getModel()).clear();
-
+        imagenSeleccionada = new File("imagenes/usr.png");
         cargarImagen("usr.png");
     }
     
