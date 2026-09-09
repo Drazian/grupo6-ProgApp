@@ -282,6 +282,9 @@ public class ConsultaUsuario extends javax.swing.JPanel {
                 if (indice != -1) {
                     DtUsuario usuario = usuarios.get(indice);
                     
+                    System.out.println("Usuario: " + usuario.getNickname());
+                    System.out.println("Imagen: " + usuario.getImagen());
+                    
                     formularioUsuario.cargarFormulario(usuario);
                     if(usuario.getTipoUsuario()==TipoUsuario.ESTUDIANTE){
                         panCursos.setVisible(false);
