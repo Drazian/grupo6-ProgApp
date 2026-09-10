@@ -17,6 +17,7 @@ public class Curso {
     
     @Id
     private String nombre;
+    @Column(length = 2000)
     private String descripcion;
     private String duracion;
     private int cantidadHoras;

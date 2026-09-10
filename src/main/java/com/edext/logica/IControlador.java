@@ -35,5 +35,7 @@ public interface IControlador {
     List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception;
     
     DtPrograma buscarPrograma(String nombre) throws Exception;
+    
+    void cargarDatosDePrueba() throws Exception;
      
 }

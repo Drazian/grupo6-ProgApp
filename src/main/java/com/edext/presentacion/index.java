@@ -1,6 +1,8 @@
 package com.edext.presentacion;
 
+import com.edext.logica.Fabrica;
 import com.edext.tools.indexHelper;
+import javax.swing.JOptionPane;
 
 
 public class index extends javax.swing.JFrame {
@@ -50,10 +52,11 @@ public class index extends javax.swing.JFrame {
         jmCrearPrograma = new javax.swing.JMenuItem();
         miAgregarPrograma = new javax.swing.JMenuItem();
         miConsultaPrograma = new javax.swing.JMenuItem();
+        mCargarDatosDePrueba = new javax.swing.JMenu();
+        miCargarDatos = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(320, 180));
-        setPreferredSize(new java.awt.Dimension(990, 580));
 
         jScrollPane1.setMinimumSize(new java.awt.Dimension(320, 180));
         jScrollPane1.setPreferredSize(new java.awt.Dimension(950, 520));
@@ -138,6 +141,14 @@ public class index extends javax.swing.JFrame {
         mPrograma.add(miConsultaPrograma);
 
         mbIndex.add(mPrograma);
+
+        mCargarDatosDePrueba.setText("Cargar datos de prueba");
+
+        miCargarDatos.setText("Cargar datos");
+        miCargarDatos.addActionListener(this::miCargarDatosActionPerformed);
+        mCargarDatosDePrueba.add(miCargarDatos);
+
+        mbIndex.add(mCargarDatosDePrueba);
 
         setJMenuBar(mbIndex);
 
@@ -319,6 +330,39 @@ public class index extends javax.swing.JFrame {
         form.cargarPanel("Crear Programa de Formacion", new CreaPrograFormaForm(), true, true);
     }//GEN-LAST:event_jmCrearProgramaActionPerformed
 
+    private void miCargarDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCargarDatosActionPerformed
+        int respuesta = JOptionPane.showConfirmDialog(
+        this,
+        "¿Desea cargar los datos de prueba?",
+        "Cargar datos de prueba",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (respuesta == JOptionPane.YES_OPTION) {
+
+            try {
+                Fabrica.getInstance().getIControlador().cargarDatosDePrueba();
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Los datos de prueba fueron cargados correctamente.",
+                    "Datos de prueba",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+
+            } catch (Exception e) {
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }//GEN-LAST:event_miCargarDatosActionPerformed
+
     
 
 
@@ -360,6 +404,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenuItem jmConsultaEdicion;
     private javax.swing.JMenuItem jmCrearPrograma;
     private javax.swing.JMenuItem jmInscripcionEdicion;
+    private javax.swing.JMenu mCargarDatosDePrueba;
     private javax.swing.JMenu mCursos;
     private javax.swing.JMenu mInstitutos;
     private javax.swing.JMenu mPrograma;
@@ -367,6 +412,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenuBar mbIndex;
     private javax.swing.JMenuItem miAgregarPrograma;
     private javax.swing.JMenuItem miAltaUsuario;
+    private javax.swing.JMenuItem miCargarDatos;
     private javax.swing.JMenuItem miConsultaPrograma;
     private javax.swing.JMenuItem miConsultaUsuario;
     private javax.swing.JMenuItem miInstituto;
