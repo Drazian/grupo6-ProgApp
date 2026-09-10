@@ -18,8 +18,8 @@ public class index extends javax.swing.JFrame {
         initComponents();
         form=new indexHelper(dpIndex);
         form.assignScroll();
-        form.setScroll(true);
-        form.setLimiteMin(true);
+        form.setScroll(true);  // Activa o desactiva el Scroll de la ventana padre
+        form.setLimiteMin(true);  // true = Impide que el formulario salga fuera de la ventana del lado izquierdo
     }
 
     /**
@@ -42,8 +42,8 @@ public class index extends javax.swing.JFrame {
         miModificarUsuario = new javax.swing.JMenuItem();
         mCursos = new javax.swing.JMenu();
         altaCurso = new javax.swing.JMenuItem();
-        editarCurso = new javax.swing.JMenuItem();
         consultaCurso = new javax.swing.JMenuItem();
+        crearEdicion = new javax.swing.JMenuItem();
         jmInscripcionEdicion = new javax.swing.JMenuItem();
         jmConsultaEdicion = new javax.swing.JMenuItem();
         mPrograma = new javax.swing.JMenu();
@@ -66,18 +66,18 @@ public class index extends javax.swing.JFrame {
         dpIndex.setLayout(dpIndexLayout);
         dpIndexLayout.setHorizontalGroup(
             dpIndexLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 950, Short.MAX_VALUE)
+            .addGap(0, 988, Short.MAX_VALUE)
         );
         dpIndexLayout.setVerticalGroup(
             dpIndexLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 520, Short.MAX_VALUE)
+            .addGap(0, 555, Short.MAX_VALUE)
         );
 
         jScrollPane1.setViewportView(dpIndex);
 
         mInstitutos.setText("Institutos");
 
-        miInstituto.setText("Instituto");
+        miInstituto.setText("Alta instituto");
         miInstituto.addActionListener(this::miInstitutoActionPerformed);
         mInstitutos.add(miInstituto);
 
@@ -85,15 +85,15 @@ public class index extends javax.swing.JFrame {
 
         mUsuarios.setText("Usuarios");
 
-        miAltaUsuario.setText("Nuevo Usuario");
+        miAltaUsuario.setText("Nuevo usuario");
         miAltaUsuario.addActionListener(this::miAltaUsuarioActionPerformed);
         mUsuarios.add(miAltaUsuario);
 
-        miConsultaUsuario.setText("Consulta Usuario");
+        miConsultaUsuario.setText("Consultar usuario");
         miConsultaUsuario.addActionListener(this::miConsultaUsuarioActionPerformed);
         mUsuarios.add(miConsultaUsuario);
 
-        miModificarUsuario.setText("Modificar Usuario");
+        miModificarUsuario.setText("Modificar usuario");
         miModificarUsuario.addActionListener(this::miModificarUsuarioActionPerformed);
         mUsuarios.add(miModificarUsuario);
 
@@ -101,31 +101,31 @@ public class index extends javax.swing.JFrame {
 
         mCursos.setText("Cursos");
 
-        altaCurso.setText("Alta curso");
+        altaCurso.setText("Nuevo curso");
         altaCurso.addActionListener(this::altaCursoActionPerformed);
         mCursos.add(altaCurso);
 
-        editarCurso.setText("Editar curso");
-        editarCurso.addActionListener(this::editarCursoActionPerformed);
-        mCursos.add(editarCurso);
-
-        consultaCurso.setText("Consulta curso");
+        consultaCurso.setText("Consultar curso");
         consultaCurso.addActionListener(this::consultaCursoActionPerformed);
         mCursos.add(consultaCurso);
+
+        crearEdicion.setText("Crear edicion de curso");
+        crearEdicion.addActionListener(this::crearEdicionActionPerformed);
+        mCursos.add(crearEdicion);
 
         jmInscripcionEdicion.setText("Inscripcion a edicion");
         jmInscripcionEdicion.addActionListener(this::jmInscripcionEdicionActionPerformed);
         mCursos.add(jmInscripcionEdicion);
 
-        jmConsultaEdicion.setText("Consulta de Edicion");
+        jmConsultaEdicion.setText("Consultar edicion");
         jmConsultaEdicion.addActionListener(this::jmConsultaEdicionActionPerformed);
         mCursos.add(jmConsultaEdicion);
 
         mbIndex.add(mCursos);
 
-        mPrograma.setText("ProgramaFormacion");
+        mPrograma.setText("Programa de Formacion");
 
-        jmCrearPrograma.setText("Crear Programa");
+        jmCrearPrograma.setText("Nuevo programa");
         jmCrearPrograma.addActionListener(this::jmCrearProgramaActionPerformed);
         mPrograma.add(jmCrearPrograma);
 
@@ -133,7 +133,7 @@ public class index extends javax.swing.JFrame {
         miAgregarPrograma.addActionListener(this::miAgregarProgramaActionPerformed);
         mPrograma.add(miAgregarPrograma);
 
-        miConsultaPrograma.setText("Consulta Programa");
+        miConsultaPrograma.setText("Consultar programa");
         miConsultaPrograma.addActionListener(this::miConsultaProgramaActionPerformed);
         mPrograma.add(miConsultaPrograma);
 
@@ -145,11 +145,11 @@ public class index extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 798, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 990, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
         );
 
         pack();
@@ -272,7 +272,7 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_miModificarUsuarioActionPerformed
 
     private void miAgregarProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAgregarProgramaActionPerformed
-        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Agregar curso a programa",true,true,true,true);
+        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Agregar curso a programas",true,true,true,true);
         internalFrame.getContentPane().add(new agregarCursoPrograma());
         internalFrame.pack();
         this.dpIndex.add(internalFrame);
@@ -280,7 +280,7 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_miAgregarProgramaActionPerformed
 
     private void miConsultaProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miConsultaProgramaActionPerformed
-        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Consulta programas",true,true,true,true);
+        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Consultar programas",true,true,true,true);
         internalFrame.getContentPane().add(new consultaPrograma());
         internalFrame.pack();
         this.dpIndex.add(internalFrame);
@@ -294,12 +294,12 @@ public class index extends javax.swing.JFrame {
         ventanaAlta.setVisible(true);
     }//GEN-LAST:event_altaCursoActionPerformed
 
-    private void editarCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarCursoActionPerformed
+    private void crearEdicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearEdicionActionPerformed
         editarCurso ventanaEditar = new editarCurso();
         ventanaEditar.setSize(600, 500);
         this.dpIndex.add(ventanaEditar);
         ventanaEditar.setVisible(true);
-    }//GEN-LAST:event_editarCursoActionPerformed
+    }//GEN-LAST:event_crearEdicionActionPerformed
 
     private void consultaCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consultaCursoActionPerformed
         consultaCurso ventanaConsulta = new consultaCurso();
@@ -308,7 +308,7 @@ public class index extends javax.swing.JFrame {
         ventanaConsulta.setVisible(true);
     }//GEN-LAST:event_consultaCursoActionPerformed
     private void jmConsultaEdicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmConsultaEdicionActionPerformed
-        form.cargarPanel("Consulta de Edicion de Curso", new consultaEdicionCurso(), true, true);
+        form.cargarPanel("Consulta de Edicion de Curso", new ConsultaEdicionForm(), true, true);
     }//GEN-LAST:event_jmConsultaEdicionActionPerformed
 
     private void jmInscripcionEdicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmInscripcionEdicionActionPerformed
@@ -319,12 +319,6 @@ public class index extends javax.swing.JFrame {
         form.cargarPanel("Crear Programa de Formacion", new CreaPrograFormaForm(), true, true);
     }//GEN-LAST:event_jmCrearProgramaActionPerformed
 
-    
-
-
-    
-    
-    
     /**
      * @param args the command line arguments
      */
@@ -349,13 +343,12 @@ public class index extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new index().setVisible(true));
     }
-
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem altaCurso;
     private javax.swing.JMenuItem consultaCurso;
+    private javax.swing.JMenuItem crearEdicion;
     private javax.swing.JDesktopPane dpIndex;
-    private javax.swing.JMenuItem editarCurso;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JMenuItem jmConsultaEdicion;
     private javax.swing.JMenuItem jmCrearPrograma;
