@@ -47,7 +47,6 @@ public class ConsultaEdicionHelper {
         else return null;
     }
     
-    
 //    public List<DtEdicion> getEdicionxCurso(String curso){
 //        this.nombre=curso;
 //        List<String> tmp=getEdicionCurso();

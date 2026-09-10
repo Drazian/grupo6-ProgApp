@@ -136,5 +136,4 @@ public class indexHelper {
     public boolean isScrollActive(){
         return activeScroll;
     }
-    
 }
