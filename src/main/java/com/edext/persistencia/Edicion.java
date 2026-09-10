@@ -23,7 +23,6 @@ public class Edicion {
 
     @Id
     private String nombre;
-    @Column(nullable=false)
     private Integer cupo;
     @Column(nullable=false)
     private LocalDate fechaFin;
@@ -46,6 +45,12 @@ public class Edicion {
  
     public Edicion(){}
     
+    public Edicion(String nombre, LocalDate fechaPublicacion, LocalDate fechaInicio, LocalDate fechaFin, Curso curso){
+        this(nombre, null, fechaPublicacion, fechaInicio, fechaFin, curso, new HashSet<>());
+    }
+    public Edicion(String nombre, LocalDate fechaPublicacion, LocalDate fechaInicio, LocalDate fechaFin, Curso curso, Set<Docente> docente){
+        this(nombre, null, fechaPublicacion, fechaInicio, fechaFin, curso, docente);
+    }
     public Edicion(String nombre, Integer cupo, LocalDate fechaPublicacion, LocalDate fechaInicio, LocalDate fechaFin, Curso curso, Set<Docente> docente){
         this.fechaPublicacion=fechaPublicacion;
         this.fechaInicio=fechaInicio;
@@ -71,6 +76,14 @@ public class Edicion {
     public String getNombre(){ return this.nombre; }
     public Integer getCupo(){ return this.cupo; }
     public Curso getCurso(){ return this.curso; }
+    public Set<String> getNamesDocentes(){ return getnamedocentes(); }
+    
+    private Set<String> getnamedocentes(){
+        Set<String> ret=new HashSet<>();
+        for (Docente docente : docentes)
+            ret.add(docente.getNombre()+" "+docente.getApellido());
+        return ret;
+    }
     
         @Override
     public int hashCode() {

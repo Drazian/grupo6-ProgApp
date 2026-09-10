@@ -15,10 +15,10 @@ import org.tinylog.Logger;
  * @author vdraco
  */
 public class indexHelper {
-    private JDesktopPane dpIndex;
-    private boolean limitMin;
-    private boolean activeScroll;
-    
+    private final JDesktopPane dpIndex;
+    private boolean limitMin, activeScroll;
+    private Dimension originalSize;
+    private int panelX, panelY;
     public indexHelper(JDesktopPane obj){
         this.dpIndex=obj;
     }
@@ -36,6 +36,7 @@ public class indexHelper {
     }
     private void cargarPanel(String titulo, Component panel, boolean unique,boolean rendOnDrag, boolean resizable, boolean closable, boolean maximizable, boolean minimizable, int with, int height){
         //JInternalFrame internalFrame;
+        this.originalSize=dpIndex.getPreferredSize();
         boolean flag=true;
         if (unique){
             for(JInternalFrame panels : this.dpIndex.getAllFrames()) {
@@ -66,6 +67,8 @@ public class indexHelper {
                 }else if(panel instanceof JInternalFrame){
                     // para implementar
                 }
+                this.panelX=with;
+                this.panelY=height;
             }catch(Exception ex){ Logger.debug("Error al cargar el Panel <{}> - Error : {}", titulo, ex.getMessage()); }
         }
     }
@@ -99,7 +102,7 @@ public class indexHelper {
     
     private void refreshPane(){
         if(activeScroll){
-            int maxX = 0, maxY = 0, rightX, bottomY;
+           int maxX = 0, maxY = 0, rightX, bottomY;
             for(Component c : dpIndex.getComponents())
                 if(c instanceof JInternalFrame){
                     rightX = c.getX() + c.getWidth();
@@ -107,15 +110,22 @@ public class indexHelper {
                     if(rightX > maxX) maxX = rightX;
                     if(bottomY > maxY) maxY = bottomY;
                 }
-            Dimension d = new Dimension(maxX, maxY);
-            dpIndex.setPreferredSize(d);
-            dpIndex.revalidate();
-            dpIndex.repaint();
+            repaint(new Dimension(maxX, maxY));
         }
     }
     
     public void setScroll(boolean modo){
+        if(!modo) repaint(originalSize);
         activeScroll=modo;
+    }
+    
+    private void repaint(){
+        dpIndex.revalidate();
+        dpIndex.repaint();
+    }
+    private void repaint(Dimension d){
+        dpIndex.setPreferredSize(d);
+        repaint();
     }
     public void setLimiteMin(boolean modo){
         this.limitMin=modo;

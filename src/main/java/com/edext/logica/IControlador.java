@@ -28,12 +28,18 @@ public interface IControlador {
     void altaEdicionCurso(String nombreCurso, com.edext.datatypes.DtEdicion dt) throws Exception;
     
     boolean setCrearProgramaFormacion(DtPrograma programa) throws Exception;
-      
+    List<DtEdicion> listarEdicionPorCurso(String curso) throws Exception;
+    DtEdicion getEdicion(String nombre) throws Exception;
+    
+    
+    
+    
     void agregarProgramaCurso(String programa, String curso) throws Exception;
     List<DtPrograma> listarProgramas() throws Exception;
     List<DtCurso> listarCursos() throws Exception;
     List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception;
     
     DtPrograma buscarPrograma(String nombre) throws Exception;
-     
+    
+    DtEdicion buscarEdicion(String nombre) throws Exception;
 }
