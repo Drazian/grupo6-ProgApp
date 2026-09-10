@@ -11,7 +11,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="miInstituto">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Instituto"/>
+                <Property name="text" type="java.lang.String" value="Alta instituto"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miInstitutoActionPerformed"/>
@@ -26,7 +26,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="miAltaUsuario">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Nuevo Usuario"/>
+                <Property name="text" type="java.lang.String" value="Nuevo usuario"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miAltaUsuarioActionPerformed"/>
@@ -34,7 +34,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="miConsultaUsuario">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Consulta Usuario"/>
+                <Property name="text" type="java.lang.String" value="Consultar usuario"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miConsultaUsuarioActionPerformed"/>
@@ -42,7 +42,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="miModificarUsuario">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Modificar Usuario"/>
+                <Property name="text" type="java.lang.String" value="Modificar usuario"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miModificarUsuarioActionPerformed"/>
@@ -57,26 +57,26 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="altaCurso">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Alta curso"/>
+                <Property name="text" type="java.lang.String" value="Nuevo curso"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="altaCursoActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="editarCurso">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Editar curso"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editarCursoActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="consultaCurso">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Consulta curso"/>
+                <Property name="text" type="java.lang.String" value="Consultar curso"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="consultaCursoActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="crearEdicion">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Crear edicion de curso"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="crearEdicionActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmInscripcionEdicion">
@@ -89,7 +89,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jmConsultaEdicion">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Consulta de Edicion"/>
+                <Property name="text" type="java.lang.String" value="Consultar edicion"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jmConsultaEdicionActionPerformed"/>
@@ -99,12 +99,12 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="mPrograma">
           <Properties>
-            <Property name="text" type="java.lang.String" value="ProgramaFormacion"/>
+            <Property name="text" type="java.lang.String" value="Programa de Formacion"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="jmCrearPrograma">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Crear Programa"/>
+                <Property name="text" type="java.lang.String" value="Nuevo programa"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jmCrearProgramaActionPerformed"/>
@@ -120,7 +120,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="miConsultaPrograma">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Consulta Programa"/>
+                <Property name="text" type="java.lang.String" value="Consultar programa"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miConsultaProgramaActionPerformed"/>
@@ -172,12 +172,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jScrollPane1" alignment="0" pref="798" max="32767" attributes="0"/>
+          <Component id="jScrollPane1" alignment="0" pref="990" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jScrollPane1" alignment="1" pref="379" max="32767" attributes="0"/>
+          <Component id="jScrollPane1" alignment="1" pref="557" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -208,12 +208,12 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="950" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="988" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="520" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="555" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>

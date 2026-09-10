@@ -11,7 +11,6 @@ import java.util.Date;
  * @author vdraco
  */
 public class Utils {
-    
 
     public final class Fecha{
         
@@ -57,11 +56,15 @@ public class Utils {
             catch (Exception e) { return null; }
         }
 
-        public static Integer parse(String cadena){
+        public static Integer valuOf(String cadena){
             try { return Integer.valueOf(cadena); }
             catch (NumberFormatException e) { return null; }
         }
+        
+        public static String valueOf(Integer numero){
+            try { return Integer.toString(numero); }
+            catch (Exception e) { return null; }
+        }
 
     }
-
 }

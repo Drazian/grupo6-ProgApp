@@ -218,9 +218,6 @@ public class Controlador implements IControlador {
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
     
-    
-    
-    
     @Override
     public boolean existeUsuario(String nickname) throws Exception {
         EntityManager em = emf.createEntityManager();
@@ -255,7 +252,7 @@ public class Controlador implements IControlador {
         }
     }
 
-    
+
     @Override
     public void altaCurso(DtCurso curso, String nombreInstituto) throws Exception {
         EntityManager em = emf.createEntityManager();
@@ -428,6 +425,33 @@ public class Controlador implements IControlador {
     }    
     
     @Override
+    public DtEdicion getEdicion(String nombre) throws Exception{
+        DtEdicion ret;
+        ConsultaEdicionHelper seek=new ConsultaEdicionHelper(emf, nombre);
+        try { ret=seek.getEdicion(); }
+        catch (Exception e) { ret=null; }
+        finally{ seek=null; }
+        return ret;
+    }
+    
+    @Override
+    public List<DtEdicion> listarEdicionPorCurso(String curso) throws Exception{
+        List<DtEdicion> ret;
+        ConsultaEdicionHelper seek=new ConsultaEdicionHelper(emf, curso);
+        try { ret=seek.getListEditPorCurso(); }
+        catch (Exception e) { ret=new ArrayList<>(); }
+        finally{ seek=null; }
+        return ret;
+    }
+    
+    @Override
+    public DtEdicion buscarEdicion(String nombre) throws Exception{
+        return getEdicion(nombre);
+    }
+
+    
+    
+    @Override
     public boolean setCrearProgramaFormacion(DtPrograma programa) throws Exception {
         boolean flag=false;
         CreaPograFormaHelper manage=new CreaPograFormaHelper(emf, programa);
@@ -443,7 +467,7 @@ public class Controlador implements IControlador {
         }
         return flag;
     }
-
+    
     @Override
     public void agregarProgramaCurso(String programa, String curso) throws Exception{
         EntityManager em = emf.createEntityManager();
@@ -482,8 +506,6 @@ public class Controlador implements IControlador {
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
 
-    
-    
     
     @Override
     public List<DtCurso> listarCursos() throws Exception{
@@ -571,6 +593,7 @@ public class Controlador implements IControlador {
         
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
+
 
 
     @Override
@@ -1493,5 +1516,4 @@ public class Controlador implements IControlador {
         }
     }
   
-            
 }

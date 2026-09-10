@@ -1,5 +1,7 @@
 package com.edext.presentacion;
 
+import com.edext.tools.ConsultaEdicionHelper;
+
 /**
  *
  * @author vdraco
@@ -11,6 +13,7 @@ public class inscripcionEdicionCurso extends javax.swing.JPanel {
      */
     public inscripcionEdicionCurso() {
         initComponents();
+        
     }
 
     /**
@@ -128,9 +131,9 @@ public class inscripcionEdicionCurso extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        consEditCurso tmpSet=new consEditCurso(jComboBox1.getSelectedIndex(), jComboBox1.getSelectedItem().toString());
-        jList1.setListData(tmpSet.getListCursos());
-        tmpSet=null;
+//        ConsultaEdicionHelper tmpSet=new ConsultaEdicionHelper(jComboBox1.getSelectedIndex(), jComboBox1.getSelectedItem().toString());
+//        jList1.setListData(tmpSet.getListCursos());
+//        tmpSet=null;
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jList2CaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jList2CaretPositionChanged
