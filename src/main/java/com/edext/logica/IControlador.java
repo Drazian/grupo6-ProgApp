@@ -33,7 +33,6 @@ public interface IControlador {
     
     
     
-    
     void agregarProgramaCurso(String programa, String curso) throws Exception;
     List<DtPrograma> listarProgramas() throws Exception;
     List<DtCurso> listarCursos() throws Exception;

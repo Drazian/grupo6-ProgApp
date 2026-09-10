@@ -100,4 +100,5 @@ public class Edicion {
         final Edicion other = (Edicion) obj;
         return Objects.equals(this.nombre, other.nombre);
     }
+    
 }

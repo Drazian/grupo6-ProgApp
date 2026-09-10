@@ -251,7 +251,6 @@ public class Controlador implements IControlador {
         }
     }
 
-    
     @Override
     public void altaCurso(DtCurso curso, String nombreInstituto) throws Exception {
         EntityManager em = emf.createEntityManager();

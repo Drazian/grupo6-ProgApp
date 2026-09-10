@@ -29,7 +29,6 @@ public class ConsultaEdicionHelper {
     private List<String> docentes;
     private boolean isEmpty;
     
-    
     public ConsultaEdicionHelper(){ listIntitutos=getInstitutos(); }
     
     public void refreshInstituto(){ listIntitutos=getInstitutos(); }

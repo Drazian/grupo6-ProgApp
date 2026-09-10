@@ -20,6 +20,7 @@ public class index extends javax.swing.JFrame {
         form.assignScroll();
         form.setScroll(true);  // Activa o desactiva el Scroll de la ventana padre
         form.setLimiteMin(true);  // true = Impide que el formulario salga fuera de la ventana del lado izquierdo
+        
     }
 
     /**

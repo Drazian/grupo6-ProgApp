@@ -24,7 +24,6 @@ public class ConsultaEdicionForm extends javax.swing.JPanel {
         cargaIntituto();
         //tmpSet=null;
         refreschCombo();
-
     }
 
     /**

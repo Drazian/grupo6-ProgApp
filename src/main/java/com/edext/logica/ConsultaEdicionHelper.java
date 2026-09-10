@@ -21,7 +21,6 @@ public class ConsultaEdicionHelper {
     private EntityManager db;
     //private EntityTransaction hiloTransaction;
     
-    
     public ConsultaEdicionHelper(EntityManagerFactory obj, String nombre){
         DB=obj;
         this.nombre=nombre;
