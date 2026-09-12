@@ -5,6 +5,10 @@
 package com.edext.presentacion;
 
 import com.edext.datatypes.DtUsuario;
+import com.edext.datatypes.DtCurso;
+import com.edext.datatypes.DtEdicion;
+import com.edext.datatypes.DtPrograma;
+import javax.swing.table.DefaultTableModel;
 import com.edext.datatypes.TipoUsuario;
 import com.edext.logica.Fabrica;
 import com.edext.logica.IControlador;
@@ -281,22 +285,135 @@ public class ConsultaUsuario extends javax.swing.JPanel {
                 crearFormulario();
                 if (indice != -1) {
                     DtUsuario usuario = usuarios.get(indice);
-                    
-                    System.out.println("Usuario: " + usuario.getNickname());
-                    System.out.println("Imagen: " + usuario.getImagen());
-                    
+                     
                     formularioUsuario.cargarFormulario(usuario);
-                    if(usuario.getTipoUsuario()==TipoUsuario.ESTUDIANTE){
-                        panCursos.setVisible(false);
-                    }else{
-                        panEdicionesDeCursos.setVisible(false);
-                    }
+                    
+                    configurarPestanas(usuario);
+                    cargarDatosUsuario(usuario);
                 }
             } 
 
     }//GEN-LAST:event_lisUsuarioValueChanged
 
+    private void configurarPestanas(DtUsuario usuario) {
 
+        if (tbCursosYProgramas.indexOfComponent(panCursos) == -1) {
+            tbCursosYProgramas.insertTab("Cursos", null, panCursos, null, 0);
+        }
+
+        if (tbCursosYProgramas.indexOfComponent(panEdicionesDeCursos) == -1) {
+            tbCursosYProgramas.insertTab("Ediciones de Cursos", null, panEdicionesDeCursos, null, 1);
+        }
+
+        if (tbCursosYProgramas.indexOfComponent(panProgramas) == -1) {
+            tbCursosYProgramas.addTab("Programas", panProgramas);
+        }
+
+        // Si es estudiante, quito la pestaña de Cursos
+        if (usuario.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
+            int indiceCursos = tbCursosYProgramas.indexOfComponent(panCursos);
+
+            if (indiceCursos != -1) {
+                tbCursosYProgramas.removeTabAt(indiceCursos);
+            }
+        }
+    }
+    
+    private void cargarCursos(List<DtCurso> cursos) {
+
+        DefaultTableModel modelo = (DefaultTableModel) tblCursos.getModel();
+
+        modelo.setRowCount(0);
+
+        for (DtCurso curso : cursos) {
+
+            modelo.addRow(new Object[]{
+                curso.getNombre(),
+                curso.getDescripcion(),
+                curso.getDuracion(),
+                curso.getCantidadHoras(),
+                curso.getCreditos(),
+                curso.getFechaRegistro(),
+                curso.getUrl()
+            });
+        }
+    }
+    
+    private void cargarEdiciones(List<DtEdicion> ediciones) {
+
+        DefaultTableModel modelo = (DefaultTableModel) tblEdicionDeCursos.getModel();
+
+        modelo.setRowCount(0);
+
+        for (DtEdicion edicion : ediciones) {
+
+            modelo.addRow(new Object[]{
+                edicion.getNombre(),
+                edicion.getCupo(),
+                edicion.getFechaPublicacion(),
+                edicion.getFechaInicio(),
+                edicion.getFechaFin()
+            });
+        }
+    }
+
+    private void cargarProgramas(List<DtPrograma> programas) {
+
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+
+        modelo.setRowCount(0);
+
+        for (DtPrograma programa : programas) {
+
+            modelo.addRow(new Object[]{
+                programa.getNombre(),
+                programa.getDescripcion(),
+                programa.getFechaRegistro(),
+                programa.getFechaInicio(),
+                programa.getFechaFin()
+            });
+        }
+    }
+    
+    private void cargarDatosUsuario(DtUsuario usuario) {
+
+        try {
+
+            IControlador ic = Fabrica.getInstance().getIControlador();
+
+            String nickname = usuario.getNickname();
+
+            // Si es docente, cargo cursos
+            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
+
+                List<DtCurso> cursos = ic.listarCursosPorUsuario(nickname);
+
+                cargarCursos(cursos);
+            }
+
+            // Cargar ediciones
+            List<DtEdicion> ediciones =
+                    ic.listarEdicionesPorUsuario(nickname);
+
+            cargarEdiciones(ediciones);
+
+            // Cargar programas
+            List<DtPrograma> programas =
+                    ic.listarProgramasPorUsuario(nickname);
+
+            cargarProgramas(programas);
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al cargar los datos del usuario: "
+                            + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;

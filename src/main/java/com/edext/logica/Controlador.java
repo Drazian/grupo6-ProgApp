@@ -1494,12 +1494,6 @@ public class Controlador implements IControlador {
             p3.getCursos().add(c10);
 
 
-            /*
-             * ============================================================
-             * FINALIZAR TRANSACCIÓN
-             * ============================================================
-             */
-
             em.getTransaction().commit();
 
         } catch (Exception e) {
@@ -1516,4 +1510,225 @@ public class Controlador implements IControlador {
         }
     }
   
+    
+    
+    
+    @Override
+    public List<DtCurso> listarCursosPorUsuario(String nickname) throws Exception {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            List<DtCurso> resultado = new ArrayList<>();
+
+            Usuario usuario = em.find(Usuario.class, nickname);
+
+            if (usuario == null) {
+                throw new Exception("No existe el usuario '" + nickname + "'.");
+            }
+
+            // Solo los docentes tienen cursos asociados.
+            // Los cursos se obtienen a través de las ediciones que dictan.
+            if (usuario instanceof Docente) {
+
+                List<Curso> cursos = em.createQuery(
+                    "SELECT DISTINCT e.curso " +
+                    "FROM Edicion e " +
+                    "JOIN e.docentes d " +
+                    "WHERE d.nickname = :nickname",
+                    Curso.class
+                )
+                .setParameter("nickname", nickname)
+                .getResultList();
+
+                for (Curso aux : cursos) {
+
+                    Set<String> nombresPrevias = new HashSet<>();
+
+                    if (aux.getPrevias() != null) {
+                        for (Curso previa : aux.getPrevias()) {
+                            nombresPrevias.add(previa.getNombre());
+                        }
+                    }
+
+                    resultado.add(new DtCurso(
+                        aux.getNombre(),
+                        aux.getDescripcion(),
+                        aux.getDuracion(),
+                        aux.getCantidadHoras(),
+                        aux.getCreditos(),
+                        aux.getUrl(),
+                        aux.getFechaRegistro(),
+                        new DtInstituto(aux.getInstituto().getNombre()),
+                        nombresPrevias
+                    ));
+                }
+            }
+
+            return resultado;
+
+        } finally {
+            em.close();
+        }
+    }
+    
+    @Override
+    public List<DtEdicion> listarEdicionesPorUsuario(String nickname) throws Exception {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            List<DtEdicion> resultado = new ArrayList<>();
+
+            Usuario usuario = em.find(Usuario.class, nickname);
+
+            if (usuario == null) {
+                throw new Exception("No existe el usuario '" + nickname + "'.");
+            }
+
+            List<Edicion> ediciones;
+
+            if (usuario instanceof Docente) {
+
+                // Ediciones que dicta el docente
+                ediciones = em.createQuery(
+                    "SELECT DISTINCT e " +
+                    "FROM Edicion e " +
+                    "JOIN e.docentes d " +
+                    "WHERE d.nickname = :nickname",
+                    Edicion.class
+                )
+                .setParameter("nickname", nickname)
+                .getResultList();
+
+            } else {
+
+                // Ediciones en las que está inscripto el estudiante
+                ediciones = em.createQuery(
+                    "SELECT ie.edicion " +
+                    "FROM InscripcionEdicion ie " +
+                    "WHERE ie.estudiante.nickname = :nickname",
+                    Edicion.class
+                )
+                .setParameter("nickname", nickname)
+                .getResultList();
+            }
+
+            for (Edicion aux : ediciones) {
+
+                Curso curso = aux.getCurso();
+
+                // Convertimos el curso a DtCurso
+                Set<String> nombresPrevias = new HashSet<>();
+
+                if (curso.getPrevias() != null) {
+                    for (Curso previa : curso.getPrevias()) {
+                        nombresPrevias.add(previa.getNombre());
+                    }
+                }
+
+                DtCurso dtCurso = new DtCurso(
+                    curso.getNombre(),
+                    curso.getDescripcion(),
+                    curso.getDuracion(),
+                    curso.getCantidadHoras(),
+                    curso.getCreditos(),
+                    curso.getUrl(),
+                    curso.getFechaRegistro(),
+                    new DtInstituto(curso.getInstituto().getNombre()),
+                    nombresPrevias
+                );
+
+                // Convertimos los docentes de la edición
+                Set<String> nombresDocentes = new HashSet<>();
+
+                if (aux.getDocentes() != null) {
+                    for (Docente docente : aux.getDocentes()) {
+                        nombresDocentes.add(docente.getNickname());
+                    }
+                }
+
+                resultado.add(new DtEdicion(
+                    aux.getNombre(),
+                    aux.getCupo(),
+                    aux.getFechaInicio(),
+                    aux.getFechaFin(),
+                    aux.getFechaPublicacion(),
+                    dtCurso,
+                    nombresDocentes
+                ));
+            }
+
+            return resultado;
+
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            List<DtPrograma> resultado = new ArrayList<>();
+
+            Usuario usuario = em.find(Usuario.class, nickname);
+
+            if (usuario == null) {
+                throw new Exception("No existe el usuario '" + nickname + "'.");
+            }
+
+            List<ProgramaFormacion> programas;
+
+            if (usuario instanceof Docente) {
+
+                programas = em.createQuery(
+                    "SELECT DISTINCT p " +
+                    "FROM ProgramaFormacion p " +
+                    "JOIN p.cursos c " +
+                    "WHERE c.nombre IN (" +
+                    "   SELECT DISTINCT e.curso.nombre " +
+                    "   FROM Edicion e " +
+                    "   JOIN e.docentes d " +
+                    "   WHERE d.nickname = :nickname" +
+                    ")",
+                    ProgramaFormacion.class
+                )
+                .setParameter("nickname", nickname)
+                .getResultList();
+
+            } else {
+
+                programas = em.createQuery(
+                    "SELECT ip.programa " +
+                    "FROM InscripcionPrograma ip " +
+                    "WHERE ip.estudiante.nickname = :nickname",
+                    ProgramaFormacion.class
+                )
+                .setParameter("nickname", nickname)
+                .getResultList();
+            }
+
+            for (ProgramaFormacion aux : programas) {
+
+                resultado.add(new DtPrograma(
+                    aux.getNombre(),
+                    aux.getDescripcion(),
+                    aux.getFechaRegistro(),
+                    aux.getFechaInicio(),
+                    aux.getFechaFin()
+                ));
+            }
+
+            return resultado;
+
+        } finally {
+            em.close();
+        }
+    }
+
+
+
+
 }
+
+ 
