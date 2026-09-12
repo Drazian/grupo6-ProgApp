@@ -4,6 +4,7 @@ package com.edext.presentacion;
 import com.edext.tools.ConsultaEdicionHelper;
 import com.edext.tools.Utils;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import org.tinylog.Logger;
 
 /**
@@ -289,6 +290,50 @@ public class ConsultaEdicionForm extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTffechaPublicacionActionPerformed
 
+    public void cargarEdicion(String nombreEdicion) {
+        try {
+            ConsultaEdicionHelper ceh = new ConsultaEdicionHelper();
+
+            if (ceh.getData(nombreEdicion)) {
+
+                jTnombre.setText(ceh.getNombre());
+                jTcupo.setText(Utils.Cast.valueOf(ceh.getCupo()));
+                jTFechaInicio.setText(Utils.Fecha.assignFormato(ceh.getFechaInicio()));
+                jTFechaFin.setText(Utils.Fecha.assignFormato(ceh.getFechaFin()));
+                jTffechaPublicacion.setText(
+                        Utils.Fecha.assignFormato(ceh.getFechaPublicacion())
+                );
+                jTcurso.setText(ceh.getCurso());
+
+                jLdocentes.setListData(
+                        ceh.getDocentes().toArray(String[]::new)
+                );
+
+                // Mostrar los datos de la edición
+                jPData.setVisible(true);
+
+                // Ocultar las listas de navegación
+                jPCursos.setVisible(false);
+                jPEdiciones.setVisible(false);
+
+            } else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No se encontró la edición: " + nombreEdicion,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al cargar la edición: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
     private void loadData(){
         ConsultaEdicionHelper ceh=new ConsultaEdicionHelper();
         if(ceh.getData(jLEdiciones.getSelectedValue())){

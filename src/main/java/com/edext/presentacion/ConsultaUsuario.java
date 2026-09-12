@@ -16,6 +16,10 @@ import java.awt.BorderLayout;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -32,6 +36,19 @@ public class ConsultaUsuario extends javax.swing.JPanel {
     public ConsultaUsuario() {
         initComponents();
         crearFormulario();
+        
+        tblCursos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblCursos.setRowSelectionAllowed(true);
+        tblCursos.setColumnSelectionAllowed(false);
+
+        tblProgramas.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblProgramas.setRowSelectionAllowed(true);
+        tblProgramas.setColumnSelectionAllowed(false);
+        
+        tblEdicionDeCursos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblEdicionDeCursos.setRowSelectionAllowed(true);
+        tblEdicionDeCursos.setColumnSelectionAllowed(false);
+        
         
         listarUsuarios();
     }
@@ -92,7 +109,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         tblEdicionDeCursos = new javax.swing.JTable();
         panProgramas = new javax.swing.JPanel();
         scpProgramas = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblProgramas = new javax.swing.JTable();
 
         lisUsuario.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -143,6 +160,11 @@ public class ConsultaUsuario extends javax.swing.JPanel {
             }
         });
         tblCursos.setColumnSelectionAllowed(true);
+        tblCursos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCursosMouseClicked(evt);
+            }
+        });
         scpCursos.setViewportView(tblCursos);
         tblCursos.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
@@ -189,6 +211,11 @@ public class ConsultaUsuario extends javax.swing.JPanel {
             }
         });
         tblEdicionDeCursos.setColumnSelectionAllowed(true);
+        tblEdicionDeCursos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblEdicionDeCursosMouseClicked(evt);
+            }
+        });
         scpEdicionDeCursos.setViewportView(tblEdicionDeCursos);
         tblEdicionDeCursos.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
@@ -209,7 +236,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
 
         panProgramas.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, new java.awt.Color(0, 0, 0)));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblProgramas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -233,9 +260,14 @@ public class ConsultaUsuario extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setColumnSelectionAllowed(true);
-        scpProgramas.setViewportView(jTable1);
-        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblProgramas.setColumnSelectionAllowed(true);
+        tblProgramas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblProgramasMouseClicked(evt);
+            }
+        });
+        scpProgramas.setViewportView(tblProgramas);
+        tblProgramas.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         javax.swing.GroupLayout panProgramasLayout = new javax.swing.GroupLayout(panProgramas);
         panProgramas.setLayout(panProgramasLayout);
@@ -294,6 +326,116 @@ public class ConsultaUsuario extends javax.swing.JPanel {
             } 
 
     }//GEN-LAST:event_lisUsuarioValueChanged
+
+    private void tblCursosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCursosMouseClicked
+
+        int fila = tblCursos.getSelectedRow();
+
+        if (fila != -1) {
+
+            String nombreCurso = tblCursos.getValueAt(fila, 0).toString();
+
+            consultaCurso ventana = new consultaCurso();
+
+            ventana.cargarCurso(nombreCurso);
+
+            // Buscar el JDesktopPane que contiene a ConsultaUsuario
+            JDesktopPane desktop = (JDesktopPane) SwingUtilities.getAncestorOfClass(
+                    JDesktopPane.class, this);
+
+            if (desktop != null) {
+                desktop.add(ventana);
+                ventana.setVisible(true);
+
+                try {
+                    ventana.setSelected(true);
+                } catch (java.beans.PropertyVetoException e) {
+                 
+                }
+            }
+        }   
+        
+    }//GEN-LAST:event_tblCursosMouseClicked
+
+    private void tblEdicionDeCursosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEdicionDeCursosMouseClicked
+        int fila = tblEdicionDeCursos.getSelectedRow();
+
+        if (fila != -1) {
+
+            String nombreEdicion =
+                    tblEdicionDeCursos.getValueAt(fila, 0).toString();
+
+            ConsultaEdicionForm formulario = new ConsultaEdicionForm();
+
+            formulario.cargarEdicion(nombreEdicion);
+
+            JDesktopPane desktop = (JDesktopPane) SwingUtilities.getAncestorOfClass(
+                    JDesktopPane.class, this);
+
+            if (desktop != null) {
+
+                // Crear ventana interna
+                JInternalFrame ventana = new JInternalFrame(
+                        "Consulta Edición",
+                        true,
+                        true,
+                        true,
+                        false
+                );
+
+                ventana.getContentPane().add(formulario);
+                ventana.pack();
+
+                desktop.add(ventana);
+                ventana.setVisible(true);
+
+                try {
+                    ventana.setMaximum(true);
+                    ventana.setSelected(true);
+                } catch (java.beans.PropertyVetoException e) {
+             
+                }
+            }
+        }
+    }//GEN-LAST:event_tblEdicionDeCursosMouseClicked
+
+    private void tblProgramasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProgramasMouseClicked
+            int fila = tblProgramas.getSelectedRow();
+
+        if (fila != -1) {
+            String nombrePrograma = tblProgramas.getValueAt(fila, 0).toString();
+
+            consultaPrograma ventana = new consultaPrograma();
+            ventana.cargarPrograma(nombrePrograma);
+
+            JDesktopPane desktop = (JDesktopPane) SwingUtilities.getAncestorOfClass(
+                    JDesktopPane.class, this);
+
+            if (desktop != null) {
+                JInternalFrame internal = new JInternalFrame(
+                        "Consulta Programa",
+                        true,
+                        true,
+                        true,
+                        false
+                );
+
+                internal.getContentPane().add(ventana);
+                internal.pack();
+
+                desktop.add(internal);
+                internal.setVisible(true);
+
+                try {
+                    internal.setMaximum(true);
+                    internal.setSelected(true);
+                } catch (java.beans.PropertyVetoException e) {
+                    // No hacer nada
+                }
+            }
+        }
+
+    }//GEN-LAST:event_tblProgramasMouseClicked
 
     private void configurarPestanas(DtUsuario usuario) {
 
@@ -359,7 +501,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
 
     private void cargarProgramas(List<DtPrograma> programas) {
 
-        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel modelo = (DefaultTableModel) tblProgramas.getModel();
 
         modelo.setRowCount(0);
 
@@ -415,8 +557,6 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
     private javax.swing.JList<String> lisUsuario;
     private javax.swing.JPanel panCursos;
     private javax.swing.JPanel panEdicionesDeCursos;
@@ -429,5 +569,6 @@ public class ConsultaUsuario extends javax.swing.JPanel {
     private javax.swing.JTabbedPane tbCursosYProgramas;
     private javax.swing.JTable tblCursos;
     private javax.swing.JTable tblEdicionDeCursos;
+    private javax.swing.JTable tblProgramas;
     // End of variables declaration//GEN-END:variables
 }

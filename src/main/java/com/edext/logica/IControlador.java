@@ -48,4 +48,6 @@ public interface IControlador {
     List<DtEdicion> listarEdicionesPorUsuario(String nickname) throws Exception;
 
     List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception;
+    
+    String obtenerInstitutoPorCurso(String nombreCurso) throws Exception;
 }

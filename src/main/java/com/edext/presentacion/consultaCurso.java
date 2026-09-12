@@ -332,7 +332,23 @@ public class consultaCurso extends javax.swing.JInternalFrame {
         this.dispose();
     }//GEN-LAST:event_cerrarButtonActionPerformed
 
+    public void cargarCurso(String nombreCurso) {
+        try {
+            String nombreInstituto = control.obtenerInstitutoPorCurso(nombreCurso);
 
+            institutoSeleccion.setSelectedItem(nombreInstituto);
+
+            cursoSeleccion.setSelectedItem(nombreCurso);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error al cargar el curso: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cerrarButton;
     private javax.swing.JLabel creditosLabel;
