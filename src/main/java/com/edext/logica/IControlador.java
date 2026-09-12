@@ -39,5 +39,13 @@ public interface IControlador {
     
     DtPrograma buscarPrograma(String nombre) throws Exception;
     
+    void cargarDatosDePrueba() throws Exception;
+    
     DtEdicion buscarEdicion(String nombre) throws Exception;
+    
+    List<DtCurso> listarCursosPorUsuario(String nickname) throws Exception;
+
+    List<DtEdicion> listarEdicionesPorUsuario(String nickname) throws Exception;
+
+    List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception;
 }
