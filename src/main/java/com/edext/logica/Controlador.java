@@ -1726,7 +1726,24 @@ public class Controlador implements IControlador {
         }
     }
 
+    @Override
+    public String obtenerInstitutoPorCurso(String nombreCurso) throws Exception {
+        EntityManager em = emf.createEntityManager();
 
+        try {
+            return em.createQuery(
+                    "SELECT c.instituto.nombre " +
+                    "FROM Curso c " +
+                    "WHERE c.nombre = :nombreCurso",
+                    String.class
+            )
+            .setParameter("nombreCurso", nombreCurso)
+            .getSingleResult();
+
+        } finally {
+            em.close();
+        }
+    }
 
 
 }

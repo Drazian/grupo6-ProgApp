@@ -276,7 +276,46 @@ public class consultaPrograma extends javax.swing.JPanel {
         
     }
 
-        
+    public void cargarPrograma(String nombrePrograma) {
+        try {
+            IControlador ic = Fabrica.getInstance().getIControlador();
+
+            DtPrograma programa = ic.buscarPrograma(nombrePrograma);
+
+            if (programa == null) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "No se encontró el programa: " + nombrePrograma,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            // Cargar el nombre en el combo
+            cbPrograma.removeAllItems();
+            cbPrograma.addItem(nombrePrograma);
+            cbPrograma.setSelectedIndex(0);
+
+            // Cargar los datos
+            txtNombre.setText(programa.getNombre());
+            txaDescripcion.setText(programa.getDescripcion());
+            txtRegistro.setText(programa.getFechaRegistro().toString());
+            txtInicio.setText(programa.getFechaInicio().toString());
+            txtFin.setText(programa.getFechaFin().toString());
+
+            // Cargar los cursos del programa
+            cargarCursos();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error al cargar el programa: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }    
        
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cbPrograma;
