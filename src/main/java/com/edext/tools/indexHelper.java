@@ -1,13 +1,20 @@
 package com.edext.tools;
 //************************* Capa Presentacion **********************************
+import com.edext.datatypes.DtInstituto;
+import com.edext.logica.Fabrica;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.beans.PropertyVetoException;
+import java.util.List;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import org.tinylog.Logger;
 
 /**
@@ -34,6 +41,7 @@ public class indexHelper {
     public void cargarPanel(String titulo, Component panel, boolean unique,boolean rendOnDrag, boolean resizable, boolean closable, boolean maximizable, boolean minimizable){
         cargarPanel(titulo, panel, unique, rendOnDrag, resizable, closable, maximizable, minimizable, 0, 0);
     }
+    
     private void cargarPanel(String titulo, Component panel, boolean unique,boolean rendOnDrag, boolean resizable, boolean closable, boolean maximizable, boolean minimizable, int with, int height){
         //JInternalFrame internalFrame;
         this.originalSize=dpIndex.getPreferredSize();
@@ -99,6 +107,25 @@ public class indexHelper {
             }
         });
     } 
+
+    public void setScroll(boolean modo){
+        if(!modo) repaint(originalSize);
+        activeScroll=modo;
+    }
+    
+    public boolean isLimiteMin(){
+        return limitMin;
+    }
+    
+    public boolean isScrollActive(){
+        return activeScroll;
+    }
+    
+    public int cargarDatosdePrueba(){
+        return setDatosPrueba();
+    }
+    
+    
     
     private void refreshPane(){
         if(activeScroll){
@@ -114,26 +141,43 @@ public class indexHelper {
         }
     }
     
-    public void setScroll(boolean modo){
-        if(!modo) repaint(originalSize);
-        activeScroll=modo;
-    }
-    
     private void repaint(){
         dpIndex.revalidate();
         dpIndex.repaint();
     }
+    
     private void repaint(Dimension d){
         dpIndex.setPreferredSize(d);
         repaint();
     }
+    
     public void setLimiteMin(boolean modo){
         this.limitMin=modo;
     }
-    public boolean isLimiteMin(){
-        return limitMin;
+    
+    private int setDatosPrueba(){
+        Pipe tmPipe=new Pipe();
+        int ret=-1;
+        try { ret=tmPipe.setDatosPrueba(); }
+        catch (Exception e) {ret=-1; }
+        tmPipe=null;
+        return ret;
     }
-    public boolean isScrollActive(){
-        return activeScroll;
+    
+    //******** Pipeline de emergencia Presentacion -> Persistencia *************
+    
+    class Pipe{
+        
+        private int setDatosPrueba() throws Exception{
+            return Fabrica.getInstance().getIControlador().cargarDatosDePrueba();
+        }
+        
     }
+    
+    
+ 
+    
+   
+    
+    
 }

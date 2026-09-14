@@ -1,6 +1,5 @@
 package com.edext.persistencia;
 
-import com.edext.datatypes.DtCurso;
 import java.util.Set;
 import java.util.HashSet;
 import java.time.LocalDate;
@@ -11,8 +10,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -25,6 +22,7 @@ public class ProgramaFormacion {
 
     @Id
     private String nombre;
+    @Column(length = 2000)
     private String descripcion;
     @Column(nullable=false)
     private LocalDate fechaRegistro;

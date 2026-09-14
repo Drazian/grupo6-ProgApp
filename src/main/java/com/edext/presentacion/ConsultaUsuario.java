@@ -16,7 +16,6 @@ import java.awt.BorderLayout;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
-import javax.swing.ListSelectionModel;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
@@ -335,7 +334,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
 
             String nombreCurso = tblCursos.getValueAt(fila, 0).toString();
 
-            consultaCurso ventana = new consultaCurso();
+            ConsultaCurso ventana = new ConsultaCurso();
 
             ventana.cargarCurso(nombreCurso);
 
@@ -365,7 +364,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
             String nombreEdicion =
                     tblEdicionDeCursos.getValueAt(fila, 0).toString();
 
-            ConsultaEdicionForm formulario = new ConsultaEdicionForm();
+            ConsultaEdicion formulario = new ConsultaEdicion();
 
             formulario.cargarEdicion(nombreEdicion);
 
@@ -405,7 +404,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         if (fila != -1) {
             String nombrePrograma = tblProgramas.getValueAt(fila, 0).toString();
 
-            consultaPrograma ventana = new consultaPrograma();
+            ConsultaPrograma ventana = new ConsultaPrograma();
             ventana.cargarPrograma(nombrePrograma);
 
             JDesktopPane desktop = (JDesktopPane) SwingUtilities.getAncestorOfClass(

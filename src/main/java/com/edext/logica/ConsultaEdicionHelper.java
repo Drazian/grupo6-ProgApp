@@ -19,11 +19,14 @@ public class ConsultaEdicionHelper {
     private String nombre;
     private DtEdicion DTO;
     private EntityManager db;
-    //private EntityTransaction hiloTransaction;
     
     public ConsultaEdicionHelper(EntityManagerFactory obj, String nombre){
         DB=obj;
         this.nombre=nombre;
+    }
+    
+    public List<String> listarEdicionPorCurso(){
+        return getEdicionxCurso();
     }
         
     public List<DtEdicion> getListEditPorCurso(){
@@ -46,52 +49,9 @@ public class ConsultaEdicionHelper {
                     tmp.getNamesDocentes());
         else return null;
     }
-    
-//    public List<DtEdicion> getEdicionxCurso(String curso){
-//        this.nombre=curso;
-//        List<String> tmp=getEdicionCurso();
-//        List<DtEdicion> tmpDTO=new ArrayList<>();
-//        if(!tmp.isEmpty())
-//            for (String string : tmp){}
-//                //tmpDTO.add(new DtEdicion())
-//    }
-//    
-    
-//    public List<DtEdicion> find(String curso){
-//        List<String> ret
-//    }
-    
-//    public DtEdicion find(String cursos){
-//        Edicion tmp=seekEdicion(cursos);
-//        //DtEdicion tmpDtE;
-//        return new DtEdicion(tmp.getNombre(), null, null, null, null, null);
-
-//        tmp.get
-//                DtEdicion(
-//                tmp.getNombre(), 
-//                tmp.getCupo(), 
-//                tmp.getFechaPublicacion(), 
-//                tmp.getFechaInicio(), 
-//                tmp.getFechaFin(), 
-//                new DtCurso(
-//                        tmp.getCurso().getNombre(), tmp.getCurso().getDescripcion(), tmp.getCurso().getDuracion(), tmp.getCurso().getCantidadHoras()
-//                        tmp.getCurso().getCreditos(), tmp.getCurso().getUrl(), tmp.getCurso().getFechaRegistro(), new DtInstituto(tmp.getCurso().getInstituto().getNombre()),
-//                        
-//                )
-////(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, DtInstituto instituto, List<DtCurso> previas
-//                ,tmp.getDocente()
-//        );
-////(String nombre, Integer cupo, LocalDate fechaPublicacion, LocalDate fechaInicio, LocalDate fechaFin, Curso curso, Set<Docente> docente)
-//    }
-//    
-//    
-//    private DtEdicion getDTO(Edicion data){
-//        return new DtEdicion
-//    }
-//    
+  
     public void kill(){
-        db.close();
-        //hiloTransaction=null;
+        if(db!=null && db.isOpen()) db.close();
         DTO=null;
         db=null;
     }
