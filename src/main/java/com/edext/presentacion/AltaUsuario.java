@@ -18,7 +18,6 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;//para que no de error al cargar el formulario la imagen generica por el ancho
 import javax.swing.filechooser.FileNameExtensionFilter;

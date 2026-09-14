@@ -29,6 +29,7 @@ public class ConsultaEdicionHelper {
     private List<String> docentes;
     private boolean isEmpty;
     
+    
     public ConsultaEdicionHelper(){ listIntitutos=getInstitutos(); }
     
     public void refreshInstituto(){ listIntitutos=getInstitutos(); }
@@ -85,7 +86,7 @@ public class ConsultaEdicionHelper {
         boolean ret=true;
         DtEdicion tmpEdicion;
         try { 
-            tmpEdicion=new Pipe().getedicion(nombre);
+            tmpEdicion=new Pipe().getPipeEdicion(nombre);
             Logger.debug(" nombre : {}",tmpEdicion.getNombre());
             this.isEmpty=false;
             this.cupo=tmpEdicion.getCupo();
@@ -137,7 +138,7 @@ public class ConsultaEdicionHelper {
         Pipe tmpPipe=new Pipe();
         List<String> ret=new ArrayList<>();
         List<DtEdicion> tmp;
-        try { tmp=tmpPipe.getediciones(curso);
+        try { tmp=tmpPipe.getPipeEdiciones(curso);
                   for(DtEdicion tmpDTO : tmp)
                       ret.add(tmpDTO.getNombre());
         } catch (Exception e) { ret=new ArrayList<>(); }
@@ -145,6 +146,7 @@ public class ConsultaEdicionHelper {
         tmp=null;
         return  ret;
     }
+
 
 
 
@@ -171,11 +173,11 @@ public class ConsultaEdicionHelper {
             return Fabrica.getInstance().getIControlador().listarCursosPorInstituto(instituto);
         }
 
-        private List<DtEdicion> getediciones(String curso) throws Exception{
+        private List<DtEdicion> getPipeEdiciones(String curso) throws Exception{
             return Fabrica.getInstance().getIControlador().listarEdicionPorCurso(curso);
         }
 
-        private DtEdicion getedicion(String nombre) throws Exception{
+        private DtEdicion getPipeEdicion(String nombre) throws Exception{
             return Fabrica.getInstance().getIControlador().getEdicion(nombre);
         }
         

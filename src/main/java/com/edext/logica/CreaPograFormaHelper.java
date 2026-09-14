@@ -54,7 +54,7 @@ public class CreaPograFormaHelper{
     }
     
     public void kill(){
-        db.close();
+        if(db!=null && db.isOpen()) db.close();
         hiloTransaction=null;
         DTO=null;
         db=null;

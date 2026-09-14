@@ -128,17 +128,37 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="mCargarDatosDePrueba">
+        <Menu class="javax.swing.JMenu" name="mArbol">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Cargar datos de prueba"/>
+            <Property name="text" type="java.lang.String" value="Arbol Jerarquico"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="miCargarDatos">
+            <MenuItem class="javax.swing.JMenuItem" name="jmverArbol">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Cargar datos"/>
+                <Property name="text" type="java.lang.String" value="Ver Estructura"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miCargarDatosActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jmverArbolActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="mDataPrueba">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Datos de prueba"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="requestFocusEnabled" type="boolean" value="false"/>
+            <Property name="verifyInputWhenFocusTarget" type="boolean" value="false"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="jmcargarDatosPrueba">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Cargar datos"/>
+                <Property name="requestFocusEnabled" type="boolean" value="false"/>
+                <Property name="verifyInputWhenFocusTarget" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jmcargarDatosPruebaActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -150,6 +170,9 @@
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[320, 180]"/>
+    </Property>
+    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[990, 580]"/>
     </Property>
   </Properties>
   <SyntheticProperties>
