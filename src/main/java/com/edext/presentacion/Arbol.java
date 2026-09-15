@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package com.edext.presentacion;
 
 import com.edext.tools.ArbolHelper;
@@ -54,92 +50,20 @@ public final class Arbol extends javax.swing.JPanel {
     private void jTreeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTreeFocusGained
         cargar();
     }//GEN-LAST:event_jTreeFocusGained
-
+    
     private void cargar(){
         ArbolHelper tree=new ArbolHelper();
-        tree.createArbol(jTree);
+        jTree.setModel(tree.getModel());
         tree=null;
+        for(int i = 0; i < jTree.getRowCount(); i++) jTree.expandRow(i);
     }
     
-    
-    
-// public void construirArbolJerarquico(JTree treeExplorador) {
-//    try {
-//        // 1. Nodo raíz del explorador
-//        DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Institutos de Educación");
-//        
-//        // 2. Listamos los institutos (usando tu IControlador)
-//        List<DtInstituto> institutos = Fabrica.getInstance().getIControlador().listarInstitutos();
-//        
-//        for (DtInstituto inst : institutos) {
-//            DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode(inst.getNombre());
-//            raiz.add(nodoInstituto);
-//            
-//            // 3. Por cada instituto, colgamos sus cursos
-//            List<String> cursos = Fabrica.getInstance().getIControlador().listarCursosPorInstituto(inst.getNombre());
-//            
-//            for (String curso : cursos) {
-//                DefaultMutableTreeNode nodoCurso = new DefaultMutableTreeNode(curso);
-//                nodoInstituto.add(nodoCurso);
-//                
-//                // 4. Usamos TU método blindado contra nulos para las ediciones
-//                // Nota: Ajustá el nombre de tu método de clase según corresponda
-//                List<String> ediciones = Fabrica.getInstance().getIControlador().listaEdicionPorCurso(curso); 
-//                
-//                for (String edicion : ediciones) {
-//                    DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode(edicion);
-//                    nodoCurso.add(nodoEdicion);
-//                }
-//            }
-//        }
-//        
-//        // 5. Inyectamos el modelo cargado al JTree de Swing
-//        treeExplorador.setModel(new DefaultTreeModel(raiz));
-//        
-//    } catch (Exception e) {
-//        org.tinylog.Logger.error(e, "Error al construir el JTree jerárquico");
-//        //JOptionPane.showMessageDialog(this, "No se pudo cargar el explorador visual: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+//    private void cargar(){
+//        ArbolHelper tree=new ArbolHelper();
+//        tree.createArbol(jTree);
+//        tree=null;
 //    }
-//}   
-//    
-//public void cargarExploradorVisual(javax.swing.JTree treeExplorador) {
-//    try {
-//        // 1. Nodo raíz principal
-//        DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Plataforma Educativa");
-//        
-//        // 2. Iteramos los institutos usando tu controlador
-//        List<DtInstituto> institutos = Fabrica.getInstance().getIControlador().listarInstitutos();
-//        for (DtInstituto inst : institutos) {
-//            DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode(inst.getNombre());
-//            raiz.add(nodoInstituto);
-//            
-//            // 3. Iteramos los cursos de ese instituto
-//            List<String> cursos = Fabrica.getInstance().getIControlador().listarCursosPorInstituto(inst.getNombre());
-//            for (String curso : cursos) {
-//                DefaultMutableTreeNode nodoCurso = new DefaultMutableTreeNode(curso);
-//                nodoInstituto.add(nodoCurso);
-//                
-//                // 4. Usamos TU método blindado contra nulos para colgar las ediciones
-//                // Pasamos el nombre del curso actual para que busque sus ediciones
-//                List<String> ediciones = Fabrica.getInstance().getIControlador().listaEdicionPorCurso(curso); 
-//                for (String edicion : ediciones) {
-//                    DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode(edicion);
-//                    nodoCurso.add(nodoEdicion);
-//                }
-//            }
-//        }
-//        
-//        // 5. Inyectamos el modelo cargado en el componente de Swing
-//        treeExplorador.setModel(new DefaultTreeModel(raiz));
-//        
-//    } catch (Exception e) {
-//        org.tinylog.Logger.error(e, "Error al rellenar el JTree con las ediciones");
-//        JOptionPane.showMessageDialog(this, "Error al cargar el árbol: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-//    }
-//}
-
-
-    
+      
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
