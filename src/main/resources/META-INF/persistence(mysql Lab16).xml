@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.1" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+  <persistence-unit name="edext" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <class>com.edext.persistencia.Instituto</class>
+    <class>com.edext.persistencia.Usuario</class>
+    <class>com.edext.persistencia.Docente</class>
+    <class>com.edext.persistencia.Estudiante</class>
+    <class>com.edext.persistencia.Curso</class>
+    <class>com.edext.persistencia.EdicionCurso</class>
+    <properties>
+
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/edEXT_6?createDatabaseIfNotExist=true&amp;allowPublicKeyRetrieval=true&amp;useSSL=false&amp;serverTimezone=UTC"/>
+      <property name="jakarta.persistence.jdbc.user" value="tecnologo"/>
+      <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+      <property name="jakarta.persistence.jdbc.password" value="tecnologo"/>
+      <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+      <!--      <property name="jakarta.persistence.schema-generation.database.action" value="create"/> -->
+      <!--      <property name="jakarta.persistence.schema-generation.database.action" value="none"/> -->
+      <!--      <property name="jakarta.persistence.schema-generation.database.action" value="update"/> -->
+      <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
+    </properties>
+  </persistence-unit>
+</persistence>
