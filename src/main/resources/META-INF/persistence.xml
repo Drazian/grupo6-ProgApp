@@ -9,11 +9,10 @@
     <class>com.edext.persistencia.Curso</class>
     <class>com.edext.persistencia.EdicionCurso</class>
     <properties>
-
-      <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/edEXT_6?createDatabaseIfNotExist=true&amp;allowPublicKeyRetrieval=true&amp;useSSL=false&amp;serverTimezone=UTC"/>
-      <property name="jakarta.persistence.jdbc.user" value="tecnologo"/>
-      <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-      <property name="jakarta.persistence.jdbc.password" value="tecnologo"/>
+      <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/edext?createDatabaseIfNotExist=true"/>
+      <property name="jakarta.persistence.jdbc.user" value="pipo"/>
+      <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
+      <property name="jakarta.persistence.jdbc.password" value="pipo"/>
       <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
       <!--      <property name="jakarta.persistence.schema-generation.database.action" value="create"/> -->
       <!--      <property name="jakarta.persistence.schema-generation.database.action" value="none"/> -->
