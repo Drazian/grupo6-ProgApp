@@ -1,17 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.edext.tools;
 
-import com.edext.datatypes.DtInstituto;
-import com.edext.logica.Fabrica;
-import java.util.List;
-import javax.swing.JOptionPane;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import com.edext.datatypes.DtInstituto;
+import com.edext.logica.Fabrica;
 import org.tinylog.Logger;
+import javax.swing.JTree;
+import java.util.List;
 
 /**
  *
@@ -19,50 +14,67 @@ import org.tinylog.Logger;
  */
 public class ArbolHelper {
     
-    public boolean createArbol(JTree objTree){
-        return makeArbol(objTree) && loadArbol(objTree);
+    // ********************** Modelo totalmente desacoplado ********************
+    public DefaultTreeModel getModel(){
+        return make();
+    }
+
+    private DefaultTreeModel make(){
+        Pipe arbol=new Pipe();
+        DefaultTreeModel ret=new DefaultTreeModel(arbol.create());
+        arbol=null;
+        return ret;
+    }
+
+    private class Pipe{
+        private DefaultMutableTreeNode create(){
+            DefaultMutableTreeNode raiz;
+            try {
+                raiz = new DefaultMutableTreeNode("Plataforma Educativa edEXT");
+                List<DtInstituto> institutos = Fabrica.getInstance().getIControlador().listarInstitutos();
+                if(!institutos.isEmpty())
+                    for(DtInstituto inst : institutos){
+                        DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode(inst.getNombre());
+                        raiz.add(nodoInstituto);
+                        List<String> cursos = Fabrica.getInstance().getIControlador().listarCursosPorInstituto(inst.getNombre());
+                        if(!cursos.isEmpty())
+                            for(String curso : cursos){
+                                DefaultMutableTreeNode nodoCurso = new DefaultMutableTreeNode(curso);
+                                nodoInstituto.add(nodoCurso);
+                                List<String> ediciones = Fabrica.getInstance().getIControlador().listaEdicionPorCurso(curso); 
+                                if(!ediciones.isEmpty())
+                                    for(String edicion : ediciones){
+                                        DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode(edicion);
+                                        nodoCurso.add(nodoEdicion);
+                                        List<String> inscripciones = Fabrica.getInstance().getIControlador().getEstudiantesInscriptosEdicion(edicion);
+                                        if(!inscripciones.isEmpty())
+                                            for (String inscripcion : inscripciones){
+                                                DefaultMutableTreeNode nodoInscripcion = new DefaultMutableTreeNode(inscripcion);
+                                                nodoEdicion.add(nodoInscripcion);
+                                            }else
+                                            nodoEdicion.add(new DefaultMutableTreeNode("vacio"));
+                                    }else
+                                    nodoCurso.add(new DefaultMutableTreeNode("vacio"));                                    
+                            }else
+                            nodoInstituto.add(new DefaultMutableTreeNode("vacio"));
+                    }else
+                    raiz.add(new DefaultMutableTreeNode("vacio"));
+            } catch (Exception e) { 
+                raiz=new DefaultMutableTreeNode("Error al crear el Arbol");
+                Logger.error(e, "Error al crear el Arbol"); }
+            return raiz;
+        }
     }
     
-    private boolean makeArbol(JTree obj){
-        boolean ret=false;
-        try {
-            DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Institutos de Educación");
-            List<DtInstituto> institutos = Fabrica.getInstance().getIControlador().listarInstitutos();
-            for (DtInstituto inst : institutos) {
-                DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode(inst.getNombre());
-                raiz.add(nodoInstituto);
-                List<String> cursos = Fabrica.getInstance().getIControlador().listarCursosPorInstituto(inst.getNombre());
-                for (String curso : cursos) {
-                    DefaultMutableTreeNode nodoCurso = new DefaultMutableTreeNode(curso);
-                    nodoInstituto.add(nodoCurso);
-                    List<String> ediciones = Fabrica.getInstance().getIControlador().listaEdicionPorCurso(curso); 
-                    for (String edicion : ediciones) {
-                        DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode(edicion);
-                        nodoCurso.add(nodoEdicion);
-                    }
-                }
-            }
-            obj.setModel(new DefaultTreeModel(raiz));
-            
-//        // 5. Inyectamos el modelo cargado al JTree de Swing
-//        treeExplorador.setModel(new DefaultTreeModel(raiz));
-//        
-        // 🚀 EL TOQUE FINAL: Expandir todos los nodos automáticamente
-
-            
-            ret=true;
-        } catch (Exception e) { 
-            ret=false;
-            Logger.error(e, "Error al construir el Arbol");
-        //JOptionPane.showMessageDialog(this, "No se pudo cargar el explorador visual: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        return  ret;
-    }   
+    //************************* Modelo Original ********************************
+    public boolean createArbol(JTree objTree){
+        return loadArbol(objTree);
+    }
     
-    public boolean loadArbol(JTree obj){
+    private boolean loadArbol(JTree obj){
         boolean ret=false;
         try {
-            DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Plataforma Educativa");
+            DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Plataforma Educativa edEXT");  // modique de titulo para agregar el nombre de la aplicacion
             List<DtInstituto> institutos = Fabrica.getInstance().getIControlador().listarInstitutos();
             for (DtInstituto inst : institutos) {
                 DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode(inst.getNombre());
@@ -75,16 +87,19 @@ public class ArbolHelper {
                     for (String edicion : ediciones) {
                         DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode(edicion);
                         nodoCurso.add(nodoEdicion);
+                        List<String> inscripciones = Fabrica.getInstance().getIControlador().getEstudiantesInscriptosEdicion(edicion); // nueva 1
+                        for (String inscripcion : inscripciones) {                                                                  // nueva 2
+                            DefaultMutableTreeNode nodoInscripcion = new DefaultMutableTreeNode(inscripcion);                    // nueva 3
+                            nodoEdicion.add(nodoInscripcion);                                                                 // nueva 4
+                        }
                     }
                 }
             }
             obj.setModel(new DefaultTreeModel(raiz));
             for(int i = 0; i < obj.getRowCount(); i++) obj.expandRow(i);
             ret=true;
-        } catch (Exception e) {
-            org.tinylog.Logger.error(e, "Error al rellenar el Arbol");
-            //JOptionPane.showMessageDialog(this, "Error al cargar el árbol: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        } catch (Exception e) { Logger.error(e, "Error al rellenar el Arbol"); }
         return ret;
     }    
+    //**************************************************************************
 }
