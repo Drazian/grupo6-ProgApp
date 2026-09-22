@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class ControladorTest {
     
+    private IControlador ic;
+    
     public ControladorTest() {
     }
     
@@ -37,6 +39,7 @@ public class ControladorTest {
     
     @BeforeEach
     public void setUp() {
+        ic = Fabrica.getInstance().getIControlador();
     }
     
     @AfterEach
@@ -57,5 +60,54 @@ public class ControladorTest {
 //    }
 
  
+    @Test
+    public void testCrearInstitutoExitoso() throws Exception{
+        String nombreInstituto = "Instituto1";
+        ic.crearInstituto(nombreInstituto);
+        
+        List<DtInstituto> institutos = ic.listarInstitutos();
+        
+        assertNotNull(institutos, "La lista de institutos no debe ser nula");
+        
+        boolean existeEnLista = institutos.stream().anyMatch(i -> i.getNombre().equals(nombreInstituto));
+        
+        assertTrue(existeEnLista, "El instituto creado deberia estar en la lista");
+        
+    }
+    
+    @Test
+    public void testCrearInstitutoDuplicado() throws Exception{
+        String nombreInstituto = "Instituto2";
+        
+        ic.crearInstituto(nombreInstituto);
+  
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.crearInstituto(nombreInstituto);}, "Ya existe");        
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testEliminarInstitutoBasico() throws Exception{
+        String nombreInstituto = "Instituto1";
+                
+        ic.eliminarInstituto(nombreInstituto);
+        
+        List<DtInstituto> institutos = ic.listarInstitutos();
+        
+        assertNotNull(institutos, "La lista de institutos no debe ser nula");
+    
+        boolean existeEnLista = institutos.stream().anyMatch(i -> i.getNombre().equals(nombreInstituto));
+        
+        assertFalse(existeEnLista, "El instituto creado deberia estar en la lista");
+    
+    }
+    
+    @Test
+    public void testEliminarInstitutoFallido() throws Exception{
+        String nombreInstituto = "InstitutoFallido";
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.eliminarInstituto(nombreInstituto);}, "Instituto inexistente");
+        assertNotNull(excepcion.getMessage());
+    }
+    
     
 }
