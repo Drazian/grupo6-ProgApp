@@ -29,7 +29,9 @@ public class institutos extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl = new javax.swing.JTable();
         btnActualizar = new javax.swing.JButton();
+        btnActualizar.setVisible(false);
         btnEliminar = new javax.swing.JButton();
+        btnEliminar.setVisible(false);
 
         lblNombre.setText("Nombre:");
 
@@ -70,9 +72,11 @@ public class institutos extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tbl);
 
         btnActualizar.setText("Actualizar");
+        btnActualizar.setEnabled(false);
         btnActualizar.addActionListener(this::btnActualizarActionPerformed);
 
         btnEliminar.setText("Eliminar");
+        btnEliminar.setEnabled(false);
         btnEliminar.addActionListener(this::btnEliminarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
