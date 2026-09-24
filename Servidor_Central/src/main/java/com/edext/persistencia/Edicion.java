@@ -52,13 +52,13 @@ public class Edicion {
         this(nombre, null, fechaPublicacion, fechaInicio, fechaFin, curso, docente);
     }
     public Edicion(String nombre, Integer cupo, LocalDate fechaPublicacion, LocalDate fechaInicio, LocalDate fechaFin, Curso curso, Set<Docente> docente){
-        this.fechaPublicacion=fechaPublicacion;
-        this.fechaInicio=fechaInicio;
-        this.fechaFin=fechaFin;
-        this.docentes=docente;
-        this.nombre=nombre;
-        this.curso=curso;
-        this.cupo=cupo;
+        setFechaPublicacion(fechaPublicacion);
+        setFechaInicio(fechaInicio);
+        setFechaFin(fechaFin);
+        setDocentes(docentes);        
+        setNombre(nombre);
+        setCurso(curso);
+        setCupo(cupo);
     }
     
     public void setCupo(Integer cupo){ this.cupo=cupo; }
@@ -85,19 +85,19 @@ public class Edicion {
         return ret;
     }
     
-        @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 53 * hash + Objects.hashCode(this.nombre);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        final Edicion other = (Edicion) obj;
-        return Objects.equals(this.nombre, other.nombre);
-    }
+//        @Override
+//    public int hashCode() {
+//        int hash = 7;
+//        hash = 53 * hash + Objects.hashCode(this.nombre);
+//        return hash;
+//    }
+//
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) return true;
+//        if (obj == null) return false;
+//        if (getClass() != obj.getClass()) return false;
+//        final Edicion other = (Edicion) obj;
+//        return Objects.equals(this.nombre, other.nombre);
+//    }
 }

@@ -23,11 +23,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  *
  * @author pipo
  */
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ControladorTest {
     
     private IControlador ic;
@@ -52,6 +57,24 @@ public class ControladorTest {
     public void tearDown() {
     }
 
+    
+    @Test
+    @Order(1)
+    public void testCargarDatosDePrueba() throws Exception {
+        int resultado = assertDoesNotThrow(() -> ic.cargarDatosDePrueba(), 
+        "La carga de datos de prueba no debería lanzar una excepción.");
+        assertNotEquals(-1, resultado, "El método debería retornar un valor distinto de -1 en caso de éxito.");
+    }
+    
+    @Test
+    @Order(2)
+    public void testCargarDatosDePruebaDuplicado() throws Exception {
+        int resultadoSegundaCarga = assertDoesNotThrow(() -> ic.cargarDatosDePrueba());
+
+        // Si la arquitectura idempotente/autogenerada devuelve 1 (o el código de retorno del controlador)
+        assertEquals(1, resultadoSegundaCarga, "La segunda carga fue procesada devolviendo el código 1.");   
+    }
+    
     @Test
     public void testCrearInstituto() throws Exception{
         String nombreInstituto = "Instituto1";

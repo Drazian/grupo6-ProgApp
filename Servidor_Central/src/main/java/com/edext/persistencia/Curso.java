@@ -38,15 +38,16 @@ public class Curso {
 
     public Curso(String nombre, String descripcion, String duracion, int cantidadHoras, 
                  int creditos, String url, Date fechaRegistro, Instituto instituto, List<Curso> previas) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras;
-        this.creditos = creditos;
-        this.url = url;
-        this.fechaRegistro = fechaRegistro;
-        this.instituto = instituto;
-        this.previas = previas;
+        
+        setNombre(nombre);
+        setDescripcion(descripcion);
+        setDuracion(duracion);
+        setCantidadHoras(cantidadHoras);
+        setCreditos(creditos);
+        setUrl(url);
+        setFechaRegistro(fechaRegistro);
+        setInstituto(instituto);
+        setPrevias(previas);
     }
 
     public String getNombre() { return nombre; }
@@ -68,17 +69,17 @@ public class Curso {
     public List<Curso> getPrevias() { return previas; }
     public void setPrevias(List<Curso> previas) { this.previas = previas; }
     
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Curso that = (Curso) o;
-        return Objects.equals(nombre, that.nombre);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(nombre);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Curso that = (Curso) o;
+//        return Objects.equals(nombre, that.nombre);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(nombre);
+//    }
     
 }

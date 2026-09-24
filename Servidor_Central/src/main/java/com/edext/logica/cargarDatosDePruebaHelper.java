@@ -62,7 +62,7 @@ public class cargarDatosDePruebaHelper {
              * ============================================================
              */
 
-            if (em.find(Instituto.class, "IN") != null
+            if (em.find(Instituto.class, "INCO") != null
                     || em.find(Usuario.class, "eleven11") != null
                     || em.find(Curso.class, "Talleres plenarios") != null
                     || em.find(Edicion.class, "Flor del Ceibo - 2010") != null

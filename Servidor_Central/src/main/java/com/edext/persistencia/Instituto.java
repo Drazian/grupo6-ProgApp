@@ -11,7 +11,7 @@ public class Instituto {
 
     public Instituto(){}
     public Instituto(String nombre){
-        this.nombre=nombre;
+        setNombre(nombre);
     }
     
     public String getNombre() {return nombre;}
