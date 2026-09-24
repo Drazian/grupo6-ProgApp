@@ -13,6 +13,7 @@ import com.edext.datatypes.DtUsuario;
 import com.edext.datatypes.TipoUsuario;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -590,7 +591,110 @@ public class ControladorTest {
         assertNotNull(lista, "La lista no debe ser nula");
     }
  
+    @Test
+    public void testSetCrearProgramaFormacion() throws Exception {
+        String nombre = "PROGRAMITA";
+        
+        DtPrograma programa = new DtPrograma(nombre, "desc", LocalDate.now(), LocalDate.now(), LocalDate.now());
+        ic.setCrearProgramaFormacion(programa);
+        
+        List<DtPrograma> programas = ic.listarProgramas();
+        assertNotNull(programas, "La lista de programas no debe ser nula");
+        
+        boolean existeEnLista = programas.stream().anyMatch(i -> i.getNombre().equals(nombre));
+        assertTrue(existeEnLista, "El programa creado deberia estar en la lista");
+    }
     
+    @Test
+    public void testSetCrearProgramaFormacionDuplicado() throws Exception {
+        String nombre = "PROGRAMITA2";
+        DtPrograma programa = new DtPrograma(nombre, "desc", LocalDate.now(), LocalDate.now(), LocalDate.now());
+        DtPrograma programa2 = new DtPrograma(nombre, "desc", LocalDate.now(), LocalDate.now(), LocalDate.now());
+        ic.setCrearProgramaFormacion(programa);
+        
+        boolean resultadoSegundaCarga = assertDoesNotThrow(() -> ic.setCrearProgramaFormacion(programa2));
+        assertEquals(false, resultadoSegundaCarga, "La segunda carga fue procesada sin duplicados."); 
+    }    
+    
+    @Test
+    public void testGetEstudiantesInscriptosEdicion() throws Exception {
+        String nombre = "Dalavuelta - 2025";
+        List<String> resultado = ic.getEstudiantesInscriptosEdicion(nombre);
+        assertNotNull(resultado, "La lista no debe ser nula");
+    }
+ 
+    @Test
+    public void testGetEstudiantesCandidatosEdicion() throws Exception {
+        String nombre = "Dalavuelta - 2025";
+        List <String> resultado = ic.getEstudiantesCandidatosEdicion(nombre);
+        assertNotNull(resultado, "La lista no debe ser nula");
+    }    
+
+    @Test
+    public void testGetEstudiantesInscriptosEdicionInexistente() throws Exception {
+        String nombre = "EDICION_INEXISTENTE";
+        List<String> resultado = ic.getEstudiantesInscriptosEdicion(nombre);
+        assertEquals(resultado, Collections.emptyList());
+    }
+ 
+    @Test
+    public void testGetEstudiantesCandidatosEdicionInexistente() throws Exception {
+        String nombre = "EDICION_INEXISTENTE";
+        List <String> resultado = ic.getEstudiantesCandidatosEdicion(nombre);
+        assertNotNull(resultado, "La lista no debe ser nula");
+    }
+    
+    
+    //Test restantes
+    
+    @Test
+    public void testSetInscripcion() throws Exception {
+        String estudiante = "roro";
+        String edicion = "MicroBit - 2026";
+        ic.setInscripcion(estudiante, edicion);
+        
+        List<String> resultado = ic.getEstudiantesInscriptosEdicion(edicion);
+        boolean existeEnLista = resultado.stream().anyMatch(i -> i.equals(estudiante));
+        assertTrue(existeEnLista, "El estudiante deberia estar en la lista");
+    }
+
+    @Test
+    public void testSetInscripcionEstudianteInexistente() throws Exception {
+        String estudiante = "";
+        String edicion = "MicroBit - 2026";
+        int resultado = ic.setInscripcion(estudiante, edicion);
+        assertEquals(resultado, 1); //Codigo de error por estudiante inexeistente.
+    }
+
+    @Test
+    public void testSetInscripcionEdicionInexistente() throws Exception {
+        String estudiante = "roro";
+        String edicion = "";
+        int resultado = ic.setInscripcion(estudiante, edicion);
+        assertEquals(resultado, 2); //Codigo de error por edicion inexistente.
+    }
+    
+    @Test
+    public void testDelInscripcion() throws Exception {
+        String estudiante = "weiss";
+        String edicion = "MicroBit - 2026";
+        ic.setInscripcion(estudiante, edicion);
+        ic.delInscripcion(estudiante, edicion);
+        
+        List<String> resultado = ic.getEstudiantesInscriptosEdicion(edicion);
+        boolean existeEnLista = resultado.stream().anyMatch(i -> i.equals(estudiante));
+        assertFalse(existeEnLista, "El estudiante no deberia estar en la lista");
+    }
+    
+    @Test
+    public void testDelInscripcionEstudianteInexistente() throws Exception {
+        String estudiante = "";
+        String edicion = "MicroBit - 2026";
+        ic.delInscripcion(estudiante, edicion);
+        
+        int resultado = ic.delInscripcion(estudiante, edicion);
+        assertEquals(resultado, -1); //Codigo de error generico/default.
+    }
     
     
 }
