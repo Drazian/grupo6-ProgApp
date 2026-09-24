@@ -38,12 +38,12 @@ public class Usuario {
     
 
     public Usuario(String nickname, String email, String nombre, String apellido, Date fNacimiento, String imagen) {
-        this.nickname = nickname;
-        this.email = email;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.fNacimiento = fNacimiento;
-        this.imagen = imagen;
+        setNickname(nickname);
+        setEmail(email);
+        setNombre(nombre);
+        setApellido(apellido);
+        setfNacimiento(fNacimiento);
+        setImagen(imagen);
     }
 
     public Usuario() {

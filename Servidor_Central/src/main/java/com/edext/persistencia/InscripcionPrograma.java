@@ -33,9 +33,9 @@ public class InscripcionPrograma {
     public InscripcionPrograma(){}
     
     public InscripcionPrograma(Estudiante estudiante, ProgramaFormacion programa, LocalDate fechaInscripcion){
-        this.fechaInscripcion=fechaInscripcion;
-        this.estudiante=estudiante;
-        this.programa=programa;
+        setFechaInscripcion(fechaInscripcion);
+        setEstudiante(estudiante);
+        setProgramaFormacion(programa);
     }
     
     public void setProgramaFormacion(ProgramaFormacion programa){ this.programa=programa; }

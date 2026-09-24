@@ -33,9 +33,9 @@ public class InscripcionEdicion {
     public InscripcionEdicion(){}
     
     public InscripcionEdicion(Estudiante estudiante, Edicion edicion, LocalDate fechaInscripcion){
-        this.fechaInscripcion=fechaInscripcion;
-        this.estudiante=estudiante;
-        this.edicion=edicion;
+        setFechaInscripcion(fechaInscripcion);
+        setEstudiante(estudiante);
+        setEdicion(edicion);
     }
     
     public void setEdicion(Edicion edicion){ this.edicion=edicion; }

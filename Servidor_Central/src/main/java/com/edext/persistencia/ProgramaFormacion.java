@@ -43,12 +43,12 @@ public class ProgramaFormacion {
     public ProgramaFormacion(){}
     
     public ProgramaFormacion(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, Set<Curso> cursos ){
-        this.descripcion=descripcion;
-        this.fechaRegistro=fechaRegistro;
-        this.fechaInicio=fechaInicio;
-        this.fechaFin=fechaFin;
-        this.cursos=cursos;
-        this.nombre=nombre;
+        setDescripcion(descripcion);
+        setFechaRegistro(fechaRegistro);
+        setFechaFin(fechaFin);
+        setFechaInicio(fechaInicio);
+        setCursos(cursos);
+        setNombre(nombre);
     }
 
 //    public void setCursos (List<Curso> cursos){this.cursos=cursos;}
@@ -81,21 +81,21 @@ public class ProgramaFormacion {
     public String getNombre(){ return this.nombre; }
     //public List<Curso> getCursos() { return this.cursos;}
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.nombre);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        final ProgramaFormacion other = (ProgramaFormacion) obj;
-        return Objects.equals(this.nombre, other.nombre);
-    }
+//    @Override
+//    public int hashCode() {
+//        int hash = 7;
+//        hash = 97 * hash + Objects.hashCode(this.nombre);
+//        return hash;
+//    }
+//
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) return true;
+//        if (obj == null) return false;
+//        if (getClass() != obj.getClass()) return false;
+//        final ProgramaFormacion other = (ProgramaFormacion) obj;
+//        return Objects.equals(this.nombre, other.nombre);
+//    }
 
     public void agregarCurso(Curso curso){
         if (!this.cursos.contains(curso)){

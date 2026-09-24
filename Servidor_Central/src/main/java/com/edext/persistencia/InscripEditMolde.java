@@ -15,8 +15,8 @@ public class InscripEditMolde implements Serializable {
     public InscripEditMolde(){}
     
     public InscripEditMolde(String estudiante, String edicion){
-        this.estudiante=estudiante;
-        this.edicion=edicion;
+        setEstudiante(estudiante);
+        setEdicion(edicion);
     }
     
     public void setEstudiante(String estudiante) { this.estudiante = estudiante; }

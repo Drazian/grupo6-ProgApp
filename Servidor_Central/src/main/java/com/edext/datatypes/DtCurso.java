@@ -18,7 +18,7 @@ public class DtCurso {
     private List<DtCurso> previas;  //  Agregado para compatibilidad con la Entity
     private DtInstituto instituto;  //  Agregado para compatibilidad con la Entity
     
-    public DtCurso() {}
+    //public DtCurso() {}
 
     //*************************************** Agregada sobrecarga secundaria para compatibilidad
 

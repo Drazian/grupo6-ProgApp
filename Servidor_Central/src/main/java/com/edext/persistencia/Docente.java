@@ -25,7 +25,7 @@ public class Docente extends Usuario {
                    List<Instituto> instituto) {
 
         super(nickname, email, nombre, apellido, fNacimiento, imagen);
-        this.institutos = instituto;
+        setInstitutos(instituto);
     }
 
     public List<Instituto> getInstitutos() {

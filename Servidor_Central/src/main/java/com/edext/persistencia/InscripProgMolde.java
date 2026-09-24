@@ -15,8 +15,8 @@ public class InscripProgMolde implements Serializable {
     public InscripProgMolde(){}
     
     public InscripProgMolde(String estudiante, String programa){
-        this.estudiante=estudiante;
-        this.programa=programa;
+        setEstudiante(estudiante);
+        setProgramaFormacion(programa);
     }
     
     public void setEstudiante(String estudiante) { this.estudiante = estudiante; }
