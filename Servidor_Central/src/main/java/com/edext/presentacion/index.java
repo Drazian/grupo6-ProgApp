@@ -36,6 +36,8 @@ public class index extends javax.swing.JFrame {
         mbIndex = new javax.swing.JMenuBar();
         mInstitutos = new javax.swing.JMenu();
         miInstituto = new javax.swing.JMenuItem();
+        mCategorias = new javax.swing.JMenu();
+        miAltaCategoria = new javax.swing.JMenuItem();
         mUsuarios = new javax.swing.JMenu();
         miAltaUsuario = new javax.swing.JMenuItem();
         miConsultaUsuario = new javax.swing.JMenuItem();
@@ -57,7 +59,6 @@ public class index extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(320, 180));
-        setPreferredSize(new java.awt.Dimension(990, 580));
 
         jScrollPane1.setMinimumSize(new java.awt.Dimension(320, 180));
         jScrollPane1.setPreferredSize(new java.awt.Dimension(950, 520));
@@ -86,6 +87,14 @@ public class index extends javax.swing.JFrame {
         mInstitutos.add(miInstituto);
 
         mbIndex.add(mInstitutos);
+
+        mCategorias.setText("Categorias");
+
+        miAltaCategoria.setText("Agregar Categoria");
+        miAltaCategoria.addActionListener(this::miAltaCategoriaActionPerformed);
+        mCategorias.add(miAltaCategoria);
+
+        mbIndex.add(mCategorias);
 
         mUsuarios.setText("Usuarios");
 
@@ -384,6 +393,14 @@ public class index extends javax.swing.JFrame {
         form.cargarPanel("Arbol", new Arbol(), true, true, true, true, true,true);
     }//GEN-LAST:event_jmverArbolActionPerformed
 
+    private void miAltaCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAltaCategoriaActionPerformed
+        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Categorias",true,true,true,true);
+        internalFrame.getContentPane().add(new AltaCategoria());
+        internalFrame.pack();
+        this.dpIndex.add(internalFrame);
+        internalFrame.setVisible(true);
+    }//GEN-LAST:event_miAltaCategoriaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -422,6 +439,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenuItem jmcargarDatosPrueba;
     private javax.swing.JMenuItem jmverArbol;
     private javax.swing.JMenu mArbol;
+    private javax.swing.JMenu mCategorias;
     private javax.swing.JMenu mCursos;
     private javax.swing.JMenu mDataPrueba;
     private javax.swing.JMenu mInstitutos;
@@ -429,6 +447,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenu mUsuarios;
     private javax.swing.JMenuBar mbIndex;
     private javax.swing.JMenuItem miAgregarPrograma;
+    private javax.swing.JMenuItem miAltaCategoria;
     private javax.swing.JMenuItem miAltaUsuario;
     private javax.swing.JMenuItem miConsultaPrograma;
     private javax.swing.JMenuItem miConsultaUsuario;
