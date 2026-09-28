@@ -1,9 +1,10 @@
 package com.edext.datatypes;
 
-public class DtInstituto {
+public class DtCategoria {
     private String nombre;
 
-    public DtInstituto(String nombre){
+    public DtCategoria(){}
+    public DtCategoria(String nombre){
         this.nombre=nombre;
     }
     

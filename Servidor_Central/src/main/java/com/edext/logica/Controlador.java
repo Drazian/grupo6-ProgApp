@@ -1,5 +1,6 @@
 package com.edext.logica;
 
+import com.edext.datatypes.DtCategoria;
 import com.edext.persistencia.ProgramaFormacion;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityManager;
@@ -16,6 +17,7 @@ import com.edext.datatypes.DtUsuario;
 import com.edext.datatypes.DtEdicion;
 import com.edext.persistencia.Curso;
 import com.edext.datatypes.DtCurso;
+import com.edext.persistencia.Categoria;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import org.tinylog.Logger;
@@ -155,6 +157,24 @@ public class Controlador implements IControlador {
     }
     
     @Override
+    public void crearCategoria(String nombre) throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            
+            //Verifico primero si existe una Categoria con ese nombre (aux), de no ser asi lo creo. De existir, envio exception.
+            Categoria aux = em.find(Categoria.class,nombre); 
+            if (aux == null){
+                        Categoria aux2 = new Categoria(nombre);
+                        em.persist(aux2);
+                        em.getTransaction().commit();
+            } else {
+                throw new Exception("La categoria con el nombre '"+nombre+"' ya existe.");
+            }
+        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+    }
+    
+    @Override
     public void eliminarInstituto(String nombre) throws Exception{
         EntityManager em = emf.createEntityManager();
         try {
@@ -217,6 +237,24 @@ public class Controlador implements IControlador {
             return resultado;     
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
+    
+    @Override
+    public List<DtCategoria> listarCategorias() throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try {
+            List<DtCategoria> resultado = new ArrayList<>();
+            
+            List<Categoria> listaAux = em.createQuery("SELECT i FROM Categoria i",Categoria.class).getResultList();
+            for (Categoria aux: listaAux){
+                resultado.add(new DtCategoria(aux.getNombre()));
+            }
+            return resultado;     
+        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+    }
+    
+    
+    
+    
     
     @Override
     public boolean existeUsuario(String nickname) throws Exception {

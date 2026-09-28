@@ -1,5 +1,6 @@
 package com.edext.logica;
 
+import com.edext.datatypes.DtCategoria;
 import com.edext.datatypes.DtConsultaCurso;
 import com.edext.datatypes.DtPrograma;
 import com.edext.datatypes.DtInstituto;
@@ -13,7 +14,9 @@ public interface IControlador {
     void crearInstituto(String nombre) throws Exception;
     void eliminarInstituto(String nombre) throws Exception;
     List<DtInstituto> listarInstitutos() throws Exception;
-
+    
+    void crearCategoria(String nombre) throws Exception;
+    List<DtCategoria> listarCategorias() throws Exception;
     
     void crearUsuario(DtUsuario usuario) throws Exception;
     boolean existeUsuario(String nickname) throws Exception;

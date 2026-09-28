@@ -4,12 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public class Instituto {
+public class Categoria {
     @Id
     private String nombre;
-    
-    public Instituto(){}
-    public Instituto(String nombre){
+
+    public Categoria(){}
+    public Categoria(String nombre){
         setNombre(nombre);
     }
     
