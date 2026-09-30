@@ -2,15 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
  */
-package com.edext.logica;
+package edu.edext.logica;
 
-import com.edext.datatypes.DtConsultaCurso;
-import com.edext.datatypes.DtCurso;
-import com.edext.datatypes.DtEdicion;
-import com.edext.datatypes.DtInstituto;
-import com.edext.datatypes.DtPrograma;
-import com.edext.datatypes.DtUsuario;
-import com.edext.datatypes.TipoUsuario;
+import edu.edext.datatypes.DtConsultaCurso;
+import edu.edext.datatypes.DtCurso;
+import edu.edext.datatypes.DtEdicion;
+import edu.edext.datatypes.DtInstituto;
+import edu.edext.datatypes.DtPrograma;
+import edu.edext.datatypes.DtUsuario;
+import edu.edext.datatypes.TipoUsuario;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
