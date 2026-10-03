@@ -1,4 +1,4 @@
-package edu.edext.srvweb;
+package edu.edext;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
