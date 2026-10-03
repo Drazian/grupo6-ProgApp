@@ -70,9 +70,13 @@ public class institutos extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tbl);
 
         btnActualizar.setText("Actualizar");
+        btnActualizar.setEnabled(false);
+        btnActualizar.setVisible(false);
         btnActualizar.addActionListener(this::btnActualizarActionPerformed);
 
         btnEliminar.setText("Eliminar");
+        btnEliminar.setEnabled(false);
+        btnEliminar.setVisible(false);
         btnEliminar.addActionListener(this::btnEliminarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

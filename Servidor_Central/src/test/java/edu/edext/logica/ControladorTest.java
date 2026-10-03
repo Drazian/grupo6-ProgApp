@@ -4,6 +4,7 @@
  */
 package edu.edext.logica;
 
+import edu.edext.datatypes.DtCategoria;
 import edu.edext.datatypes.DtConsultaCurso;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtEdicion;
@@ -129,7 +130,7 @@ public class ControladorTest {
         String nickname = "NICKNAME";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
         ic.crearUsuario(usuario);
         
         List<DtUsuario> usuarios = ic.listarUsuarios();
@@ -145,8 +146,8 @@ public class ControladorTest {
         String nickname = "NICKNAME2";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "email221", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
-        DtUsuario usuario2 = new DtUsuario(nickname, "email222", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email221", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario2 = new DtUsuario(nickname, "password", "email222", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
         ic.crearUsuario(usuario);
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario2);}, "Ya existe");        
@@ -159,8 +160,8 @@ public class ControladorTest {
         String nickname2 = "NICKNAME32";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
-        DtUsuario usuario2 = new DtUsuario(nickname2, "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario2 = new DtUsuario(nickname2, "password", "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
         ic.crearUsuario(usuario);
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario2);}, "Ya existe");        
@@ -172,7 +173,7 @@ public class ControladorTest {
         String nickname = "NICKNAME_DOCENTE";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "email_docente", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
         ic.crearUsuario(usuario);
         
         List<DtUsuario> usuarios = ic.listarUsuarios();
@@ -190,7 +191,7 @@ public class ControladorTest {
         institutos.add("Instituto manolo");
         
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "email_docente2", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente2", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario);}, "No existe el Instituto");        
         assertNotNull(excepcion.getMessage());
@@ -229,7 +230,7 @@ public class ControladorTest {
         
         List<DtCurso> previas = ic.listarCursosPorUsuario("heisenberg");
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas);
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new HashSet<String>());
         
         ic.altaCurso(curso, nombreInstituto);
         
@@ -249,12 +250,12 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso previa = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto);
+        DtCurso previa = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, new HashSet<String>());
         
         List<DtCurso> previas = ic.listarCursosPorUsuario("heisenberg");
         previas.add(previa);
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas);
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new HashSet<String>());
                
         Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, nombreInstituto);}, "No existe la previa");        
         assertNotNull(excepcion.getMessage());
@@ -270,7 +271,7 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto);
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, new HashSet<String>());
         
         ic.altaCurso(curso, nombreInstituto);
         
@@ -288,7 +289,7 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto);
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, new HashSet<String>());
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, "INSTITUTO_INEXISTENTE33");}, "Instituto inexistente");        
         assertNotNull(excepcion.getMessage());
@@ -487,6 +488,7 @@ public class ControladorTest {
         
         DtUsuario usuarioModificado = new DtUsuario(
         usuarioOriginal.getNickname(),     // Mantiene nickname
+        usuarioOriginal.getPassword(),
         usuarioOriginal.getEmail(),        // Mantiene email
         usuarioOriginal.getNombre(),       // Mantiene nombre
         nuevoApellido,                     // <--- Apellido cambiado
@@ -511,7 +513,7 @@ public class ControladorTest {
         String nickname = "NICKNAME44";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.modificarUsuario(usuario);}, "No existe");        
         assertNotNull(excepcion.getMessage());      
@@ -696,5 +698,29 @@ public class ControladorTest {
         assertEquals(resultado, -1); //Codigo de error generico/default.
     }
     
+    @Test
+    public void testAltaCategoria() throws Exception {
+        String nombreCategoria = "CAT1";
+        ic.crearCategoria(nombreCategoria);
+        
+        List<DtCategoria> categorias = ic.listarCategorias();
+        assertNotNull(categorias, "La lista no debe ser nula");
+        
+        boolean existeEnLista = categorias.stream().anyMatch(i -> i.getNombre().equals(nombreCategoria));
+        assertTrue(existeEnLista, "La categoria creada deberia estar en la lista");
+    }
+    
+    @Test
+    public void testAltaCategoriaDuplicado() throws Exception {
+        String nombreCategoria = "CAT2";
+        ic.crearCategoria(nombreCategoria);
+        
+        List<DtCategoria> categorias = ic.listarCategorias();
+        assertNotNull(categorias, "La lista no debe ser nula");
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.crearCategoria(nombreCategoria);}, "Ya existe");
+        assertNotNull(excepcion.getMessage());
+    }
+        
     
 }
