@@ -1,4 +1,4 @@
-package edu.edext.srvweb.resources;
+package edu.edext.resources;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
