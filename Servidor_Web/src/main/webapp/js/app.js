@@ -45,3 +45,69 @@ function guardarProducto(event) {
     .catch(error => console.error('Error al guardar:', error));
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+function testServlet(){
+    const contenedor = document.getElementById('contenido-dinamico');
+    
+    fetch(`TestServlet`)
+        .then(response => response.text())
+        .then(html => {
+            contenedor.innerHTML = html;
+        })
+        .catch(error => console.error('Error al cargar la sección:', error));    
+}
+
+function crearInstituto(){
+    const nombre = document.getElementById("nombre").value;
+    
+    if (!nombre.trim()){
+        alert("Ingrese un nombre valido");
+        return;
+    }
+    
+    const params = new URLSearchParams();
+    params.append('nombre', nombre);
+    
+fetch('TestServlet', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        body: params
+    })
+    .then(response => {
+        return response.text().then(texto => {
+            if (!response.ok) {
+                throw new Error(texto);
+            }
+            return texto;
+        });
+    })
+    .then(mensajeExito => {
+        alert(mensajeExito);
+        testServlet(); //Reinvocamos el GET
+    })
+    .catch(error => {
+        alert(error.message);
+    });
+    
+}
+
+
+
+
+
+
+
+
