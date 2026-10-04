@@ -27,6 +27,7 @@
                     <li><a href="#" onclick="cargarSeccion('abrirFormulario')">Agregar Producto</a></li>
                     <li><a href="#" onclick="cargarSeccion('reportes')">reportes</a></li>
                     <li><a href="#" onclick="cargarSeccion('configuracion')">Configuración</a></li>
+                    <li><a href="#" onclick="testServlet()">TestTemporal</a></li>
                 </ul>
             </nav>
         </aside>
