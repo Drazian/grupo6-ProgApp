@@ -28,6 +28,10 @@
                     <li><a href="#" onclick="cargarSeccion('reportes')">reportes</a></li>
                     <li><a href="#" onclick="cargarSeccion('configuracion')">Configuración</a></li>
                     <li><a href="#" onclick="testServlet()">TestTemporal</a></li>
+                    
+                    <li><a href="#" onclick="ProgramaServlet('formCrear')">Crear Programa</a></li>
+                    <li><a href="#" onclick="ProgramaServlet('formAgregarCurso')">Agregar curso a Programa</a></li>
+                    
                 </ul>
             </nav>
         </aside>

@@ -111,3 +111,67 @@ fetch('TestServlet', {
 
 
 
+function ProgramaServlet(opcion) {
+    const contenedor = document.getElementById('contenido-dinamico');
+    
+    // Llamada al Controlador (Servlet) pidiendo una acción específica
+    fetch(`ProgramaServlet?accion=${opcion}`)
+        .then(response => response.text())
+        .then(html => {
+            contenedor.innerHTML = html;
+        })
+        .catch(error => console.error('Error al cargar la sección:', error));
+}
+
+function crearPrograma(){
+    const nombre = document.getElementById("nombre").value;
+    const descripcion = document.getElementById("desc").value;
+    const fechaInicio = document.getElementById("fechaInicio").value;
+    const fechaFin = document.getElementById("fechaFin").value;
+    
+    if (!nombre.trim()){
+        alert("Ingrese un nombre valido");
+        return;
+    }
+
+    if (!descripcion.trim()){
+        alert("Ingrese una descripcion valida");
+        return;
+    }
+    
+        if (!fechaInicio.trim() || !fechaFin.trim()){
+        alert("Ingrese un periodo valido");
+        return;
+    }
+    
+    
+    const params = new URLSearchParams();
+    params.append('nombre', nombre);
+    params.append('desc', descripcion);
+    params.append('fechaInicio', fechaInicio);
+    params.append('fechaFin', fechaFin);
+    
+fetch('ProgramaServlet?accion=crear', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        body: params
+    })
+    .then(response => {
+        return response.text().then(texto => {
+            if (!response.ok) {
+                throw new Error(texto);
+            }
+            return texto;
+        });
+    })
+    .then(mensajeExito => {
+        alert(mensajeExito);
+        ProgramaServlet("formCrear"); //Reinvocamos el GET
+    })
+    .catch(error => {
+        alert(error.message);
+    });
+    
+}
