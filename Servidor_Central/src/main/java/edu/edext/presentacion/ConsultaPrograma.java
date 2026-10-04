@@ -267,7 +267,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                         aux.getFechaRegistro(),
                         aux.getUrl(),
                         strPrevias
-                        //, aux.getCategoria()
+                        //,aux.getCategoria()
                     });   
             }
 

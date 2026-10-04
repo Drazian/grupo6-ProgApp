@@ -627,15 +627,17 @@ public class Controlador implements IControlador {
                     }
                 }
                 resultado.add(new DtCurso(
-                                        aux.getNombre(),
-                                        aux.getDescripcion(),
-                                        aux.getDuracion(),
-                                        aux.getCantidadHoras(),
-                                        aux.getCreditos(),
-                                        aux.getUrl(),
-                                        aux.getFechaRegistro(),
-                                        new DtInstituto(aux.getInstituto().getNombre()),
-                                        nombresPrevias // Se envía la lista mapeada
+                        aux.getNombre(),                                    
+                        aux.getDescripcion(),                               
+                        aux.getDuracion(),                                  
+                        aux.getCantidadHoras(),                             
+                        aux.getCreditos(),                                  
+                        aux.getUrl(),                                       
+                        aux.getFechaRegistro(),                             
+                        new DtInstituto(aux.getInstituto().getNombre()),    
+                        null,
+                        null,
+                        nombresPrevias
                 ));
             }
             
@@ -666,15 +668,17 @@ public class Controlador implements IControlador {
                 }
 
                 resultado.add(new DtCurso(
-                                        aux.getNombre(),
-                                        aux.getDescripcion(),
-                                        aux.getDuracion(),
-                                        aux.getCantidadHoras(),
-                                        aux.getCreditos(),
-                                        aux.getUrl(),
-                                        aux.getFechaRegistro(),
-                                        new DtInstituto(aux.getInstituto().getNombre()),
-                                        nombresPrevias // Se envía la lista mapeada
+                        aux.getNombre(),                                    
+                        aux.getDescripcion(),                               
+                        aux.getDuracion(),                                  
+                        aux.getCantidadHoras(),                             
+                        aux.getCreditos(),                                  
+                        aux.getUrl(),                                       
+                        aux.getFechaRegistro(),                             
+                        new DtInstituto(aux.getInstituto().getNombre()),    
+                        null,
+                        null,
+                        nombresPrevias
                 ));
             }
             
