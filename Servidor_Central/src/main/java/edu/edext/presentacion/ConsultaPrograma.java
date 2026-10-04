@@ -66,7 +66,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                 {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Nombre", "Descripcion", "Duracion", "Horas", "Creditos", "Registro", "URL", "Previas", "Categoria"
+                "Nombre", "Descripcion", "Duracion", "Horas", "Creditos", "Registro", "URL", "Previas", "Categorias"
             }
         ) {
             Class[] types = new Class [] {
@@ -258,6 +258,10 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                                         ? String.join(", ", aux.getListPrevias()) 
                                         : "---";
                 
+                String strCategorias = (aux.getListCategorias() != null && !aux.getListCategorias().isEmpty()) 
+                                        ? String.join(", ", aux.getListCategorias()) 
+                                        : "---";
+                
                 model.addRow(new Object[]{
                         aux.getNombre(),
                         aux.getDescripcion(),
@@ -266,8 +270,8 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                         aux.getCreditos(),
                         aux.getFechaRegistro(),
                         aux.getUrl(),
-                        strPrevias
-                        //,aux.getCategoria()
+                        strPrevias,
+                        strCategorias
                     });   
             }
 

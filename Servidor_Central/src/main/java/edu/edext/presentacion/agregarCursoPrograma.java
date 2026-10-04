@@ -52,20 +52,20 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
 
         tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"A1", null, null, null, null, null, null, null},
-                {"A2", null, null, null, null, null, null, null},
-                {"A3", null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null}
+                {"A1", null, null, null, null, null, null, null, null},
+                {"A2", null, null, null, null, null, null, null, null},
+                {"A3", null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Nombre", "Descripcion", "Duracion", "Horas", "Creditos", "Registro", "URL", "Previas"
+                "Nombre", "Descripcion", "Duracion", "Horas", "Creditos", "Registro", "URL", "Previas", "Categorias"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -107,7 +107,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                                 .addGap(18, 18, 18)
                                 .addComponent(cbPrograma, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(lblSeleccionarCurso))
-                        .addGap(0, 126, Short.MAX_VALUE)))
+                        .addGap(0, 361, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -177,9 +177,13 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
             List<DtCurso> lista = ic.listarCursos();
             DefaultTableModel model = (DefaultTableModel) tbl.getModel();
             model.setRowCount(0);
-            for (DtCurso aux: lista){               
-                String strPrevias = (aux.getListPrevias()!= null && !aux.getListPrevias().isEmpty()) 
+            for (DtCurso aux: lista){
+                String strPrevias = (aux.getListPrevias() != null && !aux.getListPrevias().isEmpty()) 
                                         ? String.join(", ", aux.getListPrevias()) 
+                                        : "---";
+                
+                String strCategorias = (aux.getListCategorias() != null && !aux.getListCategorias().isEmpty()) 
+                                        ? String.join(", ", aux.getListCategorias()) 
                                         : "---";
                 
                 model.addRow(new Object[]{
@@ -190,7 +194,8 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                         aux.getCreditos(),
                         aux.getFechaRegistro(),
                         aux.getUrl(),
-                        strPrevias
+                        strPrevias,
+                        strCategorias
                     });   
             }
             
