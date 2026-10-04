@@ -155,7 +155,7 @@
                 <Column editable="false" title="Registro" type="java.lang.String"/>
                 <Column editable="false" title="URL" type="java.lang.String"/>
                 <Column editable="false" title="Previas" type="java.lang.String"/>
-                <Column editable="false" title="Categoria" type="java.lang.String"/>
+                <Column editable="false" title="Categorias" type="java.lang.String"/>
               </Table>
             </Property>
           </Properties>

@@ -626,6 +626,14 @@ public class Controlador implements IControlador {
                         nombresPrevias.add(previa.getNombre());
                     }
                 }
+                
+                Set<String> nombresCategorias = new HashSet<>();
+                if (aux.getCategorias() != null){
+                    for (String categoria : aux.getCategorias()){
+                        nombresCategorias.add(categoria);
+                    }
+                }
+                
                 resultado.add(new DtCurso(
                         aux.getNombre(),                                    
                         aux.getDescripcion(),                               
@@ -636,7 +644,7 @@ public class Controlador implements IControlador {
                         aux.getFechaRegistro(),                             
                         new DtInstituto(aux.getInstituto().getNombre()),    
                         null,
-                        null,
+                        nombresCategorias,
                         nombresPrevias
                 ));
             }
@@ -666,6 +674,13 @@ public class Controlador implements IControlador {
                         nombresPrevias.add(previa.getNombre());
                     }
                 }
+                
+                Set<String> nombresCategorias = new HashSet<>();
+                if (aux.getCategorias() != null){
+                    for (String categoria : aux.getCategorias()){
+                        nombresCategorias.add(categoria);
+                    }
+                }
 
                 resultado.add(new DtCurso(
                         aux.getNombre(),                                    
@@ -677,7 +692,7 @@ public class Controlador implements IControlador {
                         aux.getFechaRegistro(),                             
                         new DtInstituto(aux.getInstituto().getNombre()),    
                         null,
-                        null,
+                        nombresCategorias,
                         nombresPrevias
                 ));
             }
