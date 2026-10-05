@@ -1,9 +1,10 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Aplicación MVC</title>
+    <title>EDEXT</title>
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
@@ -22,17 +23,48 @@
         <!-- SECTOR 2: Menú Lateral Izquierdo -->
         <aside class="sector-2">
             <nav>
-                <ul>
-                    <li><a href="#" onclick="cargarSeccion('productos')">Ver Productos</a></li>
-                    <li><a href="#" onclick="cargarSeccion('abrirFormulario')">Agregar Producto</a></li>
-                    <li><a href="#" onclick="cargarSeccion('reportes')">reportes</a></li>
-                    <li><a href="#" onclick="cargarSeccion('configuracion')">Configuración</a></li>
-                    <li><a href="#" onclick="testServlet()">TestTemporal</a></li>
-                    
-                    <li><a href="#" onclick="ProgramaServlet('formCrear')">Crear Programa</a></li>
-                    <li><a href="#" onclick="ProgramaServlet('formAgregarCurso')">Agregar curso a Programa</a></li>
-                    
-                </ul>
+                <!-- Grupo 1: Institutos (Dinamico) -->
+                <details open>
+                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Institutos</summary>
+                    <ul id="lista-institutos" style="list-style: none; padding-left: 15px;">
+                        <li style="font-size: 12px; opacity: 0.7;">Cargando...</li>
+                    </ul>
+                </details>
+
+                <hr style="opacity: 0.2; margin: 10px 0;">
+
+                <!-- Grupo 2: Categorias (Dinamico) -->
+                <details open>
+                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Categorias</summary>
+                    <ul id="lista-categorias" style="list-style: none; padding-left: 15px;">
+                        <li style="font-size: 12px; opacity: 0.7;">Cargando...</li>
+                    </ul>
+                </details>
+
+                <hr style="opacity: 0.2; margin: 10px 0;">                
+                
+                <!-- Grupo 3: Programas de Formación (Estatico) -->
+                <details>
+                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Programas</summary>
+                    <ul style="list-style: none; padding-left: 15px;">
+                        <li><a href="#" onclick="ProgramaServlet('formCrear')">Crear Programa</a></li>
+                        <li><a href="#" onclick="ProgramaServlet('formAgregarCurso')">Agregar curso a Programa</a></li>
+                    </ul>
+                </details>
+
+                <hr style="opacity: 0.2; margin: 10px 0;">
+
+                <!-- Grupo 4: Funciones Generales / Legacy (Estatico) -->
+                <details>
+                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Opciones Generales</summary>
+                    <ul style="list-style: none; padding-left: 15px;">
+                        <li><a href="#" onclick="cargarSeccion('productos')">Ver Productos</a></li>
+                        <li><a href="#" onclick="cargarSeccion('abrirFormulario')">Agregar Producto</a></li>
+                        <li><a href="#" onclick="cargarSeccion('reportes')">Reportes</a></li>
+                        <li><a href="#" onclick="cargarSeccion('configuracion')">Configuración</a></li>
+                        <li><a href="#" onclick="testServlet()">TestTemporal</a></li>
+                    </ul>
+                </details>
             </nav>
         </aside>
 

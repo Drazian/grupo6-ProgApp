@@ -18,10 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- *
- * @author pipo
- */
 @WebServlet("/ProgramaServlet")
 public class ProgramaServlet extends HttpServlet {
     private IControlador ic = Fabrica.getInstance().getIControlador();
