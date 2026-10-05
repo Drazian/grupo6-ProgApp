@@ -10,6 +10,7 @@ import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtCurso;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -718,18 +719,82 @@ public class Controlador implements IControlador {
     }
     
     @Override
-    public DtPrograma buscarPrograma(String nombre) throws Exception{
+    public DtPrograma buscarPrograma(String nombre) throws Exception {
         EntityManager em = emf.createEntityManager();
-        try{
+        try {
             ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
-            
-            if (programa == null){
+
+            if (programa == null) {
                 throw new Exception("No existe ningún programa con el nombre: " + nombre);
             }
-            
-            return new DtPrograma(programa.getNombre(), programa.getDescripcion(), programa.getFechaRegistro(), programa.getFechaInicio(), programa.getFechaFin()); 
-        
-        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+
+            Set<DtCurso> dtCursos = new HashSet<>();
+
+            if (programa.getCursos() != null) {
+                for (Curso c : programa.getCursos()) {
+                    Set<String> categorias = c.getCategorias() != null ? new HashSet<>(c.getCategorias()) : new HashSet<>();
+
+                    DtInstituto dtInst = null;
+                    if (c.getInstituto() != null) {
+                        dtInst = new DtInstituto(c.getInstituto().getNombre());
+                    }
+
+                    DtCurso dtc = new DtCurso(
+                        c.getNombre(),
+                        c.getDescripcion(),
+                        c.getDuracion(),
+                        c.getCantidadHoras(),
+                        c.getCreditos(),
+                        c.getUrl(),
+                        c.getFechaRegistro(),
+                        dtInst,
+                        categorias
+                    );
+
+                    dtCursos.add(dtc);
+                }
+            }
+
+            LocalDate fRegistro = parseToLocalDate(programa.getFechaRegistro());
+            LocalDate fInicio   = parseToLocalDate(programa.getFechaInicio());
+            LocalDate fFin      = parseToLocalDate(programa.getFechaFin());
+
+            return new DtPrograma(
+                programa.getNombre(), 
+                programa.getDescripcion(), 
+                fRegistro, 
+                fInicio, 
+                fFin,
+                dtCursos
+            );
+
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    //Metodo auxiliar para implementar buscarPrograma().
+    //Hubiera estado bueno ponerse de acuerdo para usar LocalDate O Date pero no ambas a la vez.
+    private java.time.LocalDate parseToLocalDate(Object fecha) {
+        if (fecha == null) return null;
+        if (fecha instanceof java.time.LocalDate) {
+            return (java.time.LocalDate) fecha;
+        }
+        if (fecha instanceof String) {
+            String str = (String) fecha;
+            return str.isEmpty() ? null : java.time.LocalDate.parse(str);
+        }
+        if (fecha instanceof java.util.Date) {
+            return ((java.util.Date) fecha).toInstant()
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toLocalDate();
+        }
+        return null;
     }
 
     @Override

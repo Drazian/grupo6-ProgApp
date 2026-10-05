@@ -286,6 +286,39 @@ function agregarCursoAPrograma(){
     
 }
 
+function cargarProgramas() {
+    fetch('ProgramaServlet?accion=formVerProgramas')
+        .then(response => {
+            if (!response.ok) throw new Error('Error al obtener la lista de programas');
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('contenido-dinamico').innerHTML = 
+                '<div class="alerta-error">Ocurrió un error al cargar los programas de formación.</div>';
+        });
+}
+
+function cargarDetallePrograma(nombrePrograma) {
+    fetch(`ProgramaServlet?accion=detallePrograma&nombre=${encodeURIComponent(nombrePrograma)}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Error al cargar el detalle del programa');
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('contenido-dinamico').innerHTML = 
+                '<div class="alerta-error">Ocurrió un error al cargar el detalle del programa.</div>';
+        });
+}
+
+
 //---------------------------------------------------------------------------------
 
 
