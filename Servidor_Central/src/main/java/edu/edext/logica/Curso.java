@@ -23,6 +23,8 @@ public class Curso {
     private int cantidadHoras;
     private int creditos;
     private String url;
+    
+    @jakarta.persistence.ElementCollection(fetch = jakarta.persistence.FetchType.EAGER)
     private List<String> categorias;
     
     @Column(nullable=false) // Aporte de Draco conservado

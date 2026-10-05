@@ -30,6 +30,7 @@ public interface IControlador {
     DtConsultaCurso obtenerDatosCurso(String nombreCurso) throws Exception;
     List<String> listarNombresCursos() throws Exception;
     List<String> listarCursosPorInstituto(String nombreInstituto) throws Exception;
+    List<String> listarCursosPorCategoria(String nombreInstituto) throws Exception;
     List<DtCurso> listarCursos() throws Exception;
     
     

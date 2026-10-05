@@ -362,6 +362,21 @@ public class Controlador implements IControlador {
             em.close();
         }
     }
+    
+    @Override
+    public List<String> listarCursosPorCategoria(String nombreCategoria) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            return em.createQuery("SELECT c.nombre FROM Curso c WHERE :cat MEMBER OF c.categorias", String.class)
+                     .setParameter("cat", nombreCategoria)
+                     .getResultList();
+        } finally {
+            em.close();
+        }    
+    }
+    
+    
+    
 
     @Override
     public edu.edext.datatypes.DtConsultaCurso obtenerDatosCurso(String nombreCurso) throws Exception {
