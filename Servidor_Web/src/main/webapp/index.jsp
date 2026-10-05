@@ -24,7 +24,7 @@
         <aside class="sector-2">
             <nav>
                 <!-- Grupo 1: Institutos (Dinamico) -->
-                <details open>
+                <details>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Institutos</summary>
                     <ul id="lista-institutos" style="list-style: none; padding-left: 15px;">
                         <li style="font-size: 12px; opacity: 0.7;">Cargando...</li>
@@ -34,7 +34,7 @@
                 <hr style="opacity: 0.2; margin: 10px 0;">
 
                 <!-- Grupo 2: Categorias (Dinamico) -->
-                <details open>
+                <details>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Categorias</summary>
                     <ul id="lista-categorias" style="list-style: none; padding-left: 15px;">
                         <li style="font-size: 12px; opacity: 0.7;">Cargando...</li>
@@ -44,11 +44,12 @@
                 <hr style="opacity: 0.2; margin: 10px 0;">                
                 
                 <!-- Grupo 3: Programas de Formación (Estatico) -->
-                <details>
+                <details open>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Programas</summary>
                     <ul style="list-style: none; padding-left: 15px;">
                         <li><a href="#" onclick="ProgramaServlet('formCrear')">Crear Programa</a></li>
                         <li><a href="#" onclick="ProgramaServlet('formAgregarCurso')">Agregar curso a Programa</a></li>
+                        <li><a href="#" onclick="ProgramaServlet('formVerProgramas')">Ver Programas</a></li>
                     </ul>
                 </details>
 

@@ -54,6 +54,34 @@ public class ProgramaServlet extends HttpServlet {
                 request.getRequestDispatcher("fragmentos/agregarCursoPrograma.jsp").forward(request, response);
             break;
             
+            case "formVerProgramas":
+            try {
+                    List<DtPrograma> programas = ic.listarProgramas(); 
+
+                    request.setAttribute("listaProgramas", programas);
+                    request.getRequestDispatcher("fragmentos/verProgramas.jsp").forward(request, response);
+                } catch (Exception e) {
+                    request.setAttribute("error", e.getMessage());
+                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                }
+            break;
+            
+            case "detallePrograma":
+                try {
+                    String nombrePrograma = request.getParameter("nombre");
+
+                    DtPrograma programa = ic.buscarPrograma(nombrePrograma); 
+
+                    request.setAttribute("programa", programa);
+                    request.getRequestDispatcher("fragmentos/programaDetalles.jsp").forward(request, response);
+                } catch (Exception e) {
+                    request.setAttribute("error", e.getMessage());
+                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                }
+            break;
+            
+            
+            
             default:
                 request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
             break;
