@@ -114,7 +114,6 @@ fetch('TestServlet', {
 function ProgramaServlet(opcion) {
     const contenedor = document.getElementById('contenido-dinamico');
     
-    // Llamada al Controlador (Servlet) pidiendo una acción específica
     fetch(`ProgramaServlet?accion=${opcion}`)
         .then(response => response.text())
         .then(html => {
@@ -151,27 +150,70 @@ function crearPrograma(){
     params.append('fechaInicio', fechaInicio);
     params.append('fechaFin', fechaFin);
     
-fetch('ProgramaServlet?accion=crear', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        },
-        body: params
-    })
-    .then(response => {
-        return response.text().then(texto => {
-            if (!response.ok) {
-                throw new Error(texto);
-            }
-            return texto;
+    fetch('ProgramaServlet?accion=crear', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: params
+        })
+        .then(response => {
+            return response.text().then(texto => {
+                if (!response.ok) {
+                    throw new Error(texto);
+                }
+                return texto;
+            });
+        })
+        .then(mensajeExito => {
+            alert(mensajeExito);
+            ProgramaServlet("formCrear"); //Reinvocamos el GET
+        })
+        .catch(error => {
+            alert(error.message);
         });
-    })
-    .then(mensajeExito => {
-        alert(mensajeExito);
-        ProgramaServlet("formCrear"); //Reinvocamos el GET
-    })
-    .catch(error => {
-        alert(error.message);
-    });
+    
+}
+
+function agregarCursoAPrograma(){
+    const programa = document.getElementById('selectPrograma').value;
+    const curso = document.getElementById('selectCurso').value;
+        
+    if (!programa.trim()){
+        alert("Ingrese un programa valido");
+        return;
+    }
+
+    if (!curso.trim()){
+        alert("Ingrese un curso valido");
+        return;
+    } 
+    
+    const params = new URLSearchParams();
+    params.append('programaStr', programa);
+    params.append('cursoStr', curso);
+    
+    fetch('ProgramaServlet?accion=agregarCurso', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: params
+        })
+        .then(response => {
+            return response.text().then(texto => {
+                if (!response.ok) {
+                    throw new Error(texto);
+                }
+                return texto;
+            });
+        })
+        .then(mensajeExito => {
+            alert(mensajeExito);
+            ProgramaServlet("formAgregarCurso"); //Reinvocamos el GET
+        })
+        .catch(error => {
+            alert(error.message);
+        });
     
 }
