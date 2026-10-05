@@ -1,5 +1,9 @@
 package edu.edext.controlador;
 
+import edu.edext.datatypes.DtCategoria;
+import edu.edext.datatypes.DtInstituto;
+import edu.edext.logica.Fabrica;
+import edu.edext.logica.IControlador;
 import edu.edext.modelo.Producto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +19,7 @@ import org.tinylog.Logger;
 // Nota: Si usas una versión muy antigua de Java EE, cambia "jakarta" por "javax"
 @WebServlet("/MiControladorServlet")
 public class MiControladorServlet extends HttpServlet {
+    private IControlador ic = Fabrica.getInstance().getIControlador();
 
     // Método principal que recibe peticiones GET (clics del menú y búsquedas)
     @Override
@@ -55,7 +60,57 @@ public class MiControladorServlet extends HttpServlet {
             vistaDestino = "/fragmentos/formulario.jsp";
         }
         
-        else if("reportes".equals(accion)) vistaDestino="/fragmentos/Central-01-10-2026.log";
+        else if ("reportes".equals(accion)) {
+            vistaDestino="/fragmentos/Central-01-10-2026.log";
+        }
+        
+        // CASO 4: Obtener Institutos en JSON para el menu izquierdo de index.jsp
+        else if ("obtenerInstitutosJSON".equals(accion)) {
+            response.setContentType("application/json;charset=UTF-8");
+            try {
+                List<DtInstituto> institutos = ic.listarInstitutos();
+
+                StringBuilder json = new StringBuilder("[");
+                for (int i = 0; i < institutos.size(); i++) {
+                    json.append("{\"nombre\":\"")
+                        .append(institutos.get(i).getNombre().replace("\"", "\\\""))
+                        .append("\"}");
+                    if (i < institutos.size() - 1) json.append(",");
+                }
+                json.append("]");
+
+                response.getWriter().write(json.toString());
+            } catch (Exception e) {
+                Logger.error(e, "Error al listar institutos");
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("[]");
+            }
+            return;
+        }
+
+        // CASO 5: Obtener Categorías en JSON para el menu izquierdo de index.jsp
+        else if ("obtenerCategoriasJSON".equals(accion)) {
+            response.setContentType("application/json;charset=UTF-8");
+            try {
+                List<DtCategoria> categorias = ic.listarCategorias();
+
+                StringBuilder json = new StringBuilder("[");
+                for (int i = 0; i < categorias.size(); i++) {
+                    json.append("{\"nombre\":\"")
+                        .append(categorias.get(i).getNombre().replace("\"", "\\\""))
+                        .append("\"}");
+                    if (i < categorias.size() - 1) json.append(",");
+                }
+                json.append("]");
+
+                response.getWriter().write(json.toString());
+            } catch (Exception e) {
+                Logger.error(e, "Error al listar categorías");
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("[]");
+            }
+            return;
+        }
         
         // Despachador: Toma los datos procesados y renderiza el JSP correspondiente
         request.getRequestDispatcher(vistaDestino).forward(request, response);
