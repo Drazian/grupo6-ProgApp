@@ -38,7 +38,7 @@ public class CursoServlet extends HttpServlet {
                     if ("instituto".equalsIgnoreCase(opcion)) {
                         cursos = ic.listarCursosPorInstituto(nombre);
                     } else if ("categoria".equalsIgnoreCase(opcion)) {
-                        cursos = ic.listarCursosPorInstituto(nombre); //TO-DO: CREAR listarCursosPorCategoria(nombre)
+                        cursos = ic.listarCursosPorCategoria(nombre);
                     }
 
                     request.setAttribute("listaCursos", cursos);
