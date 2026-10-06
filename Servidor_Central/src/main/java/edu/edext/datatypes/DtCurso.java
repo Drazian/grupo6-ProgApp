@@ -19,11 +19,8 @@ public class DtCurso {
     private DtInstituto instituto;
     private Set<String> categorias;
     
-    public DtCurso() {}
-
-    //*************************************** Agregada sobrecarga secundaria para compatibilidad
-
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, DtInstituto instituto, List<DtCurso> previas, Set<String> categorias) {
+    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, 
+            int creditos, String url, Date fechaRegistro, DtInstituto instituto, List<DtCurso> previas, Set<String> categorias) {
         this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, instituto, categorias);
         Set<String> tmpPrevias=new HashSet<>();
         for (DtCurso previa : previas) tmpPrevias.add(previa.getNombre());
@@ -31,7 +28,8 @@ public class DtCurso {
         this.previas=previas;
         tmpPrevias=null;
     }
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, DtInstituto instituto ,Set<String> previas, Set<String> categorias) {
+    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, 
+                   int creditos, String url, Date fechaRegistro, DtInstituto instituto ,Set<String> previas, Set<String> categorias) {
         this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, instituto, categorias);
         List<DtCurso> tmpPrevias=new ArrayList<>();
         for (String previa : previas) tmpPrevias.add(new DtCurso(previa, descripcion, duracion, cantidadHoras,creditos, url, fechaRegistro, instituto, previas, categorias));
@@ -39,20 +37,13 @@ public class DtCurso {
         this.previas=tmpPrevias;
         tmpPrevias=null;
     }
+    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, 
+                   String url, Date fechaRegistro, DtInstituto instituto, Set<String> categorias){
+        this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, instituto, null, categorias, null);
+    }
     
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, DtInstituto instituto, Set<String> categorias){
-            this.nombre = nombre;
-            this.descripcion = descripcion;
-            this.duracion = duracion;
-            this.cantidadHoras = cantidadHoras;
-            this.creditos = creditos;
-            this.url = url;
-            this.fechaRegistro = fechaRegistro;
-            this.instituto=instituto;
-            this.categorias=categorias;
-    } 
-
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, DtInstituto instituto, Set<String> previas, Set<String> categorias, Set<String> namePrevias){
+    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, 
+                   String url, Date fechaRegistro, DtInstituto instituto, Set<String> previas, Set<String> categorias, Set<String> namePrevias){
             this.nombre = nombre;
             this.descripcion = descripcion;
             this.duracion = duracion;
@@ -64,8 +55,7 @@ public class DtCurso {
             this.namePrevias = (namePrevias != null) ? namePrevias : new HashSet<>();
             this.categorias = (categorias != null) ? categorias : new HashSet<>();
             this.previas = new ArrayList<>(); // Inicializado para evitar NullPointer
-    } 
-    
+    }
     
     public String getNombre() { return nombre; }
     public String getDescripcion() { return descripcion; }

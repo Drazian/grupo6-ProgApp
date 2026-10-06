@@ -1,15 +1,19 @@
-package edu.edext.presentacion;
+package edu.edext.presentacion.pasado;
+
 import edu.edext.datatypes.DtInstituto;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.tools.Utils;
+import edu.edext.tools.Utils.Mouse;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 
-public class institutos extends javax.swing.JPanel {
+public class AltaInstituto extends javax.swing.JPanel {
 
-    public institutos() {
+    private final Mouse mouse=new Mouse();
+    public AltaInstituto() {
         initComponents();
         cargarTabla();
     }
@@ -30,6 +34,18 @@ public class institutos extends javax.swing.JPanel {
         tbl = new javax.swing.JTable();
         btnActualizar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
+
+        setMinimumSize(new java.awt.Dimension(406, 276));
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+        });
 
         lblNombre.setText("Nombre:");
 
@@ -71,12 +87,10 @@ public class institutos extends javax.swing.JPanel {
 
         btnActualizar.setText("Actualizar");
         btnActualizar.setEnabled(false);
-        btnActualizar.setVisible(false);
         btnActualizar.addActionListener(this::btnActualizarActionPerformed);
 
         btnEliminar.setText("Eliminar");
         btnEliminar.setEnabled(false);
-        btnEliminar.setVisible(false);
         btnEliminar.addActionListener(this::btnEliminarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -89,7 +103,7 @@ public class institutos extends javax.swing.JPanel {
                         .addGap(17, 17, 17)
                         .addComponent(lblNombre)
                         .addGap(18, 18, 18)
-                        .addComponent(txtNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                        .addComponent(txtNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addComponent(btnCrear))
                     .addGroup(layout.createSequentialGroup()
@@ -111,12 +125,12 @@ public class institutos extends javax.swing.JPanel {
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCrear))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnActualizar)
                     .addComponent(btnEliminar))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -179,6 +193,14 @@ public class institutos extends javax.swing.JPanel {
             txtNombre.setText(nombre);
         }
     }//GEN-LAST:event_tblMouseClicked
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_formMouseDragged
 
     private void cargarTabla(){
         try{

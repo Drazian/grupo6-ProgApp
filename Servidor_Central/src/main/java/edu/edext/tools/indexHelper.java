@@ -25,24 +25,36 @@ public class indexHelper {
     private final JDesktopPane dpIndex;
     private boolean limitMin, activeScroll;
     private Dimension originalSize;
-    private int panelX, panelY;
+    private int panelX, panelY, prefX, prefY, minX, minY;
     public indexHelper(JDesktopPane obj){
         this.dpIndex=obj;
     }
     
-    public void cargarpanel(String titulo, Component panel, boolean unique, boolean rendOnDrag, int with, int height){
-        cargarPanel(titulo, panel, unique, rendOnDrag, unique, unique, unique, unique, with, height);
+    public void cargarPanel(String titulo, Component panel, int with, int height){
+        cargarPanel(titulo, panel, true, false, false, true, true, true, with, height);
+      //cargarPanel(titulo, panel, unique, rendOnDrag, resizable, closable, maximizable, minimizable, int with, int height){
+    }
+    public void cargarPanel(String titulo, Component panel){
+        cargarPanel(titulo, panel, true);
+    }
+
+    public void cargarPanel(String titulo, Component panel, boolean unique){
+        cargarPanel(titulo, panel, unique, true);
     }
     
     public void cargarPanel(String titulo, Component panel, boolean unique, boolean rendOnDrag){
-        cargarPanel(titulo, panel, unique, rendOnDrag, false, true, false, true);
+        cargarPanel(titulo, panel, unique, rendOnDrag, false, true, true, true);
     }
     
-    public void cargarPanel(String titulo, Component panel, boolean unique,boolean rendOnDrag, boolean resizable, boolean closable, boolean maximizable, boolean minimizable){
+    public void cargarPanel(String titulo, Component panel, boolean unique, boolean rendOnDrag, int with, int height){
+        cargarPanel(titulo, panel, unique, rendOnDrag, unique, unique, unique, unique, with, height);
+    }
+    
+    public void cargarPanel(String titulo, Component panel, boolean unique, boolean rendOnDrag, boolean resizable, boolean closable, boolean maximizable, boolean minimizable){
         cargarPanel(titulo, panel, unique, rendOnDrag, resizable, closable, maximizable, minimizable, 0, 0);
     }
     
-    private void cargarPanel(String titulo, Component panel, boolean unique,boolean rendOnDrag, boolean resizable, boolean closable, boolean maximizable, boolean minimizable, int with, int height){
+    private void cargarPanel(String titulo, Component panel, boolean unique, boolean rendOnDrag, boolean resizable, boolean closable, boolean maximizable, boolean minimizable, int with, int height){
         this.originalSize=dpIndex.getPreferredSize();
         boolean flag=true;
         if (unique){
@@ -76,6 +88,8 @@ public class indexHelper {
                         }
                     });
                     internalFrame.getContentPane().add(panel);
+                    internalFrame.setPreferredSize(panel.getPreferredSize());
+                    internalFrame.setMinimumSize(panel.getMinimumSize());
                     internalFrame.pack();
                     this.dpIndex.add(internalFrame);
                     if(!rendOnDrag)  this.dpIndex.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);

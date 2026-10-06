@@ -1,11 +1,11 @@
 package edu.edext.tools;
 //************************* Capa Presentacion **********************************
-import java.awt.Component;
-import java.util.ArrayList;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.Timer;
+import java.awt.Component;
+import javax.swing.JLabel;
+import java.util.ArrayList;
+import javax.swing.JButton;
 
 /**
  *
