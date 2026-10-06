@@ -1,8 +1,10 @@
-package edu.edext.presentacion;
+package edu.edext.presentacion.pasado;
 
 import edu.edext.datatypes.DtCategoria;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.tools.Utils;
+import edu.edext.tools.Utils.Mouse;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -10,6 +12,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class AltaCategoria extends javax.swing.JPanel {
 
+    private final Mouse mouse=new Mouse();
     public AltaCategoria() {
         initComponents();
         cargarTabla();
@@ -31,6 +34,19 @@ public class AltaCategoria extends javax.swing.JPanel {
         tbl = new javax.swing.JTable();
         btnActualizar = new javax.swing.JButton();
         btnActualizar.setVisible(false);
+
+        setMinimumSize(new java.awt.Dimension(406, 276));
+        setPreferredSize(new java.awt.Dimension(425, 324));
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+        });
 
         lblNombre.setText("Nombre:");
 
@@ -71,7 +87,6 @@ public class AltaCategoria extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tbl);
 
         btnActualizar.setText("Actualizar");
-        btnActualizar.setEnabled(false);
         btnActualizar.addActionListener(this::btnActualizarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -84,7 +99,7 @@ public class AltaCategoria extends javax.swing.JPanel {
                         .addGap(17, 17, 17)
                         .addComponent(lblNombre)
                         .addGap(18, 18, 18)
-                        .addComponent(txtNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                        .addComponent(txtNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addComponent(btnCrear))
                     .addGroup(layout.createSequentialGroup()
@@ -105,10 +120,10 @@ public class AltaCategoria extends javax.swing.JPanel {
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCrear))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(btnActualizar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -147,6 +162,14 @@ public class AltaCategoria extends javax.swing.JPanel {
             txtNombre.setText(nombre);
         }
     }//GEN-LAST:event_tblMouseClicked
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_formMouseDragged
 
     private void cargarTabla(){
         try{

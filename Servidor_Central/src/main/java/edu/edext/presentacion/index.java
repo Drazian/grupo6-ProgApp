@@ -1,5 +1,8 @@
 package edu.edext.presentacion;
 
+import edu.edext.presentacion.pasado.AltaCategoria;
+import edu.edext.presentacion.pasado.AltaInstituto;
+import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.indexHelper;
 import javax.swing.JOptionPane;
 import org.tinylog.Logger;
@@ -10,6 +13,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JInternalFrame ventanaConsultaUsuario;
     private javax.swing.JInternalFrame ventanaModificarUsuario;
     private final indexHelper form;
+    private final Mouse mouse= new Mouse();
     
     /**
      * Creates new form index
@@ -58,27 +62,38 @@ public class index extends javax.swing.JFrame {
         jmcargarDatosPrueba = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(320, 180));
+        setMinimumSize(new java.awt.Dimension(710, 418));
+        setPreferredSize(new java.awt.Dimension(1043, 640));
 
-        jScrollPane1.setMinimumSize(new java.awt.Dimension(320, 180));
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(950, 520));
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(710, 392));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(1020, 580));
 
         dpIndex.setDoubleBuffered(true);
-        dpIndex.setMinimumSize(new java.awt.Dimension(320, 180));
-        dpIndex.setPreferredSize(new java.awt.Dimension(950, 520));
+        dpIndex.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                dpIndexMouseDragged(evt);
+            }
+        });
+        dpIndex.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                dpIndexMousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout dpIndexLayout = new javax.swing.GroupLayout(dpIndex);
         dpIndex.setLayout(dpIndexLayout);
         dpIndexLayout.setHorizontalGroup(
             dpIndexLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 988, Short.MAX_VALUE)
+            .addGap(0, 858, Short.MAX_VALUE)
         );
         dpIndexLayout.setVerticalGroup(
             dpIndexLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 555, Short.MAX_VALUE)
+            .addGap(0, 515, Short.MAX_VALUE)
         );
 
         jScrollPane1.setViewportView(dpIndex);
+
+        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         mInstitutos.setText("Institutos");
 
@@ -175,65 +190,15 @@ public class index extends javax.swing.JFrame {
 
         setJMenuBar(mbIndex);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 990, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
-        );
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void miInstitutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miInstitutoActionPerformed
-        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Institutos",true,true,true,true);
-        internalFrame.getContentPane().add(new institutos());
-        internalFrame.pack();
-        this.dpIndex.add(internalFrame);
-        internalFrame.setVisible(true);
+        form.cargarPanel("Institutos", new AltaInstituto(), true, true, true, true, true, true);
     }//GEN-LAST:event_miInstitutoActionPerformed
     //Abrir menu Nuevo Usuario
     private void miAltaUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAltaUsuarioActionPerformed
-        // Si la ventana ya existe y sigue abierta
-        if (ventanaAltaUsuario != null && ventanaAltaUsuario.isDisplayable()) {
-            try {
-                ventanaAltaUsuario.setSelected(true);
-            } catch (java.beans.PropertyVetoException e) {
-                
-            }
-            //trae la ventana al frente
-            ventanaAltaUsuario.toFront();
-            return;
-        }
-
-        // Crear la ventana solamente si no existe
-        ventanaAltaUsuario = new javax.swing.JInternalFrame(
-                "Nuevo Usuario", true, true, false, false);
-        
-        AltaUsuario formulario = new AltaUsuario();
-
-        ventanaAltaUsuario.getContentPane().add(formulario);
-        
-        ventanaAltaUsuario.pack();
-        
-        dpIndex.add(ventanaAltaUsuario);
-        ventanaAltaUsuario.setVisible(true);
-
-        // Cuando se cierre, se libera la referencia
-        ventanaAltaUsuario.addInternalFrameListener(
-                new javax.swing.event.InternalFrameAdapter() {
-                    @Override
-                    public void internalFrameClosed(
-                            javax.swing.event.InternalFrameEvent e) {
-                        ventanaAltaUsuario = null;
-                    }
-                }
-        );
-
+        form.cargarPanel("Nuevo Usuario", new AltaUsuario(), true, true, false, true, false, true);
     }//GEN-LAST:event_miAltaUsuarioActionPerformed
     //Abrir menuCosnulta usuario
     private void miConsultaUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miConsultaUsuarioActionPerformed
@@ -395,12 +360,16 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_jmverArbolActionPerformed
 
     private void miAltaCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAltaCategoriaActionPerformed
-        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Categorias",true,true,true,true);
-        internalFrame.getContentPane().add(new AltaCategoria());
-        internalFrame.pack();
-        this.dpIndex.add(internalFrame);
-        internalFrame.setVisible(true);
+        form.cargarPanel("Categorias", new AltaCategoria(), true, true, true, true, true, true);
     }//GEN-LAST:event_miAltaCategoriaActionPerformed
+
+    private void dpIndexMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dpIndexMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_dpIndexMousePressed
+
+    private void dpIndexMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dpIndexMouseDragged
+        mouse.MouseDragged(evt);
+    }//GEN-LAST:event_dpIndexMouseDragged
 
     /**
      * @param args the command line arguments

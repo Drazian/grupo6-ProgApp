@@ -70,42 +70,54 @@ public class ModificarUsuario extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panModificar = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         lisUsuario = new javax.swing.JList<>();
-        panModificar = new javax.swing.JPanel();
 
-        lisUsuario.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
         });
-        lisUsuario.addListSelectionListener(this::lisUsuarioValueChanged);
-        jScrollPane1.setViewportView(lisUsuario);
+
+        panModificar.setBackground(new java.awt.Color(180, 46, 46));
 
         javax.swing.GroupLayout panModificarLayout = new javax.swing.GroupLayout(panModificar);
         panModificar.setLayout(panModificarLayout);
         panModificarLayout.setHorizontalGroup(
             panModificarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 427, Short.MAX_VALUE)
+            .addGap(0, 500, Short.MAX_VALUE)
         );
         panModificarLayout.setVerticalGroup(
             panModificarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(64, 380));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(64, 535));
+
+        lisUsuario.setBackground(new java.awt.Color(131, 164, 169));
+        lisUsuario.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        lisUsuario.setMinimumSize(new java.awt.Dimension(0, 0));
+        lisUsuario.addListSelectionListener(this::lisUsuarioValueChanged);
+        jScrollPane1.setViewportView(lisUsuario);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panModificar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(panModificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
             .addComponent(panModificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -137,6 +149,10 @@ public class ModificarUsuario extends javax.swing.JPanel {
             formularioUsuario.cargarFormulario(usuario);
         });       
     }//GEN-LAST:event_lisUsuarioValueChanged
+
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        
+    }//GEN-LAST:event_formComponentResized
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

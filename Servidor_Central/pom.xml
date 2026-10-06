@@ -34,7 +34,6 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>

@@ -650,7 +650,8 @@ public class Controlador implements IControlador {
                     }
                 }
                 
-                resultado.add(new DtCurso(
+                resultado.add(
+                        new DtCurso(
                         aux.getNombre(),                                    
                         aux.getDescripcion(),                               
                         aux.getDuracion(),                                  
