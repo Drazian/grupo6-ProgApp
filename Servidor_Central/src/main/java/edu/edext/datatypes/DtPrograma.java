@@ -43,4 +43,22 @@ public class DtPrograma {
     public LocalDate getFechaRegistro (){ return this.fechaRegistro; }
     public List<DtCurso> toArray(){ return new ArrayList<>(this.cursos); }
 
+    //Las categorias se obtienen de los Cursos del Programa.
+    public Set<String> getCategorias() {
+        Set<String> categoriasPrograma = new HashSet<>();
+        if (this.cursos != null) {
+            for (DtCurso curso : this.cursos) {
+                if (curso.getSetCategorias() != null) {
+                    categoriasPrograma.addAll(curso.getSetCategorias());
+                }
+            }
+        }
+        return categoriasPrograma;
+    }
+
+    
+    
+    
+    
+    
 }

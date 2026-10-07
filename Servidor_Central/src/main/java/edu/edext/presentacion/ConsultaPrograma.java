@@ -9,6 +9,7 @@ import edu.edext.datatypes.DtCurso;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -52,6 +53,8 @@ public class ConsultaPrograma extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         txaDescripcion = new javax.swing.JTextArea();
         lblCursos = new javax.swing.JLabel();
+        lblCategorias = new javax.swing.JLabel();
+        txtCategorias = new javax.swing.JTextField();
 
         lblPrograma.setText("Programa de formacion:");
 
@@ -112,6 +115,10 @@ public class ConsultaPrograma extends javax.swing.JPanel {
 
         lblCursos.setText("Cursos:");
 
+        lblCategorias.setText("Categorias:");
+
+        txtCategorias.setEditable(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -128,32 +135,36 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                                 .addComponent(cbPrograma, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblDescripcion)
-                                    .addComponent(lblNombre))
-                                .addGap(18, 18, 18)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lblDescripcion)
+                                            .addComponent(lblNombre))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(lblCursos))
+                                .addGap(22, 84, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(22, 87, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                            .addComponent(lblRegistro)
-                                            .addGap(18, 18, 18))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(lblInicio)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(lblRegistro)
+                                        .addGap(18, 18, 18))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblInicio)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE))
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(lblFin)
-                                        .addGap(37, 37, 37)))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(txtFin, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-                                    .addComponent(txtInicio, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtRegistro, javax.swing.GroupLayout.Alignment.LEADING))))
-                        .addGap(96, 96, 96))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblCursos)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                        .addGap(37, 37, 37))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblCategorias)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtFin, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(txtInicio, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                                        .addComponent(txtRegistro, javax.swing.GroupLayout.Alignment.LEADING))
+                                    .addComponent(txtCategorias))))
+                        .addGap(101, 101, 101)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -171,18 +182,25 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                     .addComponent(txtRegistro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblDescripcion)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblDescripcion)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblCursos))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblInicio)
                             .addComponent(txtInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(21, 21, 21)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblFin))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblCursos)
+                            .addComponent(lblFin)
+                            .addComponent(txtFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblCategorias)
+                            .addComponent(txtCategorias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -211,6 +229,15 @@ public class ConsultaPrograma extends javax.swing.JPanel {
             txtInicio.setText(aux.getFechaInicio().toString());
             txtFin.setText(aux.getFechaFin().toString());
             cargarCursos();
+            
+            //Para cargar categorias
+            Set<String> categorias = aux.getCategorias();
+            String categoriasStr = (categorias != null && !categorias.isEmpty())
+                                    ? String.join(", ", categorias)
+                                    : "Sin categorías";
+            txtCategorias.setText(categoriasStr);
+            
+            
             
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al obtener los datos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
@@ -330,6 +357,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> cbPrograma;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblCategorias;
     private javax.swing.JLabel lblCursos;
     private javax.swing.JLabel lblDescripcion;
     private javax.swing.JLabel lblFin;
@@ -339,6 +367,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
     private javax.swing.JLabel lblRegistro;
     private javax.swing.JTable tbl;
     private javax.swing.JTextArea txaDescripcion;
+    private javax.swing.JTextField txtCategorias;
     private javax.swing.JTextField txtFin;
     private javax.swing.JTextField txtInicio;
     private javax.swing.JTextField txtNombre;
