@@ -71,8 +71,7 @@ public class UsuarioServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    
-    private void cargarInstitutos(HttpServletResponse response)
+        private void cargarInstitutos(HttpServletResponse response)
         throws IOException {
 
         response.setContentType("application/json;charset=UTF-8");
@@ -115,16 +114,12 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String accion = request.getParameter("accion");
-        
-      
         if ("listarInstitutos".equals(accion)) {
             cargarInstitutos(response);
         } else {
             processRequest(request, response);
         }
-    }
-
-    
+    } 
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -177,7 +172,7 @@ public class UsuarioServlet extends HttpServlet {
                 throw e;
             } catch (Exception e) {
                 throw new ServletException(
-                    "No se pudieron validar los datos del usuario.", e
+                   "No se pudieron validar los datos del usuario.", e
                 );
             }
             Part imagen = request.getPart("imagen");
@@ -186,7 +181,6 @@ public class UsuarioServlet extends HttpServlet {
             File archivoTemporal = null;
 
             if (imagen != null && imagen.getSize() > 0) {
-
                 String nombreOriginal = imagen.getSubmittedFileName();
 
                 String extension = "";
