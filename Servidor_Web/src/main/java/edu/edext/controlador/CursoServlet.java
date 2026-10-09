@@ -1,10 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package edu.edext.controlador;
 
 import edu.edext.datatypes.DtCurso;
+import edu.edext.datatypes.DtInstituto;
+import edu.edext.datatypes.DtUsuario;
+import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import java.io.IOException;
@@ -14,7 +13,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @WebServlet("/CursoServlet")
 public class CursoServlet extends HttpServlet {
@@ -48,10 +52,32 @@ public class CursoServlet extends HttpServlet {
                     request.setAttribute("error", e.getMessage());
                     request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
                 }
+                break;
                 
-            break;
+            case "altaCurso": // NUESTRO CASO DE USO AGREGADO
+                // 1. Validar seguridad: Solo docentes pueden dar de alta un curso
+                HttpSession session = request.getSession();
+                DtUsuario usuarioLogueado = (DtUsuario) session.getAttribute("usuarioLogueado");
+                
+                if (usuarioLogueado == null || usuarioLogueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los docentes pueden realizar esta acción.");
+                    return; // Cortamos la ejecución aquí
+                }
+
+                try {
+                    // 2. Cargar datos dinámicos para los <select> del formulario
+                    request.setAttribute("institutos", ic.listarInstitutos());
+                    request.setAttribute("categorias", ic.listarCategorias());
+                    request.setAttribute("cursosPrevios", ic.listarNombresCursos());
+
+                    // 3. Despachar el fragmento HTML
+                    request.getRequestDispatcher("fragmentos/altaCurso.jsp").forward(request, response);
+                } catch (Exception e) {
+                    request.setAttribute("error", e.getMessage());
+                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                }
+                break;
         }
-        
     }
 
     @Override
@@ -66,9 +92,52 @@ public class CursoServlet extends HttpServlet {
         }
         
         switch (accion){
-        
-        }        
-        
-    }
+            case "altaCurso": // NUESTRO CASO DE USO AGREGADO
+                try {
+                    // 1. Extraer los datos básicos
+                    String nombreCurso = request.getParameter("nombre");
+                    String descripcion = request.getParameter("descripcion");
+                    String duracion = request.getParameter("duracion");
+                    int cantidadHoras = Integer.parseInt(request.getParameter("cantidadHoras"));
+                    int creditos = Integer.parseInt(request.getParameter("creditos"));
+                    String url = request.getParameter("url");
+                    String nombreInstituto = request.getParameter("instituto");
 
+                    // 2. Extraer selecciones múltiples
+                    String[] catArray = request.getParameterValues("categorias");
+                    Set<String> categorias = catArray != null ? new HashSet<>(Arrays.asList(catArray)) : new HashSet<>();
+                    
+                    if (categorias.isEmpty()) {
+                        throw new Exception("Debe seleccionar al menos una categoría.");
+                    }
+
+                    String[] prevArray = request.getParameterValues("previas");
+                    Set<String> previas = prevArray != null ? new HashSet<>(Arrays.asList(prevArray)) : new HashSet<>();
+
+                    // 3. Generar la fecha actual del sistema
+                    Date fechaRegistro = new Date(); 
+
+                    // 4. Armar el Datatype
+                    DtCurso dtCurso = new DtCurso(
+                            nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
+                            fechaRegistro, new DtInstituto(nombreInstituto), null, categorias, previas
+                    );
+
+                    // 5. Llamar a la lógica del controlador
+                    ic.altaCurso(dtCurso, nombreInstituto); 
+
+                    // 6. Enviar mensaje de éxito
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write("Curso registrado exitosamente.");
+
+                } catch (NumberFormatException e) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("Las horas y los créditos deben ser números válidos.");
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write(e.getMessage());
+                }
+                break;
+        }       
+    }
 }

@@ -250,7 +250,7 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
             
             em.remove(aux);
             
-            em.getTransaction().commit();        
+            em.getTransaction().commit();       
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
     
@@ -280,7 +280,7 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
                }
                
            }
-            return resultado;
+             return resultado;
         }finally {
             em.close();
         }
@@ -313,10 +313,6 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
             return resultado;     
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
-    
-    
-    
-    
     
     @Override
     public boolean existeUsuario(String nickname) throws Exception {
@@ -382,6 +378,18 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
                     previas.add(previa);
                 }
             }
+            
+            // 3.5 Resolver las categorías (NUEVO REQUERIMIENTO TAREA 2)
+            List<Categoria> categoriasAsignadas = new ArrayList<>();
+            if (curso.getListCategorias() != null && !curso.getListCategorias().isEmpty()) {
+                for (String nombreCat : curso.getListCategorias()) {
+                    Categoria cat = em.find(Categoria.class, nombreCat);
+                    if (cat == null) {
+                        throw new Exception("No se encontró la categoría '" + nombreCat + "'.");
+                    }
+                    categoriasAsignadas.add(cat);
+                }
+            }
 
             // 4. Crear la entidad y persistir
             Curso nuevoCurso = new Curso(
@@ -393,7 +401,7 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
                 curso.getUrl(),
                 curso.getFechaRegistro(),
                 instituto,
-                curso.getListCategorias(),
+                categoriasAsignadas,
                 previas
             );
 
@@ -437,15 +445,14 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
     public List<String> listarCursosPorCategoria(String nombreCategoria) throws Exception {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("SELECT c.nombre FROM Curso c WHERE :cat MEMBER OF c.categorias", String.class)
+            // HQL actualizado usando JOIN para la relación ManyToMany
+            return em.createQuery("SELECT c.nombre FROM Curso c JOIN c.categorias cat WHERE cat.nombre = :cat", String.class)
                      .setParameter("cat", nombreCategoria)
                      .getResultList();
         } finally {
             em.close();
         }    
     }
-    
-    
     
 
     @Override
@@ -461,10 +468,18 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
              
             List<String> programas = new java.util.ArrayList<>(); 
 
+            // Convertir la lista de Categoria a lista de String para el Datatype
+            List<String> nombresCategorias = new ArrayList<>();
+            if (c.getCategorias() != null) {
+                for(Categoria cat : c.getCategorias()){
+                    nombresCategorias.add(cat.getNombre());
+                }
+            }
+
             return new edu.edext.datatypes.DtConsultaCurso(
                 c.getNombre(), c.getDescripcion(), c.getDuracion(),
                 c.getCantidadHoras(), c.getCreditos(), c.getUrl(), c.getFechaRegistro(),
-                ediciones, programas, c.getCategorias()
+                ediciones, programas, nombresCategorias
             );
         } finally {
             em.close();
@@ -651,12 +666,6 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
         return ret;
     }
     
-    
-    
-    
-    
-    
-    
     @Override
     public void agregarProgramaCurso(String programa, String curso) throws Exception{
         EntityManager em = emf.createEntityManager();
@@ -712,10 +721,11 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
                     }
                 }
                 
+                // Mapear objetos Categoria a nombres
                 Set<String> nombresCategorias = new HashSet<>();
                 if (aux.getCategorias() != null){
-                    for (String categoria : aux.getCategorias()){
-                        nombresCategorias.add(categoria);
+                    for (Categoria categoria : aux.getCategorias()){
+                        nombresCategorias.add(categoria.getNombre());
                     }
                 }
                 
@@ -761,10 +771,11 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
                     }
                 }
                 
+                // Mapear objetos Categoria a nombres
                 Set<String> nombresCategorias = new HashSet<>();
                 if (aux.getCategorias() != null){
-                    for (String categoria : aux.getCategorias()){
-                        nombresCategorias.add(categoria);
+                    for (Categoria categoria : aux.getCategorias()){
+                        nombresCategorias.add(categoria.getNombre());
                     }
                 }
 
@@ -802,7 +813,14 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
 
             if (programa.getCursos() != null) {
                 for (Curso c : programa.getCursos()) {
-                    Set<String> categorias = c.getCategorias() != null ? new HashSet<>(c.getCategorias()) : new HashSet<>();
+                    
+                    // Mapear objetos Categoria a nombres
+                    Set<String> nombresCategorias = new HashSet<>();
+                    if (c.getCategorias() != null) {
+                        for (Categoria cat : c.getCategorias()) {
+                            nombresCategorias.add(cat.getNombre());
+                        }
+                    }
 
                     DtInstituto dtInst = null;
                     if (c.getInstituto() != null) {
@@ -818,7 +836,7 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
                         c.getUrl(),
                         c.getFechaRegistro(),
                         dtInst,
-                        categorias
+                        nombresCategorias
                     );
 
                     dtCursos.add(dtc);
@@ -848,8 +866,6 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
         }
     }
 
-    //Metodo auxiliar para implementar buscarPrograma().
-    //Hubiera estado bueno ponerse de acuerdo para usar LocalDate O Date pero no ambas a la vez.
     private java.time.LocalDate parseToLocalDate(Object fecha) {
         if (fecha == null) return null;
         if (fecha instanceof java.time.LocalDate) {
@@ -894,8 +910,6 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
                 throw new Exception("No existe el usuario '" + nickname + "'.");
             }
 
-            // Solo los docentes tienen cursos asociados.
-            // Los cursos se obtienen a través de las ediciones que dictan.
             if (usuario instanceof Docente) {
 
                 List<Curso> cursos = em.createQuery(
@@ -984,7 +998,6 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
 
                 Curso curso = aux.getCurso();
 
-                // Convertimos el curso a DtCurso
                 Set<String> nombresPrevias = new HashSet<>();
 
                 if (curso.getPrevias() != null) {
@@ -1005,7 +1018,6 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
                     nombresPrevias
                 );
 
-                // Convertimos los docentes de la edición
                 Set<String> nombresDocentes = new HashSet<>();
 
                 if (aux.getDocentes() != null) {
@@ -1030,7 +1042,7 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
         } finally {
             em.close();
         }
-    }    
+    }   
     
     @Override
     public List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception {
@@ -1111,9 +1123,5 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
         } finally {
             em.close();
         }
-    }    
-    //************************************************************************* 
-
-    
-    
+    }   
 }
