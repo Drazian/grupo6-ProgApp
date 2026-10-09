@@ -1,37 +1,22 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Lista cursos</title>
-    </head>
-    <body>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-        <div class="contenedor-cursos">
-            <h3>Resultados de búsqueda - <span class="badge-filtro">${filtroAplicado}</span></h3>
+<div class="contenedor-lista">
+    <h2>Resultados para: ${filtroAplicado}</h2>
+    <hr>
+    
+    <ul style="list-style: none; padding: 0;">
+        <c:forEach var="curso" items="${listaCursos}">
+            <!-- Al hacer clic en un curso, llama a JavaScript para ver sus detalles -->
+            <li style="margin-bottom: 10px;">
+                <a href="#" onclick="verDetallesCurso('${curso}')" style="font-size: 18px; text-decoration: none; font-weight: bold; color: #337ab7;">
+                    📘 ${curso}
+                </a>
+            </li>
+        </c:forEach>
+    </ul>
 
-            <c:choose>
-                <c:when test="${not empty listaCursos}">
-                    <ul class="lista-resultados-cursos">
-                        <c:forEach var="curso" items="${listaCursos}">
-                            <li class="item-curso">
-                                <span class="nombre-curso">${curso}</span>
-                                <button class="btn-detalle" onclick="verDetalleCurso('${curso}')">Ver detalle</button>
-                            </li>
-                        </c:forEach>
-                    </ul>
-                </c:when>
-
-                <c:otherwise>
-                    <div class="alerta-info">
-                        No se encontraron cursos registrados para este criterio.
-                    </div>
-                </c:otherwise>
-            </c:choose>
-        </div>
-        
-        
-        
-    </body>
-</html>
+    <c:if test="${empty listaCursos}">
+        <p style="color: #666;">No hay cursos registrados para esta selección.</p>
+    </c:if>
+</div>

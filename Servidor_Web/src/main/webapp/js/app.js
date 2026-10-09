@@ -551,4 +551,79 @@ function cerrarSesion() {
     fetch('LoginServlet?accion=logout', { method: 'POST' })
         .then(() => window.location.reload());
 }
+
+// 1. Llama al Servlet para buscar cursos filtrados y pinta la lista
+function cargarCursosPor(opcionBusqueda, nombreFiltro) {
+    // Ejemplo: CursoServlet?accion=buscarCurso&opcion=instituto&nombre=CURE
+    fetch(`CursoServlet?accion=buscarCurso&opcion=${opcionBusqueda}&nombre=${nombreFiltro}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => console.error("Error cargando lista de cursos:", error));
+}
+
+// 2. Llama al Servlet para buscar un curso específico y pinta sus detalles
+function verDetallesCurso(nombreCurso) {
+    // Ejemplo: CursoServlet?accion=verDetallesCurso&nombreCurso=Programacion Avanzada
+    fetch(`CursoServlet?accion=verDetallesCurso&nombreCurso=${nombreCurso}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => console.error("Error cargando detalles del curso:", error));
+}
+
+// 3. Preparativos para los siguientes Casos de Uso (Consulta Edicion / Consulta Programa)
+function verDetalleEdicion(nombreEdicion) {
+    alert("Próximamente: Redirigiendo a Consulta de Edición -> " + nombreEdicion);
+    // Aquí luego haremos el fetch a EdicionServlet
+}
+
+function verDetallePrograma(nombrePrograma) {
+    alert("Próximamente: Redirigiendo a Consulta de Programa -> " + nombrePrograma);
+    // Aquí luego haremos el fetch a ProgramaServlet
+}
+
+// Se ejecuta automáticamente cuando la página index.jsp termina de cargar
+document.addEventListener("DOMContentLoaded", function() {
+    cargarMenuLateral();
+});
+
+function cargarMenuLateral() {
+    // 1. Cargar "n" Institutos dinámicamente
+    // Usamos el mismo endpoint que ya tenías funcionando en tu alta de usuario
+    fetch('UsuarioServlet?accion=listarInstitutos')
+        .then(response => response.json())
+        .then(institutos => {
+            const ulInstitutos = document.getElementById('lista-institutos');
+            ulInstitutos.innerHTML = ''; // Limpiamos el "Cargando..."
+
+            institutos.forEach(inst => {
+                const li = document.createElement('li');
+                li.style.marginBottom = "5px";
+                // Aquí enlazamos el clic con la función del Caso de Uso
+                li.innerHTML = `<a href="#" onclick="cargarCursosPor('instituto', '${inst.nombre}')">${inst.nombre}</a>`;
+                ulInstitutos.appendChild(li);
+            });
+        })
+        .catch(error => console.error("Error al cargar institutos:", error));
+
+    // 2. Cargar "n" Categorías dinámicamente
+    fetch('CursoServlet?accion=listarCategoriasJson')
+        .then(response => response.json())
+        .then(categorias => {
+            const ulCategorias = document.getElementById('lista-categorias');
+            ulCategorias.innerHTML = ''; // Limpiamos el "Cargando..."
+
+            categorias.forEach(cat => {
+                const li = document.createElement('li');
+                li.style.marginBottom = "5px";
+                // Enlazamos el clic con la función del Caso de Uso
+                li.innerHTML = `<a href="#" onclick="cargarCursosPor('categoria', '${cat.nombre}')">${cat.nombre}</a>`;
+                ulCategorias.appendChild(li);
+            });
+        })
+        .catch(error => console.error("Error al cargar categorías:", error));
+}
 //---------------------------------------------------------------------------------

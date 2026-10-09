@@ -53,8 +53,48 @@ public class CursoServlet extends HttpServlet {
                     request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
                 }
                 break;
+
+            case "listarCategoriasJson": // NUEVO CASO AGREGADO
+                try {
+                    // Obtenemos la lista de categorías
+                    List<edu.edext.datatypes.DtCategoria> listaCat = ic.listarCategorias();
+                    
+                    // Armamos un JSON manualmente
+                    StringBuilder json = new StringBuilder("[");
+                    for (int i = 0; i < listaCat.size(); i++) {
+                        json.append("{\"nombre\":\"").append(listaCat.get(i).getNombre()).append("\"}");
+                        if (i < listaCat.size() - 1) {
+                            json.append(",");
+                        }
+                    }
+                    json.append("]");
+
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write(json.toString());
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al obtener categorías");
+                }
+                break;
+
+            case "verDetallesCurso": // CASO DE USO: CONSULTA DE CURSO
+                try {
+                    String nombreDelCurso = request.getParameter("nombreCurso");
+                    
+                    // Llamamos a la lógica que extrae todos los datos, ediciones y programas
+                    edu.edext.datatypes.DtConsultaCurso dtCurso = ic.obtenerDatosCurso(nombreDelCurso);
+                    
+                    // Lo inyectamos en el request con la clave "curso"
+                    request.setAttribute("curso", dtCurso);
+                    
+                    // Despachamos el fragmento de detalles
+                    request.getRequestDispatcher("fragmentos/consultaCurso.jsp").forward(request, response);
+                } catch (Exception e) {
+                    request.setAttribute("error", e.getMessage());
+                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                }
+                break;
                 
-            case "altaCurso": // NUESTRO CASO DE USO AGREGADO
+            case "altaCurso": 
                 // 1. Validar seguridad: Solo docentes pueden dar de alta un curso
                 HttpSession session = request.getSession();
                 DtUsuario usuarioLogueado = (DtUsuario) session.getAttribute("usuarioLogueado");
@@ -92,7 +132,7 @@ public class CursoServlet extends HttpServlet {
         }
         
         switch (accion){
-            case "altaCurso": // NUESTRO CASO DE USO AGREGADO
+            case "altaCurso": 
                 try {
                     // 1. Extraer los datos básicos
                     String nombreCurso = request.getParameter("nombre");
