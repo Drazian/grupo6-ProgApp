@@ -455,18 +455,23 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
     }
     
 
-    @Override
+@Override
     public edu.edext.datatypes.DtConsultaCurso obtenerDatosCurso(String nombreCurso) throws Exception {
         EntityManager em = emf.createEntityManager();
         try {
             Curso c = em.find(Curso.class, nombreCurso);
             if (c == null) throw new Exception("El curso no existe.");
 
+            // Buscar nombres de las ediciones
              List<String> ediciones = em.createQuery("SELECT e.nombre FROM Edicion e WHERE e.curso.nombre = :curso", String.class)
                                        .setParameter("curso", nombreCurso)
                                        .getResultList();
              
-            List<String> programas = new java.util.ArrayList<>(); 
+            // SOLUCIÓN: Buscar nombres de los programas que contienen a este curso
+            List<String> programas = em.createQuery(
+                    "SELECT p.nombre FROM ProgramaFormacion p JOIN p.cursos c WHERE c.nombre = :curso", String.class)
+                    .setParameter("curso", nombreCurso)
+                    .getResultList();
 
             // Convertir la lista de Categoria a lista de String para el Datatype
             List<String> nombresCategorias = new ArrayList<>();
