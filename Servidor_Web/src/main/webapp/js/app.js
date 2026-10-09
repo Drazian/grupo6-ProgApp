@@ -318,7 +318,239 @@ function cargarDetallePrograma(nombrePrograma) {
         });
 }
 
+// Función para interceptar y enviar el formulario de Alta de Curso
+function altaCurso(event) {
+    event.preventDefault();
 
+    const divError = document.getElementById('mensaje-error');
+    divError.style.display = 'none';
+    divError.innerHTML = '';
+
+    const form = document.getElementById('formAltaCurso');
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return; 
+    }
+
+    // Convertir el FormData a URLSearchParams para que Java extraiga los números y arrays correctamente
+    const datos = new URLSearchParams(new FormData(form));
+
+    fetch('CursoServlet?accion=altaCurso', {
+        method: 'POST',
+        body: datos
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text().then(mensajeExito => {
+                alert(mensajeExito); 
+                form.reset(); 
+            });
+        } else {
+            return response.text().then(mensajeError => {
+                throw new Error(mensajeError);
+            });
+        }
+    })
+    .catch(error => {
+        divError.innerHTML = "<strong>Error:</strong> " + error.message;
+        divError.style.display = 'block';
+        divError.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
+}
+
+// Función auxiliar para el botón Cancelar del formulario
+function cancelarOperacion() {
+    const form = document.getElementById('formAltaCurso');
+    if (form) {
+        form.reset();
+        document.getElementById('mensaje-error').style.display = 'none';
+        
+        // Opcional: Aquí podrías ocultar el contenedor central si así lo deseas
+        // document.getElementById('contenedor-central').innerHTML = '';
+    }
+}
+
+// Función para pedirle el fragmento al Servlet e inyectarlo en el HTML
+function cargarAltaCurso() {
+    fetch('CursoServlet?accion=altaCurso')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error de permisos o de servidor");
+            }
+            return response.text();
+        })
+        .then(htmlString => {
+            // Inyectamos el formulario dentro del sector 3
+            document.getElementById('contenido-dinamico').innerHTML = htmlString;
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = 
+                "<h3 style='color:red;'>No tienes permisos para ver esta sección.</h3>";
+        });
+}
+
+// 1. Función para cargar la vista
+function cargarAltaUsuario() {
+    fetch('fragmentos/altaUsuario.jsp')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+            inicializarEventosUsuario(); // Encendemos la lógica de tu formulario
+        })
+        .catch(error => console.error("Error al cargar la vista:", error));
+}
+
+// 2. Todos tus scripts originales empaquetados para ejecutarse tras inyectar el HTML
+function inicializarEventosUsuario() {
+    
+    // Cargar la lista de institutos (Ruta corregida)
+    fetch("UsuarioServlet?accion=listarInstitutos")
+        .then(response => response.json())
+        .then(institutos => {
+            const selectInstituto = document.getElementById("instituto");
+            institutos.forEach(instituto => {
+                const opcion = document.createElement("option");
+                opcion.value = instituto.nombre;
+                opcion.textContent = instituto.nombre;
+                selectInstituto.appendChild(opcion);
+            });
+        }).catch(err => console.log("Error cargando institutos", err));
+
+    // Mostrar/Ocultar Institutos
+    document.getElementById("docente").addEventListener("change", function() {
+        document.getElementById("seccionInstitutos").style.display = this.checked ? "block" : "none";
+    });
+
+    // Vista previa de la imagen
+    document.getElementById("imagen").addEventListener("change", function(event) {
+        const archivo = event.target.files[0];
+        if (archivo) {
+            const lector = new FileReader();
+            lector.onload = function(e) {
+                document.getElementById("vistaPrevia").src = e.target.result;
+            };
+            lector.readAsDataURL(archivo);
+        }
+    });
+
+    // Botón Agregar Instituto
+    document.getElementById("agregarInstituto").addEventListener("click", function() {
+        const selectInstituto = document.getElementById("instituto");
+        const selectSeleccionados = document.getElementById("institutosSeleccionados");
+        const institutoSeleccionado = selectInstituto.value;
+
+        if (institutoSeleccionado === "") return alert("Seleccione un instituto.");
+
+        for (let i = 0; i < selectSeleccionados.options.length; i++) {
+            if (selectSeleccionados.options[i].value === institutoSeleccionado) {
+                return alert("El instituto ya fue agregado.");
+            }
+        }
+        const opcion = document.createElement("option");
+        opcion.value = institutoSeleccionado;
+        opcion.textContent = institutoSeleccionado;
+        selectSeleccionados.appendChild(opcion);
+    });
+
+    // Botón Quitar Instituto
+    document.getElementById("quitarInstituto").addEventListener("click", function() {
+        const selectSeleccionados = document.getElementById("institutosSeleccionados");
+        if (selectSeleccionados.selectedIndex === -1) return alert("Seleccione un instituto para quitar.");
+        selectSeleccionados.remove(selectSeleccionados.selectedIndex);
+    });
+
+    // Enviar el Formulario
+    document.getElementById("formAltaUsuario").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const nickname = document.getElementById("nickname").value.trim();
+        const nombre = document.getElementById("nombre").value.trim();
+        const apellido = document.getElementById("apellido").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const confirmarPassword = document.getElementById("confirmarPassword").value;
+        const fechaNacimiento = document.getElementById("fechaNacimiento").value;
+        const docente = document.getElementById("docente").checked;
+
+        if (password !== confirmarPassword) return alert("Las contraseñas no coinciden.");
+        if (docente && document.getElementById("institutosSeleccionados").options.length === 0) {
+            return alert("Un docente debe tener al menos un instituto asignado.");
+        }
+
+        const datos = new FormData();
+        datos.append("nickname", nickname);
+        datos.append("nombre", nombre);
+        datos.append("apellido", apellido);
+        datos.append("email", email);
+        datos.append("password", password);
+        datos.append("fechaNacimiento", fechaNacimiento);
+        datos.append("tipoUsuario", docente ? "DOCENTE" : "ESTUDIANTE");
+
+        const selectSeleccionados = document.getElementById("institutosSeleccionados");
+        for (let i = 0; i < selectSeleccionados.options.length; i++) {
+            datos.append("institutos", selectSeleccionados.options[i].value);
+        }
+
+        const archivoImagen = document.getElementById("imagen").files[0];
+        if (archivoImagen) datos.append("imagen", archivoImagen);
+
+        // Ruta corregida
+        fetch("UsuarioServlet?accion=crear", {
+            method: "POST",
+            body: datos
+        })
+        .then(response => response.text())
+        .then(resultado => {
+            alert(resultado); // Muestra el mensaje del Servlet
+            document.getElementById('formAltaUsuario').reset();
+            document.getElementById('vistaPrevia').src = 'imagenes/usr.png';
+            document.getElementById('institutosSeleccionados').innerHTML = ''; // Limpia la lista
+        })
+        .catch(error => alert("Error: " + error));
+    });
+}
+
+// Carga el formulario HTML
+// Carga el formulario HTML
+function cargarLogin() {
+    fetch('fragmentos/login.jsp')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+            
+            // Asignamos el evento Submit al formulario recién inyectado
+            document.getElementById("formLogin").addEventListener("submit", function(event) {
+                event.preventDefault();
+                
+                // LA SOLUCIÓN: URLSearchParams convierte los datos al formato de texto estándar que Java espera
+                const datos = new URLSearchParams(new FormData(this));
+                
+                fetch('LoginServlet?accion=login', {
+                    method: 'POST',
+                    body: datos
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Si el login es correcto, recargamos la página para actualizar el Menú y el Header
+                        window.location.reload(); 
+                    } else {
+                        return response.text().then(err => { throw new Error(err); });
+                    }
+                })
+                .catch(error => {
+                    const divError = document.getElementById("mensaje-error-login");
+                    divError.innerHTML = error.message;
+                    divError.style.display = "block";
+                });
+            });
+        });
+}
+// Cierra la sesión y recarga la página
+function cerrarSesion() {
+    fetch('LoginServlet?accion=logout', { method: 'POST' })
+        .then(() => window.location.reload());
+}
 //---------------------------------------------------------------------------------
 
 

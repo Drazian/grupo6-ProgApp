@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name="Curso") // Aporte de Draco conservado
+@Table(name="Curso")
 public class Curso {
     
     @Id
@@ -24,23 +24,25 @@ public class Curso {
     private int creditos;
     private String url;
     
-    @jakarta.persistence.ElementCollection(fetch = jakarta.persistence.FetchType.EAGER)
-    private List<String> categorias;
-    
-    @Column(nullable=false) // Aporte de Draco conservado
+    @Column(nullable=false)
     private Date fechaRegistro;
 
     @ManyToOne
     private Instituto instituto;
 
     @ManyToMany
-    @JoinTable(name="Previas")    // Para mejorar la legibilidad externa
+    @JoinTable(name="Curso_Categoria")
+    private List<Categoria> categorias;
+
+    @ManyToMany
+    @JoinTable(name="Previas")
     private List<Curso> previas;
 
     public Curso() {}
 
+    // El parámetro aquí ya está corregido a List<Categoria>
     public Curso(String nombre, String descripcion, String duracion, int cantidadHoras, 
-                 int creditos, String url, Date fechaRegistro, Instituto instituto, List<String> categorias, List<Curso> previas) {
+                 int creditos, String url, Date fechaRegistro, Instituto instituto, List<Categoria> categorias, List<Curso> previas) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.duracion = duracion;
@@ -49,7 +51,7 @@ public class Curso {
         this.url = url;
         this.fechaRegistro = fechaRegistro;
         this.instituto = instituto;
-        this.categorias=categorias;
+        this.categorias = categorias;
         this.previas = previas;
     }
 
@@ -69,8 +71,8 @@ public class Curso {
     public void setFechaRegistro(Date fechaRegistro) { this.fechaRegistro = fechaRegistro; }
     public Instituto getInstituto() { return instituto; }
     public void setInstituto(Instituto instituto) { this.instituto = instituto; }
-    public List<String> getCategorias() { return categorias; }
-    public void setCategorias(List<String> categorias) { this.categorias=categorias; }
+    public List<Categoria> getCategorias() { return categorias; }
+    public void setCategorias(List<Categoria> categorias) { this.categorias = categorias; }
     public List<Curso> getPrevias() { return previas; }
     public void setPrevias(List<Curso> previas) { this.previas = previas; }
     
@@ -86,5 +88,4 @@ public class Curso {
     public int hashCode() {
         return Objects.hash(nombre);
     }
-    
 }
