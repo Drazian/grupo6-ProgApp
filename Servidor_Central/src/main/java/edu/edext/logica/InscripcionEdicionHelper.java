@@ -133,7 +133,7 @@ public class InscripcionEdicionHelper {
             InscripcionEdicionID idDual = new InscripcionEdicionID(nomEstudiante, nomEdicion);
             InscripcionEdicion isExist = db.find(InscripcionEdicion.class, idDual);
             if(isExist==null){
-                InscripcionEdicion newInscripcion=new InscripcionEdicion(estudiante, edicion, LocalDate.now(), 0);
+                InscripcionEdicion newInscripcion=new InscripcionEdicion(estudiante, edicion, LocalDate.now(), 1);
                 db.persist(newInscripcion);
                 db.getTransaction().commit();
                 Logger.info("Se Inscribio el Estudiante {} en la edicion {}", nomEstudiante, nomEdicion);

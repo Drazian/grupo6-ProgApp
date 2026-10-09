@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Controlador implements IControlador {
     private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("edext");
@@ -131,6 +134,72 @@ public class Controlador implements IControlador {
         }
     }
     
+    @Override
+public void crearUsuario(DtUsuario usuario, File imagenTemporal)
+        throws Exception {
+
+    String nombreImagen = usuario.getImagen();
+
+    // Comprobar nuevamente los datos antes de guardar la imagen.
+    if (existeUsuario(usuario.getNickname())) {
+        throw new Exception(
+            "Ya existe un usuario con el nickname '"
+            + usuario.getNickname() + "'."
+        );
+    }
+
+    if (existeEmail(usuario.getEmail())) {
+        throw new Exception(
+            "Ya existe un usuario con el correo '"
+            + usuario.getEmail() + "'."
+        );
+    }
+
+    boolean imagenGuardada = false;
+
+    try {
+        // Guardar la imagen únicamente si se recibió un archivo.
+        if (imagenTemporal != null) {
+            nombreImagen = GestorImagenes.guardarImagen(
+                imagenTemporal,
+                usuario.getNickname()
+            );
+
+            imagenGuardada = true;
+        }
+
+        // Crear un DtUsuario con el nombre definitivo de la imagen.
+        DtUsuario usuarioConImagen = new DtUsuario(
+            usuario.getNickname(),
+            usuario.getPassword(),
+            usuario.getEmail(),
+            usuario.getNombre(),
+            usuario.getApellido(),
+            nombreImagen,
+            usuario.getfNacimiento(),
+            usuario.getInstitutos(),
+            usuario.getTipoUsuario()
+        );
+
+        // Reutilizar el método existente.
+        crearUsuario(usuarioConImagen);
+
+    } catch (Exception e) {
+
+        // Si falla el registro, intentar eliminar la imagen guardada.
+        if (imagenGuardada) {
+            try {
+                Files.deleteIfExists(
+                    Paths.get("imagenes", nombreImagen)
+                );
+            } catch (Exception errorImagen) {
+                e.addSuppressed(errorImagen);
+            }
+        }
+
+        throw e;
+    }
+}
     @Override
     public void crearInstituto(String nombre) throws Exception{
         EntityManager em = emf.createEntityManager();
