@@ -1,0 +1,8 @@
+edu/edext/resources/JakartaEE10Resource.class
+edu/edext/controlador/ProgramaServlet.class
+edu/edext/JakartaRestConfiguration.class
+edu/edext/controlador/CursoServlet.class
+edu/edext/modelo/Producto.class
+edu/edext/controlador/UsuarioServlet.class
+edu/edext/controlador/TestServlet.class
+edu/edext/controlador/MiControladorServlet.class

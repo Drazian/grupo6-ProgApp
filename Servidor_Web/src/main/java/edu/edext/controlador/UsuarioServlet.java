@@ -116,8 +116,15 @@ public class UsuarioServlet extends HttpServlet {
         String accion = request.getParameter("accion");
         if ("listarInstitutos".equals(accion)) {
             cargarInstitutos(response);
+        } else if ("formAlta".equals(accion)) {
+            request.getRequestDispatcher("/fragmentos/altaUsuario.jsp")
+                   .forward(request, response);
+
         } else {
-            processRequest(request, response);
+            response.sendError(
+                HttpServletResponse.SC_BAD_REQUEST,
+                "Acción de usuario no válida."
+            );
         }
     } 
     /**
@@ -153,28 +160,37 @@ public class UsuarioServlet extends HttpServlet {
                 institutos = Collections.emptyList();
             }
             
+            
             try {
                 IControlador ic = Fabrica.getInstance().getIControlador();
 
                 if (ic.existeUsuario(nickname)) {
-                    throw new ServletException(
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write(
                         "Ya existe un usuario con el nickname '" + nickname + "'."
                     );
+                    return;
                 }
 
                 if (ic.existeEmail(email)) {
-                    throw new ServletException(
-                        "Ya existe un usuario con el correo '" + email + "'."
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write(
+                        "Ya existe un usuario registrado con el correo '" + email + "'."
                     );
+                    return;
                 }
-                
-            } catch (ServletException e) {
-                throw e;
+
             } catch (Exception e) {
-                throw new ServletException(
-                   "No se pudieron validar los datos del usuario.", e
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write(
+                    "No se pudieron validar los datos del usuario. Intenta nuevamente."
                 );
+                return;
             }
+
             Part imagen = request.getPart("imagen");
             
            
