@@ -28,28 +28,46 @@ public class LoginServlet extends HttpServlet {
             String password = request.getParameter("password");
 
             try {
-                // Buscamos coincidencia de Nickname/Email y Contraseña
                 List<DtUsuario> usuarios = ic.listarUsuarios();
                 DtUsuario logueado = null;
                 
-                for (DtUsuario u : usuarios) {
-                    if ((u.getNickname().equals(identificador) || u.getEmail().equals(identificador)) 
-                            && u.getPassword().equals(password)) {
-                        logueado = u;
-                        break;
+                if (usuarios != null && identificador != null && password != null) {
+                    for (DtUsuario u : usuarios) {
+                        boolean coincideUsuario = (u.getNickname() != null && u.getNickname().equalsIgnoreCase(identificador)) 
+                                               || (u.getEmail() != null && u.getEmail().equalsIgnoreCase(identificador));
+                        
+                        if (coincideUsuario && u.getPassword() != null) {
+                            boolean passValida = false;
+                            
+                           try {
+                                if (u.getPassword().startsWith("$2a$") || u.getPassword().startsWith("$2b$") || u.getPassword().startsWith("$2y$")) {
+                                    // Opción A: Si usas la librería jbcrypt directamente
+                                    passValida = org.mindrot.jbcrypt.BCrypt.checkpw(password, u.getPassword());
+
+                                    // Opción B: Si tu clase Utils tiene el método checkpw
+                                    // passValida = edu.edext.tools.Utils.Crypt.checkpw(password, u.getPassword());
+                                } else {
+                                    passValida = u.getPassword().equals(password);
+                                }
+                            } catch (Exception ex) {
+                                passValida = u.getPassword().equals(password);
+                            }
+                            if (passValida) {
+                                logueado = u;
+                                break;
+                            }
+                        }
                     }
                 }
 
                 if (logueado != null) {
-                    // ¡Éxito! Guardamos el usuario en la sesión del servidor
                     HttpSession session = request.getSession();
                     session.setAttribute("usuarioLogueado", logueado);
                     
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.getWriter().write("OK");
                 } else {
-                    // Falla: Credenciales incorrectas
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Error 401
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.getWriter().write("Usuario o contraseña incorrectos.");
                 }
             } catch (Exception e) {
@@ -58,7 +76,6 @@ public class LoginServlet extends HttpServlet {
             }
         } 
         else if ("logout".equals(accion)) {
-            // Destruimos la sesión
             HttpSession session = request.getSession(false);
             if (session != null) {
                 session.invalidate();

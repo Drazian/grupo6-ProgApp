@@ -9,14 +9,35 @@
 </head>
 <body>
 
-    <!-- SECTOR 1: Barra Superior Completa -->
+<!-- SECTOR 1: Barra Superior Completa -->
     <header class="sector-1">
         <div class="logo">MiLogo</div>
+        
         <div class="buscador">
-            <input type="text" id="input-busqueda" placeholder="Buscar...">
-            <button onclick="ejecutarBusqueda()">Buscar</button>
+            <input type="text" id="input-busqueda" placeholder="Buscar..." onkeypress="if(event.key === 'Enter') BuscadorServlet()">
+            <button type="button" onclick="BuscadorServlet()">Buscar</button>
+        </div>      
+        
+        <!-- Bloque de Sesión Dinámico -->
+        <div class="sesion" style="display: flex; align-items: center; gap: 15px;">
+            <c:choose>
+                <c:when test="${not empty sessionScope.usuarioLogueado}">
+                    <!-- Si hay sesión: Mostramos Imagen, Nombre, Rol y botón Salir -->
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="imagenes/${sessionScope.usuarioLogueado.imagen}" alt="Perfil" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid white;">
+                        <span style="font-weight: bold;">
+                            Hola, ${sessionScope.usuarioLogueado.nombre} 
+                            <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">(${sessionScope.usuarioLogueado.tipoUsuario})</span>
+                        </span>
+                        <button onclick="cerrarSesion()" style="background-color: #d9534f; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px;">Cerrar Sesión</button>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <!-- Si NO hay sesión: Botón de Iniciar Sesión -->
+                    <button onclick="cargarLogin()" style="background-color: #5cb85c; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;">Iniciar Sesión</button>
+                </c:otherwise>
+            </c:choose>
         </div>
-        <div class="sesion">Usuario: Juan Pérez</div>
     </header>
 
     <div class="contenedor-inferior">
@@ -32,6 +53,18 @@
                 </details>
 
                 <hr style="opacity: 0.2; margin: 10px 0;">
+                
+                <!-- Menú Usuarios (NUEVO) -->
+                <details>
+                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Usuarios</summary>
+                    <ul style="list-style: none; padding-left: 15px; margin-top: 5px;">
+                        <li><a href="#" onclick="cargarAltaUsuario(); return false;">Alta de usuario</a></li>
+                        <li><a href="#" onclick="cargarModificarUsuario(); return false;">Modificar usuario</a></li>
+                        <li><a href="#" onclick="cargarConsultaUsuario(); return false;">Consultar usuario</a></li>
+                        <li><a href="#" onclick="cargarSocialUsuario(); return false;">Social (Seguir / Dejar de seguir)</a></li>
+                    </ul>
+                </details>
+                <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 5px 0;">
 
                 <!-- Grupo 2: Categorias (Dinamico) -->
                 <details>
@@ -43,26 +76,26 @@
 
                 <hr style="opacity: 0.2; margin: 10px 0;">                
                 
-                <!-- Grupo 3: Programas de Formación (Estatico) -->
-                <details open>
+                <!-- Grupo 3: Cursos (Restringido a Docentes) -->
+                <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
+                    <details>
+                        <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Cursos</summary>
+                        <ul style="list-style: none; padding-left: 15px;">
+                            <li><a href="#" onclick="cargarAltaCurso()">Alta Curso</a></li>
+                            <!-- AQUÍ ESTABA EL ERROR: Faltaban las comillas dobles y cerrar el <li> -->
+                            <li><a href="#" onclick="cargarAltaEdicion()">Alta Edición de Curso</a></li>
+                        </ul>                      
+                    </details>
+                    <hr style="opacity: 0.2; margin: 10px 0;">
+                </c:if>
+                
+                <!-- Grupo 4: Programas de Formación (Estatico) -->
+                <details>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Programas</summary>
                     <ul style="list-style: none; padding-left: 15px;">
                         <li><a href="#" onclick="ProgramaServlet('formCrear')">Crear Programa</a></li>
                         <li><a href="#" onclick="ProgramaServlet('formAgregarCurso')">Agregar curso a Programa</a></li>
                         <li><a href="#" onclick="ProgramaServlet('formVerProgramas')">Ver Programas</a></li>
-                    </ul>
-                </details>
-
-                <hr style="opacity: 0.2; margin: 10px 0;">
-                
-                                <!-- Grupo 4: Usuarios -->
-                <details>
-                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Usuarios</summary>
-                    <ul style="list-style: none; padding-left: 15px;">
-                        <li><a href="#" onclick="event.preventDefault(); UsuarioServlet('formAlta')">Alta de usuario</a></li>
-                        <li><a href="#" onclick="event.preventDefault(); UsuarioServlet('formModificar')">Modificar usuario</a></li>
-                        <li><a href="#" onclick="event.preventDefault(); UsuarioServlet('formConsultar')">Consultar usuario</a></li>
-                        <li><a href="#" onclick="event.preventDefault(); UsuarioServlet('formSeguidos')">Usuarios seguidos</a></li>
                     </ul>
                 </details>
 
@@ -76,7 +109,7 @@
                         <li><a href="#" onclick="cargarSeccion('abrirFormulario')">Agregar Producto</a></li>
                         <li><a href="#" onclick="cargarSeccion('reportes')">Reportes</a></li>
                         <li><a href="#" onclick="cargarSeccion('configuracion')">Configuración</a></li>
-                        <li><a href="#" onclick="testServlet()">TestTemporal</a></li>
+                        <li><a href="#" onclick="testServlet()">TestTemporal</a></li>                     
                     </ul>
                 </details>
             </nav>
@@ -92,4 +125,3 @@
     <script src="js/app.js"></script>
 </body>
 </html>
-

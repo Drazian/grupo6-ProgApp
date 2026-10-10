@@ -19,8 +19,11 @@ public interface IControlador {
     List<DtCategoria> listarCategorias() throws Exception;
     
     void crearUsuario(DtUsuario usuario) throws Exception;
-    void crearUsuario(DtUsuario usuario, java.io.File imagenTemporal)
-        throws Exception;
+ 
+    
+    public void crearUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;
+    public void modificarUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;
+    
     boolean existeUsuario(String nickname) throws Exception;
     boolean existeEmail(String email) throws Exception;
     public void modificarUsuario(DtUsuario usuarioModificado)throws Exception;

@@ -796,4 +796,97 @@ function altaEdicion(event) {
         divError.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 }
-//---------------------------------------------------------------------------------
+
+function cargarModificarUsuario() {
+    const contenedor = document.getElementById('contenido-dinamico');
+
+    fetch('fragmentos/ModificarUsuario.jsp')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("No se pudo cargar la vista de modificación.");
+            }
+            return response.text();
+        })
+        .then(html => {
+            contenedor.innerHTML = html;
+            if (typeof inicializarEventosModificarUsuario === "function") {
+                inicializarEventosModificarUsuario();
+            }
+        })
+        .catch(error => console.error("Error al cargar la vista de modificación:", error));
+}
+
+function inicializarEventosModificarUsuario() {
+    const form = document.getElementById('formModificarUsuario');
+    const inputImagen = document.getElementById('imagen');
+    const vistaPrevia = document.getElementById('vistaPreviaModificar');
+    const divError = document.getElementById('mensaje-error-modificar');
+
+    if (!form) return;
+
+    // 1. Mostrar vista previa dinámica de la imagen
+    if (inputImagen && vistaPrevia) {
+        inputImagen.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    vistaPrevia.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // 2. Interceptar el envío del formulario
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        if (divError) {
+            divError.style.display = 'none';
+            divError.innerText = '';
+        }
+
+        const pass = document.getElementById('password') ? document.getElementById('password').value : '';
+        const confirmPass = document.getElementById('confirmarPassword') ? document.getElementById('confirmarPassword').value : '';
+
+        // Validación: si escribió en algún campo de contraseña, deben coincidir
+        if (pass.length > 0 || confirmPass.length > 0) {
+            if (pass !== confirmPass) {
+                if (divError) {
+                    divError.innerText = "Las contraseñas no coinciden. Por favor verifique.";
+                    divError.style.display = 'block';
+                } else {
+                    alert("Las contraseñas no coinciden.");
+                }
+                return; // Detiene el envío y permite al usuario corregirlo
+            }
+        }
+
+        const formData = new FormData(form);
+        formData.append('accion', 'modificarUsuario');
+
+        fetch('UsuarioServlet', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.text();
+        })
+        .then(mensajeExito => {
+            alert("Cambios guardados correctamente."); // Mensaje de confirmación
+            window.location.reload(); // Recarga la página obligatoriamente
+        })
+        .catch(error => {
+            if (divError) {
+                divError.innerText = error.message || "Error al actualizar el perfil.";
+                divError.style.display = 'block';
+            } else {
+                alert("Error: " + error.message);
+            }
+        });
+    });
+}
