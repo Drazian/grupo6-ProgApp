@@ -12,10 +12,11 @@
 <!-- SECTOR 1: Barra Superior Completa -->
     <header class="sector-1">
         <div class="logo">MiLogo</div>
+        
         <div class="buscador">
-            <input type="text" id="input-busqueda" placeholder="Buscar...">
-            <button onclick="ejecutarBusqueda()">Buscar</button>
-        </div>
+            <input type="text" id="input-busqueda" placeholder="Buscar..." onkeypress="if(event.key === 'Enter') BuscadorServlet()">
+            <button type="button" onclick="BuscadorServlet()">Buscar</button>
+        </div>      
         
         <!-- Bloque de Sesión Dinámico -->
         <div class="sesion" style="display: flex; align-items: center; gap: 15px;">

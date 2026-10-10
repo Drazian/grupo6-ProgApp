@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package edu.edext.controlador;
 
 import edu.edext.datatypes.DtCurso;
@@ -22,10 +18,6 @@ import java.util.List;
 public class ProgramaServlet extends HttpServlet {
     private IControlador ic = Fabrica.getInstance().getIControlador();
     
-    //CU:
-    //Crear programa de formacion
-    //Agregar curso a programa de formacion
-
     //Responsable de mostrar formularios
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
