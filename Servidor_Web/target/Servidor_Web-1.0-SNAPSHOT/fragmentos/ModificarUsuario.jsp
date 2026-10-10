@@ -32,7 +32,7 @@
 
         <div style="margin-bottom: 15px;">
             <label for="fechaNacimiento" style="display: block; font-weight: bold; margin-bottom: 5px;">Fecha de Nacimiento:</label>
-            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${sessionScope.usuarioLogueado.fechaNacimiento}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${sessionScope.usuarioLogueado.fNacimiento}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
         <div style="margin-bottom: 15px;">
