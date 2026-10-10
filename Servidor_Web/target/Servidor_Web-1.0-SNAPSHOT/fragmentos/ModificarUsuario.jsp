@@ -35,10 +35,24 @@
             <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${sessionScope.usuarioLogueado.fNacimiento}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
+        <!-- Campos opcionales para cambio de contraseña -->
+        <div style="margin-bottom: 15px;">
+            <label for="password" style="display: block; font-weight: bold; margin-bottom: 5px;">Nueva Contraseña (opcional):</label>
+            <input type="password" id="password" name="password" placeholder="Dejar en blanco si no se desea cambiar" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="confirmarPassword" style="display: block; font-weight: bold; margin-bottom: 5px;">Repetir Contraseña:</label>
+            <input type="password" id="confirmarPassword" name="confirmarPassword" placeholder="Repita la nueva contraseña" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
         <div style="margin-bottom: 15px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Imagen de Perfil:</label>
             <div style="display: flex; align-items: center; gap: 15px; margin-top: 5px;">
-                <img id="vistaPreviaModificar" src="imagenes/${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" alt="Vista previa" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
+                <img id="vistaPreviaModificar" 
+                     src="imagenes/${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
+                     alt="Foto de perfil" 
+                     style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
                 <input type="file" id="imagen" name="imagen" accept="image/*" />
             </div>
         </div>

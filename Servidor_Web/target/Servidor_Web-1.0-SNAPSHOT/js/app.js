@@ -820,10 +820,11 @@ function inicializarEventosModificarUsuario() {
     const form = document.getElementById('formModificarUsuario');
     const inputImagen = document.getElementById('imagen');
     const vistaPrevia = document.getElementById('vistaPreviaModificar');
+    const divError = document.getElementById('mensaje-error-modificar');
 
-    if (!form) return; // Evita errores si la vista no terminó de renderizarse
+    if (!form) return;
 
-    // Evento 1: Vista previa dinámica de la foto de perfil al seleccionar un archivo
+    // 1. Mostrar vista previa dinámica de la imagen
     if (inputImagen && vistaPrevia) {
         inputImagen.addEventListener('change', function (e) {
             const file = e.target.files[0];
@@ -837,9 +838,30 @@ function inicializarEventosModificarUsuario() {
         });
     }
 
-    // Evento 2: Envío asíncrono (AJAX) del formulario al Servlet
+    // 2. Interceptar el envío del formulario
     form.addEventListener('submit', function (e) {
-        e.preventDefault(); // Evita el submit tradicional del HTML
+        e.preventDefault();
+
+        if (divError) {
+            divError.style.display = 'none';
+            divError.innerText = '';
+        }
+
+        const pass = document.getElementById('password') ? document.getElementById('password').value : '';
+        const confirmPass = document.getElementById('confirmarPassword') ? document.getElementById('confirmarPassword').value : '';
+
+        // Validación: si escribió en algún campo de contraseña, deben coincidir
+        if (pass.length > 0 || confirmPass.length > 0) {
+            if (pass !== confirmPass) {
+                if (divError) {
+                    divError.innerText = "Las contraseñas no coinciden. Por favor verifique.";
+                    divError.style.display = 'block';
+                } else {
+                    alert("Las contraseñas no coinciden.");
+                }
+                return; // Detiene el envío y permite al usuario corregirlo
+            }
+        }
 
         const formData = new FormData(form);
         formData.append('accion', 'modificarUsuario');
@@ -849,21 +871,22 @@ function inicializarEventosModificarUsuario() {
             body: formData
         })
         .then(response => {
-            if (!response.ok) throw new Error("Error en el servidor al guardar datos.");
-            return response.json(); // o response.text() según responda tu backend
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.text();
         })
-        .then(data => {
-            alert("Perfil modificado con éxito");
-            // Opcional: refrescar interfaz o redirigir
+        .then(mensajeExito => {
+            alert("Cambios guardados correctamente."); // Mensaje de confirmación
+            window.location.reload(); // Recarga la página obligatoriamente
         })
         .catch(error => {
-            const divError = document.getElementById('mensaje-error-modificar');
             if (divError) {
-                divError.innerText = "No se pudieron guardar los cambios. Intente nuevamente.";
-                divError.style.display = "block";
+                divError.innerText = error.message || "Error al actualizar el perfil.";
+                divError.style.display = 'block';
+            } else {
+                alert("Error: " + error.message);
             }
-            console.error(error);
         });
     });
 }
-//---------------------------------------------------------------------------------

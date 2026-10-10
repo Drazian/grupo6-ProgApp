@@ -23,44 +23,59 @@ public class Controlador implements IControlador {
     private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("edext");
     
     @Override
-    public void modificarUsuario(DtUsuario usuario)throws Exception{
+    public void modificarUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception {
         EntityManager em = emf.createEntityManager();
-        
-        try{
+
+        try {
             em.getTransaction().begin();
-            
+
             Usuario usuarioModificado = em.find(Usuario.class, usuario.getNickname());
+            if (usuarioModificado == null) {
+                throw new Exception("El usuario '" + usuario.getNickname() + "' no existe.");
+            }
+
             usuarioModificado.setApellido(usuario.getApellido());
             usuarioModificado.setNombre(usuario.getNombre());
             usuarioModificado.setfNacimiento(usuario.getfNacimiento());
-            usuarioModificado.setImagen(usuario.getImagen());
-            
-            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
-                List<Instituto> institutos = new ArrayList<>();
-                
-                for(String aux: usuario.getInstitutos()){
-                    Instituto instituto = em.find(Instituto.class,aux);
-                    institutos.add(instituto);
-                }
-                        
-                ((Docente) usuarioModificado).setInstitutos(institutos);
-            
-            }
-            em.getTransaction().commit();
-        } catch (Exception e) {
 
+            // Si llegó un texto plano en password, se reemplaza encriptando con BCrypt; si vino null o vacío, se mantiene la actual
+            if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
+                String hashPassword = edu.edext.tools.Utils.Crypt.BCrypt(usuario.getPassword().trim(), 7);
+                usuarioModificado.setPassword(hashPassword);
+            }
+
+            if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
+                String nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, usuario.getNickname());
+                usuarioModificado.setImagen(nombreImagen);
+            } else if (usuario.getImagen() != null) {
+                usuarioModificado.setImagen(usuario.getImagen());
+            }
+
+            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE && usuario.getInstitutos() != null) {
+                List<Instituto> institutos = new ArrayList<>();
+                for (String aux : usuario.getInstitutos()) {
+                    Instituto instituto = em.find(Instituto.class, aux);
+                    if (instituto != null) {
+                        institutos.add(instituto);
+                    }
+                }
+                ((Docente) usuarioModificado).setInstitutos(institutos);
+            }
+
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-
-            throw e;   
-        }finally{
+            throw e;
+        } finally {
             em.close();
         }
     }
     
     @Override
-    public void crearUsuario(DtUsuario usuario) throws Exception{
+    public void crearUsuario(DtUsuario usuario) throws Exception {
         EntityManager em = emf.createEntityManager();
 
         try {
@@ -82,6 +97,14 @@ public class Controlador implements IControlador {
                     "Ya existe un usuario con el Email '" 
                     + usuario.getEmail() + "'.");
             }
+
+            // Generar Hash BCrypt para la contraseña nueva
+            String passwordHash = usuario.getPassword();
+            if (passwordHash != null && !passwordHash.trim().isEmpty()) {
+                if (!passwordHash.startsWith("$2a$") && !passwordHash.startsWith("$2b$")) {
+                    passwordHash = edu.edext.tools.Utils.Crypt.BCrypt(passwordHash.trim(), 7);
+                }
+            }
             
             Usuario nuevoUsuario;
             
@@ -99,7 +122,7 @@ public class Controlador implements IControlador {
                 }
                 nuevoUsuario = new Docente(
                     usuario.getNickname(),
-                    usuario.getPassword(),
+                    passwordHash, // <--- Se asigna el hash encriptado
                     usuario.getEmail(),
                     usuario.getNombre(),
                     usuario.getApellido(),
@@ -110,7 +133,7 @@ public class Controlador implements IControlador {
             } else {
                 nuevoUsuario = new Estudiante(
                     usuario.getNickname(),
-                    usuario.getPassword(),
+                    passwordHash, // <--- Se asigna el hash encriptado
                     usuario.getEmail(),
                     usuario.getNombre(),
                     usuario.getApellido(),
@@ -134,72 +157,7 @@ public class Controlador implements IControlador {
         }
     }
     
-    @Override
-public void crearUsuario(DtUsuario usuario, File imagenTemporal)
-        throws Exception {
-
-    String nombreImagen = usuario.getImagen();
-
-    // Comprobar nuevamente los datos antes de guardar la imagen.
-    if (existeUsuario(usuario.getNickname())) {
-        throw new Exception(
-            "Ya existe un usuario con el nickname '"
-            + usuario.getNickname() + "'."
-        );
-    }
-
-    if (existeEmail(usuario.getEmail())) {
-        throw new Exception(
-            "Ya existe un usuario con el correo '"
-            + usuario.getEmail() + "'."
-        );
-    }
-
-    boolean imagenGuardada = false;
-
-    try {
-        // Guardar la imagen únicamente si se recibió un archivo.
-        if (imagenTemporal != null) {
-            nombreImagen = GestorImagenes.guardarImagen(
-                imagenTemporal,
-                usuario.getNickname()
-            );
-
-            imagenGuardada = true;
-        }
-
-        // Crear un DtUsuario con el nombre definitivo de la imagen.
-        DtUsuario usuarioConImagen = new DtUsuario(
-            usuario.getNickname(),
-            usuario.getPassword(),
-            usuario.getEmail(),
-            usuario.getNombre(),
-            usuario.getApellido(),
-            nombreImagen,
-            usuario.getfNacimiento(),
-            usuario.getInstitutos(),
-            usuario.getTipoUsuario()
-        );
-
-        // Reutilizar el método existente.
-        crearUsuario(usuarioConImagen);
-
-    } catch (Exception e) {
-
-        // Si falla el registro, intentar eliminar la imagen guardada.
-        if (imagenGuardada) {
-            try {
-                Files.deleteIfExists(
-                    Paths.get("imagenes", nombreImagen)
-                );
-            } catch (Exception errorImagen) {
-                e.addSuppressed(errorImagen);
-            }
-        }
-
-        throw e;
-    }
-}
+ 
     @Override
     public void crearInstituto(String nombre) throws Exception{
         EntityManager em = emf.createEntityManager();
@@ -1128,5 +1086,49 @@ public void crearUsuario(DtUsuario usuario, File imagenTemporal)
         } finally {
             em.close();
         }
-    }   
+    }
+    
+    @Override
+    public void crearUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception {
+        String nombreImagen = usuario.getImagen();
+
+        if (existeUsuario(usuario.getNickname())) {
+            throw new Exception("Ya existe un usuario con el nickname '" + usuario.getNickname() + "'.");
+        }
+
+        if (existeEmail(usuario.getEmail())) {
+            throw new Exception("Ya existe un usuario con el correo '" + usuario.getEmail() + "'.");
+        }
+
+        // Si se enviaron bytes de imagen, se guardan en el servidor central
+        if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
+            nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, usuario.getNickname());
+        }
+
+        DtUsuario usuarioConImagen = new DtUsuario(
+            usuario.getNickname(),
+            usuario.getPassword(),
+            usuario.getEmail(),
+            usuario.getNombre(),
+            usuario.getApellido(),
+            nombreImagen,
+            usuario.getfNacimiento(),
+            usuario.getInstitutos(),
+            usuario.getTipoUsuario()
+        );
+
+        crearUsuario(usuarioConImagen);
+    }
+    
+    @Override
+    public void modificarUsuario(DtUsuario usuario) throws Exception {
+        modificarUsuario(usuario, null, null);
+    }
+
+    
+
+
+
 }
+
+    
