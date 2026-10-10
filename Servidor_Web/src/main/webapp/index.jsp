@@ -53,6 +53,18 @@
                 </details>
 
                 <hr style="opacity: 0.2; margin: 10px 0;">
+                
+                <!-- Menú Usuarios (NUEVO) -->
+                <details>
+                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Usuarios</summary>
+                    <ul style="list-style: none; padding-left: 15px; margin-top: 5px;">
+                        <li><a href="#" onclick="cargarAltaUsuario(); return false;">Alta de usuario</a></li>
+                        <li><a href="#" onclick="cargarModificarUsuario(); return false;">Modificar usuario</a></li>
+                        <li><a href="#" onclick="cargarConsultaUsuario(); return false;">Consultar usuario</a></li>
+                        <li><a href="#" onclick="cargarSocialUsuario(); return false;">Social (Seguir / Dejar de seguir)</a></li>
+                    </ul>
+                </details>
+                <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 5px 0;">
 
                 <!-- Grupo 2: Categorias (Dinamico) -->
                 <details>
@@ -97,8 +109,7 @@
                         <li><a href="#" onclick="cargarSeccion('abrirFormulario')">Agregar Producto</a></li>
                         <li><a href="#" onclick="cargarSeccion('reportes')">Reportes</a></li>
                         <li><a href="#" onclick="cargarSeccion('configuracion')">Configuración</a></li>
-                        <li><a href="#" onclick="testServlet()">TestTemporal</a></li>
-                        <li><a href="#" onclick="cargarAltaUsuario()">Alta de Usuario</a></li>                      
+                        <li><a href="#" onclick="testServlet()">TestTemporal</a></li>                     
                     </ul>
                 </details>
             </nav>

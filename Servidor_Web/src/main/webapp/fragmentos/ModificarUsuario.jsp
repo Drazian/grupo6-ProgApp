@@ -1,72 +1,51 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<div class="contenedor-formulario" style="max-width: 500px; margin: 0 auto; padding: 20px;">
+<div class="contenedor-formulario" style="max-width: 550px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff;">
     <h2>Modificar Perfil</h2>
-    <hr>
+    <hr style="margin-bottom: 20px;">
 
-    <div id="mensaje-error-modificar" style="color: red; display: none; margin-bottom: 15px;"></div>
+    <!-- Mensaje de feedback para AJAX -->
+    <div id="mensaje-error-modificar" style="display:none; background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;"></div>
 
     <form id="formModificarUsuario" enctype="multipart/form-data">
         
-        <div class="form-group">
-            <label for="nickname">Nickname:</label>
-            <input type="text" id="nickname" name="nickname" value="${sessionScope.usuarioLogueado.nickname}" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nickname:</label>
+            <input type="text" value="${sessionScope.usuarioLogueado.nickname}" readonly disabled style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
-        <div class="form-group">
-            <label for="email">Correo electrónico:</label>
-            <input type="email" id="email" name="email" value="${sessionScope.usuarioLogueado.email}" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Correo Electrónico:</label>
+            <input type="email" value="${sessionScope.usuarioLogueado.email}" readonly disabled style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
-        <div class="form-group">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" value="${sessionScope.usuarioLogueado.nombre}" required>
+        <div style="margin-bottom: 15px;">
+            <label for="nombre" style="display: block; font-weight: bold; margin-bottom: 5px;">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="${sessionScope.usuarioLogueado.nombre}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
-        <div class="form-group">
-            <label for="apellido">Apellido:</label>
-            <input type="text" id="apellido" name="apellido" value="${sessionScope.usuarioLogueado.apellido}" required>
+        <div style="margin-bottom: 15px;">
+            <label for="apellido" style="display: block; font-weight: bold; margin-bottom: 5px;">Apellido:</label>
+            <input type="text" id="apellido" name="apellido" value="${sessionScope.usuarioLogueado.apellido}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
-        <div class="form-group">
-            <label for="fechaNacimiento">Fecha de Nacimiento:</label>
-            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${sessionScope.usuarioLogueado.fNacimiento}" required>
+        <div style="margin-bottom: 15px;">
+            <label for="fechaNacimiento" style="display: block; font-weight: bold; margin-bottom: 5px;">Fecha de Nacimiento:</label>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${sessionScope.usuarioLogueado.fechaNacimiento}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
-        <div class="form-group">
-            <label>Imagen de Perfil:</label><br>
-            <img id="vistaPreviaModificar" 
-                 src="imagenes/${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
-                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 1px solid #ccc;">
-            <input type="file" id="imagen" name="imagen" accept=".jpg,.png">
-        </div>
-
-        <c:if test="${sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
-            <div id="seccionInstitutosModificar" style="border: 1px solid #ddd; padding: 10px; margin-top: 15px; border-radius: 5px;">
-                <label><strong>Institutos del Docente:</strong></label>
-                
-                <div style="display: flex; gap: 5px; margin-top: 5px;">
-                    <select id="selectInstitutoModificar" style="flex: 1;">
-                        <option value="">-- Seleccionar Instituto --</option>
-                    </select>
-                    <button type="button" id="btnAgregarInstitutoModificar">Agregar</button>
-                </div>
-
-                <div style="margin-top: 10px;">
-                    <select id="institutosSeleccionadosModificar" name="institutos" multiple style="width: 100%; height: 80px;">
-                        <c:forEach var="inst" items="${sessionScope.usuarioLogueado.institutos}">
-                            <option value="${inst}" selected>${inst}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <button type="button" id="btnQuitarInstitutoModificar" style="margin-top: 5px; background-color: #d9534f; color: white; border: none; padding: 3px 8px; cursor: pointer;">Quitar Seleccionado</button>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Imagen de Perfil:</label>
+            <div style="display: flex; align-items: center; gap: 15px; margin-top: 5px;">
+                <img id="vistaPreviaModificar" src="imagenes/${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" alt="Vista previa" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
+                <input type="file" id="imagen" name="imagen" accept="image/*" />
             </div>
-        </c:if>
-
-        <div class="form-actions" style="margin-top: 20px; text-align: center; display: flex; gap: 10px;">
-            <button type="submit" style="flex: 1; background-color: #0275d8; color: white;">Guardar Cambios</button>
-            <button type="button" onclick="cancelarOperacion()" style="flex: 1; background-color: #6c757d; color: white;">Cancelar</button>
         </div>
+
+        <div style="text-align: right; margin-top: 20px;">
+            <button type="submit" style="background-color: #5cb85c; color: white; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px;">Guardar Cambios</button>
+        </div>
+
     </form>
 </div>

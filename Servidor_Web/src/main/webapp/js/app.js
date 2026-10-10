@@ -796,4 +796,74 @@ function altaEdicion(event) {
         divError.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 }
+
+function cargarModificarUsuario() {
+    const contenedor = document.getElementById('contenido-dinamico');
+
+    fetch('fragmentos/ModificarUsuario.jsp')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("No se pudo cargar la vista de modificación.");
+            }
+            return response.text();
+        })
+        .then(html => {
+            contenedor.innerHTML = html;
+            if (typeof inicializarEventosModificarUsuario === "function") {
+                inicializarEventosModificarUsuario();
+            }
+        })
+        .catch(error => console.error("Error al cargar la vista de modificación:", error));
+}
+
+function inicializarEventosModificarUsuario() {
+    const form = document.getElementById('formModificarUsuario');
+    const inputImagen = document.getElementById('imagen');
+    const vistaPrevia = document.getElementById('vistaPreviaModificar');
+
+    if (!form) return; // Evita errores si la vista no terminó de renderizarse
+
+    // Evento 1: Vista previa dinámica de la foto de perfil al seleccionar un archivo
+    if (inputImagen && vistaPrevia) {
+        inputImagen.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    vistaPrevia.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Evento 2: Envío asíncrono (AJAX) del formulario al Servlet
+    form.addEventListener('submit', function (e) {
+        e.preventDefault(); // Evita el submit tradicional del HTML
+
+        const formData = new FormData(form);
+        formData.append('accion', 'modificarUsuario');
+
+        fetch('UsuarioServlet', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Error en el servidor al guardar datos.");
+            return response.json(); // o response.text() según responda tu backend
+        })
+        .then(data => {
+            alert("Perfil modificado con éxito");
+            // Opcional: refrescar interfaz o redirigir
+        })
+        .catch(error => {
+            const divError = document.getElementById('mensaje-error-modificar');
+            if (divError) {
+                divError.innerText = "No se pudieron guardar los cambios. Intente nuevamente.";
+                divError.style.display = "block";
+            }
+            console.error(error);
+        });
+    });
+}
 //---------------------------------------------------------------------------------

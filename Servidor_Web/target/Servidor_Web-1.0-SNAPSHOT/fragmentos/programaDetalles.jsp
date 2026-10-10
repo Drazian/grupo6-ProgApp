@@ -25,6 +25,29 @@
                         <p><strong>Fecha de Fin:</strong> ${programa.fechaFin}</p>
                         <p><strong>Fecha de Alta:</strong> ${programa.fechaRegistro}</p>
                     </div>
+                    
+                    
+                    <div class="categorias-programa">
+                        <strong>Categorias:</strong>
+                        <c:choose>
+                            <c:when test="${not empty programa.getCategorias()}">
+                                <c:forEach var="categoria" items="${programa.getCategorias()}">
+                                    <span class="badge-categoria"><c:out value="${categoria}"/></span>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="texto-vacio">Sin categorias asociadas</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                 </div>
             </div>
 
