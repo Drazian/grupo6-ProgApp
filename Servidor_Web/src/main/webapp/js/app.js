@@ -626,4 +626,78 @@ function cargarMenuLateral() {
         })
         .catch(error => console.error("Error al cargar categorías:", error));
 }
+
+// 1. Función para pintar la vista de Alta de Edición (Deberás llamarla desde el menú lateral)
+function cargarAltaEdicion() {
+    fetch('EdicionServlet?accion=altaEdicion')
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(err => { throw new Error("Acceso denegado: " + response.status); });
+            }
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style="color:red; text-align:center;">${error.message}. ¿Iniciaste sesión como Docente?</h3>`;
+        });
+}
+
+// 2. Función dinámica para cargar cursos al cambiar el <select> de Institutos
+function cargarCursosDeInstituto(nombreInstituto) {
+    const selectCurso = document.getElementById('cursoEdicion');
+    
+    if (!nombreInstituto) {
+        selectCurso.innerHTML = '<option value="">Primero seleccione un instituto</option>';
+        selectCurso.disabled = true;
+        return;
+    }
+
+    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${nombreInstituto}`)
+        .then(response => response.json())
+        .then(cursos => {
+            selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
+            cursos.forEach(curso => {
+                selectCurso.innerHTML += `<option value="${curso}">${curso}</option>`;
+            });
+            selectCurso.disabled = false;
+        })
+        .catch(error => console.error("Error cargando cursos del instituto:", error));
+}
+
+// 3. Función para interceptar el formulario y enviarlo por POST
+function altaEdicion(event) {
+    event.preventDefault();
+    const divError = document.getElementById('mensaje-error-edicion');
+    divError.style.display = 'none';
+
+    const form = document.getElementById('formAltaEdicion');
+    
+    // Convertimos los datos para soportar listas múltiples (select multiple)
+    const datos = new URLSearchParams(new FormData(form));
+
+    fetch('EdicionServlet?accion=altaEdicion', {
+        method: 'POST',
+        body: datos
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text().then(msg => {
+                alert(msg); // Muestra éxito
+                form.reset(); // Limpia la pantalla para otra edición
+                document.getElementById('cursoEdicion').innerHTML = '<option value="">Primero seleccione un instituto</option>';
+                document.getElementById('cursoEdicion').disabled = true;
+            });
+        } else {
+            return response.text().then(err => { throw new Error(err); });
+        }
+    })
+    .catch(error => {
+        // En caso de nombre duplicado, el usuario verá el error aquí y podrá corregirlo
+        divError.innerHTML = "<strong>Error:</strong> " + error.message;
+        divError.style.display = 'block';
+        divError.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+}
 //---------------------------------------------------------------------------------

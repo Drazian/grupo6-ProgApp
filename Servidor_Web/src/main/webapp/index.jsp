@@ -65,18 +65,19 @@
                 
                 <!-- Grupo 3: Cursos (Restringido a Docentes) -->
                 <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
-                    <details open>
+                    <details>
                         <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Cursos</summary>
                         <ul style="list-style: none; padding-left: 15px;">
                             <li><a href="#" onclick="cargarAltaCurso()">Alta Curso</a></li>
-                            <!-- Aquí agregarás "Alta edición" en el futuro -->
-                        </ul>
+                            <!-- AQUÍ ESTABA EL ERROR: Faltaban las comillas dobles y cerrar el <li> -->
+                            <li><a href="#" onclick="cargarAltaEdicion()">Alta Edición de Curso</a></li>
+                        </ul>                      
                     </details>
                     <hr style="opacity: 0.2; margin: 10px 0;">
                 </c:if>
                 
                 <!-- Grupo 4: Programas de Formación (Estatico) -->
-                <details open>
+                <details>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Programas</summary>
                     <ul style="list-style: none; padding-left: 15px;">
                         <li><a href="#" onclick="ProgramaServlet('formCrear')">Crear Programa</a></li>
@@ -96,7 +97,7 @@
                         <li><a href="#" onclick="cargarSeccion('reportes')">Reportes</a></li>
                         <li><a href="#" onclick="cargarSeccion('configuracion')">Configuración</a></li>
                         <li><a href="#" onclick="testServlet()">TestTemporal</a></li>
-                        <li><a href="#" onclick="cargarAltaUsuario()">Alta de Usuario</a></li>                     
+                        <li><a href="#" onclick="cargarAltaUsuario()">Alta de Usuario</a></li>                      
                     </ul>
                 </details>
             </nav>
