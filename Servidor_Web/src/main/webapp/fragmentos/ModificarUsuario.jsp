@@ -5,7 +5,6 @@
     <h2>Modificar Perfil</h2>
     <hr style="margin-bottom: 20px;">
 
-    <!-- Mensaje de feedback para AJAX -->
     <div id="mensaje-error-modificar" style="display:none; background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;"></div>
 
     <form id="formModificarUsuario" enctype="multipart/form-data">
@@ -35,7 +34,29 @@
             <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${sessionScope.usuarioLogueado.fNacimiento}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
-        <!-- Campos opcionales para cambio de contraseña -->
+        <!-- SECCIÓN EXCLUSIVA PARA DOCENTES: Gestión de Institutos -->
+        <c:if test="${sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
+            <div id="seccionInstitutosModificar" style="margin-bottom: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Institutos Asignados:</label>
+                
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                    <select id="institutoModificar" style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="">Seleccione un instituto para agregar...</option>
+                    </select>
+                    <button type="button" id="agregarInstitutoModificar" style="padding: 8px 12px; background-color: #0275d8; color: white; border: none; border-radius: 4px; cursor: pointer;">Agregar</button>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <select id="institutosSeleccionadosModificar" multiple style="width: 100%; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        <c:forEach var="inst" items="${sessionScope.usuarioLogueado.institutos}">
+                            <option value="${inst}">${inst}</option>
+                        </c:forEach>
+                    </select>
+                    <button type="button" id="quitarInstitutoModificar" style="margin-top: 5px; padding: 6px 12px; background-color: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer;">Quitar Selección</button>
+                </div>
+            </div>
+        </c:if>
+
         <div style="margin-bottom: 15px;">
             <label for="password" style="display: block; font-weight: bold; margin-bottom: 5px;">Nueva Contraseña (opcional):</label>
             <input type="password" id="password" name="password" placeholder="Dejar en blanco si no se desea cambiar" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
