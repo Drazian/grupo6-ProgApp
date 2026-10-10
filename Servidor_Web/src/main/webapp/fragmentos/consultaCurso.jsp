@@ -25,7 +25,8 @@
             <h3>Ediciones Asociadas</h3>
             <ul>
                 <c:forEach var="ed" items="${curso.ediciones}">
-                    <li><a href="#" onclick="verDetalleEdicion('${ed}')">${ed}</a></li>
+                    <!-- AQUÍ ESTÁ EL FIX: Llama a la función JavaScript correcta -->
+                    <li><a href="#" onclick="cargarConsultaEdicion('${ed}')">${ed}</a></li>
                 </c:forEach>
                 <c:if test="${empty curso.ediciones}">
                     <li style="color: #999;">No hay ediciones registradas.</li>

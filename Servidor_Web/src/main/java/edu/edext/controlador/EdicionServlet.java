@@ -70,6 +70,23 @@ public class EdicionServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo cursos.");
                 }
                 break;
+            
+            case "consultaEdicion":
+                try {
+                    String nombreEdicion = request.getParameter("nombre");
+                    DtEdicion edicion = ic.getEdicion(nombreEdicion);
+                    
+                    if (edicion == null) {
+                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "La edición no existe.");
+                        return;
+                    }
+                    
+                    request.setAttribute("edicion", edicion);
+                    request.getRequestDispatcher("fragmentos/consultaEdicion.jsp").forward(request, response);
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error cargando la edición: " + e.getMessage());
+                }
+                break;    
         }
     }
 

@@ -2,11 +2,11 @@ package edu.edext.logica;
 //**************************** Capa Logica *************************************
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtEdicion;
+import edu.edext.datatypes.DtUsuario;
+import edu.edext.datatypes.TipoUsuario;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -37,15 +37,30 @@ public class ConsultaEdicionHelper {
     
     public DtEdicion getEdicion(){
         Edicion tmp=seekEdicion();
-        if(tmp!=null)
+        if(tmp!=null) {
+            // SOLUCIÓN: Extraemos los DtUsuario completos para tener acceso a la imagen
+            List<DtUsuario> dtDocentes = new ArrayList<>();
+            if (tmp.getDocentes() != null) {
+                for (Docente d : tmp.getDocentes()) {
+                    List<String> instDocente = new ArrayList<>();
+                    if (d.getInstitutos() != null) {
+                        for(Instituto inst : d.getInstitutos()) {
+                            instDocente.add(inst.getNombre());
+                        }
+                    }
+                    dtDocentes.add(new DtUsuario(d.getNickname(), d.getPassword(), d.getEmail(), d.getNombre(), d.getApellido(), d.getImagen(), d.getfNacimiento(), instDocente, TipoUsuario.DOCENTE));
+                }
+            }
+            
             return new DtEdicion(
                     tmp.getNombre(), 
                     tmp.getCupo(), 
                     tmp.getFechaInicio(), 
                     tmp.getFechaFin(), 
                     tmp.getFechaPublicacion(), 
-                    new DtCurso(tmp.getNombre(), null, null, 0, 0, null, null, null, null), 
-                    tmp.getNamesDocentes());
+                    new DtCurso(tmp.getCurso().getNombre(), null, null, 0, 0, null, null, null, null), 
+                    dtDocentes); // Pasamos la lista de DtUsuario en lugar del Set<String>
+        }
         else return null;
     }
   
@@ -63,8 +78,7 @@ public class ConsultaEdicionHelper {
         List<String> ret;
         try { ret=db.createQuery("SELECT e.nombre FROM Edicion e WHERE e.curso.nombre = :curso", String.class).setParameter("curso", nombre).getResultList(); }
         catch (Exception e) { ret=new ArrayList<>(); }
-        db.close();
-        db=null;
+        finally { if(db!=null && db.isOpen()) db.close(); }
         return ret;
     }
 
@@ -73,15 +87,16 @@ public class ConsultaEdicionHelper {
         String ret;
         try { ret=db.find(Edicion.class, nombre).getNombre(); }
         catch (Exception e) { ret=null; }
+        finally { if(db!=null && db.isOpen()) db.close(); }
         return ret;
     }
+    
     private Edicion seekEdicion(){
         db=DB.createEntityManager();
         Edicion ret;
         try { ret=db.find(Edicion.class, nombre); }
         catch (Exception e) { ret=null; }
-        db=null;
+        // No cerramos db aquí porque las relaciones (docentes) se leen en getEdicion()
         return ret;
     }
-    
 }
