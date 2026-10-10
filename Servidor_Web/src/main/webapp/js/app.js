@@ -955,3 +955,20 @@ function inicializarEventosModificarUsuario() {
         });
     });
 }
+
+// Carga los datos completos de una Edición
+function cargarConsultaEdicion(nombreEdicion) {
+    document.getElementById('contenido-dinamico').innerHTML = "<h3 style='text-align:center;'>Cargando edición...</h3>";
+    
+    fetch(`EdicionServlet?accion=consultaEdicion&nombre=${encodeURIComponent(nombreEdicion)}`)
+        .then(response => {
+            if (!response.ok) throw new Error("Error al cargar la edición");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style="color:red; text-align:center;">${error.message}</h3>`;
+        });
+}
