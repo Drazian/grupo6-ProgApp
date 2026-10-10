@@ -47,6 +47,102 @@ function guardarProducto(event) {
 
 //---------------------------------------------------------------------------------
 
+//Filtrados y ordenamientos
+function initBuscador() {
+    const selectTipo = document.getElementById('filtroTipo');
+    const selectOrden = document.getElementById('criterioOrden');
+    const tablaResultados = document.getElementById('tablaResultados');
+
+    if (!tablaResultados || !selectTipo || !selectOrden) return;
+
+    const tbody = tablaResultados.querySelector('tbody');
+
+    function actualizarResultados() {
+        const tipoSeleccionado = selectTipo.value;
+        const criterioOrden = selectOrden.value;
+
+        let filas = Array.from(tbody.querySelectorAll('tr.fila-resultado'));
+
+        // 1. FILTRADO POR TIPO
+        filas.forEach(fila => {
+            const tipoFila = fila.getAttribute('data-tipo');
+            if (tipoSeleccionado === 'TODOS' || tipoFila === tipoSeleccionado) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
+
+        // 2. ORDENAMIENTO
+        filas.sort((a, b) => {
+            if (criterioOrden === 'ALFABETICO') {
+                const nombreA = (a.getAttribute('data-nombre') || '').toLowerCase();
+                const nombreB = (b.getAttribute('data-nombre') || '').toLowerCase();
+                return nombreA.localeCompare(nombreB);
+            } else if (criterioOrden === 'FECHA') {
+                const fechaA = a.getAttribute('data-fecha') || '';
+                const fechaB = b.getAttribute('data-fecha') || '';
+                return fechaB.localeCompare(fechaA); // Descendente (más reciente primero)
+            }
+            return 0;
+        });
+
+        // 3. REORDENAR EN EL DOM
+        filas.forEach(fila => tbody.appendChild(fila));
+    }
+
+    selectTipo.addEventListener('change', actualizarResultados);
+    selectOrden.addEventListener('change', actualizarResultados);
+
+    actualizarResultados();
+}
+
+function verDetallesBusqueda(nombre, tipo){
+    const tipoNormalizado = (tipo || '').toLowerCase(); //Lo normalizamos por seguridad.
+    
+    switch (tipoNormalizado){
+        case "programa":
+            cargarDetallePrograma(nombre);
+        break;
+        
+        case "curso":
+            //Aguardando implementacion de ConsultaCurso.
+        break;
+    }
+    
+}
+
+
+
+function BuscadorServlet(){
+    const input = document.getElementById('input-busqueda');
+    const contenedor = document.getElementById('contenido-dinamico');
+
+    if (!input || !contenedor) return;
+
+    const query = encodeURIComponent(input.value.trim());
+
+    fetch(`BuscadorServlet?query=${query}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Reemplaza únicamente el contenido del área central
+            contenedor.innerHTML = html;
+            
+            // Inicializa los eventos de los comboboxes de orden y filtrado
+            initBuscador();
+        })
+        .catch(error => console.error('Error al ejecutar la búsqueda:', error));
+}
+
+
+
+//---------------------------------------------------------------------------------
+
 //Para evitar tener que crear un Servlet extra se procede generando un evento para cargar los Institutos y Categorias del menu izquierdo.
 document.addEventListener("DOMContentLoaded", function() {
     cargarInstitutosMenu();
