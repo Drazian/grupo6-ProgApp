@@ -123,6 +123,11 @@ public class UsuarioServlet extends HttpServlet {
             String apellido = request.getParameter("apellido");
             String fechaNacimiento = request.getParameter("fechaNacimiento");
             String nuevaPassword = request.getParameter("password");
+            String[] institutosArray = request.getParameterValues("institutos"); // Capturar institutos
+
+            List<String> institutos = (institutosArray != null && institutosArray.length > 0) 
+                ? Arrays.asList(institutosArray) 
+                : usuarioActual.getInstitutos();
 
             Part partImagen = request.getPart("imagen");
             byte[] bytesImagen = null;
@@ -138,7 +143,6 @@ public class UsuarioServlet extends HttpServlet {
             try {
                 Date fecha = Date.valueOf(fechaNacimiento);
 
-                // Si escribió algo en el campo, se envía la clave en texto plano; si no, va null
                 String passwordParaControlador = (nuevaPassword != null && !nuevaPassword.trim().isEmpty()) 
                     ? nuevaPassword.trim() 
                     : null;
@@ -161,14 +165,14 @@ public class UsuarioServlet extends HttpServlet {
                     apellido,
                     nombreImagenFinal, 
                     fecha,
-                    usuarioActual.getInstitutos(),
+                    institutos, // Se envían los institutos actualizados
                     usuarioActual.getTipoUsuario()
                 );
 
                 IControlador ic = Fabrica.getInstance().getIControlador();
                 ic.modificarUsuario(usuarioModificado, bytesImagen, nombreOriginal);
 
-                // Sincronizamos la sesión trayendo el DtUsuario actualizado con su hash real desde la BD
+                // Sincronizar usuario en sesión
                 List<DtUsuario> listaActualizada = ic.listarUsuarios();
                 for (DtUsuario u : listaActualizada) {
                     if (u.getNickname().equalsIgnoreCase(usuarioActual.getNickname())) {

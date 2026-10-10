@@ -824,7 +824,55 @@ function inicializarEventosModificarUsuario() {
 
     if (!form) return;
 
-    // 1. Mostrar vista previa dinámica de la imagen
+    // Cargar combo de institutos solo si existe el componente (docente)
+    const selectInstituto = document.getElementById("institutoModificar");
+    if (selectInstituto) {
+        fetch("UsuarioServlet?accion=listarInstitutos")
+            .then(response => response.json())
+            .then(institutos => {
+                institutos.forEach(inst => {
+                    const opcion = document.createElement("option");
+                    opcion.value = inst.nombre;
+                    opcion.textContent = inst.nombre;
+                    selectInstituto.appendChild(opcion);
+                });
+            })
+            .catch(err => console.error("Error cargando institutos:", err));
+
+        // Evento Agregar Instituto
+        const btnAgregar = document.getElementById("agregarInstitutoModificar");
+        if (btnAgregar) {
+            btnAgregar.addEventListener("click", function () {
+                const instSeleccionado = selectInstituto.value;
+                const selectLista = document.getElementById("institutosSeleccionadosModificar");
+
+                if (!instSeleccionado) return alert("Seleccione un instituto de la lista.");
+
+                for (let i = 0; i < selectLista.options.length; i++) {
+                    if (selectLista.options[i].value === instSeleccionado) {
+                        return alert("El instituto ya fue agregado.");
+                    }
+                }
+
+                const opcion = document.createElement("option");
+                opcion.value = instSeleccionado;
+                opcion.textContent = instSeleccionado;
+                selectLista.appendChild(opcion);
+            });
+        }
+
+        // Evento Quitar Instituto
+        const btnQuitar = document.getElementById("quitarInstitutoModificar");
+        if (btnQuitar) {
+            btnQuitar.addEventListener("click", function () {
+                const selectLista = document.getElementById("institutosSeleccionadosModificar");
+                if (selectLista.selectedIndex === -1) return alert("Seleccione un instituto para quitar.");
+                selectLista.remove(selectLista.selectedIndex);
+            });
+        }
+    }
+
+    // Vista previa de imagen
     if (inputImagen && vistaPrevia) {
         inputImagen.addEventListener('change', function (e) {
             const file = e.target.files[0];
@@ -838,7 +886,7 @@ function inicializarEventosModificarUsuario() {
         });
     }
 
-    // 2. Interceptar el envío del formulario
+    // Interceptar el envío
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -850,7 +898,6 @@ function inicializarEventosModificarUsuario() {
         const pass = document.getElementById('password') ? document.getElementById('password').value : '';
         const confirmPass = document.getElementById('confirmarPassword') ? document.getElementById('confirmarPassword').value : '';
 
-        // Validación: si escribió en algún campo de contraseña, deben coincidir
         if (pass.length > 0 || confirmPass.length > 0) {
             if (pass !== confirmPass) {
                 if (divError) {
@@ -859,12 +906,30 @@ function inicializarEventosModificarUsuario() {
                 } else {
                     alert("Las contraseñas no coinciden.");
                 }
-                return; // Detiene el envío y permite al usuario corregirlo
+                return;
             }
+        }
+
+        const selectLista = document.getElementById("institutosSeleccionadosModificar");
+        if (selectLista && selectLista.options.length === 0) {
+            if (divError) {
+                divError.innerText = "Un docente debe tener al menos un instituto asignado.";
+                divError.style.display = 'block';
+            } else {
+                alert("Un docente debe tener al menos un instituto asignado.");
+            }
+            return;
         }
 
         const formData = new FormData(form);
         formData.append('accion', 'modificarUsuario');
+
+        // Adjuntar todos los valores de la lista de institutos seleccionados
+        if (selectLista) {
+            for (let i = 0; i < selectLista.options.length; i++) {
+                formData.append("institutos", selectLista.options[i].value);
+            }
+        }
 
         fetch('UsuarioServlet', {
             method: 'POST',
@@ -877,8 +942,8 @@ function inicializarEventosModificarUsuario() {
             return response.text();
         })
         .then(mensajeExito => {
-            alert("Cambios guardados correctamente."); // Mensaje de confirmación
-            window.location.reload(); // Recarga la página obligatoriamente
+            alert("Cambios guardados correctamente.");
+            window.location.reload();
         })
         .catch(error => {
             if (divError) {
