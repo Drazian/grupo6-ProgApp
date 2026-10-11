@@ -45,16 +45,27 @@ public class Curso {
     public Curso(String nombre, String descripcion, String duracion, int cantidadHoras, 
                  int creditos, String url, Date fechaRegistro, Instituto instituto, 
                  List<Categoria> categorias, List<Curso> previas) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras;
-        this.creditos = creditos;
-        this.url = url;
-        this.fechaRegistro = fechaRegistro;
-        this.instituto = instituto;
-        this.categorias = categorias;
-        this.previas = previas;
+        setNombre(nombre);
+        setDescripcion(descripcion);
+        setDuracion(duracion);
+        setCantidadHoras(cantidadHoras);
+        setCreditos(creditos);
+        setUrl(url);
+        setFechaRegistro(fechaRegistro);
+        setInstituto(instituto);
+        setCategorias(categorias);
+        setPrevias(previas);
+                
+//        this.nombre = nombre;
+//        this.descripcion = descripcion;
+//        this.duracion = duracion;
+//        this.cantidadHoras = cantidadHoras;
+//        this.creditos = creditos;
+//        this.url = url;
+//        this.fechaRegistro = fechaRegistro;
+//        this.instituto = instituto;
+//        this.categorias = categorias;
+//        this.previas = previas;
     }
 
     public String getNombre() { return nombre; }

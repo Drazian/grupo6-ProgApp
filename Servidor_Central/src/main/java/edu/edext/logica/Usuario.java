@@ -53,13 +53,12 @@ public class Usuario {
     
 
     public Usuario(String nickname, String password, String email, String nombre, String apellido, Date fNacimiento, String imagen) {
-        this.nickname = nickname;
-        this.password=password;
-        this.email = email;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.fNacimiento = fNacimiento;
-        this.imagen = imagen;
+        setNickname(nickname);
+        setPassword(password);
+        setEmail(email);
+        setApellido(apellido);
+        setfNacimiento(fNacimiento);
+        setImagen(imagen);
     }
 
     public Usuario() {
