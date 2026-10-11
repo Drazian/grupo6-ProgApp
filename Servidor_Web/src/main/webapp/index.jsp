@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<!-- SECTOR 1: Barra Superior Completa -->
+    <!-- SECTOR 1: Barra Superior Completa -->
     <header class="sector-1">
         <div class="logo">MiLogo</div>
         
@@ -22,13 +22,19 @@
         <div class="sesion" style="display: flex; align-items: center; gap: 15px;">
             <c:choose>
                 <c:when test="${not empty sessionScope.usuarioLogueado}">
-                    <!-- Si hay sesión: Mostramos Imagen, Nombre, Rol y botón Salir -->
+                    <!-- Si hay sesión: Mostramos Imagen, Saludo con Rol y botón Salir -->
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <img src="imagenes/${sessionScope.usuarioLogueado.imagen}" alt="Perfil" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid white;">
+                        
+                        <!-- Foto de perfil servida dinámicamente desde ImagenServlet -->
+                        <img src="ImagenServlet?nombre=${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
+                             alt="Foto de perfil" 
+                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
+
                         <span style="font-weight: bold;">
-                            Hola, ${sessionScope.usuarioLogueado.nombre} 
+                            Hola, ${sessionScope.usuarioLogueado.nombre} ${sessionScope.usuarioLogueado.apellido}
                             <span style="font-size: 12px; font-weight: normal; opacity: 0.8;">(${sessionScope.usuarioLogueado.tipoUsuario})</span>
                         </span>
+
                         <button onclick="cerrarSesion()" style="background-color: #d9534f; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px;">Cerrar Sesión</button>
                     </div>
                 </c:when>
@@ -54,7 +60,7 @@
 
                 <hr style="opacity: 0.2; margin: 10px 0;">
                 
-                <!-- Menú Usuarios (NUEVO) -->
+                <!-- Menú Usuarios -->
                 <details>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Usuarios</summary>
                     <ul style="list-style: none; padding-left: 15px; margin-top: 5px;">
@@ -82,7 +88,6 @@
                         <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Cursos</summary>
                         <ul style="list-style: none; padding-left: 15px;">
                             <li><a href="#" onclick="cargarAltaCurso()">Alta Curso</a></li>
-                            <!-- AQUÍ ESTABA EL ERROR: Faltaban las comillas dobles y cerrar el <li> -->
                             <li><a href="#" onclick="cargarAltaEdicion()">Alta Edición de Curso</a></li>
                         </ul>                      
                     </details>
