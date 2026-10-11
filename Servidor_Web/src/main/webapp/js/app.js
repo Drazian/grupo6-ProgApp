@@ -972,3 +972,99 @@ function cargarConsultaEdicion(nombreEdicion) {
             document.getElementById('contenido-dinamico').innerHTML = `<h3 style="color:red; text-align:center;">${error.message}</h3>`;
         });
 }
+
+// Cargar la vista principal de inscripción
+function cargarFormInscripcion() {
+    fetch('InscripcionServlet?accion=formulario')
+        .then(response => {
+            if (!response.ok) throw new Error("Acceso denegado. Esta función es solo para Estudiantes.");
+            return response.text();
+        })
+        .then(html => document.getElementById('contenido-dinamico').innerHTML = html)
+        .catch(error => document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center; padding: 20px;'>${error.message}</h3>`);
+}
+
+// 1er Eslabón AJAX: Cuando selecciona Instituto, carga Cursos (Reutilizamos el EdicionServlet que ya hace esto)
+function cargarCursosParaInscripcion(nombreInstituto) {
+    const selectCurso = document.getElementById('cursoInscripcion');
+    const selectEdicion = document.getElementById('edicionInscripcion');
+    
+    selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
+    selectEdicion.disabled = true;
+
+    if (!nombreInstituto) {
+        selectCurso.innerHTML = '<option value="">Primero seleccione un instituto</option>';
+        selectCurso.disabled = true;
+        return;
+    }
+
+    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${nombreInstituto}`)
+        .then(response => response.json())
+        .then(cursos => {
+            selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
+            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            selectCurso.disabled = false;
+        });
+}
+
+// 2do Eslabón AJAX: Cuando selecciona Curso, carga Ediciones
+function cargarEdicionesParaInscripcion(nombreCurso) {
+    const selectEdicion = document.getElementById('edicionInscripcion');
+    
+    if (!nombreCurso) {
+        selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
+        selectEdicion.disabled = true;
+        return;
+    }
+
+    fetch(`InscripcionServlet?accion=listarEdiciones&curso=${nombreCurso}`)
+        .then(response => response.json())
+        .then(ediciones => {
+            if(ediciones.length === 0) {
+                selectEdicion.innerHTML = '<option value="">No hay ediciones disponibles</option>';
+                selectEdicion.disabled = true;
+            } else {
+                selectEdicion.innerHTML = '<option value="">Seleccione la Edición...</option>';
+                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
+                selectEdicion.disabled = false;
+            }
+        });
+}
+
+// Enviar el formulario y manejar el cartel de Ya Inscripto vs Éxito
+function inscribirEdicion(event) {
+    event.preventDefault();
+    const msgDiv = document.getElementById('mensaje-inscripcion');
+    const form = document.getElementById('formInscripcionEdicion');
+    const datos = new URLSearchParams(new FormData(form));
+
+    fetch('InscripcionServlet?accion=inscribir', {
+        method: 'POST',
+        body: datos
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text().then(msg => {
+                msgDiv.style.display = 'block';
+                msgDiv.style.backgroundColor = '#dff0d8';
+                msgDiv.style.color = '#3c763d';
+                msgDiv.style.border = '1px solid #d6e9c6';
+                msgDiv.innerHTML = "✔ " + msg;
+                
+                // Limpiar todo después de éxito
+                form.reset();
+                document.getElementById('cursoInscripcion').disabled = true;
+                document.getElementById('edicionInscripcion').disabled = true;
+            });
+        } else {
+            return response.text().then(err => {
+                msgDiv.style.display = 'block';
+                msgDiv.style.backgroundColor = '#f2dede';
+                msgDiv.style.color = '#a94442';
+                msgDiv.style.border = '1px solid #ebccd1';
+                msgDiv.innerHTML = "<strong>Atención:</strong> " + err;
+            });
+        }
+    })
+    .catch(error => console.error('Error procesando inscripción:', error));
+}

@@ -89,6 +89,17 @@
                     <hr style="opacity: 0.2; margin: 10px 0;">
                 </c:if>
                 
+                <!-- Grupo: Estudiantes (Restringido a Estudiantes) -->
+                <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'ESTUDIANTE'}">
+                    <details>
+                        <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Inscripciones</summary>
+                        <ul style="list-style: none; padding-left: 15px;">
+                            <li><a href="#" onclick="cargarFormInscripcion()">Inscripción a Edición</a></li>
+                        </ul>
+                    </details>
+                    <hr style="opacity: 0.2; margin: 10px 0;">
+                </c:if>    
+                    
                 <!-- Grupo 4: Programas de Formación (Estatico) -->
                 <details>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Programas</summary>
