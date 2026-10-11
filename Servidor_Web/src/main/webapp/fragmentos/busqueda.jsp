@@ -40,7 +40,12 @@
                         data-nombre="${item.nombre}" 
                         data-fecha="${item.fechaPublicacion}">
 
-                        <td><!-- Contenedor imagen --></td>
+                        <td>
+                            <img src="ImagenServlet?nombre=${empty item.imagen ? 'usr.png' : item.imagen}" 
+                                 alt="Imagen" 
+                                 style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 1px solid #ccc;">
+                        </td>
+                        
                         <td>${item.nombre}</td>
                         <td>${item.descripcion}</td>
                         <td>${item.fechaPublicacion}</td>

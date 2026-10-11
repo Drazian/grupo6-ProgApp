@@ -9,7 +9,7 @@
     <body>
         <h1>Crear Programa</h1>
         
-        <form id="formCrearPrograma">
+        <form id="formCrearPrograma" enctype="multipart/form-data">
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" placeholder="Programita" required><br>
 
@@ -21,6 +21,10 @@
 
             <label for="fechaFin">Fecha de Fin:</label>
             <input type="date" id="fechaFin" required><br>
+            
+            <label for="imagen">Imagen del Programa:</label>
+            <input type="file" id="imagen" accept=".jpg, .png"><br><br>
+            <img id="vistaPrevia" src="imagenes/usr.png" alt="Vista previa" width="150" height="150" style="border-radius: 5px; object-fit: cover;"><br>
             
             <button type="button" onclick="crearPrograma()">Guardar</button>
         </form>

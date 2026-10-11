@@ -43,7 +43,7 @@ public class BuscadorServlet extends HttpServlet {
                     
                     if (queryLower.isEmpty() || nombre.toLowerCase().contains(queryLower) || desc.toLowerCase().contains(queryLower)){
                         LocalDate fechaReg = prog.getFechaRegistro() != null ? prog.getFechaRegistro() : LocalDate.now();
-                        DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,"","programa");
+                        DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,prog.getImagen(),"programa");
                         resultados.add(res);
                     }
                 }
@@ -57,7 +57,7 @@ public class BuscadorServlet extends HttpServlet {
                     
                     if (queryLower.isEmpty() || nombre.toLowerCase().contains(queryLower) || desc.toLowerCase().contains(queryLower)) {
                         LocalDate fechaReg = DateToLocalDate(curso.getFechaRegistro()); //Conversion a LocalDate para unificar.
-                        DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,"","curso");
+                        DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,null,"curso");
                         resultados.add(res);
                     }
                 }

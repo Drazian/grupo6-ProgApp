@@ -106,13 +106,11 @@ function verDetallesBusqueda(nombre, tipo){
         break;
         
         case "curso":
-            //Aguardando implementacion de ConsultaCurso.
+            verDetallesCurso(nombre);
         break;
     }
     
 }
-
-
 
 function BuscadorServlet(){
     const input = document.getElementById('input-busqueda');
@@ -282,6 +280,10 @@ function ProgramaServlet(opcion) {
         .then(response => response.text())
         .then(html => {
             contenedor.innerHTML = html;
+            
+            if (opcion === 'formCrear') {
+                inicializarEventosCrearPrograma();
+            }
         })
         .catch(error => console.error('Error al cargar la sección:', error));
 }
@@ -302,24 +304,26 @@ function crearPrograma(){
         return;
     }
     
-        if (!fechaInicio.trim() || !fechaFin.trim()){
+    if (!fechaInicio.trim() || !fechaFin.trim()){
         alert("Ingrese un periodo valido");
         return;
     }
     
     
-    const params = new URLSearchParams();
-    params.append('nombre', nombre);
-    params.append('desc', descripcion);
-    params.append('fechaInicio', fechaInicio);
-    params.append('fechaFin', fechaFin);
+    const datos = new FormData();
+    datos.append('nombre', nombre);
+    datos.append('desc', descripcion);
+    datos.append('fechaInicio', fechaInicio);
+    datos.append('fechaFin', fechaFin);
+    
+    const archivoImagen = document.getElementById("imagen").files[0];
+    if (archivoImagen) {
+        datos.append('imagen', archivoImagen);
+    }
     
     fetch('ProgramaServlet?accion=crear', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-            },
-            body: params
+            body: datos
         })
         .then(response => {
             return response.text().then(texto => {
@@ -338,6 +342,25 @@ function crearPrograma(){
         });
     
 }
+
+function inicializarEventosCrearPrograma() {
+    const inputImagen = document.getElementById("imagen");
+    
+    if (inputImagen) {
+        inputImagen.addEventListener("change", function(event) {
+            const archivo = event.target.files[0];
+            if (archivo) {
+                const lector = new FileReader();
+                lector.onload = function(e) {
+                    document.getElementById("vistaPrevia").src = e.target.result;
+                };
+                lector.readAsDataURL(archivo);
+            }
+        });
+    }
+}
+
+
 
 function agregarCursoAPrograma(){
     const programa = document.getElementById('selectPrograma').value;
