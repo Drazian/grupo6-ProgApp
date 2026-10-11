@@ -508,27 +508,50 @@ public class AltaUsuario extends javax.swing.JPanel {
         
     }
     //carga una imagen generica de usuario en el formulario
-    private void cargarImagen(String s) {
-        lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadJVM(s)));
-//        File archivo = new File("imagenes", s);
-//        ImageIcon icono = new ImageIcon(archivo.getAbsolutePath());
-//
-//        Image imagen = icono.getImage();
-//
-//        if (lblImagen.getWidth() <= 0 || lblImagen.getHeight() <= 0) {
-//            SwingUtilities.invokeLater(() -> cargarImagen(s));
-//            return;
-//        }
-//
-//        Image imagenEscalada = imagen.getScaledInstance(
-//            lblImagen.getWidth(),
-//            lblImagen.getHeight(),
-//            Image.SCALE_SMOOTH
-//        );
-//
-//        lblImagen.setIcon(new ImageIcon(imagenEscalada));
+// Carga la imagen de usuario en el JLabel del formulario Swing
+   private void cargarImagen(String s) {
+    if (s == null || s.trim().isEmpty()) {
+        s = IMAGEDEFAULT;
     }
 
+    // 1. Buscar primero en la carpeta compartida central de GestorImagenes
+    File archivo = new File(GestorImagenes.getRutaBase(), s);
+
+    // 2. Si no existe allí, buscar en la carpeta del proyecto (fallback para 'usr.png')
+    if (!archivo.exists()) {
+        archivo = new File(RUTADEFAULT, s);
+    }
+
+    // 3. Si aún no existe, fallback final a la imagen genérica por defecto
+    if (!archivo.exists()) {
+        archivo = new File(RUTADEFAULT, IMAGEDEFAULT);
+    }
+
+    // 4. Si Swing no ha calculado las dimensiones del contenedor aún
+    if (lblImagen.getWidth() <= 0 || lblImagen.getHeight() <= 0) {
+        final String nombreFinal = s;
+        SwingUtilities.invokeLater(() -> cargarImagen(nombreFinal));
+        return;
+    }
+
+    // 5. Cargar y redimensionar la imagen proporcionalmente
+    try {
+        ImageIcon iconoOriginal = new ImageIcon(archivo.getAbsolutePath());
+        Image imagen = iconoOriginal.getImage();
+
+        Image imagenEscalada = imagen.getScaledInstance(
+            lblImagen.getWidth(),
+            lblImagen.getHeight(),
+            Image.SCALE_SMOOTH
+        );
+
+        lblImagen.setIcon(new ImageIcon(imagenEscalada));
+        lblImagen.setText("");
+    } catch (Exception e) {
+        lblImagen.setIcon(null);
+        lblImagen.setText("Sin Imagen");
+    }
+}
     private void cargarInstitutos() {
         Utils.FX.reSizePadre(this, widthForm, heightForm[0]);   
         try {
