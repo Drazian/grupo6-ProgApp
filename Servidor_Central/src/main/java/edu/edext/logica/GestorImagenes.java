@@ -1,51 +1,53 @@
 package edu.edext.logica;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class GestorImagenes {
-    
-    private static final Path CARPETA_IMAGENES = Paths.get("imagenes");
-    
-    public static void prepararCarpeta() throws Exception {
-        Files.createDirectories(CARPETA_IMAGENES);
+
+    // Ruta absoluta en el disco del sistema (ej: C:\Users\TuUsuario\edext_imagenes\ en Windows)
+    private static final String RUTA_BASE = System.getProperty("user.home") 
+            + File.separator + "edext_imagenes" + File.separator;
+
+    public static String getRutaBase() {
+        File dir = new File(RUTA_BASE);
+        if (!dir.exists()) {
+            dir.mkdirs(); // Crea la carpeta automáticamente si no existe
+        }
+        return RUTA_BASE;
     }
 
-    // Método 1: Firma principal basada en bytes (para Web y arquitectura distribuida)
-    public static String guardarImagen(byte[] bytesImagen, String nombreOriginal, String nickname) throws Exception {
-        if (bytesImagen == null || bytesImagen.length == 0) {
-            return null;
+    // Método invocado tanto por Servlets como por Swing
+    public static String guardarImagen(byte[] bytesImagen, String nombreOriginal, String nickname) throws IOException {
+        if (bytesImagen == null || bytesImagen.length == 0 || nombreOriginal == null) {
+            return "usr.png";
         }
-
-        prepararCarpeta();
 
         String extension = "";
         int punto = nombreOriginal.lastIndexOf('.');
         if (punto > 0) {
             extension = nombreOriginal.substring(punto).toLowerCase();
+        } else {
+            extension = ".png";
         }
 
-        if (!extension.equals(".png") && !extension.equals(".jpg") && !extension.equals(".jpeg")) {
-            throw new Exception("El archivo seleccionado no es una imagen válida (.png o .jpg).");
+        String nombreArchivoFinal = nickname + extension;
+        File destino = new File(getRutaBase() + nombreArchivoFinal);
+
+        try (FileOutputStream fos = new FileOutputStream(destino)) {
+            fos.write(bytesImagen);
         }
 
-        String nombreArchivo = nickname + extension;
-        Path destino = CARPETA_IMAGENES.resolve(nombreArchivo);
-
-        Files.write(destino, bytesImagen);
-
-        return nombreArchivo;
+        return nombreArchivoFinal;
     }
 
-    // Método 2: Sobrecarga para compatibilidad con Swing (AltaUsuario.java en Servidor Central)
-    public static String guardarImagen(File imagenOriginal, String nickname) throws Exception {
-        if (imagenOriginal == null || !imagenOriginal.exists()) {
-            return null;
+    public static String guardarImagen(File archivoOrigen, String nickname) throws IOException {
+        if (archivoOrigen == null || !archivoOrigen.exists()) {
+            return "usr.png";
         }
 
-        byte[] bytes = Files.readAllBytes(imagenOriginal.toPath());
-        return guardarImagen(bytes, imagenOriginal.getName(), nickname);
+        byte[] bytes = java.nio.file.Files.readAllBytes(archivoOrigen.toPath());
+        return guardarImagen(bytes, archivoOrigen.getName(), nickname);
     }
 }
