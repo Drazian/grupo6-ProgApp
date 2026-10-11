@@ -4,6 +4,7 @@
  */
 package edu.edext.logica;
 
+import edu.edext.datatypes.DtCategoria;
 import edu.edext.datatypes.DtConsultaCurso;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtEdicion;
@@ -696,6 +697,31 @@ public class ControladorTest {
         int resultado = ic.delInscripcion(estudiante, edicion);
         assertEquals(resultado, -1); //Codigo de error generico/default.
     }
+    
+    @Test
+    public void testAltaCategoria() throws Exception {
+        String nombreCategoria = "CAT1";
+        ic.crearCategoria(nombreCategoria);
+        
+        List<DtCategoria> categorias = ic.listarCategorias();
+        assertNotNull(categorias, "La lista no debe ser nula");
+        
+        boolean existeEnLista = categorias.stream().anyMatch(i -> i.getNombre().equals(nombreCategoria));
+        assertTrue(existeEnLista, "La categoria creada deberia estar en la lista");
+    }
+    
+    @Test
+    public void testAltaCategoriaDuplicado() throws Exception {
+        String nombreCategoria = "CAT2";
+        ic.crearCategoria(nombreCategoria);
+        
+        List<DtCategoria> categorias = ic.listarCategorias();
+        assertNotNull(categorias, "La lista no debe ser nula");
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.crearCategoria(nombreCategoria);}, "Ya existe");
+        assertNotNull(excepcion.getMessage());
+    }
+    
     
     
 }
