@@ -7,14 +7,14 @@ public class DtResultadoBusqueda {
     private String descripcion;
     private String tipo; //Curso o Programa
     private LocalDate fechaPublicacion;
-    private String urlImagen;
+    private String imagen;
     
     public DtResultadoBusqueda(){}
-    public DtResultadoBusqueda(String nombre, String descripcion, LocalDate fechaPublicacion, String urlImagen, String tipo){
+    public DtResultadoBusqueda(String nombre, String descripcion, LocalDate fechaPublicacion, String imagen, String tipo){
         this.nombre=nombre;
         this.descripcion=descripcion;
         this.fechaPublicacion=fechaPublicacion;
-        this.urlImagen=urlImagen;
+        this.imagen=imagen;
         this.tipo=tipo;
     }
     
@@ -22,6 +22,6 @@ public class DtResultadoBusqueda {
     public String getDescripcion(){return descripcion;}
     public String getTipo(){return tipo;}
     public LocalDate getFechaPublicacion(){return fechaPublicacion;}
-    public String getUrlImagen(){return urlImagen;}
+    public String getImagen(){return imagen;}
     
 }

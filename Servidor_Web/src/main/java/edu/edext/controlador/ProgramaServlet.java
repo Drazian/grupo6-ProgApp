@@ -7,14 +7,18 @@ import edu.edext.logica.IControlador;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 
 @WebServlet("/ProgramaServlet")
+@MultipartConfig
 public class ProgramaServlet extends HttpServlet {
     private IControlador ic = Fabrica.getInstance().getIControlador();
     
@@ -112,10 +116,23 @@ public class ProgramaServlet extends HttpServlet {
                 
                 LocalDate fechaRegistro = LocalDate.now();
                 
+                //Gestion de imagenes
+                Part partImagen = request.getPart("imagen");
+                byte[] bytesImagen = null;
+                String nombreOriginal = null;
+                
+                if (partImagen != null && partImagen.getSize() > 0) {
+                    nombreOriginal = partImagen.getSubmittedFileName();
+                    try (InputStream is = partImagen.getInputStream()) {
+                        bytesImagen = is.readAllBytes();
+                    }
+                }
+                
                 DtPrograma programa = new DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
                 
                 try {
-                    ic.setCrearProgramaFormacion(programa);
+                    ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);
+                                        
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.getWriter().write("Programa " + nombre + " creado con exito.");
                 } catch (Exception e){

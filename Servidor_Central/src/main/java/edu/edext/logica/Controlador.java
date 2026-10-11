@@ -572,6 +572,31 @@ public class Controlador implements IControlador {
     }
     
     @Override
+    public void setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
+    String nombreImagen = programa.getImagen();
+
+            // Si se enviaron bytes de imagen, se guardan en el servidor central
+            if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
+                nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, programa.getNombre());
+            }
+
+            // Creamos el DtPrograma con la imagen ya procesada
+            DtPrograma programaConImagen = new DtPrograma(
+                programa.getFechaRegistro(),
+                programa.getNombre(),
+                programa.getDescripcion(),
+                programa.getFechaInicio(),
+                programa.getFechaFin(),
+                nombreImagen
+            );
+
+            // Delegamos en el método original que ya maneja el Helper, la validación y el persist
+            setCrearProgramaFormacion(programaConImagen);
+        }
+    
+    
+    
+    @Override
     public int setInscripcion(String nomEstudiante, String nomEdicion) throws Exception{
         InscripcionEdicionHelper regInscrip=new InscripcionEdicionHelper(emf, "");
         int ret=-1;
@@ -659,7 +684,7 @@ public class Controlador implements IControlador {
             
             List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
             for (ProgramaFormacion aux: listaAux){
-                resultado.add(new DtPrograma(aux.getNombre(), aux.getDescripcion(),aux.getFechaRegistro(),aux.getFechaInicio(),aux.getFechaFin()));
+                resultado.add(new DtPrograma(aux.getFechaRegistro(), aux.getNombre(), aux.getDescripcion(),aux.getFechaInicio(),aux.getFechaFin(), aux.getImagen()));
             }
             
             return resultado;          
@@ -816,7 +841,8 @@ public class Controlador implements IControlador {
                 fRegistro, 
                 fInicio, 
                 fFin,
-                dtCursos
+                dtCursos,
+                programa.getImagen()
             );
 
         } catch (Exception e) {
@@ -1054,11 +1080,12 @@ public class Controlador implements IControlador {
             for (ProgramaFormacion aux : programas) {
 
                 resultado.add(new DtPrograma(
+                    aux.getFechaRegistro(),
                     aux.getNombre(),
                     aux.getDescripcion(),
-                    aux.getFechaRegistro(),
                     aux.getFechaInicio(),
-                    aux.getFechaFin()
+                    aux.getFechaFin(),
+                    aux.getImagen()
                 ));
             }
 

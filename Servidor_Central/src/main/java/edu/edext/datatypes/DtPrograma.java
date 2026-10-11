@@ -16,7 +16,8 @@ public class DtPrograma {
     private final LocalDate fechaFin;
     private final LocalDate fechaInicio;
     private final LocalDate fechaRegistro;
-    private final Set<DtCurso> cursos;
+    private Set<DtCurso> cursos;
+    private String imagen;
 
 
     public DtPrograma(String nombre, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, Set<DtCurso> cursos){
@@ -35,6 +36,26 @@ public class DtPrograma {
         this.nombre=nombre;
     }
     
+    public DtPrograma(LocalDate fechaRegistro, String nombre, String descripcion, LocalDate fechaInicio, LocalDate fechaFin, String imagen){
+        this.fechaRegistro=fechaRegistro;
+        this.fechaInicio = fechaInicio;
+        this.descripcion=descripcion;
+        this.fechaFin=fechaFin;
+        this.nombre=nombre;
+        this.imagen=imagen;
+    }
+        
+    public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, Set<DtCurso> cursos, String imagen){
+        this.cursos=cursos!=null?cursos:new HashSet<>();
+        this.fechaRegistro=fechaRegistro;
+        this.fechaInicio = fechaInicio;
+        this.descripcion=descripcion;
+        this.fechaFin=fechaFin;
+        this.nombre=nombre;
+        this.imagen=imagen;
+    }
+
+    public String getImagen() {return this.imagen; }
     public String getNombre(){ return this.nombre; }
     public LocalDate getFechaFin(){ return this.fechaFin; }
     public Set<DtCurso> getDtCursos(){  return this.cursos; }
@@ -56,9 +77,4 @@ public class DtPrograma {
         return categoriasPrograma;
     }
 
-    
-    
-    
-    
-    
 }

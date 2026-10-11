@@ -60,7 +60,7 @@ public class CreaPograFormaHelper{
     }
     
     private ProgramaFormacion toEntity(){
-        return new ProgramaFormacion(DTO.getNombre(), DTO.getDescripcion(), DTO.getFechaRegistro(), DTO.getFechaInicio(), DTO.getFechaFin(), null);
+        return new ProgramaFormacion(DTO.getNombre(), DTO.getDescripcion(), DTO.getFechaRegistro(), DTO.getFechaInicio(), DTO.getFechaFin(), null, DTO.getImagen());
     }
     
     private boolean validateData(DtPrograma DTO){

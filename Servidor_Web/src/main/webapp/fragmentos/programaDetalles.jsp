@@ -40,16 +40,17 @@
                             </c:otherwise>
                         </c:choose>
                     </div>
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+                                       
                 </div>
             </div>
+            
+                    
+            <div class="imagen">
+                <img src="ImagenServlet?nombre=${empty programa.imagen ? 'usr.png' : programa.imagen}" 
+                alt="Imagen del Programa" 
+                style="width: 150px; height: 150px; object-fit: cover; border-radius: 4px;">
+            </div>
+                    
 
             <!-- CURSOS -->
             <div class="seccion-cursos-integrantes">
@@ -60,7 +61,7 @@
                             <c:forEach var="curso" items="${programa.getDtCursos()}">
                                 <li class="item-curso-integrante">
                                     <span class="nombre-curso">${curso.nombre}</span>
-                                    <button class="btn-detalle-curso" onclick="verDetalleCurso('${curso.nombre}')">
+                                    <button class="btn-detalle-curso" onclick="verDetallesCurso('${curso.nombre}')">
                                         Consultar Curso
                                     </button>
                                 </li>
