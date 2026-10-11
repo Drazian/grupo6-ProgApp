@@ -831,9 +831,9 @@ public class Controlador implements IControlador {
                 }
             }
 
-            LocalDate fRegistro = parseToLocalDate(programa.getFechaRegistro());
-            LocalDate fInicio   = parseToLocalDate(programa.getFechaInicio());
-            LocalDate fFin      = parseToLocalDate(programa.getFechaFin());
+            LocalDate fRegistro = programa.getFechaRegistro();
+            LocalDate fInicio   = programa.getFechaInicio();
+            LocalDate fFin      = programa.getFechaFin();
 
             return new DtPrograma(
                 programa.getNombre(), 
@@ -855,22 +855,22 @@ public class Controlador implements IControlador {
         }
     }
 
-    private java.time.LocalDate parseToLocalDate(Object fecha) {
-        if (fecha == null) return null;
-        if (fecha instanceof java.time.LocalDate) {
-            return (java.time.LocalDate) fecha;
-        }
-        if (fecha instanceof String) {
-            String str = (String) fecha;
-            return str.isEmpty() ? null : java.time.LocalDate.parse(str);
-        }
-        if (fecha instanceof java.util.Date) {
-            return ((java.util.Date) fecha).toInstant()
-                    .atZone(java.time.ZoneId.systemDefault())
-                    .toLocalDate();
-        }
-        return null;
-    }
+//    private java.time.LocalDate parseToLocalDate(Object fecha) {
+//        if (fecha == null) return null;
+//        if (fecha instanceof java.time.LocalDate) {
+//            return (java.time.LocalDate) fecha;
+//        }
+//        if (fecha instanceof String) {
+//            String str = (String) fecha;
+//            return str.isEmpty() ? null : java.time.LocalDate.parse(str);
+//        }
+//        if (fecha instanceof java.util.Date) {
+//            return ((java.util.Date) fecha).toInstant()
+//                    .atZone(java.time.ZoneId.systemDefault())
+//                    .toLocalDate();
+//        }
+//        return null;
+//    }
 
     @Override
     public int cargarDatosDePrueba() throws Exception{

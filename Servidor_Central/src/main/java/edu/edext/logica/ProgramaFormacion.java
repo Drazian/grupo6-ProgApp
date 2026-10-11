@@ -66,13 +66,13 @@ public class ProgramaFormacion {
     
     
 //    public void setCursos (List<Curso> cursos){this.cursos=cursos;}
-    public void setNombre(String nombre){ this.nombre=nombre;  }
-    public void setCursos(Set<Curso> cursos) { this.cursos=cursos; }
-    public void setFechaFin(LocalDate fechaFin){ this.fechaFin=fechaFin; }
-    public void setDescripcion(String descripcion){ this.descripcion=descripcion; }
-    public void setFechaInicio(LocalDate fechaInicio){ this.fechaInicio=fechaInicio; }
-    public void setFechaRegistro(LocalDate fechaRegistro){ this.fechaRegistro=fechaRegistro; }
-    public void setImagen (String imagen){this.imagen=imagen;}
+//    public void setNombre(String nombre){ this.nombre=nombre;  }
+//    public void setCursos(Set<Curso> cursos) { this.cursos=cursos; }
+//    public void setFechaFin(LocalDate fechaFin){ this.fechaFin=fechaFin; }
+//    public void setDescripcion(String descripcion){ this.descripcion=descripcion; }
+//    public void setFechaInicio(LocalDate fechaInicio){ this.fechaInicio=fechaInicio; }
+//    public void setFechaRegistro(LocalDate fechaRegistro){ this.fechaRegistro=fechaRegistro; }
+//    public void setImagen (String imagen){this.imagen=imagen;}
         
     public String getImagen(){return this.imagen;}
     public LocalDate getFechaRegistro (){ return this.fechaRegistro; }
