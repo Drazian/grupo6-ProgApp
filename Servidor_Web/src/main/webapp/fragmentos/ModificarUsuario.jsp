@@ -71,10 +71,10 @@
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Imagen de Perfil:</label>
             <div style="display: flex; align-items: center; gap: 15px; margin-top: 5px;">
                 <img id="vistaPreviaModificar" 
-                     src="imagenes/${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
-                     alt="Foto de perfil" 
-                     style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
-                <input type="file" id="imagen" name="imagen" accept="image/*" />
+                    src="ImagenServlet?nombre=${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
+                    alt="Foto de perfil" 
+                    style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
+                               <input type="file" id="imagen" name="imagen" accept="image/*" />
             </div>
         </div>
 
