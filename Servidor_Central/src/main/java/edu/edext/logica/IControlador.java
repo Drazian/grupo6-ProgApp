@@ -19,7 +19,6 @@ public interface IControlador {
     List<DtCategoria> listarCategorias() throws Exception;
     
     void crearUsuario(DtUsuario usuario) throws Exception;
- 
     
     public void crearUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;
     public void modificarUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;
@@ -67,6 +66,13 @@ public interface IControlador {
     String obtenerInstitutoPorCurso(String nombreCurso) throws Exception;
 
     //**************************************************************************
+    
+    void seguirUsuario(String nicknameSeguidor, String nicknameASeguir) throws Exception;
+void dejarDeSeguirUsuario(String nicknameSeguidor, String nicknameADejar) throws Exception;
+
+List<String> listarSeguidos(String nickname) throws Exception;
+
+List<String> listarSeguidores(String nickname) throws Exception;
 
     
     

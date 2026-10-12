@@ -1091,3 +1091,91 @@ function inscribirEdicion(event) {
     })
     .catch(error => console.error('Error procesando inscripción:', error));
 }
+
+function cargarSocial() {
+    fetch('UsuarioServlet?accion=cargarSocial')
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(err => { throw new Error(err); });
+            }
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+            inicializarEventosSocial();
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = error.message;
+        });
+}
+
+function inicializarEventosSocial() {
+    const formSeguir = document.getElementById('formSeguirUsuario');
+    const formDejarSeguir = document.getElementById('formDejarSeguir');
+    const formEliminarSeguidor = document.getElementById('formEliminarSeguidor');
+
+    if (formSeguir) {
+        formSeguir.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nickname = document.getElementById('nicknameASeguir').value.trim();
+            const params = new URLSearchParams();
+            params.append('accion', 'seguir');
+            params.append('nicknameASeguir', nickname);
+
+            ejecutarAccionSocial(params);
+        });
+    }
+
+    if (formDejarSeguir) {
+        formDejarSeguir.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const select = document.getElementById('nicknameSeleccionado');
+            if (select.selectedIndex === -1) return alert("Seleccione un usuario de la lista.");
+
+            const params = new URLSearchParams();
+            params.append('accion', 'dejarSeguir');
+            params.append('nicknameSeleccionado', select.value);
+
+            ejecutarAccionSocial(params);
+        });
+    }
+
+    if (formEliminarSeguidor) {
+        formEliminarSeguidor.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const select = document.getElementById('seguidorSeleccionado');
+            if (select.selectedIndex === -1) return alert("Seleccione un seguidor de la lista.");
+
+            const params = new URLSearchParams();
+            params.append('accion', 'eliminarSeguidor');
+            params.append('seguidorSeleccionado', select.value);
+
+            ejecutarAccionSocial(params);
+        });
+    }
+}
+
+function ejecutarAccionSocial(params) {
+    fetch('UsuarioServlet', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        body: params
+    })
+    .then(response => {
+        return response.text().then(texto => {
+            if (!response.ok) {
+                throw new Error(texto);
+            }
+            return texto;
+        });
+    })
+    .then(mensajeExito => {
+        alert(mensajeExito);
+        cargarSocial();
+    })
+    .catch(error => {
+        alert(error.message);
+    });
+}

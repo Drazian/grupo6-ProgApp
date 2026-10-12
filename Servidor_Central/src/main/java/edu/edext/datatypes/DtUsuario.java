@@ -1,5 +1,6 @@
 package edu.edext.datatypes;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -19,10 +20,16 @@ public class DtUsuario {
     private final Date fNacimiento;
     private final List<String> institutos;
     private final TipoUsuario tipoUsuario;
+    private final List<String> seguidos;
+    private final List<String> seguidores;
 
     public DtUsuario(String nickname, String password, String email, String nombre, String apellido, String imagen, Date fNacimiento, List<String> institutos, TipoUsuario tipoUsuario) {
+        this(nickname, password, email, nombre, apellido, imagen, fNacimiento, institutos, tipoUsuario, new ArrayList<>(), new ArrayList<>());
+    }
+
+    public DtUsuario(String nickname, String password, String email, String nombre, String apellido, String imagen, Date fNacimiento, List<String> institutos, TipoUsuario tipoUsuario, List<String> seguidos, List<String> seguidores) {
         this.nickname = nickname;
-        this.password=password;
+        this.password = password;
         this.email = email;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -30,6 +37,8 @@ public class DtUsuario {
         this.fNacimiento = fNacimiento;
         this.institutos = institutos;
         this.tipoUsuario = tipoUsuario;
+        this.seguidos = seguidos;
+        this.seguidores = seguidores;
     }
 
     public String getNickname() {
@@ -66,6 +75,14 @@ public class DtUsuario {
         return tipoUsuario;
     }
 
+    public List<String> getSeguidos() {
+        return seguidos;
+    }
+
+    public List<String> getSeguidores() {
+        return seguidores;
+    }
+
     @Override
     public String toString() {
        return nickname;
@@ -86,5 +103,4 @@ public class DtUsuario {
         final DtUsuario other = (DtUsuario) obj;
         return Objects.equals(this.nickname, other.nickname);
     }
-       
 }

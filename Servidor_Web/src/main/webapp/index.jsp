@@ -65,9 +65,12 @@
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Usuarios</summary>
                     <ul style="list-style: none; padding-left: 15px; margin-top: 5px;">
                         <li><a href="#" onclick="cargarAltaUsuario(); return false;">Alta de usuario</a></li>
-                        <li><a href="#" onclick="cargarModificarUsuario(); return false;">Modificar usuario</a></li>
-                        <li><a href="#" onclick="cargarConsultaUsuario(); return false;">Consultar usuario</a></li>
-                        <li><a href="#" onclick="cargarSocialUsuario(); return false;">Social (Seguir / Dejar de seguir)</a></li>
+                        <c:if test="${not empty sessionScope.usuarioLogueado}">
+                            <li><a href="#" onclick="cargarModificarUsuario(); return false;">Modificar usuario</a></li>
+                        </c:if>
+                        <c:if test="${not empty sessionScope.usuarioLogueado}">
+                            <li><a href="#" onclick="cargarSocial(); return false;">Social (Seguidores y Seguidos)</a></li>
+                        </c:if>
                     </ul>
                 </details>
                 <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 5px 0;">
