@@ -131,10 +131,17 @@ public class ProgramaServlet extends HttpServlet {
                 DtPrograma programa = new DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
                 
                 try {
-                    ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);
-                                        
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().write("Programa " + nombre + " creado con exito.");
+                    boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);
+                    
+                    if (resultado == true){
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.getWriter().write("Programa " + nombre + " creado con exito.");                    
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("El programa " + nombre + " ya existe.");                         
+                    }
+                    
+
                 } catch (Exception e){
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Error al crear el programa: " + e.getMessage());                    
