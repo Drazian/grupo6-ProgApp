@@ -586,7 +586,7 @@ public class Controlador implements IControlador {
     }
     
     @Override
-    public void setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
+    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
     String nombreImagen = programa.getImagen();
 
             // Si se enviaron bytes de imagen, se guardan en el servidor central
@@ -605,7 +605,8 @@ public class Controlador implements IControlador {
             );
 
             // Delegamos en el método original que ya maneja el Helper, la validación y el persist
-            setCrearProgramaFormacion(programaConImagen);
+            boolean resultado = setCrearProgramaFormacion(programaConImagen);
+            return resultado;
         }
     
     
