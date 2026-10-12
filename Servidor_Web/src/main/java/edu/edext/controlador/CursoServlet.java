@@ -6,14 +6,17 @@ import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.logica.GestorImagenes; // FIX: Importamos tu gestor de imágenes
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig; // FIX: Obligatorio para leer archivos
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part; // FIX: Para interceptar el archivo binario
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -21,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 @WebServlet("/CursoServlet")
+@MultipartConfig // IMPORTANTE: Sin esto, el Servlet no puede leer el FormData con imágenes
 public class CursoServlet extends HttpServlet {
     private IControlador ic = Fabrica.getInstance().getIControlador();
 
@@ -54,7 +58,7 @@ public class CursoServlet extends HttpServlet {
                 }
                 break;
 
-            case "listarCategoriasJson": // NUEVO CASO AGREGADO
+            case "listarCategoriasJson": 
                 try {
                     // Obtenemos la lista de categorías
                     List<edu.edext.datatypes.DtCategoria> listaCat = ic.listarCategorias();
@@ -157,16 +161,33 @@ public class CursoServlet extends HttpServlet {
                     // 3. Generar la fecha actual del sistema
                     Date fechaRegistro = new Date(); 
 
-                    // 4. Armar el Datatype
+                    // --- FIX IMAGEN: 4. Capturar y guardar la imagen del curso ---
+                    String nombreImagen = "usr.png"; // Imagen genérica por defecto
+                    Part filePart = request.getPart("imagen"); // Asegúrate de que el input en tu JSP se llame name="imagen"
+                    
+                    if (filePart != null && filePart.getSize() > 0) {
+                        byte[] imgBytes = filePart.getInputStream().readAllBytes();
+                        String nombreOriginal = filePart.getSubmittedFileName();
+                        
+                        // Limpiamos los espacios del nombre del curso para usarlo como identificador del archivo
+                        String identificadorUnico = "Curso_" + nombreCurso.replaceAll("\\s+", "_"); 
+                        
+                        // Guardamos físicamente la imagen y obtenemos el nombre del archivo final
+                        nombreImagen = GestorImagenes.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
+                    }
+
+                    // 5. Armar el Datatype
+                    // ATENCIÓN: Se añadió 'nombreImagen' al final del constructor.
+                    // Recuerda agregarlo también en DtCurso.java y Curso.java (como hicimos con DtEdicion)
                     DtCurso dtCurso = new DtCurso(
                             nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
-                            fechaRegistro, new DtInstituto(nombreInstituto), null, categorias, previas
+                            fechaRegistro, new DtInstituto(nombreInstituto), null, categorias, previas, nombreImagen
                     );
 
-                    // 5. Llamar a la lógica del controlador
+                    // 6. Llamar a la lógica del controlador
                     ic.altaCurso(dtCurso, nombreInstituto); 
 
-                    // 6. Enviar mensaje de éxito
+                    // 7. Enviar mensaje de éxito
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.getWriter().write("Curso registrado exitosamente.");
 

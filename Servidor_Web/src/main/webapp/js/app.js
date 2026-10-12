@@ -26,10 +26,10 @@ function ejecutarBusqueda() {
 
 // Función para interceptar y enviar formularios con AJAX sin recargar la página
 function guardarProducto(event) {
-    event.preventDefault(); // Evita que la página se recargue por defecto
+    event.preventDefault(); 
     
     const formulario = document.getElementById('form-registro');
-    const formData = new URLSearchParams(new FormData(formulario)); // Prepara los datos
+    const formData = new URLSearchParams(new FormData(formulario)); 
 
     fetch('MiControladorServlet', {
         method: 'POST',
@@ -38,9 +38,8 @@ function guardarProducto(event) {
     })
     .then(response => response.text())
     .then(htmlRespuesta => {
-        // Mostramos el mensaje de éxito directamente en el contenedor del formulario
         document.getElementById('resultado-registro').innerHTML = htmlRespuesta;
-        formulario.reset(); // Limpia los inputs
+        formulario.reset(); 
     })
     .catch(error => console.error('Error al guardar:', error));
 }
@@ -98,7 +97,7 @@ function initBuscador() {
 }
 
 function verDetallesBusqueda(nombre, tipo){
-    const tipoNormalizado = (tipo || '').toLowerCase(); //Lo normalizamos por seguridad.
+    const tipoNormalizado = (tipo || '').toLowerCase(); 
     
     switch (tipoNormalizado){
         case "programa":
@@ -109,7 +108,6 @@ function verDetallesBusqueda(nombre, tipo){
             verDetallesCurso(nombre);
         break;
     }
-    
 }
 
 function BuscadorServlet(){
@@ -128,16 +126,11 @@ function BuscadorServlet(){
             return response.text();
         })
         .then(html => {
-            // Reemplaza únicamente el contenido del área central
             contenedor.innerHTML = html;
-            
-            // Inicializa los eventos de los comboboxes de orden y filtrado
             initBuscador();
         })
         .catch(error => console.error('Error al ejecutar la búsqueda:', error));
 }
-
-
 
 //---------------------------------------------------------------------------------
 
@@ -145,6 +138,7 @@ function BuscadorServlet(){
 document.addEventListener("DOMContentLoaded", function() {
     cargarInstitutosMenu();
     cargarCategoriasMenu();
+    cargarMenuLateral();
 });
 
 function cargarInstitutosMenu() {
@@ -155,23 +149,25 @@ function cargarInstitutosMenu() {
         })
         .then(institutos => {
             const ul = document.getElementById('lista-institutos');
-            ul.innerHTML = '';
+            if(ul) {
+                ul.innerHTML = '';
 
-            if (!institutos || institutos.length === 0) {
-                ul.innerHTML = '<li style="font-size: 12px; opacity: 0.7;">Sin institutos</li>';
-                return;
+                if (!institutos || institutos.length === 0) {
+                    ul.innerHTML = '<li style="font-size: 12px; opacity: 0.7;">Sin institutos</li>';
+                    return;
+                }
+
+                institutos.forEach(inst => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#" onclick="event.preventDefault(); buscarCurso('instituto', '${inst.nombre}')">${inst.nombre}</a>`;
+                    ul.appendChild(li);
+                });
             }
-
-            institutos.forEach(inst => {
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#" onclick="event.preventDefault(); buscarCurso('instituto', '${inst.nombre}')">${inst.nombre}</a>`;
-                ul.appendChild(li);
-            });
         })
         .catch(error => {
             console.error('Error al cargar institutos:', error);
-            document.getElementById('lista-institutos').innerHTML = 
-                '<li style="font-size: 12px; color: red;">Error al cargar</li>';
+            const ul = document.getElementById('lista-institutos');
+            if(ul) ul.innerHTML = '<li style="font-size: 12px; color: red;">Error al cargar</li>';
         });
 }
 
@@ -183,23 +179,25 @@ function cargarCategoriasMenu() {
         })
         .then(categorias => {
             const ul = document.getElementById('lista-categorias');
-            ul.innerHTML = '';
+            if(ul) {
+                ul.innerHTML = '';
 
-            if (!categorias || categorias.length === 0) {
-                ul.innerHTML = '<li style="font-size: 12px; opacity: 0.7;">Sin categorias</li>';
-                return;
+                if (!categorias || categorias.length === 0) {
+                    ul.innerHTML = '<li style="font-size: 12px; opacity: 0.7;">Sin categorias</li>';
+                    return;
+                }
+
+                categorias.forEach(cat => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#" onclick="event.preventDefault(); buscarCurso('categoria', '${cat.nombre}')">${cat.nombre}</a>`;
+                    ul.appendChild(li);
+                });
             }
-
-            categorias.forEach(cat => {
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#" onclick="event.preventDefault(); buscarCurso('categoria', '${cat.nombre}')">${cat.nombre}</a>`;
-                ul.appendChild(li);
-            });
         })
         .catch(error => {
             console.error('Error al cargar categorías:', error);
-            document.getElementById('lista-categorias').innerHTML = 
-                '<li style="font-size: 12px; color: red;">Error al cargar</li>';
+            const ul = document.getElementById('lista-categorias');
+            if(ul) ul.innerHTML = '<li style="font-size: 12px; color: red;">Error al cargar</li>';
         });
 }
 
@@ -309,7 +307,6 @@ function crearPrograma(){
         return;
     }
     
-    
     const datos = new FormData();
     datos.append('nombre', nombre);
     datos.append('desc', descripcion);
@@ -335,7 +332,7 @@ function crearPrograma(){
         })
         .then(mensajeExito => {
             alert(mensajeExito);
-            ProgramaServlet("formCrear"); //Reinvocamos el GET
+            ProgramaServlet("formCrear"); 
         })
         .catch(error => {
             alert(error.message);
@@ -359,8 +356,6 @@ function inicializarEventosCrearPrograma() {
         });
     }
 }
-
-
 
 function agregarCursoAPrograma(){
     const programa = document.getElementById('selectPrograma').value;
@@ -397,7 +392,7 @@ function agregarCursoAPrograma(){
         })
         .then(mensajeExito => {
             alert(mensajeExito);
-            ProgramaServlet("formAgregarCurso"); //Reinvocamos el GET
+            ProgramaServlet("formAgregarCurso"); 
         })
         .catch(error => {
             alert(error.message);
@@ -437,14 +432,15 @@ function cargarDetallePrograma(nombrePrograma) {
         });
 }
 
-// Función para interceptar y enviar el formulario de Alta de Curso
+// =====================================================================
+// FUNCIONES DE CURSO Y EDICIÓN (LIMPIAS Y ÚNICAS)
+// =====================================================================
+
 function altaCurso(event) {
     event.preventDefault();
-
     const divError = document.getElementById('mensaje-error');
     divError.style.display = 'none';
     divError.innerHTML = '';
-
     const form = document.getElementById('formAltaCurso');
     
     if (!form.checkValidity()) {
@@ -452,8 +448,8 @@ function altaCurso(event) {
         return; 
     }
 
-    // Convertir el FormData a URLSearchParams para que Java extraiga los números y arrays correctamente
-    const datos = new URLSearchParams(new FormData(form));
+    // Usar FormData puro para que el navegador genere el multipart/form-data
+    const datos = new FormData(form);
 
     fetch('CursoServlet?accion=altaCurso', {
         method: 'POST',
@@ -478,19 +474,49 @@ function altaCurso(event) {
     });
 }
 
-// Función auxiliar para el botón Cancelar del formulario
+function altaEdicion(event) {
+    event.preventDefault();
+    const divError = document.getElementById('mensaje-error-edicion');
+    divError.style.display = 'none';
+
+    const form = document.getElementById('formAltaEdicion');
+    
+    // Usar FormData puro para que el navegador genere el multipart/form-data
+    const datos = new FormData(form);
+
+    fetch('EdicionServlet?accion=altaEdicion', {
+        method: 'POST',
+        body: datos // NO AGREGAR HEADERS AQUÍ. El navegador lo hace solo.
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text().then(msg => {
+                alert(msg);
+                form.reset();
+                document.getElementById('cursoEdicion').innerHTML = '<option value="">Primero seleccione un instituto</option>';
+                document.getElementById('cursoEdicion').disabled = true;
+            });
+        } else {
+            return response.text().then(err => { throw new Error(err); });
+        }
+    })
+    .catch(error => {
+        divError.innerHTML = "<strong>Error:</strong> " + error.message;
+        divError.style.display = 'block';
+        divError.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+}
+
+// =====================================================================
+
 function cancelarOperacion() {
     const form = document.getElementById('formAltaCurso');
     if (form) {
         form.reset();
         document.getElementById('mensaje-error').style.display = 'none';
-        
-        // Opcional: Aquí podrías ocultar el contenedor central si así lo deseas
-        // document.getElementById('contenedor-central').innerHTML = '';
     }
 }
 
-// Función para pedirle el fragmento al Servlet e inyectarlo en el HTML
 function cargarAltaCurso() {
     fetch('CursoServlet?accion=altaCurso')
         .then(response => {
@@ -500,7 +526,6 @@ function cargarAltaCurso() {
             return response.text();
         })
         .then(htmlString => {
-            // Inyectamos el formulario dentro del sector 3
             document.getElementById('contenido-dinamico').innerHTML = htmlString;
         })
         .catch(error => {
@@ -509,171 +534,176 @@ function cargarAltaCurso() {
         });
 }
 
-// 1. Función para cargar la vista
 function cargarAltaUsuario() {
     fetch('fragmentos/altaUsuario.jsp')
         .then(response => response.text())
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
-            inicializarEventosUsuario(); // Encendemos la lógica de tu formulario
+            inicializarEventosUsuario(); 
         })
         .catch(error => console.error("Error al cargar la vista:", error));
 }
 
-// 2. Todos tus scripts originales empaquetados para ejecutarse tras inyectar el HTML
 function inicializarEventosUsuario() {
-    
-    // Cargar la lista de institutos (Ruta corregida)
     fetch("UsuarioServlet?accion=listarInstitutos")
         .then(response => response.json())
         .then(institutos => {
             const selectInstituto = document.getElementById("instituto");
-            institutos.forEach(instituto => {
-                const opcion = document.createElement("option");
-                opcion.value = instituto.nombre;
-                opcion.textContent = instituto.nombre;
-                selectInstituto.appendChild(opcion);
-            });
+            if(selectInstituto) {
+                institutos.forEach(instituto => {
+                    const opcion = document.createElement("option");
+                    opcion.value = instituto.nombre;
+                    opcion.textContent = instituto.nombre;
+                    selectInstituto.appendChild(opcion);
+                });
+            }
         }).catch(err => console.log("Error cargando institutos", err));
 
-    // Mostrar/Ocultar Institutos
-    document.getElementById("docente").addEventListener("change", function() {
-        document.getElementById("seccionInstitutos").style.display = this.checked ? "block" : "none";
-    });
+    const checkDocente = document.getElementById("docente");
+    if(checkDocente) {
+        checkDocente.addEventListener("change", function() {
+            document.getElementById("seccionInstitutos").style.display = this.checked ? "block" : "none";
+        });
+    }
 
-    // Vista previa de la imagen
-    document.getElementById("imagen").addEventListener("change", function(event) {
-        const archivo = event.target.files[0];
-        if (archivo) {
-            const lector = new FileReader();
-            lector.onload = function(e) {
-                document.getElementById("vistaPrevia").src = e.target.result;
-            };
-            lector.readAsDataURL(archivo);
-        }
-    });
-
-    // Botón Agregar Instituto
-    document.getElementById("agregarInstituto").addEventListener("click", function() {
-        const selectInstituto = document.getElementById("instituto");
-        const selectSeleccionados = document.getElementById("institutosSeleccionados");
-        const institutoSeleccionado = selectInstituto.value;
-
-        if (institutoSeleccionado === "") return alert("Seleccione un instituto.");
-
-        for (let i = 0; i < selectSeleccionados.options.length; i++) {
-            if (selectSeleccionados.options[i].value === institutoSeleccionado) {
-                return alert("El instituto ya fue agregado.");
+    const inputImagen = document.getElementById("imagen");
+    if(inputImagen) {
+        inputImagen.addEventListener("change", function(event) {
+            const archivo = event.target.files[0];
+            if (archivo) {
+                const lector = new FileReader();
+                lector.onload = function(e) {
+                    document.getElementById("vistaPrevia").src = e.target.result;
+                };
+                lector.readAsDataURL(archivo);
             }
-        }
-        const opcion = document.createElement("option");
-        opcion.value = institutoSeleccionado;
-        opcion.textContent = institutoSeleccionado;
-        selectSeleccionados.appendChild(opcion);
-    });
+        });
+    }
 
-    // Botón Quitar Instituto
-    document.getElementById("quitarInstituto").addEventListener("click", function() {
-        const selectSeleccionados = document.getElementById("institutosSeleccionados");
-        if (selectSeleccionados.selectedIndex === -1) return alert("Seleccione un instituto para quitar.");
-        selectSeleccionados.remove(selectSeleccionados.selectedIndex);
-    });
+    const btnAgregarInst = document.getElementById("agregarInstituto");
+    if(btnAgregarInst) {
+        btnAgregarInst.addEventListener("click", function() {
+            const selectInstituto = document.getElementById("instituto");
+            const selectSeleccionados = document.getElementById("institutosSeleccionados");
+            const institutoSeleccionado = selectInstituto.value;
 
-    // Enviar el Formulario
-    document.getElementById("formAltaUsuario").addEventListener("submit", function(event) {
-        event.preventDefault();
+            if (institutoSeleccionado === "") return alert("Seleccione un instituto.");
 
-        const nickname = document.getElementById("nickname").value.trim();
-        const nombre = document.getElementById("nombre").value.trim();
-        const apellido = document.getElementById("apellido").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-        const confirmarPassword = document.getElementById("confirmarPassword").value;
-        const fechaNacimiento = document.getElementById("fechaNacimiento").value;
-        const docente = document.getElementById("docente").checked;
+            for (let i = 0; i < selectSeleccionados.options.length; i++) {
+                if (selectSeleccionados.options[i].value === institutoSeleccionado) {
+                    return alert("El instituto ya fue agregado.");
+                }
+            }
+            const opcion = document.createElement("option");
+            opcion.value = institutoSeleccionado;
+            opcion.textContent = institutoSeleccionado;
+            selectSeleccionados.appendChild(opcion);
+        });
+    }
 
-        if (password !== confirmarPassword) return alert("Las contraseñas no coinciden.");
-        if (docente && document.getElementById("institutosSeleccionados").options.length === 0) {
-            return alert("Un docente debe tener al menos un instituto asignado.");
-        }
+    const btnQuitarInst = document.getElementById("quitarInstituto");
+    if(btnQuitarInst) {
+        btnQuitarInst.addEventListener("click", function() {
+            const selectSeleccionados = document.getElementById("institutosSeleccionados");
+            if (selectSeleccionados.selectedIndex === -1) return alert("Seleccione un instituto para quitar.");
+            selectSeleccionados.remove(selectSeleccionados.selectedIndex);
+        });
+    }
 
-        const datos = new FormData();
-        datos.append("nickname", nickname);
-        datos.append("nombre", nombre);
-        datos.append("apellido", apellido);
-        datos.append("email", email);
-        datos.append("password", password);
-        datos.append("fechaNacimiento", fechaNacimiento);
-        datos.append("tipoUsuario", docente ? "DOCENTE" : "ESTUDIANTE");
+    const formUsuario = document.getElementById("formAltaUsuario");
+    if(formUsuario) {
+        formUsuario.addEventListener("submit", function(event) {
+            event.preventDefault();
 
-        const selectSeleccionados = document.getElementById("institutosSeleccionados");
-        for (let i = 0; i < selectSeleccionados.options.length; i++) {
-            datos.append("institutos", selectSeleccionados.options[i].value);
-        }
+            const nickname = document.getElementById("nickname").value.trim();
+            const nombre = document.getElementById("nombre").value.trim();
+            const apellido = document.getElementById("apellido").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmarPassword = document.getElementById("confirmarPassword").value;
+            const fechaNacimiento = document.getElementById("fechaNacimiento").value;
+            const docente = document.getElementById("docente").checked;
 
-        const archivoImagen = document.getElementById("imagen").files[0];
-        if (archivoImagen) datos.append("imagen", archivoImagen);
+            if (password !== confirmarPassword) return alert("Las contraseñas no coinciden.");
+            if (docente && document.getElementById("institutosSeleccionados").options.length === 0) {
+                return alert("Un docente debe tener al menos un instituto asignado.");
+            }
 
-        // Ruta corregida
-        fetch("UsuarioServlet?accion=crear", {
-            method: "POST",
-            body: datos
-        })
-        .then(response => response.text())
-        .then(resultado => {
-            alert(resultado); // Muestra el mensaje del Servlet
-            document.getElementById('formAltaUsuario').reset();
-            document.getElementById('vistaPrevia').src = 'imagenes/usr.png';
-            document.getElementById('institutosSeleccionados').innerHTML = ''; // Limpia la lista
-        })
-        .catch(error => alert("Error: " + error));
-    });
+            const datos = new FormData();
+            datos.append("nickname", nickname);
+            datos.append("nombre", nombre);
+            datos.append("apellido", apellido);
+            datos.append("email", email);
+            datos.append("password", password);
+            datos.append("fechaNacimiento", fechaNacimiento);
+            datos.append("tipoUsuario", docente ? "DOCENTE" : "ESTUDIANTE");
+
+            const selectSeleccionados = document.getElementById("institutosSeleccionados");
+            if(selectSeleccionados) {
+                for (let i = 0; i < selectSeleccionados.options.length; i++) {
+                    datos.append("institutos", selectSeleccionados.options[i].value);
+                }
+            }
+
+            const archivoImagen = document.getElementById("imagen").files[0];
+            if (archivoImagen) datos.append("imagen", archivoImagen);
+
+            fetch("UsuarioServlet?accion=crear", {
+                method: "POST",
+                body: datos
+            })
+            .then(response => response.text())
+            .then(resultado => {
+                alert(resultado); 
+                document.getElementById('formAltaUsuario').reset();
+                document.getElementById('vistaPrevia').src = 'imagenes/usr.png';
+                document.getElementById('institutosSeleccionados').innerHTML = ''; 
+            })
+            .catch(error => alert("Error: " + error));
+        });
+    }
 }
 
-// Carga el formulario HTML
-// Carga el formulario HTML
 function cargarLogin() {
     fetch('fragmentos/login.jsp')
         .then(response => response.text())
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
             
-            // Asignamos el evento Submit al formulario recién inyectado
-            document.getElementById("formLogin").addEventListener("submit", function(event) {
-                event.preventDefault();
-                
-                // LA SOLUCIÓN: URLSearchParams convierte los datos al formato de texto estándar que Java espera
-                const datos = new URLSearchParams(new FormData(this));
-                
-                fetch('LoginServlet?accion=login', {
-                    method: 'POST',
-                    body: datos
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Si el login es correcto, recargamos la página para actualizar el Menú y el Header
-                        window.location.reload(); 
-                    } else {
-                        return response.text().then(err => { throw new Error(err); });
-                    }
-                })
-                .catch(error => {
-                    const divError = document.getElementById("mensaje-error-login");
-                    divError.innerHTML = error.message;
-                    divError.style.display = "block";
+            const formLogin = document.getElementById("formLogin");
+            if(formLogin) {
+                formLogin.addEventListener("submit", function(event) {
+                    event.preventDefault();
+                    
+                    const datos = new URLSearchParams(new FormData(this));
+                    
+                    fetch('LoginServlet?accion=login', {
+                        method: 'POST',
+                        body: datos
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload(); 
+                        } else {
+                            return response.text().then(err => { throw new Error(err); });
+                        }
+                    })
+                    .catch(error => {
+                        const divError = document.getElementById("mensaje-error-login");
+                        divError.innerHTML = error.message;
+                        divError.style.display = "block";
+                    });
                 });
-            });
+            }
         });
 }
-// Cierra la sesión y recarga la página
+
 function cerrarSesion() {
     fetch('LoginServlet?accion=logout', { method: 'POST' })
         .then(() => window.location.reload());
 }
 
-// 1. Llama al Servlet para buscar cursos filtrados y pinta la lista
 function cargarCursosPor(opcionBusqueda, nombreFiltro) {
-    // Ejemplo: CursoServlet?accion=buscarCurso&opcion=instituto&nombre=CURE
     fetch(`CursoServlet?accion=buscarCurso&opcion=${opcionBusqueda}&nombre=${nombreFiltro}`)
         .then(response => response.text())
         .then(html => {
@@ -682,9 +712,7 @@ function cargarCursosPor(opcionBusqueda, nombreFiltro) {
         .catch(error => console.error("Error cargando lista de cursos:", error));
 }
 
-// 2. Llama al Servlet para buscar un curso específico y pinta sus detalles
 function verDetallesCurso(nombreCurso) {
-    // Ejemplo: CursoServlet?accion=verDetallesCurso&nombreCurso=Programacion Avanzada
     fetch(`CursoServlet?accion=verDetallesCurso&nombreCurso=${nombreCurso}`)
         .then(response => response.text())
         .then(html => {
@@ -693,60 +721,50 @@ function verDetallesCurso(nombreCurso) {
         .catch(error => console.error("Error cargando detalles del curso:", error));
 }
 
-// 3. Preparativos para los siguientes Casos de Uso (Consulta Edicion / Consulta Programa)
 function verDetalleEdicion(nombreEdicion) {
     alert("Próximamente: Redirigiendo a Consulta de Edición -> " + nombreEdicion);
-    // Aquí luego haremos el fetch a EdicionServlet
 }
 
 function verDetallePrograma(nombrePrograma) {
     alert("Próximamente: Redirigiendo a Consulta de Programa -> " + nombrePrograma);
-    // Aquí luego haremos el fetch a ProgramaServlet
 }
 
-// Se ejecuta automáticamente cuando la página index.jsp termina de cargar
-document.addEventListener("DOMContentLoaded", function() {
-    cargarMenuLateral();
-});
-
 function cargarMenuLateral() {
-    // 1. Cargar "n" Institutos dinámicamente
-    // Usamos el mismo endpoint que ya tenías funcionando en tu alta de usuario
     fetch('UsuarioServlet?accion=listarInstitutos')
         .then(response => response.json())
         .then(institutos => {
             const ulInstitutos = document.getElementById('lista-institutos');
-            ulInstitutos.innerHTML = ''; // Limpiamos el "Cargando..."
+            if(ulInstitutos) {
+                ulInstitutos.innerHTML = ''; 
 
-            institutos.forEach(inst => {
-                const li = document.createElement('li');
-                li.style.marginBottom = "5px";
-                // Aquí enlazamos el clic con la función del Caso de Uso
-                li.innerHTML = `<a href="#" onclick="cargarCursosPor('instituto', '${inst.nombre}')">${inst.nombre}</a>`;
-                ulInstitutos.appendChild(li);
-            });
+                institutos.forEach(inst => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = "5px";
+                    li.innerHTML = `<a href="#" onclick="cargarCursosPor('instituto', '${inst.nombre}')">${inst.nombre}</a>`;
+                    ulInstitutos.appendChild(li);
+                });
+            }
         })
         .catch(error => console.error("Error al cargar institutos:", error));
 
-    // 2. Cargar "n" Categorías dinámicamente
     fetch('CursoServlet?accion=listarCategoriasJson')
         .then(response => response.json())
         .then(categorias => {
             const ulCategorias = document.getElementById('lista-categorias');
-            ulCategorias.innerHTML = ''; // Limpiamos el "Cargando..."
+            if(ulCategorias) {
+                ulCategorias.innerHTML = ''; 
 
-            categorias.forEach(cat => {
-                const li = document.createElement('li');
-                li.style.marginBottom = "5px";
-                // Enlazamos el clic con la función del Caso de Uso
-                li.innerHTML = `<a href="#" onclick="cargarCursosPor('categoria', '${cat.nombre}')">${cat.nombre}</a>`;
-                ulCategorias.appendChild(li);
-            });
+                categorias.forEach(cat => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = "5px";
+                    li.innerHTML = `<a href="#" onclick="cargarCursosPor('categoria', '${cat.nombre}')">${cat.nombre}</a>`;
+                    ulCategorias.appendChild(li);
+                });
+            }
         })
         .catch(error => console.error("Error al cargar categorías:", error));
 }
 
-// 1. Función para pintar la vista de Alta de Edición (Deberás llamarla desde el menú lateral)
 function cargarAltaEdicion() {
     fetch('EdicionServlet?accion=altaEdicion')
         .then(response => {
@@ -763,7 +781,6 @@ function cargarAltaEdicion() {
         });
 }
 
-// 2. Función dinámica para cargar cursos al cambiar el <select> de Institutos
 function cargarCursosDeInstituto(nombreInstituto) {
     const selectCurso = document.getElementById('cursoEdicion');
     
@@ -783,41 +800,6 @@ function cargarCursosDeInstituto(nombreInstituto) {
             selectCurso.disabled = false;
         })
         .catch(error => console.error("Error cargando cursos del instituto:", error));
-}
-
-// 3. Función para interceptar el formulario y enviarlo por POST
-function altaEdicion(event) {
-    event.preventDefault();
-    const divError = document.getElementById('mensaje-error-edicion');
-    divError.style.display = 'none';
-
-    const form = document.getElementById('formAltaEdicion');
-    
-    // Convertimos los datos para soportar listas múltiples (select multiple)
-    const datos = new URLSearchParams(new FormData(form));
-
-    fetch('EdicionServlet?accion=altaEdicion', {
-        method: 'POST',
-        body: datos
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.text().then(msg => {
-                alert(msg); // Muestra éxito
-                form.reset(); // Limpia la pantalla para otra edición
-                document.getElementById('cursoEdicion').innerHTML = '<option value="">Primero seleccione un instituto</option>';
-                document.getElementById('cursoEdicion').disabled = true;
-            });
-        } else {
-            return response.text().then(err => { throw new Error(err); });
-        }
-    })
-    .catch(error => {
-        // En caso de nombre duplicado, el usuario verá el error aquí y podrá corregirlo
-        divError.innerHTML = "<strong>Error:</strong> " + error.message;
-        divError.style.display = 'block';
-        divError.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
 }
 
 function cargarModificarUsuario() {
@@ -847,7 +829,6 @@ function inicializarEventosModificarUsuario() {
 
     if (!form) return;
 
-    // Cargar combo de institutos solo si existe el componente (docente)
     const selectInstituto = document.getElementById("institutoModificar");
     if (selectInstituto) {
         fetch("UsuarioServlet?accion=listarInstitutos")
@@ -862,7 +843,6 @@ function inicializarEventosModificarUsuario() {
             })
             .catch(err => console.error("Error cargando institutos:", err));
 
-        // Evento Agregar Instituto
         const btnAgregar = document.getElementById("agregarInstitutoModificar");
         if (btnAgregar) {
             btnAgregar.addEventListener("click", function () {
@@ -884,7 +864,6 @@ function inicializarEventosModificarUsuario() {
             });
         }
 
-        // Evento Quitar Instituto
         const btnQuitar = document.getElementById("quitarInstitutoModificar");
         if (btnQuitar) {
             btnQuitar.addEventListener("click", function () {
@@ -895,7 +874,6 @@ function inicializarEventosModificarUsuario() {
         }
     }
 
-    // Vista previa de imagen
     if (inputImagen && vistaPrevia) {
         inputImagen.addEventListener('change', function (e) {
             const file = e.target.files[0];
@@ -909,7 +887,6 @@ function inicializarEventosModificarUsuario() {
         });
     }
 
-    // Interceptar el envío
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -947,7 +924,6 @@ function inicializarEventosModificarUsuario() {
         const formData = new FormData(form);
         formData.append('accion', 'modificarUsuario');
 
-        // Adjuntar todos los valores de la lista de institutos seleccionados
         if (selectLista) {
             for (let i = 0; i < selectLista.options.length; i++) {
                 formData.append("institutos", selectLista.options[i].value);
@@ -979,7 +955,6 @@ function inicializarEventosModificarUsuario() {
     });
 }
 
-// Carga los datos completos de una Edición
 function cargarConsultaEdicion(nombreEdicion) {
     document.getElementById('contenido-dinamico').innerHTML = "<h3 style='text-align:center;'>Cargando edición...</h3>";
     
@@ -996,7 +971,6 @@ function cargarConsultaEdicion(nombreEdicion) {
         });
 }
 
-// Cargar la vista principal de inscripción
 function cargarFormInscripcion() {
     fetch('InscripcionServlet?accion=formulario')
         .then(response => {
@@ -1007,7 +981,6 @@ function cargarFormInscripcion() {
         .catch(error => document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center; padding: 20px;'>${error.message}</h3>`);
 }
 
-// 1er Eslabón AJAX: Cuando selecciona Instituto, carga Cursos (Reutilizamos el EdicionServlet que ya hace esto)
 function cargarCursosParaInscripcion(nombreInstituto) {
     const selectCurso = document.getElementById('cursoInscripcion');
     const selectEdicion = document.getElementById('edicionInscripcion');
@@ -1030,7 +1003,6 @@ function cargarCursosParaInscripcion(nombreInstituto) {
         });
 }
 
-// 2do Eslabón AJAX: Cuando selecciona Curso, carga Ediciones
 function cargarEdicionesParaInscripcion(nombreCurso) {
     const selectEdicion = document.getElementById('edicionInscripcion');
     
@@ -1054,7 +1026,6 @@ function cargarEdicionesParaInscripcion(nombreCurso) {
         });
 }
 
-// Enviar el formulario y manejar el cartel de Ya Inscripto vs Éxito
 function inscribirEdicion(event) {
     event.preventDefault();
     const msgDiv = document.getElementById('mensaje-inscripcion');
@@ -1074,7 +1045,6 @@ function inscribirEdicion(event) {
                 msgDiv.style.border = '1px solid #d6e9c6';
                 msgDiv.innerHTML = "✔ " + msg;
                 
-                // Limpiar todo después de éxito
                 form.reset();
                 document.getElementById('cursoInscripcion').disabled = true;
                 document.getElementById('edicionInscripcion').disabled = true;

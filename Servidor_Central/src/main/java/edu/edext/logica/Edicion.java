@@ -34,6 +34,8 @@ public class Edicion {
     @NotNull
     @Column(nullable=false)
     private LocalDate fechaPublicacion;
+    @Column(nullable=true)
+    private String imagen;
 
     @ManyToMany
     @JoinTable(
@@ -73,6 +75,8 @@ public class Edicion {
     public void setDocentes(Set<Docente> docentes){ this.docentes=docentes; }
     public void setFechaInicio(LocalDate fechaInicio){ this.fechaInicio=fechaInicio; }
     public void setFechaPublicacion (LocalDate fechaPublicacion){ this.fechaPublicacion=fechaPublicacion; }
+    public void setImagen(String imagen) { this.imagen = imagen; }
+    public String getImagen() { return this.imagen; }
 
     public LocalDate getFechaPublicacion(){ return this.fechaPublicacion; }
     public LocalDate getFechaInicio(){ return this.fechaInicio; }
@@ -90,7 +94,7 @@ public class Edicion {
         return ret;
     }
     
-        @Override
+    @Override
     public int hashCode() {
         int hash = 7;
         hash = 53 * hash + Objects.hashCode(this.nombre);

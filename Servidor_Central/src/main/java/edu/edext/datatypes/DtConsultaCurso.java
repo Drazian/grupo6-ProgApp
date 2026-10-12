@@ -14,9 +14,11 @@ public class DtConsultaCurso {
     private final List<String> ediciones;
     private final List<String> programas;
     private final List<String> categorias;
+    private final String imagen;
 
     public DtConsultaCurso(String nombre, String descripcion, String duracion, int cantidadHoras, 
-                           int creditos, String url, Date fechaRegistro, List<String> ediciones, List<String> programas, List<String> categorias) {
+                           int creditos, String url, Date fechaRegistro, List<String> ediciones, 
+                           List<String> programas, List<String> categorias, String imagen) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.duracion = duracion;
@@ -27,6 +29,12 @@ public class DtConsultaCurso {
         this.ediciones = ediciones;
         this.programas = programas;
         this.categorias=categorias;
+        this.imagen = (imagen != null && !imagen.isEmpty()) ? imagen : "usr.png";
+    }
+
+    public DtConsultaCurso(String nombre, String descripcion, String duracion, int cantidadHoras, 
+                           int creditos, String url, Date fechaRegistro, List<String> ediciones, List<String> programas, List<String> categorias) {
+        this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, ediciones, programas, categorias, "usr.png");
     }
 
     public String getNombre() { return nombre; }
@@ -39,4 +47,5 @@ public class DtConsultaCurso {
     public List<String> getEdiciones() { return ediciones; }
     public List<String> getProgramas() { return programas; }
     public List<String> getCategorias() { return categorias; }
+    public String getImagen() { return imagen; }
 }

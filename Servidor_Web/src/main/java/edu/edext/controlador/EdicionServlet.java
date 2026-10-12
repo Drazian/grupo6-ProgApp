@@ -5,13 +5,16 @@ import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.logica.GestorImagenes; 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig; 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part; 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,6 +25,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 @WebServlet("/EdicionServlet")
+@MultipartConfig // IMPORTANTE: Sin esto, el Servlet no puede leer el FormData con imágenes
 public class EdicionServlet extends HttpServlet {
     private IControlador ic = Fabrica.getInstance().getIControlador();
 
@@ -90,7 +94,7 @@ public class EdicionServlet extends HttpServlet {
         }
     }
 
-@Override
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain; charset=UTF-8");
@@ -113,12 +117,11 @@ public class EdicionServlet extends HttpServlet {
                     throw new Exception("Debe seleccionar al menos un docente para dictar la edición.");
                 }
 
-                // 3. Parsear fechas al formato LocalDate (El fix del error)
+                // 3. Parsear fechas al formato LocalDate
                 LocalDate fechaInicio = LocalDate.parse(fechaInicioStr);
                 LocalDate fechaFin = LocalDate.parse(fechaFinStr);
-                LocalDate fechaPublicacion = LocalDate.now(); // Fecha actual del sistema
+                LocalDate fechaPublicacion = LocalDate.now();
 
-                // Validación lógica rápida de fechas usando isAfter de LocalDate
                 if(fechaInicio.isAfter(fechaFin)) {
                      throw new Exception("La fecha de inicio no puede ser posterior a la fecha de fin.");
                 }
@@ -129,12 +132,29 @@ public class EdicionServlet extends HttpServlet {
                     cupo = Integer.parseInt(cupoStr);
                 }
 
-                // 5. Instanciar el DtEdicion (Ahora los tipos coinciden perfectamente)
+                // --- FIX IMAGEN: 5. Capturar y guardar la imagen de la edición ---
+                String nombreImagen = "usr.png"; // Imagen genérica por defecto
+                Part filePart = request.getPart("imagen"); // Asegúrate de que el input en tu JSP se llame name="imagen"
+                
+                if (filePart != null && filePart.getSize() > 0) {
+                    byte[] imgBytes = filePart.getInputStream().readAllBytes();
+                    String nombreOriginal = filePart.getSubmittedFileName();
+                    
+                    // Limpiamos los espacios del nombre de la edición para usarlo como identificador del archivo
+                    String identificadorUnico = "Edicion_" + nombreEdicion.replaceAll("\\s+", "_");
+                    
+                    // Guardamos físicamente la imagen y obtenemos el nombre del archivo final
+                    nombreImagen = GestorImagenes.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
+                }
+
+                // 6. Instanciar el DtEdicion
+                // ATENCIÓN: Se añadió 'nombreImagen' al final. Si NetBeans te marca error aquí, 
+                // lee la advertencia importante debajo de este código.
                 DtEdicion dt = new DtEdicion(
-                    nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes
+                    nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen
                 );
 
-                // 6. Impactar en base de datos
+                // 7. Impactar en base de datos
                 ic.altaEdicionCurso(nombreCurso, dt);
 
                 response.setStatus(HttpServletResponse.SC_OK);

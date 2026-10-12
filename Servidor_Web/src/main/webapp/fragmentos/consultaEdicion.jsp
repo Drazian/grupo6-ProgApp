@@ -4,6 +4,10 @@
 <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
     <h2 style="color: #2c3e50; margin-bottom: 5px;">Edición: ${edicion.nombre}</h2>
     <h4 style="color: #7f8c8d; margin-top: 0;">Curso Asociado: ${edicion.curso.nombre}</h4>
+    
+    <!-- FIX 1: Cambiado a edicion.imagen para que cargue la portada correcta -->
+    <img src="ImagenServlet?nombre=${edicion.imagen}" alt="Portada" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    
     <hr style="border: 1px solid #eee; margin: 20px 0;">
 
     <div style="display: flex; gap: 30px; flex-wrap: wrap;">
@@ -27,10 +31,11 @@
                     <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
                         <c:forEach var="docente" items="${edicion.docentes}">
                             <div style="display: flex; align-items: center; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #e9ecef;">
-                                <!-- Lógica de la imagen: Si tiene muestra la foto, sino un avatar genérico -->
+                                
                                 <c:choose>
                                     <c:when test="${not empty docente.imagen}">
-                                        <img src="imagenes/${docente.imagen}" alt="Foto" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #ddd;">
+                                        <!-- FIX 2: Llamada al ImagenServlet en lugar de la carpeta física -->
+                                        <img src="ImagenServlet?nombre=${docente.imagen}" alt="Foto" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #ddd;">
                                     </c:when>
                                     <c:otherwise>
                                         <div style="width: 50px; height: 50px; border-radius: 50%; background: #bdc3c7; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; margin-right: 15px;">
