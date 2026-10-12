@@ -6,11 +6,11 @@ import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
-import edu.edext.logica.GestorImagenes; // FIX: Importamos tu gestor de imágenes
+import edu.edext.logica.GestorImagenes;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig; // FIX: Obligatorio para leer archivos
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 @WebServlet("/CursoServlet")
-@MultipartConfig // IMPORTANTE: Sin esto, el Servlet no puede leer el FormData con imágenes
+@MultipartConfig 
 public class CursoServlet extends HttpServlet {
     private IControlador ic = Fabrica.getInstance().getIControlador();
 
@@ -33,7 +33,7 @@ public class CursoServlet extends HttpServlet {
         String accion = request.getParameter("accion");
         
         if (accion == null){
-            accion = "error"; //Opcion por defecto si no se indica nada.
+            accion = "error"; 
         }
               
         switch (accion){
@@ -80,7 +80,7 @@ public class CursoServlet extends HttpServlet {
                 }
                 break;
 
-            case "verDetallesCurso": // CASO DE USO: CONSULTA DE CURSO
+            case "verDetallesCurso": 
                 try {
                     String nombreDelCurso = request.getParameter("nombreCurso");
                     
