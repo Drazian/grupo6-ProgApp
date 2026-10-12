@@ -213,33 +213,47 @@ public class Controlador implements IControlador {
     }
     
     @Override
-    public List<DtUsuario> listarUsuarios(){
+    public List<DtUsuario> listarUsuarios() {
         EntityManager em = emf.createEntityManager();
-        
-        try{
-           List <DtUsuario> resultado = new ArrayList<>();
-           List<Usuario> listAux = em.createQuery("SELECT u FROM Usuario u", Usuario.class).getResultList();
-           
-           for(Usuario aux: listAux){
-               
-               if (aux instanceof Docente){
-                  List<String> institutos =  new ArrayList<>();
-                  
-                  for (Instituto instituto : ((Docente) aux).getInstitutos()) {
-                      institutos.add(instituto.getNombre());
-                  }
-                  resultado.add(new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(), 
-                          aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), 
-                          institutos , TipoUsuario.DOCENTE));
-                  
-               }else{
-                   resultado.add(new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(), 
-                          aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), null, TipoUsuario.ESTUDIANTE));
-               }
-               
-           }
-             return resultado;
-        }finally {
+
+        try {
+            List<DtUsuario> resultado = new ArrayList<>();
+            List<Usuario> listAux = em.createQuery("SELECT u FROM Usuario u", Usuario.class).getResultList();
+
+            for (Usuario aux : listAux) {
+
+                List<String> seguidos = new ArrayList<>();
+                if (aux.getSeguidos() != null) {
+                    for (Usuario s : aux.getSeguidos()) {
+                        seguidos.add(s.getNickname());
+                    }
+                }
+
+                List<String> seguidores = new ArrayList<>();
+                if (aux.getSeguidores() != null) {
+                    for (Usuario s : aux.getSeguidores()) {
+                        seguidores.add(s.getNickname());
+                    }
+                }
+
+                if (aux instanceof Docente) {
+                    List<String> institutos = new ArrayList<>();
+
+                    for (Instituto instituto : ((Docente) aux).getInstitutos()) {
+                        institutos.add(instituto.getNombre());
+                    }
+                    resultado.add(new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
+                            aux.getApellido(), aux.getImagen(), aux.getfNacimiento(),
+                            institutos, TipoUsuario.DOCENTE, seguidos, seguidores));
+
+                } else {
+                    resultado.add(new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
+                            aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), null, TipoUsuario.ESTUDIANTE, seguidos, seguidores));
+                }
+
+            }
+            return resultado;
+        } finally {
             em.close();
         }
     }
@@ -1153,7 +1167,95 @@ public class Controlador implements IControlador {
     }
 
     
+    @Override
+    public void seguirUsuario(String nicknameSeguidor, String nicknameASeguir) throws Exception {
+        if (nicknameSeguidor.equalsIgnoreCase(nicknameASeguir)) {
+            throw new Exception("Un usuario no puede seguirse a sí mismo.");
+        }
 
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Usuario seguidor = em.find(Usuario.class, nicknameSeguidor);
+            Usuario seguido = em.find(Usuario.class, nicknameASeguir);
+
+            if (seguidor == null || seguido == null) {
+                throw new Exception("Uno de los usuarios no existe.");
+            }
+
+            seguidor.agregarSeguido(seguido);
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void dejarDeSeguirUsuario(String nicknameSeguidor, String nicknameADejar) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Usuario seguidor = em.find(Usuario.class, nicknameSeguidor);
+            Usuario seguido = em.find(Usuario.class, nicknameADejar);
+
+            if (seguidor == null || seguido == null) {
+                throw new Exception("Uno de los usuarios no existe.");
+            }
+
+            seguidor.removerSeguido(seguido);
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<String> listarSeguidos(String nickname) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            Usuario usuario = em.find(Usuario.class, nickname);
+            List<String> res = new ArrayList<>();
+            if (usuario != null && usuario.getSeguidos() != null) {
+                for (Usuario u : usuario.getSeguidos()) {
+                    res.add(u.getNickname());
+                }
+            }
+            return res;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<String> listarSeguidores(String nickname) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            Usuario usuario = em.find(Usuario.class, nickname);
+            List<String> res = new ArrayList<>();
+            if (usuario != null && usuario.getSeguidores() != null) {
+                for (Usuario u : usuario.getSeguidores()) {
+                    res.add(u.getNickname());
+                }
+            }
+            return res;
+        } finally {
+            em.close();
+        }
+    }
 
 
 }

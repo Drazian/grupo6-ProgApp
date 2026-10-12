@@ -7,6 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -14,7 +17,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -51,11 +56,22 @@ public class Usuario {
     @Temporal(TemporalType.DATE)
     private Date fNacimiento;
     
+    @ManyToMany
+    @JoinTable(
+        name = "usuario_seguidores",
+        joinColumns = @JoinColumn(name = "seguidor_nickname"),
+        inverseJoinColumns = @JoinColumn(name = "seguido_nickname")
+    )
+    private List<Usuario> seguidos = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "seguidos")
+    private List<Usuario> seguidores = new ArrayList<>();
 
     public Usuario(String nickname, String password, String email, String nombre, String apellido, Date fNacimiento, String imagen) {
         setNickname(nickname);
         setPassword(password);
         setEmail(email);
+        setNombre(nombre);
         setApellido(apellido);
         setfNacimiento(fNacimiento);
         setImagen(imagen);
@@ -115,5 +131,34 @@ public class Usuario {
     public void setImagen(String imagen) {
         this.imagen = imagen;
     }
-    
+
+    public List<Usuario> getSeguidos() {
+        return seguidos;
+    }
+
+    public void setSeguidos(List<Usuario> seguidos) {
+        this.seguidos = seguidos;
+    }
+
+    public List<Usuario> getSeguidores() {
+        return seguidores;
+    }
+
+    public void setSeguidores(List<Usuario> seguidores) {
+        this.seguidores = seguidores;
+    }
+
+    public void agregarSeguido(Usuario u) {
+        if (!this.seguidos.contains(u)) {
+            this.seguidos.add(u);
+            u.getSeguidores().add(this);
+        }
+    }
+
+    public void removerSeguido(Usuario u) {
+        if (this.seguidos.contains(u)) {
+            this.seguidos.remove(u);
+            u.getSeguidores().remove(this);
+        }
+    }
 }

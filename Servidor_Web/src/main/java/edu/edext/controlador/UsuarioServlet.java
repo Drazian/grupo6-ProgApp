@@ -16,6 +16,7 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +55,17 @@ public class UsuarioServlet extends HttpServlet {
             cargarInstitutos(response);
         } else if ("formAlta".equals(accion)) {
             request.getRequestDispatcher("/fragmentos/altaUsuario.jsp").forward(request, response);
+        } else if ("cargarSocial".equals(accion)) {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("usuarioLogueado") == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("<h3 style='color:red; text-align:center;'>Debe iniciar sesión para acceder a la red social.</h3>");
+                return;
+            }
+
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            actualizarListasSociales(request, ic);
+            request.getRequestDispatcher("/fragmentos/seguidos.jsp").forward(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción de usuario no válida.");
         }
@@ -64,6 +76,7 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String accion = request.getParameter("accion");
+        IControlador ic = Fabrica.getInstance().getIControlador();
 
         if ("crear".equals(accion)) {
             String nickname = request.getParameter("nickname");
@@ -97,7 +110,6 @@ public class UsuarioServlet extends HttpServlet {
                     null, fecha, institutos, tipo
                 );
 
-                IControlador ic = Fabrica.getInstance().getIControlador();
                 ic.crearUsuario(usuario, bytesImagen, nombreOriginal);
 
                 response.setContentType("text/plain;charset=UTF-8");
@@ -123,7 +135,7 @@ public class UsuarioServlet extends HttpServlet {
             String apellido = request.getParameter("apellido");
             String fechaNacimiento = request.getParameter("fechaNacimiento");
             String nuevaPassword = request.getParameter("password");
-            String[] institutosArray = request.getParameterValues("institutos"); // Capturar institutos
+            String[] institutosArray = request.getParameterValues("institutos");
 
             List<String> institutos = (institutosArray != null && institutosArray.length > 0) 
                 ? Arrays.asList(institutosArray) 
@@ -165,14 +177,12 @@ public class UsuarioServlet extends HttpServlet {
                     apellido,
                     nombreImagenFinal, 
                     fecha,
-                    institutos, // Se envían los institutos actualizados
+                    institutos,
                     usuarioActual.getTipoUsuario()
                 );
 
-                IControlador ic = Fabrica.getInstance().getIControlador();
                 ic.modificarUsuario(usuarioModificado, bytesImagen, nombreOriginal);
 
-                // Sincronizar usuario en sesión
                 List<DtUsuario> listaActualizada = ic.listarUsuarios();
                 for (DtUsuario u : listaActualizada) {
                     if (u.getNickname().equalsIgnoreCase(usuarioActual.getNickname())) {
@@ -188,6 +198,124 @@ public class UsuarioServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write(e.getMessage());
+            }
+
+        } else if ("seguir".equals(accion)) {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("usuarioLogueado") == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Debe iniciar sesión para realizar esta acción.");
+                return;
+            }
+
+            DtUsuario logueado = (DtUsuario) session.getAttribute("usuarioLogueado");
+            String nicknameASeguir = request.getParameter("nicknameASeguir");
+
+            try {
+                if (nicknameASeguir == null || nicknameASeguir.trim().isEmpty()) {
+                    throw new Exception("Ingrese un nickname válido.");
+                }
+                if (logueado.getNickname().equalsIgnoreCase(nicknameASeguir.trim())) {
+                    throw new Exception("No puede seguirse a sí mismo.");
+                }
+                if (!ic.existeUsuario(nicknameASeguir.trim())) {
+                    throw new Exception("El usuario '" + nicknameASeguir + "' no existe.");
+                }
+
+                List<String> seguidos = ic.listarSeguidos(logueado.getNickname());
+                if (seguidos.contains(nicknameASeguir.trim())) {
+                    throw new Exception("Ya sigue al usuario '" + nicknameASeguir + "'.");
+                }
+
+                ic.seguirUsuario(logueado.getNickname(), nicknameASeguir.trim());
+                actualizarSesionUsuario(request, ic, logueado.getNickname());
+
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("Ahora sigues a '" + nicknameASeguir.trim() + "'.");
+
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write(e.getMessage());
+            }
+
+        } else if ("dejarSeguir".equals(accion)) {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("usuarioLogueado") == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Debe iniciar sesión para realizar esta acción.");
+                return;
+            }
+
+            DtUsuario logueado = (DtUsuario) session.getAttribute("usuarioLogueado");
+            String nicknameADejar = request.getParameter("nicknameSeleccionado");
+
+            try {
+                if (nicknameADejar == null || nicknameADejar.trim().isEmpty()) {
+                    throw new Exception("Seleccione un usuario para dejar de seguir.");
+                }
+
+                ic.dejarDeSeguirUsuario(logueado.getNickname(), nicknameADejar.trim());
+                actualizarSesionUsuario(request, ic, logueado.getNickname());
+
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("Has dejado de seguir a '" + nicknameADejar.trim() + "'.");
+
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write(e.getMessage());
+            }
+
+        } else if ("eliminarSeguidor".equals(accion)) {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("usuarioLogueado") == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Debe iniciar sesión para realizar esta acción.");
+                return;
+            }
+
+            DtUsuario logueado = (DtUsuario) session.getAttribute("usuarioLogueado");
+            String seguidorAEliminar = request.getParameter("seguidorSeleccionado");
+
+            try {
+                if (seguidorAEliminar == null || seguidorAEliminar.trim().isEmpty()) {
+                    throw new Exception("Seleccione un seguidor para eliminar.");
+                }
+
+                ic.dejarDeSeguirUsuario(seguidorAEliminar.trim(), logueado.getNickname());
+                actualizarSesionUsuario(request, ic, logueado.getNickname());
+
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("Se ha eliminado a '" + seguidorAEliminar.trim() + "' de tus seguidores.");
+
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write(e.getMessage());
+            }
+        }
+    }
+    
+    private void actualizarListasSociales(HttpServletRequest request, IControlador ic) {
+        DtUsuario logueado = (DtUsuario) request.getSession().getAttribute("usuarioLogueado");
+        if (logueado != null) {
+            try {
+                request.setAttribute("listaSeguidos", ic.listarSeguidos(logueado.getNickname()));
+                request.setAttribute("listaSeguidores", ic.listarSeguidores(logueado.getNickname()));
+            } catch (Exception e) {
+                request.setAttribute("listaSeguidos", new ArrayList<String>());
+                request.setAttribute("listaSeguidores", new ArrayList<String>());
+            }
+        }
+    }
+
+    private void actualizarSesionUsuario(HttpServletRequest request, IControlador ic, String nickname) throws Exception {
+        List<DtUsuario> usuarios = ic.listarUsuarios();
+        for (DtUsuario u : usuarios) {
+            if (u.getNickname().equalsIgnoreCase(nickname)) {
+                request.getSession().setAttribute("usuarioLogueado", u);
+                break;
             }
         }
     }
