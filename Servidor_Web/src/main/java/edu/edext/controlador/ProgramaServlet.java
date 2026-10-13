@@ -162,7 +162,7 @@ public class ProgramaServlet extends HttpServlet {
                 try {
                     ic.agregarProgramaCurso(programaStr, cursoStr);
                     response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().write("Curso " + cursoStr + " agregado con exito al programa" + programaStr + ".");
+                    response.getWriter().write("Curso " + cursoStr + " agregado con exito al programa " + programaStr + ".");
                 } catch (Exception e){
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Error al agregar el curso al programa: " + e.getMessage());                    

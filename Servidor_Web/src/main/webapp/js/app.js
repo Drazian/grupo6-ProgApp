@@ -282,6 +282,12 @@ function ProgramaServlet(opcion) {
             if (opcion === 'formCrear') {
                 inicializarEventosCrearPrograma();
             }
+            
+            if (opcion === 'formAgregarCurso'){
+                inicializarEventosAgregarCursoAPrograma();
+            }
+            
+            
         })
         .catch(error => console.error('Error al cargar la sección:', error));
 }
@@ -356,6 +362,33 @@ function inicializarEventosCrearPrograma() {
         });
     }
 }
+
+function inicializarEventosAgregarCursoAPrograma() {
+document.querySelectorAll('.btn-seleccionar-curso').forEach(button => {
+        button.addEventListener('click', function() {
+            const nombreCurso = this.getAttribute('data-nombre');
+            
+            // 1. Asignar al input oculto
+            const inputCurso = document.getElementById('selectCurso');
+            if (inputCurso) inputCurso.value = nombreCurso;
+
+            // 2. Actualizar el label inferior
+            const label = document.getElementById('labelCursoSeleccionado');
+            if (label) label.innerText = nombreCurso;
+
+            // 3. Resaltar la fila seleccionada
+            document.querySelectorAll('tr[id^="fila-curso-"]').forEach(fila => {
+                fila.classList.remove('table-active');
+            });
+            
+            const filaSeleccionada = document.getElementById('fila-curso-' + nombreCurso);
+            if (filaSeleccionada) {
+                filaSeleccionada.classList.add('table-active');
+            }
+        });
+    });
+}
+
 
 function agregarCursoAPrograma(){
     const programa = document.getElementById('selectPrograma').value;

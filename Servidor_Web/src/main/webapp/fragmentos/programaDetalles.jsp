@@ -57,16 +57,36 @@
                 <br><h3>Cursos del Programa</h3><br>
                 <c:choose>
                     <c:when test="${not empty programa.getDtCursos()}">
-                        <ul class="lista-cursos-programa">
-                            <c:forEach var="curso" items="${programa.getDtCursos()}">
-                                <li class="item-curso-integrante">
-                                    <span class="nombre-curso">${curso.nombre}</span>
-                                    <button class="btn-detalle-curso" onclick="verDetallesCurso('${curso.nombre}')">
-                                        Consultar Curso
-                                    </button>
-                                </li>
-                            </c:forEach>
-                        </ul>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">Imagen</th>
+                                        <th>Nombre del Curso</th>
+                                        <th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="curso" items="${programa.getDtCursos()}">
+                                        <tr>
+                                            <td>
+                                                <img src="ImagenServlet?nombre=${empty curso.imagen ? 'usr.png' : curso.imagen}" 
+                                                     alt="Curso" 
+                                                     style="width: 45px; height: 45px; object-fit: cover; border-radius: 50%; border: 1px solid #ccc;">
+                                            </td>
+                                            <td>
+                                                <span style="font-weight: 500;">${curso.nombre}</span>
+                                            </td>
+                                            <td class="text-end">
+                                                <button type="button" class="btn btn-sm btn-info" onclick="verDetallesCurso('${curso.nombre}')">
+                                                    Consultar Curso
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
                     </c:when>
                     <c:otherwise>
                         <div class="alerta-info">

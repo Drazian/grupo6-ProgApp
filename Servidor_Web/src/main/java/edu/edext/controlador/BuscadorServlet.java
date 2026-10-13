@@ -57,7 +57,7 @@ public class BuscadorServlet extends HttpServlet {
                     
                     if (queryLower.isEmpty() || nombre.toLowerCase().contains(queryLower) || desc.toLowerCase().contains(queryLower)) {
                         LocalDate fechaReg = DateToLocalDate(curso.getFechaRegistro()); //Conversion a LocalDate para unificar.
-                        DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,null,"curso");
+                        DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,curso.getImagen(),"curso");
                         resultados.add(res);
                     }
                 }
