@@ -85,13 +85,14 @@
 
                 <hr style="opacity: 0.2; margin: 10px 0;">                
                 
-                <!-- Grupo 3: Cursos (Restringido a Docentes) -->
+                <!-- Grupo 3: Cursos e Inscripciones (Restringido a Docentes) -->
                 <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
                     <details>
                         <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Cursos</summary>
                         <ul style="list-style: none; padding-left: 15px;">
                             <li><a href="#" onclick="cargarAltaCurso()">Alta Curso</a></li>
                             <li><a href="#" onclick="cargarAltaEdicion()">Alta Edición de Curso</a></li>
+                            <li><a href="#" onclick="cargarFormSeleccionEstudiantes()">Evaluar Inscripciones</a></li>
                         </ul>                      
                     </details>
                     <hr style="opacity: 0.2; margin: 10px 0;">

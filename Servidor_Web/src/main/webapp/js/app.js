@@ -1149,3 +1149,187 @@ function ejecutarAccionSocial(params) {
         alert(error.message);
     });
 }
+
+// =====================================================================
+// CASO DE USO: SELECCIONAR ESTUDIANTES A EDICIÓN (DOCENTE)
+// =====================================================================
+
+function cargarFormSeleccionEstudiantes() {
+    fetch('InscripcionServlet?accion=formularioSeleccion')
+        .then(response => {
+            if (!response.ok) throw new Error("Acceso denegado. Función exclusiva para Docentes.");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
+        });
+}
+
+function cargarCursosParaSeleccion(nombreInstituto) {
+    const selectCurso = document.getElementById('cursoSeleccion');
+    const selectEdicion = document.getElementById('edicionSeleccion');
+    const tablaContenedor = document.getElementById('contenedor-tabla-inscripciones');
+    const btnGuardar = document.getElementById('btnGuardarSeleccion');
+    
+    selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
+    selectEdicion.disabled = true;
+    tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione Instituto, Curso y Edición para ver las inscripciones.</p>';
+    if(btnGuardar) btnGuardar.disabled = true;
+
+    if (!nombreInstituto) {
+        selectCurso.innerHTML = '<option value="">Primero seleccione un instituto</option>';
+        selectCurso.disabled = true;
+        return;
+    }
+
+    // Reutilizamos el endpoint que ya tenías
+    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${nombreInstituto}`)
+        .then(response => response.json())
+        .then(cursos => {
+            selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
+            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            selectCurso.disabled = false;
+        });
+}
+
+function cargarEdicionesParaSeleccion(nombreCurso) {
+    const selectEdicion = document.getElementById('edicionSeleccion');
+    const tablaContenedor = document.getElementById('contenedor-tabla-inscripciones');
+    const btnGuardar = document.getElementById('btnGuardarSeleccion');
+    
+    tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione Instituto, Curso y Edición para ver las inscripciones.</p>';
+    if(btnGuardar) btnGuardar.disabled = true;
+
+    if (!nombreCurso) {
+        selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
+        selectEdicion.disabled = true;
+        return;
+    }
+
+    fetch(`InscripcionServlet?accion=listarEdiciones&curso=${nombreCurso}`)
+        .then(response => response.json())
+        .then(ediciones => {
+            if(ediciones.length === 0) {
+                selectEdicion.innerHTML = '<option value="">No hay ediciones disponibles</option>';
+                selectEdicion.disabled = true;
+            } else {
+                selectEdicion.innerHTML = '<option value="">Seleccione la Edición...</option>';
+                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
+                selectEdicion.disabled = false;
+            }
+        });
+}
+
+function cargarTablaInscripciones(nombreEdicion) {
+    const tablaContenedor = document.getElementById('contenedor-tabla-inscripciones');
+    const btnGuardar = document.getElementById('btnGuardarSeleccion');
+    const inputOculto = document.getElementById('edicionOculta');
+    
+    if (!nombreEdicion) {
+        tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione Instituto, Curso y Edición para ver las inscripciones.</p>';
+        if(btnGuardar) btnGuardar.disabled = true;
+        return;
+    }
+
+    inputOculto.value = nombreEdicion;
+    tablaContenedor.innerHTML = '<h4 style="text-align:center; color: #3498db;">Cargando inscripciones...</h4>';
+
+    fetch(`InscripcionServlet?accion=listarInscripciones&edicion=${encodeURIComponent(nombreEdicion)}`)
+        .then(response => response.text())
+        .then(html => {
+            tablaContenedor.innerHTML = html;
+            
+            // Si la tabla cargó y hay cuerpo de tabla, habilitamos el botón de guardar
+            if (document.getElementById('cuerpoTablaInscripciones')) {
+                btnGuardar.disabled = false;
+            } else {
+                btnGuardar.disabled = true;
+            }
+        })
+        .catch(error => {
+            tablaContenedor.innerHTML = `<p style="color:red; text-align:center;">Error al cargar la tabla.</p>`;
+        });
+}
+
+// Lógica para Requerimiento Especial 7.5
+function ordenarInscripciones(criterio) {
+    const tbody = document.getElementById('cuerpoTablaInscripciones');
+    if (!tbody) return;
+
+    // Convertimos las filas (nodos HTML) en un array real para poder usar .sort()
+    const filas = Array.from(tbody.querySelectorAll('tr.fila-inscripcion'));
+
+    filas.sort((a, b) => {
+        if (criterio === 'prioridad') {
+            // Orden descendente por prioridad (mayor a menor)
+            const prioA = parseFloat(a.getAttribute('data-prioridad')) || 0;
+            const prioB = parseFloat(b.getAttribute('data-prioridad')) || 0;
+            return prioB - prioA;
+        } else {
+            // Orden ascendente por fecha (antiguas primero)
+            const fechaA = a.getAttribute('data-fecha') || '';
+            const fechaB = b.getAttribute('data-fecha') || '';
+            return fechaA.localeCompare(fechaB);
+        }
+    });
+
+    // Reinyectamos las filas ordenadas. El navegador no las duplica, simplemente las mueve de lugar.
+    filas.forEach(fila => tbody.appendChild(fila));
+}
+
+function guardarSeleccionEstudiantes(event) {
+    event.preventDefault();
+    const msgDiv = document.getElementById('mensaje-seleccion');
+    const form = document.getElementById('formSeleccionEstudiantes');
+    const btnGuardar = document.getElementById('btnGuardarSeleccion');
+    
+    // Checkea que todos los radio buttons hayan sido marcados
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    btnGuardar.disabled = true;
+    btnGuardar.innerText = 'Guardando...';
+    msgDiv.style.display = 'none';
+
+    // Capturamos todos los inputs radio de forma masiva
+    const datos = new URLSearchParams(new FormData(form));
+    datos.append('accion', 'guardarSeleccion');
+
+    fetch('InscripcionServlet', {
+        method: 'POST',
+        body: datos
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.text().then(msg => {
+                msgDiv.style.display = 'block';
+                msgDiv.style.backgroundColor = '#dff0d8';
+                msgDiv.style.color = '#3c763d';
+                msgDiv.style.border = '1px solid #d6e9c6';
+                msgDiv.innerHTML = "✔ " + msg;
+                
+                // Recargar la tabla solita a los 1.5 seg para mostrar los colores actualizados (Verdes o Rojos)
+                const edicionActual = document.getElementById('edicionOculta').value;
+                setTimeout(() => cargarTablaInscripciones(edicionActual), 1500);
+            });
+        } else {
+            return response.text().then(err => { throw new Error(err); });
+        }
+    })
+    .catch(error => {
+        msgDiv.style.display = 'block';
+        msgDiv.style.backgroundColor = '#f2dede';
+        msgDiv.style.color = '#a94442';
+        msgDiv.style.border = '1px solid #ebccd1';
+        msgDiv.innerHTML = "<strong>Error:</strong> " + error.message;
+    })
+    .finally(() => {
+        btnGuardar.disabled = false;
+        btnGuardar.innerText = 'Guardar Selección';
+    });
+}
