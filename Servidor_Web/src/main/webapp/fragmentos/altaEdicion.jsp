@@ -7,7 +7,8 @@
     
     <div id="mensaje-error-edicion" style="color: red; display: none; margin-bottom: 15px; padding: 10px; border: 1px solid red; background: #ffeeee;"></div>
 
-    <form id="formAltaEdicion" onsubmit="altaEdicion(event)">
+    <!-- EL FIX: Se agregó enctype="multipart/form-data" para permitir envío de imágenes -->
+    <form id="formAltaEdicion" enctype="multipart/form-data" onsubmit="altaEdicion(event)">
         <!-- 1. Selección de Instituto -->
         <div class="form-group">
             <label for="institutoEdicion">Instituto que lo brinda:</label>
@@ -58,7 +59,12 @@
                 </c:forEach>
             </select>
         </div>
-
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="imagen" style="font-weight: bold;">Imagen representativa (Opcional):</label>
+            <input type="file" id="imagen" name="imagen" accept="image/*" style="width: 100%; padding: 8px;">
+        </div>
+        
         <div class="form-actions" style="margin-top: 20px;">
             <button type="submit" style="background-color: #5cb85c; color: white; padding: 10px 15px; border: none; cursor: pointer;">Crear Edición</button>
             <!-- Permite cancelar y limpiar la pantalla -->

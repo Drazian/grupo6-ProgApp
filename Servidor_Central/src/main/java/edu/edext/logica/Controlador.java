@@ -38,7 +38,6 @@ public class Controlador implements IControlador {
             usuarioModificado.setNombre(usuario.getNombre());
             usuarioModificado.setfNacimiento(usuario.getfNacimiento());
 
-            // Si llegó un texto plano en password, se reemplaza encriptando con BCrypt; si vino null o vacío, se mantiene la actual
             if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
                 String hashPassword = edu.edext.tools.Utils.Crypt.BCrypt(usuario.getPassword().trim(), 7);
                 usuarioModificado.setPassword(hashPassword);
@@ -98,7 +97,6 @@ public class Controlador implements IControlador {
                     + usuario.getEmail() + "'.");
             }
 
-            // Generar Hash BCrypt para la contraseña nueva
             String passwordHash = usuario.getPassword();
             if (passwordHash != null && !passwordHash.trim().isEmpty()) {
                 if (!passwordHash.startsWith("$2a$") && !passwordHash.startsWith("$2b$")) {
@@ -122,7 +120,7 @@ public class Controlador implements IControlador {
                 }
                 nuevoUsuario = new Docente(
                     usuario.getNickname(),
-                    passwordHash, // <--- Se asigna el hash encriptado
+                    passwordHash, 
                     usuario.getEmail(),
                     usuario.getNombre(),
                     usuario.getApellido(),
@@ -133,7 +131,7 @@ public class Controlador implements IControlador {
             } else {
                 nuevoUsuario = new Estudiante(
                     usuario.getNickname(),
-                    passwordHash, // <--- Se asigna el hash encriptado
+                    passwordHash, 
                     usuario.getEmail(),
                     usuario.getNombre(),
                     usuario.getApellido(),
@@ -164,7 +162,6 @@ public class Controlador implements IControlador {
         try {
             em.getTransaction().begin();
             
-            //Verifico primero si existe un Instituto con ese nombre (aux), de no ser asi lo creo. De existir, envio exception.
             Instituto aux = em.find(Instituto.class,nombre); 
             if (aux == null){
                         Instituto aux2 = new Instituto(nombre);
@@ -182,7 +179,6 @@ public class Controlador implements IControlador {
         try {
             em.getTransaction().begin();
             
-            //Verifico primero si existe una Categoria con ese nombre (aux), de no ser asi lo creo. De existir, envio exception.
             Categoria aux = em.find(Categoria.class,nombre); 
             if (aux == null){
                         Categoria aux2 = new Categoria(nombre);
@@ -327,19 +323,16 @@ public class Controlador implements IControlador {
         try {
             em.getTransaction().begin();
 
-            // 1. Validar que el curso no exista previamente
             Curso existe = em.find(Curso.class, curso.getNombre());
             if (existe != null) {
                 throw new Exception("Ya existe un curso registrado con el nombre '" + curso.getNombre() + "'.");
             }
 
-            // 2. Obtener el Instituto seleccionado
             Instituto instituto = em.find(Instituto.class, nombreInstituto);
             if (instituto == null) {
                 throw new Exception("El instituto '" + nombreInstituto + "' no existe en la base de datos.");
             }
 
-            // 3. Resolver los cursos previos
             List<Curso> previas = new ArrayList<>();
             if (curso.getPrevias() != null && !curso.getPrevias().isEmpty()) {
                 for (String nombrePrevia : curso.getListPrevias()) {
@@ -351,7 +344,6 @@ public class Controlador implements IControlador {
                 }
             }
             
-            // 3.5 Resolver las categorías (NUEVO REQUERIMIENTO TAREA 2)
             List<Categoria> categoriasAsignadas = new ArrayList<>();
             if (curso.getListCategorias() != null && !curso.getListCategorias().isEmpty()) {
                 for (String nombreCat : curso.getListCategorias()) {
@@ -363,7 +355,6 @@ public class Controlador implements IControlador {
                 }
             }
 
-            // 4. Crear la entidad y persistir
             Curso nuevoCurso = new Curso(
                 curso.getNombre(),
                 curso.getDescripcion(),
@@ -376,6 +367,8 @@ public class Controlador implements IControlador {
                 categoriasAsignadas,
                 previas
             );
+            
+            nuevoCurso.setImagen(curso.getImagen());
 
             em.persist(nuevoCurso);
             em.getTransaction().commit();
@@ -394,7 +387,6 @@ public class Controlador implements IControlador {
     public List<String> listarNombresCursos() throws Exception {
         EntityManager em = emf.createEntityManager();
         try {
-            // Consulta rápida para cargar el JList de "Previas" en la interfaz
             return em.createQuery("SELECT c.nombre FROM Curso c", String.class).getResultList();
         } finally {
             em.close();
@@ -417,7 +409,6 @@ public class Controlador implements IControlador {
     public List<String> listarCursosPorCategoria(String nombreCategoria) throws Exception {
         EntityManager em = emf.createEntityManager();
         try {
-            // HQL actualizado usando JOIN para la relación ManyToMany
             return em.createQuery("SELECT c.nombre FROM Curso c JOIN c.categorias cat WHERE cat.nombre = :cat", String.class)
                      .setParameter("cat", nombreCategoria)
                      .getResultList();
@@ -434,18 +425,15 @@ public class Controlador implements IControlador {
             Curso c = em.find(Curso.class, nombreCurso);
             if (c == null) throw new Exception("El curso no existe.");
 
-            // Buscar nombres de las ediciones
              List<String> ediciones = em.createQuery("SELECT e.nombre FROM Edicion e WHERE e.curso.nombre = :curso", String.class)
                                        .setParameter("curso", nombreCurso)
                                        .getResultList();
              
-            // SOLUCIÓN: Buscar nombres de los programas que contienen a este curso
             List<String> programas = em.createQuery(
                     "SELECT p.nombre FROM ProgramaFormacion p JOIN p.cursos c WHERE c.nombre = :curso", String.class)
                     .setParameter("curso", nombreCurso)
                     .getResultList();
 
-            // Convertir la lista de Categoria a lista de String para el Datatype
             List<String> nombresCategorias = new ArrayList<>();
             if (c.getCategorias() != null) {
                 for(Categoria cat : c.getCategorias()){
@@ -456,7 +444,7 @@ public class Controlador implements IControlador {
             return new edu.edext.datatypes.DtConsultaCurso(
                 c.getNombre(), c.getDescripcion(), c.getDuracion(),
                 c.getCantidadHoras(), c.getCreditos(), c.getUrl(), c.getFechaRegistro(),
-                ediciones, programas, nombresCategorias
+                ediciones, programas, nombresCategorias, c.getImagen()
             );
         } finally {
             em.close();
@@ -479,19 +467,16 @@ public class Controlador implements IControlador {
         try {
             em.getTransaction().begin();
 
-            // 1. Verificar unicidad del nombre de la edición
             Edicion existe = em.find(Edicion.class, dt.getNombre());
             if (existe != null) {
                 throw new Exception("Ya existe una Edición de Curso con el nombre: " + dt.getNombre());
             }
 
-            // 2. Buscar el curso padre al que pertenece esta edición
             Curso curso = em.find(Curso.class, nombreCurso);
             if (curso == null) {
                 throw new Exception("El curso seleccionado no existe en la base de datos.");
             }
 
-            // 3. Crear la nueva edición y pasarle los datos del Datatype
             Edicion nuevaEdicion = new Edicion();
             nuevaEdicion.setNombre(dt.getNombre());
             nuevaEdicion.setFechaInicio(dt.getFechaInicio());
@@ -501,11 +486,10 @@ public class Controlador implements IControlador {
                 nuevaEdicion.setCupo(dt.getCupo());
             }
             
-            // Guardamos la fecha y vinculamos el curso
             nuevaEdicion.setFechaPublicacion(dt.getFechaPublicacion()); 
             nuevaEdicion.setCurso(curso); 
+            nuevaEdicion.setImagen(dt.getImagen());
 
-            // 4. Buscar los docentes en la base de datos y asignarlos
             Set<Docente> docentesAsignados = new HashSet<>();
             for (String nick : dt.getNameDocentes()) {
                 Docente d = em.find(Docente.class, nick);
@@ -514,10 +498,8 @@ public class Controlador implements IControlador {
                 }
             }
             
-            // Asignamos la lista de docentes a la entidad
             nuevaEdicion.setDocentes(docentesAsignados);
 
-            // 5. Persistir en la base de datos
             em.persist(nuevaEdicion);
             em.getTransaction().commit();
             
@@ -589,12 +571,10 @@ public class Controlador implements IControlador {
     public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
     String nombreImagen = programa.getImagen();
 
-            // Si se enviaron bytes de imagen, se guardan en el servidor central
             if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
                 nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, programa.getNombre());
             }
 
-            // Creamos el DtPrograma con la imagen ya procesada
             DtPrograma programaConImagen = new DtPrograma(
                 programa.getFechaRegistro(),
                 programa.getNombre(),
@@ -604,7 +584,6 @@ public class Controlador implements IControlador {
                 nombreImagen
             );
 
-            // Delegamos en el método original que ya maneja el Helper, la validación y el persist
             boolean resultado = setCrearProgramaFormacion(programaConImagen);
             return resultado;
         }
@@ -716,7 +695,6 @@ public class Controlador implements IControlador {
             
             List<Curso> listaAux = em.createQuery("SELECT i FROM Curso i", Curso.class).getResultList();
             for (Curso aux : listaAux) {
-                // Extraer solo los nombres de la lista de previas
                 Set<String> nombresPrevias = new HashSet<>();
                 if (aux.getPrevias() != null) {
                     for (Curso previa : aux.getPrevias()) {
@@ -724,7 +702,6 @@ public class Controlador implements IControlador {
                     }
                 }
                 
-                // Mapear objetos Categoria a nombres
                 Set<String> nombresCategorias = new HashSet<>();
                 if (aux.getCategorias() != null){
                     for (Categoria categoria : aux.getCategorias()){
@@ -744,7 +721,8 @@ public class Controlador implements IControlador {
                         new DtInstituto(aux.getInstituto().getNombre()),    
                         null,
                         nombresCategorias,
-                        nombresPrevias
+                        nombresPrevias,
+                        aux.getImagen()
                 ));
             }
             
@@ -754,7 +732,7 @@ public class Controlador implements IControlador {
     }
 
     @Override
-    public List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception{//
+    public List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception{
         EntityManager em = emf.createEntityManager();
         try{
             ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
@@ -766,7 +744,6 @@ public class Controlador implements IControlador {
             List<DtCurso> resultado = new ArrayList<>();
             
             for (Curso aux : programa.getCursos()) {
-                // Extraer solo los nombres de la lista de previas
                 Set<String> nombresPrevias = new HashSet<>();
                 if (aux.getPrevias() != null) {
                     for (Curso previa : aux.getPrevias()) {
@@ -774,7 +751,6 @@ public class Controlador implements IControlador {
                     }
                 }
                 
-                // Mapear objetos Categoria a nombres
                 Set<String> nombresCategorias = new HashSet<>();
                 if (aux.getCategorias() != null){
                     for (Categoria categoria : aux.getCategorias()){
@@ -793,7 +769,8 @@ public class Controlador implements IControlador {
                         new DtInstituto(aux.getInstituto().getNombre()),    
                         null,
                         nombresCategorias,
-                        nombresPrevias
+                        nombresPrevias,
+                        aux.getImagen()
                 ));
             }
             
@@ -817,7 +794,6 @@ public class Controlador implements IControlador {
             if (programa.getCursos() != null) {
                 for (Curso c : programa.getCursos()) {
                     
-                    // Mapear objetos Categoria a nombres
                     Set<String> nombresCategorias = new HashSet<>();
                     if (c.getCategorias() != null) {
                         for (Categoria cat : c.getCategorias()) {
@@ -839,7 +815,8 @@ public class Controlador implements IControlador {
                         c.getUrl(),
                         c.getFechaRegistro(),
                         dtInst,
-                        nombresCategorias
+                        nombresCategorias,
+                        c.getImagen()
                     );
 
                     dtCursos.add(dtc);
@@ -870,23 +847,6 @@ public class Controlador implements IControlador {
         }
     }
 
-//    private java.time.LocalDate parseToLocalDate(Object fecha) {
-//        if (fecha == null) return null;
-//        if (fecha instanceof java.time.LocalDate) {
-//            return (java.time.LocalDate) fecha;
-//        }
-//        if (fecha instanceof String) {
-//            String str = (String) fecha;
-//            return str.isEmpty() ? null : java.time.LocalDate.parse(str);
-//        }
-//        if (fecha instanceof java.util.Date) {
-//            return ((java.util.Date) fecha).toInstant()
-//                    .atZone(java.time.ZoneId.systemDefault())
-//                    .toLocalDate();
-//        }
-//        return null;
-//    }
-
     @Override
     public int cargarDatosDePrueba() throws Exception{
         cargarDatosDePruebaHelper DatosDePrueba=new cargarDatosDePruebaHelper(emf);
@@ -900,7 +860,6 @@ public class Controlador implements IControlador {
         return ret;
     }
     
-    //*********************** Revisar contribucion de Diego*********************    
     @Override
     public List<DtCurso> listarCursosPorUsuario(String nickname) throws Exception {
         EntityManager em = emf.createEntityManager();
@@ -945,7 +904,8 @@ public class Controlador implements IControlador {
                         aux.getUrl(),
                         aux.getFechaRegistro(),
                         new DtInstituto(aux.getInstituto().getNombre()),
-                        nombresPrevias
+                        nombresPrevias,
+                        aux.getImagen()
                     ));
                 }
             }
@@ -974,7 +934,6 @@ public class Controlador implements IControlador {
 
             if (usuario instanceof Docente) {
 
-                // Ediciones que dicta el docente
                 ediciones = em.createQuery(
                     "SELECT DISTINCT e " +
                     "FROM Edicion e " +
@@ -987,7 +946,6 @@ public class Controlador implements IControlador {
 
             } else {
 
-                // Ediciones en las que está inscripto el estudiante
                 ediciones = em.createQuery(
                     "SELECT ie.edicion " +
                     "FROM InscripcionEdicion ie " +
@@ -1019,7 +977,8 @@ public class Controlador implements IControlador {
                     curso.getUrl(),
                     curso.getFechaRegistro(),
                     new DtInstituto(curso.getInstituto().getNombre()),
-                    nombresPrevias
+                    nombresPrevias,
+                    curso.getImagen()
                 );
 
                 Set<String> nombresDocentes = new HashSet<>();
@@ -1037,7 +996,8 @@ public class Controlador implements IControlador {
                     aux.getFechaFin(),
                     aux.getFechaPublicacion(),
                     dtCurso,
-                    nombresDocentes
+                    nombresDocentes,
+                    aux.getImagen()
                 ));
             }
 
@@ -1142,7 +1102,6 @@ public class Controlador implements IControlador {
             throw new Exception("Ya existe un usuario con el correo '" + usuario.getEmail() + "'.");
         }
 
-        // Si se enviaron bytes de imagen, se guardan en el servidor central
         if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
             nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, usuario.getNickname());
         }
@@ -1260,5 +1219,3 @@ public class Controlador implements IControlador {
 
 
 }
-
-    

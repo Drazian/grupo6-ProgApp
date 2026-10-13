@@ -38,7 +38,6 @@ public class ConsultaEdicionHelper {
     public DtEdicion getEdicion(){
         Edicion tmp=seekEdicion();
         if(tmp!=null) {
-            // SOLUCIÓN: Extraemos los DtUsuario completos para tener acceso a la imagen
             List<DtUsuario> dtDocentes = new ArrayList<>();
             if (tmp.getDocentes() != null) {
                 for (Docente d : tmp.getDocentes()) {
@@ -58,8 +57,10 @@ public class ConsultaEdicionHelper {
                     tmp.getFechaInicio(), 
                     tmp.getFechaFin(), 
                     tmp.getFechaPublicacion(), 
-                    new DtCurso(tmp.getCurso().getNombre(), null, null, 0, 0, null, null, null, null), 
-                    dtDocentes); // Pasamos la lista de DtUsuario en lugar del Set<String>
+                    new DtCurso(tmp.getCurso().getNombre(), null, null, 0, 0, null, null, null, null, "usr.png"), 
+                    dtDocentes,
+                    tmp.getImagen()
+            ); 
         }
         else return null;
     }
@@ -96,7 +97,6 @@ public class ConsultaEdicionHelper {
         Edicion ret;
         try { ret=db.find(Edicion.class, nombre); }
         catch (Exception e) { ret=null; }
-        // No cerramos db aquí porque las relaciones (docentes) se leen en getEdicion()
         return ret;
     }
 }

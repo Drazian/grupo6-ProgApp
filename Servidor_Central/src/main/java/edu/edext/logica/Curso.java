@@ -29,6 +29,9 @@ public class Curso {
     @Column(nullable=false)
     private Date fechaRegistro;
 
+    @Column(nullable=true)
+    private String imagen;
+
     @ManyToOne
     private Instituto instituto;
 
@@ -55,17 +58,6 @@ public class Curso {
         setInstituto(instituto);
         setCategorias(categorias);
         setPrevias(previas);
-                
-//        this.nombre = nombre;
-//        this.descripcion = descripcion;
-//        this.duracion = duracion;
-//        this.cantidadHoras = cantidadHoras;
-//        this.creditos = creditos;
-//        this.url = url;
-//        this.fechaRegistro = fechaRegistro;
-//        this.instituto = instituto;
-//        this.categorias = categorias;
-//        this.previas = previas;
     }
 
     public String getNombre() { return nombre; }
@@ -97,6 +89,8 @@ public class Curso {
     
     public List<Curso> getPrevias() { return previas; }
     public void setPrevias(List<Curso> previas) { this.previas = previas; }
+    public String getImagen() { return imagen; }
+    public void setImagen(String imagen) { this.imagen = imagen; }
     
     @Override
     public boolean equals(Object o) {

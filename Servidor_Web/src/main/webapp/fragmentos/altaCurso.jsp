@@ -74,7 +74,12 @@
                 </c:forEach>
             </select>
         </div>
-
+        
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="imagen" style="font-weight: bold;">Imagen representativa (Opcional):</label>
+            <input type="file" id="imagen" name="imagen" accept="image/*" style="width: 100%; padding: 8px;">
+        </div>
+        
         <div class="form-actions" style="margin-top: 20px;">
             <!-- El evento onclick llama a tu futura función en app.js -->
             <button type="button" onclick="altaCurso(event)">Dar de Alta</button>
