@@ -312,7 +312,6 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_jmConsultaEdicionActionPerformed
 
     private void jmInscripcionEdicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmInscripcionEdicionActionPerformed
-        form.cargarPanel("Inscripcion a Edicion de Curso", new InscripcionEdicion(), true, true);
     }//GEN-LAST:event_jmInscripcionEdicionActionPerformed
 
     private void jmCrearProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmCrearProgramaActionPerformed

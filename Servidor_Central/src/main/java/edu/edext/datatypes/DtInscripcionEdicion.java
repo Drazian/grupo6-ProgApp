@@ -20,12 +20,18 @@ public class DtInscripcionEdicion {
     private final DtUsuario estudiante;
     private final LocalDate fechaInscripcion;
     private final String[] nomEstado={"No Inscripto", "Inscripto", "Aceptado", "Rechazado"};
+    private final double prioridad;
 
-    public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado){
+    public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado, double prioridad){
         this.fechaInscripcion=fechaInscripcion;
         this.estudiante=estudiante;
         this.edicion=edicion;
         this.estado=estado;
+        this.prioridad = prioridad;
+    }
+    
+    public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado){
+        this(estudiante, edicion, fechaInscripcion, estado, 0.0);
     }
    
     public int getValorEstado(){ return this.estado; }
@@ -33,5 +39,5 @@ public class DtInscripcionEdicion {
     public String getEstado(){ return nomEstado[this.estado]; }
     public DtUsuario getEstudiante(){  return this.estudiante;  }
     public LocalDate getFechaInscripcion(){ return this.fechaInscripcion; }
-    
+    public double getPrioridad(){ return this.prioridad; }
 }

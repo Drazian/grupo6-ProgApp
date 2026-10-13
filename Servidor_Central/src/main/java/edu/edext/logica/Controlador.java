@@ -1217,5 +1217,24 @@ public class Controlador implements IControlador {
         }
     }
 
+    @Override
+    public java.util.List<edu.edext.datatypes.DtInscripcionEdicion> getInscripcionesCompletas(String nombreEdicion) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            return helper.getInscripcionesCompletas();
+        } finally {
+            helper.kill();
+        }
+    }
+
+    @Override
+    public void evaluarInscripciones(String nombreEdicion, java.util.Map<String, Integer> evaluaciones) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            helper.evaluarInscripciones(evaluaciones);
+        } finally {
+            helper.kill();
+        }
+    }
 
 }

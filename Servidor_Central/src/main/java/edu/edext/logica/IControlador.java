@@ -74,6 +74,8 @@ List<String> listarSeguidos(String nickname) throws Exception;
 
 List<String> listarSeguidores(String nickname) throws Exception;
 
-    
+
+    public java.util.List<edu.edext.datatypes.DtInscripcionEdicion> getInscripcionesCompletas(String nombreEdicion) throws Exception;
+    public void evaluarInscripciones(String nombreEdicion, java.util.Map<String, Integer> evaluaciones) throws Exception;    
     
 }
