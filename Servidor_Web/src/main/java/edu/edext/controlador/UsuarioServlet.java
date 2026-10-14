@@ -1,6 +1,8 @@
 package edu.edext.controlador;
 
+import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtInstituto;
+import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
@@ -51,10 +53,13 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String accion = request.getParameter("accion");
+
         if ("listarInstitutos".equals(accion)) {
             cargarInstitutos(response);
+
         } else if ("formAlta".equals(accion)) {
             request.getRequestDispatcher("/fragmentos/altaUsuario.jsp").forward(request, response);
+
         } else if ("cargarSocial".equals(accion)) {
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("usuarioLogueado") == null) {
@@ -122,20 +127,84 @@ public class UsuarioServlet extends HttpServlet {
                     response.getWriter().write("<p style='color:red;'>Error al cargar perfil: " + e.getMessage() + "</p>");
                 }
             }
-            } else if ("getLogueado".equals(accion)) {
+
+        } else if ("consultaUsuario".equals(accion)) {
+            try {
+                IControlador ic = Fabrica.getInstance().getIControlador();
+                List<DtUsuario> todosLosUsuarios = ic.listarUsuarios();
+
+                request.setAttribute("todosLosUsuarios", todosLosUsuarios);
+                request.getRequestDispatcher("/fragmentos/consultaUsuario.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("<h3 style='color:red;'>Error: " + e.getMessage() + "</h3>");
+            }
+
+        } else if ("detalleConsultaUsuario".equals(accion)) {
+            String nickname = request.getParameter("nickname");
+            if (nickname != null && !nickname.trim().isEmpty()) {
+                try {
+                    IControlador ic = Fabrica.getInstance().getIControlador();
+                    DtUsuario dtUsuario = null;
+
+                    for (DtUsuario u : ic.listarUsuarios()) {
+                        if (u.getNickname().equalsIgnoreCase(nickname.trim())) {
+                            dtUsuario = u;
+                            break;
+                        }
+                    }
+
+                    if (dtUsuario != null) {
+                        HttpSession session = request.getSession(false);
+                        DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+
+                        boolean esPropioPerfil = (logueado != null && logueado.getNickname().equalsIgnoreCase(dtUsuario.getNickname()));
+                        boolean loSigo = false;
+
+                        if (logueado != null) {
+                            List<String> misSeguidos = ic.listarSeguidos(logueado.getNickname());
+                            loSigo = misSeguidos.contains(nickname.trim());
+                        }
+
+                        if (dtUsuario.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
+                            List<DtEdicion> edicionesEstudiante = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
+                            request.setAttribute("listaInscripciones", edicionesEstudiante);
+                        } else if (dtUsuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
+                            List<DtEdicion> edicionesDocente = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
+                            request.setAttribute("listaEdicionesDocente", edicionesDocente);
+                        }
+
+                        List<DtPrograma> programasUsuario = ic.listarProgramasPorUsuario(dtUsuario.getNickname());
+                        request.setAttribute("listaProgramas", programasUsuario);
+
+                        request.setAttribute("usuarioPerfil", dtUsuario);
+                        request.setAttribute("esPropioPerfil", esPropioPerfil);
+                        request.setAttribute("loSigo", loSigo);
+
+                        request.getRequestDispatcher("/fragmentos/detalleConsultaUsuario.jsp").forward(request, response);
+                    }
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("Error al cargar detalle: " + e.getMessage());
+                }
+            } // Se agregó la llave faltante aquí
+
+        } else if ("getLogueado".equals(accion)) {
             HttpSession session = request.getSession(false);
             DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
-            
+
             response.setContentType("text/plain;charset=UTF-8");
             if (logueado != null) {
                 response.getWriter().write(logueado.getNickname());
             } else {
                 response.getWriter().write("");
             }
+
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción de usuario no válida.");
         }
-    } 
+    }
+     
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

@@ -83,7 +83,21 @@
                     </ul>
                 </details>
 
-                <hr style="opacity: 0.2; margin: 10px 0;">                
+                <hr style="opacity: 0.2; margin: 10px 0;"> 
+                           
+                <!-- Grupo Usuarios -->
+                <details>
+                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Usuarios</summary>
+                    <ul style="list-style: none; padding-left: 15px; margin: 5px 0 0 0;">
+                        <li style="margin-bottom: 5px;">
+                            <a href="#" onclick="event.preventDefault(); cargarConsultaUsuario();" style="text-decoration: none; color: inherit; font-size: 14px;">
+                                Ver información de usuariosó
+                            </a>
+                        </li>
+                    </ul>
+                </details>
+
+                <hr style="opacity: 0.2; margin: 10px 0;"> 
                 
                 <!-- Grupo 3: Cursos e Inscripciones (Restringido a Docentes) -->
                 <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">

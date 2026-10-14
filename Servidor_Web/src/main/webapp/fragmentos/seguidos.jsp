@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
-<h2>Red Social - Usuarios del Sistema</h2>
+<h2>Ingrese nickname para buscar</h2>
 
 <div style="display: flex; gap: 20px; align-items: flex-start;">
 
