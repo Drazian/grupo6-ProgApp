@@ -103,26 +103,44 @@ function initBuscador() {
     actualizarResultados();
 }
 
-function verDetallesBusqueda(nombre, tipo){
-    const tipoNormalizado = (tipo || '').toLowerCase(); 
+function verDetallesBusqueda(nombre, tipo){     
+    const tipoNormalizado = (tipo || '').toLowerCase();     
     
-    switch (tipoNormalizado){
-        case "programa":
-            cargarDetallePrograma(nombre);
-        break;
-        
-        case "curso":
-            verDetallesCurso(nombre);
-        break;
-        
-        case "docente":
-            verPerfilUsuario(nombre);
-        break;
-        
-        case "estudiante":
-            verPerfilUsuario(nombre);
-        break;
-        
+    //Si es un usuario, verificamos si es el usuario actual
+    if (tipoNormalizado === 'docente' || tipoNormalizado === 'estudiante') {
+        fetch('UsuarioServlet?accion=getLogueado')
+            .then(response => {
+                if (!response.ok) throw new Error('Error al obtener usuario logueado');
+                return response.text();
+            })
+            .then(nicknameLogueado => {
+                const nickLimpioLogueado = (nicknameLogueado || '').trim();
+                
+                //Si se selecciona al usuario logueado, se va a cargar el modificar y no a ver el perfil.
+                if (nickLimpioLogueado !== '' && nombre.toLowerCase() === nickLimpioLogueado.toLowerCase()) {
+                    cargarModificarUsuario();
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+    } else {
+        //Si no se selecciono el usuario logueado, seguir curso normal
+        switch (tipoNormalizado){
+            case "programa":
+                cargarDetallePrograma(nombre);
+            break;
+
+            case "curso":
+                verDetallesCurso(nombre);
+            break;
+
+            case "docente":
+            case "estudiante":
+                verPerfilUsuario(nombre);
+            break;
+
+        }
     }
 }
 
