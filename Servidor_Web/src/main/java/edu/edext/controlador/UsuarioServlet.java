@@ -122,6 +122,16 @@ public class UsuarioServlet extends HttpServlet {
                     response.getWriter().write("<p style='color:red;'>Error al cargar perfil: " + e.getMessage() + "</p>");
                 }
             }
+            } else if ("getLogueado".equals(accion)) {
+            HttpSession session = request.getSession(false);
+            DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+            
+            response.setContentType("text/plain;charset=UTF-8");
+            if (logueado != null) {
+                response.getWriter().write(logueado.getNickname());
+            } else {
+                response.getWriter().write("");
+            }
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción de usuario no válida.");
         }
