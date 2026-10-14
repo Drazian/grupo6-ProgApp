@@ -1,6 +1,8 @@
 package edu.edext.controlador;
 
+import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtInstituto;
+import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
@@ -120,6 +122,70 @@ public class UsuarioServlet extends HttpServlet {
                 } catch (Exception e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("<p style='color:red;'>Error al cargar perfil: " + e.getMessage() + "</p>");
+                }
+            }
+        } else if ("consultaUsuario".equals(accion)) {
+            try {
+                IControlador ic = Fabrica.getInstance().getIControlador();
+                List<DtUsuario> todosLosUsuarios = ic.listarUsuarios();
+
+                request.setAttribute("todosLosUsuarios", todosLosUsuarios);
+                request.getRequestDispatcher("/fragmentos/consultaUsuario.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("<h3 style='color:red;'>Error: " + e.getMessage() + "</h3>");
+            }
+
+        } else if ("detalleConsultaUsuario".equals(accion)) {
+            String nickname = request.getParameter("nickname");
+            if (nickname != null && !nickname.trim().isEmpty()) {
+                try {
+                    IControlador ic = Fabrica.getInstance().getIControlador();
+                    DtUsuario dtUsuario = null;
+
+                    for (DtUsuario u : ic.listarUsuarios()) {
+                        if (u.getNickname().equalsIgnoreCase(nickname.trim())) {
+                            dtUsuario = u;
+                            break;
+                        }
+                    }
+
+                    if (dtUsuario != null) {
+                        HttpSession session = request.getSession(false);
+                        DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+
+                        boolean esPropioPerfil = (logueado != null && logueado.getNickname().equalsIgnoreCase(dtUsuario.getNickname()));
+                        boolean loSigo = false;
+
+                        if (logueado != null) {
+                            List<String> misSeguidos = ic.listarSeguidos(logueado.getNickname());
+                            loSigo = misSeguidos.contains(nickname.trim());
+                        }
+
+                        // Usamos los métodos exactos que existen en Controlador.java:
+                        if (dtUsuario.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
+                            // Obtiene las ediciones a las que está inscripto el estudiante
+                            List<DtEdicion> edicionesEstudiante = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
+                            request.setAttribute("listaInscripciones", edicionesEstudiante);
+                        } else if (dtUsuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
+                            // Obtiene las ediciones dictadas por el docente
+                            List<DtEdicion> edicionesDocente = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
+                            request.setAttribute("listaEdicionesDocente", edicionesDocente);
+                        }
+
+                        // Carga de programas de formación del usuario
+                        List<DtPrograma> programasUsuario = ic.listarProgramasPorUsuario(dtUsuario.getNickname());
+                        request.setAttribute("listaProgramas", programasUsuario);
+
+                        request.setAttribute("usuarioPerfil", dtUsuario);
+                        request.setAttribute("esPropioPerfil", esPropioPerfil);
+                        request.setAttribute("loSigo", loSigo);
+
+                        request.getRequestDispatcher("/fragmentos/detalleConsultaUsuario.jsp").forward(request, response);
+                    }
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("Error al cargar detalle: " + e.getMessage());
                 }
             }
         } else {

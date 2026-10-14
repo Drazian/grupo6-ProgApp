@@ -20,7 +20,7 @@
         <c:choose>
             <c:when test="${requestScope.loSigo}">
                 <button type="button" onclick="dejarDeSeguirRapido('${requestScope.usuarioPerfil.nickname}')" 
-                        style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        style="background-color: #d95f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
                     Dejar de seguir
                 </button>
             </c:when>
@@ -75,7 +75,7 @@
             <ul style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                 <c:forEach var="seguido" items="${requestScope.seguidosPerfil}">
                     <li style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
-                        ➡️ <b>${seguido}</b>
+                         <b>${seguido}</b>
                     </li>
                 </c:forEach>
                 <c:if test="${empty requestScope.seguidosPerfil}">

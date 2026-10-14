@@ -1366,3 +1366,62 @@ function guardarSeleccionEstudiantes(event) {
     });
 }
 
+//---------------------------------------------------------
+//------- Consulta Usuario --------------------------------
+//---------------------------------------------------------
+
+function cargarConsultaUsuario() {
+    const contenedor = document.getElementById('contenido-dinamico');
+    contenedor.innerHTML = '<h3 style="text-align:center; color:#3498db;">Cargando usuarios...</h3>';
+
+    fetch('UsuarioServlet?accion=consultaUsuario')
+        .then(response => {
+            if (!response.ok) throw new Error("Error al cargar la consulta de usuario.");
+            return response.text();
+        })
+        .then(html => {
+            contenedor.innerHTML = html;
+        })
+        .catch(error => {
+            contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
+        });
+}
+
+function cargarDetalleConsultaUsuario(nickname) {
+    const contenedor = document.getElementById('contenedor-detalle-consulta-usuario');
+    if (!contenedor) return;
+
+    contenedor.innerHTML = '<h4 style="text-align:center; color:#3498db;">Cargando detalles del usuario...</h4>';
+
+    fetch(`UsuarioServlet?accion=detalleConsultaUsuario&nickname=${encodeURIComponent(nickname)}`)
+        .then(response => {
+            if (!response.ok) throw new Error("Error al cargar la información del usuario.");
+            return response.text();
+        })
+        .then(html => {
+            contenedor.innerHTML = html;
+        })
+        .catch(error => {
+            contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
+        });
+}
+
+function cambiarPestana(idPestana) {
+    const contenidos = document.querySelectorAll('.contenido-tab');
+    contenidos.forEach(div => div.style.display = 'none');
+
+    const botones = document.querySelectorAll('.tab-btn');
+    botones.forEach(btn => {
+        btn.style.background = '#e0e0e0';
+        btn.style.color = '#333';
+    });
+
+    const tabSeleccionado = document.getElementById(idPestana);
+    if (tabSeleccionado) tabSeleccionado.style.display = 'block';
+
+    const btnSeleccionado = document.getElementById(`btn-${idPestana}`);
+    if (btnSeleccionado) {
+        btnSeleccionado.style.background = '#3498db';
+        btnSeleccionado.style.color = 'white';
+    }
+}
