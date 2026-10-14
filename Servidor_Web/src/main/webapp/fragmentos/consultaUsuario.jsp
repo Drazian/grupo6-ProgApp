@@ -6,8 +6,7 @@
     <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-top: 0;">
         Información de Usuario
     </h2>
-
-    <div style="margin-bottom: 25px;">
+    <div id="bloque-lista-usuarios" style="margin-bottom: 25px;">
         <label style="font-weight: bold; color: #34495e; display: block; margin-bottom: 8px;">
             Seleccione un usuario para consultar su información:
         </label>

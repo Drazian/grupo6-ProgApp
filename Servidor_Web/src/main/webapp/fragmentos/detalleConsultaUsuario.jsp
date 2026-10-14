@@ -3,9 +3,8 @@
 
 <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px;">
     
-    <!-- CABECERA: DATOS Y FOTO DEL USUARIO -->
     <div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
-        
+
         <div style="display: flex; gap: 20px; align-items: flex-start;">
             <img src="ImagenServlet?nombre=${empty requestScope.usuarioPerfil.imagen ? 'usr.png' : requestScope.usuarioPerfil.imagen}" 
                  alt="Foto Perfil" 
@@ -33,28 +32,41 @@
                         </c:choose>
                     </p>
                 </c:if>
+                    
             </div>
         </div>
+          <c:if test="${not empty sessionScope.usuarioLogueado}">
+              <div>
+                  <c:choose>
+                      <c:when test="${sessionScope.usuarioLogueado.nickname == requestScope.usuarioPerfil.nickname}">
+                          <button type="button" 
+                                  onclick="cargarModificarUsuario();" 
+                                  style="background-color: #2ecc71; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                              Modificar Perfil
+                          </button>
+                      </c:when>
 
-        <!-- Botón Seguir / Dejar de seguir -->
-        <c:if test="${not empty sessionScope.usuarioLogueado && sessionScope.usuarioLogueado.nickname != requestScope.usuarioPerfil.nickname}">
-            <div>
-                <c:choose>
-                    <c:when test="${requestScope.loSigo}">
-                        <button type="button" onclick="dejarDeSeguirRapido('${requestScope.usuarioPerfil.nickname}')" 
-                                style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                            Dejar de seguir
-                        </button>
-                    </c:when>
-                    <c:otherwise>
-                        <button type="button" onclick="seguirRapido('${requestScope.usuarioPerfil.nickname}')" 
-                                style="background-color: #0275d8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                            Seguir
-                        </button>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-        </c:if>
+                      <c:otherwise>
+                          <c:choose>
+                              <c:when test="${requestScope.loSigo}">
+                                  <button type="button" 
+                                          onclick="dejarDeSeguirRapido('${requestScope.usuarioPerfil.nickname}')" 
+                                          style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                      Dejar de seguir
+                                  </button>
+                              </c:when>
+                              <c:otherwise>
+                                  <button type="button" 
+                                          onclick="seguirRapido('${requestScope.usuarioPerfil.nickname}')" 
+                                          style="background-color: #0275d8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                      Seguir
+                                  </button>
+                              </c:otherwise>
+                          </c:choose>
+                      </c:otherwise>
+                  </c:choose>
+              </div>
+          </c:if>
 
     </div>
 

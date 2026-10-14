@@ -36,6 +36,12 @@
                         </span>
 
                         <button onclick="cerrarSesion()" style="background-color: #d9534f; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px;">Cerrar Sesión</button>
+                    
+                        <button type="button" 
+                                onclick="event.preventDefault(); cargarMiPerfil('${sessionScope.usuarioLogueado.nickname}');" 
+                                style="background-color: #2980b9; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+                            Mi Perfil
+                        </button>
                     </div>
                 </c:when>
                 <c:otherwise>
@@ -91,7 +97,7 @@
                     <ul style="list-style: none; padding-left: 15px; margin: 5px 0 0 0;">
                         <li style="margin-bottom: 5px;">
                             <a href="#" onclick="event.preventDefault(); cargarConsultaUsuario();" style="text-decoration: none; color: inherit; font-size: 14px;">
-                                Ver información de usuariosó
+                                Ver información de usuarios
                             </a>
                         </li>
                     </ul>

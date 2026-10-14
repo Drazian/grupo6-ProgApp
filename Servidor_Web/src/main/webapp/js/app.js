@@ -1422,6 +1422,7 @@ function cargarConsultaUsuario() {
 }
 
 function cargarDetalleConsultaUsuario(nickname) {
+    console.log("--> Clic en Mi Perfil. Nickname recibido:", nickname);
     const contenedor = document.getElementById('contenedor-detalle-consulta-usuario');
     if (!contenedor) return;
 
@@ -1458,4 +1459,44 @@ function cambiarPestana(idPestana) {
         btnSeleccionado.style.background = '#3498db';
         btnSeleccionado.style.color = 'white';
     }
+}
+
+
+function cargarMiPerfil(nickname) {
+    if (!nickname) {
+        console.error("No hay un nickname válido para cargar el perfil.");
+        return;
+    }
+
+    const contenedorPrincipal = document.getElementById('contenido-dinamico');
+    if (!contenedorPrincipal) {
+        console.error("No se encontró el elemento 'contenido-principal' en el DOM.");
+        return;
+    }
+
+    contenedorPrincipal.innerHTML = '<h4 style="text-align:center; color:#3498db; margin-top:20px;">Cargando Mi Perfil...</h4>';
+
+    // 1. Cargamos el fragmento base consultaUsuario.jsp
+    fetch('UsuarioServlet?accion=consultaUsuario')
+        .then(response => {
+            if (!response.ok) throw new Error("Error al cargar la interfaz de consulta.");
+            return response.text();
+        })
+        .then(htmlConsulta => {
+            contenedorPrincipal.innerHTML = htmlConsulta;
+
+            const lista = document.getElementById('bloque-lista-usuarios');
+            if (lista) lista.style.display = 'none';
+
+            const titulo = contenedorPrincipal.querySelector('h2');
+            if (titulo) {
+                titulo.textContent = 'Mi Perfil';
+            }
+
+            cargarDetalleConsultaUsuario(nickname);
+        })
+        .catch(error => {
+            console.error("Error en cargarMiPerfil:", error);
+            contenedorPrincipal.innerHTML = `<p style="color:red; text-align:center; padding:20px;">${error.message}</p>`;
+        });
 }
