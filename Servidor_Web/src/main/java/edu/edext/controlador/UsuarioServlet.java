@@ -64,8 +64,64 @@ public class UsuarioServlet extends HttpServlet {
             }
 
             IControlador ic = Fabrica.getInstance().getIControlador();
-            actualizarListasSociales(request, ic);
-            request.getRequestDispatcher("/fragmentos/seguidos.jsp").forward(request, response);
+            DtUsuario logueado = (DtUsuario) session.getAttribute("usuarioLogueado");
+
+            try {
+                List<DtUsuario> todosLosUsuarios = ic.listarUsuarios();
+                List<String> misSeguidos = ic.listarSeguidos(logueado.getNickname());
+
+                request.setAttribute("todosLosUsuarios", todosLosUsuarios);
+                request.setAttribute("misSeguidos", misSeguidos);
+
+                request.getRequestDispatcher("/fragmentos/seguidos.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al cargar la red social: " + e.getMessage() + "</h3>");
+            }
+
+        } else if ("verPerfil".equals(accion)) {
+            String nickname = request.getParameter("nickname");
+
+            if (nickname != null && !nickname.trim().isEmpty()) {
+                try {
+                    IControlador ic = Fabrica.getInstance().getIControlador();
+
+                    DtUsuario dtUsuario = null;
+                    for (DtUsuario u : ic.listarUsuarios()) {
+                        if (u.getNickname().equalsIgnoreCase(nickname.trim())) {
+                            dtUsuario = u;
+                            break;
+                        }
+                    }
+
+                    if (dtUsuario != null) {
+                        HttpSession session = request.getSession(false);
+                        DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+
+                        List<String> seguidoresPerfil = ic.listarSeguidores(nickname.trim());
+                        List<String> seguidosPerfil = ic.listarSeguidos(nickname.trim());
+
+                        boolean loSigo = false;
+                        if (logueado != null) {
+                            List<String> misSeguidos = ic.listarSeguidos(logueado.getNickname());
+                            loSigo = misSeguidos.contains(nickname.trim());
+                        }
+
+                        request.setAttribute("usuarioPerfil", dtUsuario);
+                        request.setAttribute("seguidoresPerfil", seguidoresPerfil);
+                        request.setAttribute("seguidosPerfil", seguidosPerfil);
+                        request.setAttribute("loSigo", loSigo);
+
+                        request.getRequestDispatcher("/fragmentos/detallePerfil.jsp").forward(request, response);
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.getWriter().write("<p style='color:red;'>Usuario no encontrado.</p>");
+                    }
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("<p style='color:red;'>Error al cargar perfil: " + e.getMessage() + "</p>");
+                }
+            }
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción de usuario no válida.");
         }

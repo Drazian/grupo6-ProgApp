@@ -41,6 +41,7 @@
                 <c:otherwise>
                     <!-- Si NO hay sesión: Botón de Iniciar Sesión -->
                     <button onclick="cargarLogin()" style="background-color: #5cb85c; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;">Iniciar Sesión</button>
+                    <button onclick="cargarAltaUsuario()" style="background-color: #0275d8; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;">Registrarse</button>
                 </c:otherwise>
             </c:choose>
         </div>
@@ -58,21 +59,20 @@
                     </ul>
                 </details>
 
-                <hr style="opacity: 0.2; margin: 10px 0;">
+               
                 
                 <!-- Menú Usuarios -->
-                <details>
-                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Usuarios</summary>
-                    <ul style="list-style: none; padding-left: 15px; margin-top: 5px;">
-                        <li><a href="#" onclick="cargarAltaUsuario(); return false;">Alta de usuario</a></li>
-                        <c:if test="${not empty sessionScope.usuarioLogueado}">
-                            <li><a href="#" onclick="cargarModificarUsuario(); return false;">Modificar usuario</a></li>
-                        </c:if>
-                        <c:if test="${not empty sessionScope.usuarioLogueado}">
-                            <li><a href="#" onclick="cargarSocial(); return false;">Social (Seguidores y Seguidos)</a></li>
-                        </c:if>
-                    </ul>
-                </details>
+                <c:if test="${not empty sessionScope.usuarioLogueado}">
+                 <hr style="opacity: 0.2; margin: 10px 0;">
+                    <details>
+                        <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Mi Perfil</summary>
+                        <ul style="list-style: none; padding-left: 15px; margin-top: 5px;">
+                                <li><a href="#" onclick="cargarModificarUsuario(); return false;">Modificar perfil</a></li>
+                                <li><a href="#" onclick="cargarSocial(); return false;">Social</a></li>
+
+                        </ul>
+                    </details>
+                </c:if>
                 <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.2); margin: 5px 0;">
 
                 <!-- Grupo 2: Categorias (Dinamico) -->

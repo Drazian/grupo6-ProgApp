@@ -780,7 +780,7 @@ function cargarMenuLateral() {
         })
         .catch(error => console.error("Error al cargar institutos:", error));
 
-    fetch('CursoServlet?accion=listarCategoriasJson')
+    fetch('MiControladorServlet?accion=obtenerCategoriasJSON')
         .then(response => response.json())
         .then(categorias => {
             const ulCategorias = document.getElementById('lista-categorias');
@@ -1095,6 +1095,10 @@ function inscribirEdicion(event) {
     .catch(error => console.error('Error procesando inscripción:', error));
 }
 
+// =====================================================================
+// FUNCIONALIDAD DE RED SOCIAL Y VER PERFIL
+// =====================================================================
+
 function cargarSocial() {
     fetch('UsuarioServlet?accion=cargarSocial')
         .then(response => {
@@ -1105,57 +1109,26 @@ function cargarSocial() {
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
-            inicializarEventosSocial();
         })
         .catch(error => {
             document.getElementById('contenido-dinamico').innerHTML = error.message;
         });
 }
 
-function inicializarEventosSocial() {
-    const formSeguir = document.getElementById('formSeguirUsuario');
-    const formDejarSeguir = document.getElementById('formDejarSeguir');
-    const formEliminarSeguidor = document.getElementById('formEliminarSeguidor');
+function seguirRapido(nickname) {
+    const params = new URLSearchParams();
+    params.append('accion', 'seguir');
+    params.append('nicknameASeguir', nickname);
 
-    if (formSeguir) {
-        formSeguir.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const nickname = document.getElementById('nicknameASeguir').value.trim();
-            const params = new URLSearchParams();
-            params.append('accion', 'seguir');
-            params.append('nicknameASeguir', nickname);
+    ejecutarAccionSocial(params);
+}
 
-            ejecutarAccionSocial(params);
-        });
-    }
+function dejarDeSeguirRapido(nickname) {
+    const params = new URLSearchParams();
+    params.append('accion', 'dejarSeguir');
+    params.append('nicknameSeleccionado', nickname);
 
-    if (formDejarSeguir) {
-        formDejarSeguir.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const select = document.getElementById('nicknameSeleccionado');
-            if (select.selectedIndex === -1) return alert("Seleccione un usuario de la lista.");
-
-            const params = new URLSearchParams();
-            params.append('accion', 'dejarSeguir');
-            params.append('nicknameSeleccionado', select.value);
-
-            ejecutarAccionSocial(params);
-        });
-    }
-
-    if (formEliminarSeguidor) {
-        formEliminarSeguidor.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const select = document.getElementById('seguidorSeleccionado');
-            if (select.selectedIndex === -1) return alert("Seleccione un seguidor de la lista.");
-
-            const params = new URLSearchParams();
-            params.append('accion', 'eliminarSeguidor');
-            params.append('seguidorSeleccionado', select.value);
-
-            ejecutarAccionSocial(params);
-        });
-    }
+    ejecutarAccionSocial(params);
 }
 
 function ejecutarAccionSocial(params) {
@@ -1176,10 +1149,46 @@ function ejecutarAccionSocial(params) {
     })
     .then(mensajeExito => {
         alert(mensajeExito);
-        cargarSocial();
+        cargarSocial(); // Recarga la lista para actualizar los botones de estado
     })
     .catch(error => {
         alert(error.message);
+    });
+}
+
+function verPerfilUsuario(nickname) {
+    const contenedor = document.getElementById('detalle-perfil-usuario');
+    if (contenedor) {
+        contenedor.innerHTML = '<h4 style="text-align:center; color:#3498db;">Cargando perfil...</h4>';
+        
+        fetch(`UsuarioServlet?accion=verPerfil&nickname=${encodeURIComponent(nickname)}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Error al cargar el perfil");
+                return response.text();
+            })
+            .then(html => {
+                contenedor.innerHTML = html;
+            })
+            .catch(error => {
+                contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
+            });
+    }
+}
+
+function filtrarUsuariosRedSocial() {
+    const input = document.getElementById('filtroNickname');
+    if (!input) return;
+    
+    const filtro = input.value.toLowerCase().trim();
+    const filas = document.querySelectorAll('.fila-usuario-social');
+
+    filas.forEach(fila => {
+        const nickname = fila.getAttribute('data-nickname');
+        if (nickname.includes(filtro)) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
     });
 }
 
@@ -1218,7 +1227,6 @@ function cargarCursosParaSeleccion(nombreInstituto) {
         return;
     }
 
-    // Reutilizamos el endpoint que ya tenías
     fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${nombreInstituto}`)
         .then(response => response.json())
         .then(cursos => {
@@ -1275,7 +1283,6 @@ function cargarTablaInscripciones(nombreEdicion) {
         .then(html => {
             tablaContenedor.innerHTML = html;
             
-            // Si la tabla cargó y hay cuerpo de tabla, habilitamos el botón de guardar
             if (document.getElementById('cuerpoTablaInscripciones')) {
                 btnGuardar.disabled = false;
             } else {
@@ -1287,29 +1294,24 @@ function cargarTablaInscripciones(nombreEdicion) {
         });
 }
 
-// Lógica para Requerimiento Especial 7.5
 function ordenarInscripciones(criterio) {
     const tbody = document.getElementById('cuerpoTablaInscripciones');
     if (!tbody) return;
 
-    // Convertimos las filas (nodos HTML) en un array real para poder usar .sort()
     const filas = Array.from(tbody.querySelectorAll('tr.fila-inscripcion'));
 
     filas.sort((a, b) => {
         if (criterio === 'prioridad') {
-            // Orden descendente por prioridad (mayor a menor)
             const prioA = parseFloat(a.getAttribute('data-prioridad')) || 0;
             const prioB = parseFloat(b.getAttribute('data-prioridad')) || 0;
             return prioB - prioA;
         } else {
-            // Orden ascendente por fecha (antiguas primero)
             const fechaA = a.getAttribute('data-fecha') || '';
             const fechaB = b.getAttribute('data-fecha') || '';
             return fechaA.localeCompare(fechaB);
         }
     });
 
-    // Reinyectamos las filas ordenadas. El navegador no las duplica, simplemente las mueve de lugar.
     filas.forEach(fila => tbody.appendChild(fila));
 }
 
@@ -1319,7 +1321,6 @@ function guardarSeleccionEstudiantes(event) {
     const form = document.getElementById('formSeleccionEstudiantes');
     const btnGuardar = document.getElementById('btnGuardarSeleccion');
     
-    // Checkea que todos los radio buttons hayan sido marcados
     if (!form.checkValidity()) {
         form.reportValidity();
         return;
@@ -1329,7 +1330,6 @@ function guardarSeleccionEstudiantes(event) {
     btnGuardar.innerText = 'Guardando...';
     msgDiv.style.display = 'none';
 
-    // Capturamos todos los inputs radio de forma masiva
     const datos = new URLSearchParams(new FormData(form));
     datos.append('accion', 'guardarSeleccion');
 
@@ -1346,7 +1346,6 @@ function guardarSeleccionEstudiantes(event) {
                 msgDiv.style.border = '1px solid #d6e9c6';
                 msgDiv.innerHTML = "✔ " + msg;
                 
-                // Recargar la tabla solita a los 1.5 seg para mostrar los colores actualizados (Verdes o Rojos)
                 const edicionActual = document.getElementById('edicionOculta').value;
                 setTimeout(() => cargarTablaInscripciones(edicionActual), 1500);
             });
@@ -1366,3 +1365,4 @@ function guardarSeleccionEstudiantes(event) {
         btnGuardar.innerText = 'Guardar Selección';
     });
 }
+

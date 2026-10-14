@@ -70,7 +70,7 @@ public class AltaUsuario extends javax.swing.JPanel {
         jPInstituto.setVisible(false);
         btnQuitarInstituto.setEnabled(false);
         
-        //btnAceptar.setVisible(false);
+        btnAceptar.setVisible(false);
         //txtEmail.setEditable(false);
         
         DefaultListModel<String> model = new DefaultListModel<>();

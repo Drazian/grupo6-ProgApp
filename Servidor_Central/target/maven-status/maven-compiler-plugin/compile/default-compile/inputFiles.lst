@@ -39,7 +39,6 @@
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/presentacion/ConsultaPrograma.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/presentacion/ConsultaUsuario.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/presentacion/CreaPrograFormaForm.java
-/home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/presentacion/InscripcionEdicion.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/presentacion/ModificarUsuario.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/presentacion/agregarCursoPrograma.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/presentacion/index.java
@@ -47,7 +46,6 @@
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/tools/ConsultaEdicionHelper.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/tools/CreaProgFormaHelper.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/tools/CreaProgFormaUtils.java
-/home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/tools/InscripcionEdicionHelper.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/tools/Utils.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/tools/cronometroHelper.java
 /home/usuario/Documentos/grupo6-ProgApp/Servidor_Central/src/main/java/edu/edext/tools/indexHelper.java
