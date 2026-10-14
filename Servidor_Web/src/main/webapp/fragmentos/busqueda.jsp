@@ -14,6 +14,9 @@
             <option value="TODOS">Todos</option>
             <option value="curso">Cursos</option>
             <option value="programa">Programas de formación</option>
+            <option value="usuario">Usuarios</option>
+            <option value="docente">Docentes</option>
+            <option value="estudiante">Estudiantes</option>
         </select>
 
         <!-- Criterio de Orden -->
