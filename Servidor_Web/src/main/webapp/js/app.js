@@ -64,13 +64,20 @@ function initBuscador() {
 
         // 1. FILTRADO POR TIPO
         filas.forEach(fila => {
-            const tipoFila = fila.getAttribute('data-tipo');
-            if (tipoSeleccionado === 'TODOS' || tipoFila === tipoSeleccionado) {
-                fila.style.display = '';
-            } else {
-                fila.style.display = 'none';
-            }
-        });
+                    const tipoFila = fila.getAttribute('data-tipo').trim().toLocaleString();
+                    
+                    //Si se selecciona TODOS, entonces se muestra todo.
+                    //Si se selecciona usuarios, se muestran los docentes y los estudiantes.
+                    const coincideTipo = (tipoSeleccionado === 'TODOS') || 
+                                         (tipoFila === tipoSeleccionado) || 
+                                         (tipoSeleccionado === 'usuario' && (tipoFila === 'docente' || tipoFila === 'estudiante'));
+
+                    if (coincideTipo) {
+                        fila.style.display = '';
+                    } else {
+                        fila.style.display = 'none';
+                    }
+                });
 
         // 2. ORDENAMIENTO
         filas.sort((a, b) => {
@@ -107,6 +114,15 @@ function verDetallesBusqueda(nombre, tipo){
         case "curso":
             verDetallesCurso(nombre);
         break;
+        
+        case "docente":
+            verPerfilUsuario(nombre);
+        break;
+        
+        case "estudiante":
+            verPerfilUsuario(nombre);
+        break;
+        
     }
 }
 

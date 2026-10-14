@@ -2,6 +2,8 @@ package edu.edext.controlador;
 
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtPrograma;
+import edu.edext.datatypes.DtUsuario;
+import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import edu.edext.modelo.DtResultadoBusqueda;
@@ -63,12 +65,32 @@ public class BuscadorServlet extends HttpServlet {
                 }
             }
             
+            List<DtUsuario> usuarios = ic.listarUsuarios();
+            
+            if (usuarios != null){
+                for (DtUsuario user : usuarios){
+                    String nickname = user.getNickname() != null ? user.getNickname() : "";
+                    String nom = user.getNombre() != null ? user.getNombre() : "";
+                    String ape = user.getApellido() != null ? user.getApellido() : "";
+                    String tip = user.getTipoUsuario().toString();
+                    String nombre = (nom + " " + ape).trim();
+                    
+                    if (queryLower.isEmpty() || nickname.toLowerCase().contains(queryLower) || nombre.toLowerCase().contains(queryLower)){
+                        LocalDate fechaN = user.getfNacimiento() != null ? DateToLocalDate(user.getfNacimiento()) : LocalDate.now();
+                        DtResultadoBusqueda res = new DtResultadoBusqueda(nickname, nombre, fechaN, user.getImagen(),tip.toLowerCase());
+                        resultados.add(res);
+                    }
+                }
+                    
+            }
+            
             request.setAttribute("resultadosBusqueda", resultados);
             request.setAttribute("queryBuscada", query);
             request.getRequestDispatcher("/fragmentos/busqueda.jsp").forward(request, response);
         
         } catch (Exception e) {
             request.setAttribute("error", e.getMessage());
+            
         }
         
         
@@ -83,6 +105,8 @@ public class BuscadorServlet extends HttpServlet {
     private LocalDate DateToLocalDate(Date date){
         if (date == null){
             return LocalDate.now();
+        } else if (date instanceof java.sql.Date) {
+            return ((java.sql.Date) date).toLocalDate();
         } else {
             return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         }

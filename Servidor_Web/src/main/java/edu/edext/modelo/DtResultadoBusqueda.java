@@ -3,9 +3,9 @@ package edu.edext.modelo;
 import java.time.LocalDate;
 
 public class DtResultadoBusqueda {
-    private String nombre;
-    private String descripcion;
-    private String tipo; //Curso o Programa
+    private String nombre; //En caso de usuario es nickname
+    private String descripcion; //En caso de usuario es el nombre+apellido
+    private String tipo; //curso, programa o usuario (DOCENTE o ESTUDIANTE)
     private LocalDate fechaPublicacion;
     private String imagen;
     
