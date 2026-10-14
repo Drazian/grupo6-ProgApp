@@ -53,10 +53,13 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String accion = request.getParameter("accion");
+
         if ("listarInstitutos".equals(accion)) {
             cargarInstitutos(response);
+
         } else if ("formAlta".equals(accion)) {
             request.getRequestDispatcher("/fragmentos/altaUsuario.jsp").forward(request, response);
+
         } else if ("cargarSocial".equals(accion)) {
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("usuarioLogueado") == null) {
@@ -124,6 +127,7 @@ public class UsuarioServlet extends HttpServlet {
                     response.getWriter().write("<p style='color:red;'>Error al cargar perfil: " + e.getMessage() + "</p>");
                 }
             }
+
         } else if ("consultaUsuario".equals(accion)) {
             try {
                 IControlador ic = Fabrica.getInstance().getIControlador();
@@ -162,18 +166,14 @@ public class UsuarioServlet extends HttpServlet {
                             loSigo = misSeguidos.contains(nickname.trim());
                         }
 
-                        // Usamos los métodos exactos que existen en Controlador.java:
                         if (dtUsuario.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
-                            // Obtiene las ediciones a las que está inscripto el estudiante
                             List<DtEdicion> edicionesEstudiante = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
                             request.setAttribute("listaInscripciones", edicionesEstudiante);
                         } else if (dtUsuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
-                            // Obtiene las ediciones dictadas por el docente
                             List<DtEdicion> edicionesDocente = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
                             request.setAttribute("listaEdicionesDocente", edicionesDocente);
                         }
 
-                        // Carga de programas de formación del usuario
                         List<DtPrograma> programasUsuario = ic.listarProgramasPorUsuario(dtUsuario.getNickname());
                         request.setAttribute("listaProgramas", programasUsuario);
 
@@ -187,11 +187,24 @@ public class UsuarioServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Error al cargar detalle: " + e.getMessage());
                 }
+            } // Se agregó la llave faltante aquí
+
+        } else if ("getLogueado".equals(accion)) {
+            HttpSession session = request.getSession(false);
+            DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+
+            response.setContentType("text/plain;charset=UTF-8");
+            if (logueado != null) {
+                response.getWriter().write(logueado.getNickname());
+            } else {
+                response.getWriter().write("");
             }
+
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción de usuario no válida.");
         }
-    } 
+    }
+     
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
