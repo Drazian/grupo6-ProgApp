@@ -2,6 +2,7 @@ package edu.edext.controlador;
 
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtInstituto;
+import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part; // FIX: Para interceptar el archivo binario
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -47,6 +49,43 @@ public class CursoServlet extends HttpServlet {
                         cursos = ic.listarCursosPorInstituto(nombre);
                     } else if ("categoria".equalsIgnoreCase(opcion)) {
                         cursos = ic.listarCursosPorCategoria(nombre);
+                        
+                        //Si es una categoria, tambien deberia de traerse los programas (ya que los programas no tienen Instituto para comparar).
+                        //Para no complejizar la gestion, la realizamos aqui en vez de el ProgramaServlet o en un nuevo Servlet.
+                        List<String> programas = new ArrayList<>();
+                        List<DtPrograma> listaProgramas = ic.listarProgramas();
+                        
+                        if (listaProgramas != null) {
+                                for (DtPrograma programa : listaProgramas) {
+                                    Set<String> categoriasPrograma = programa.getCategorias();
+
+                                    if (categoriasPrograma != null) {
+                                        boolean perteneceACategoria = false;
+
+                                        for (String catStr : categoriasPrograma) {
+                                            if (catStr != null) {
+                                                // Dividimos por espacios o comas por si el string trae varias juntas ("CAT2 CAT1")
+                                                String[] subCategorias = catStr.split("[,\\s]+");
+
+                                                for (String subCat : subCategorias) {
+                                                    if (subCat.trim().equalsIgnoreCase(nombre)) {
+                                                        perteneceACategoria = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            if (perteneceACategoria) break;
+                                        }
+
+                                        // Si alguna de las subcategorías coincide, agregamos el programa
+                                        if (perteneceACategoria) {
+                                            programas.add(programa.getNombre());
+                                        }
+                                    }
+                                }
+                        
+                        request.setAttribute("listaProgramas", programas);
+                        }
                     }
 
                     request.setAttribute("listaCursos", cursos);

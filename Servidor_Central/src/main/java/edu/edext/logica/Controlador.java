@@ -572,7 +572,7 @@ public class Controlador implements IControlador {
     String nombreImagen = programa.getImagen();
 
             if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
-                nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, programa.getNombre());
+                nombreImagen = GestorImagenes.guardarImagen(bytesImagen, "Programa_" + nombreOriginal, "Programa_" + programa.getNombre());
             }
 
             DtPrograma programaConImagen = new DtPrograma(
@@ -670,21 +670,69 @@ public class Controlador implements IControlador {
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
 
-    @Override
-    public List<DtPrograma> listarProgramas() throws Exception{
-        EntityManager em = emf.createEntityManager();
-        try{
-            List<DtPrograma> resultado = new ArrayList<>();
-            
-            List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
-            for (ProgramaFormacion aux: listaAux){
-                resultado.add(new DtPrograma(aux.getFechaRegistro(), aux.getNombre(), aux.getDescripcion(),aux.getFechaInicio(),aux.getFechaFin(), aux.getImagen()));
-            }
-            
-            return resultado;          
+@Override
+public List<DtPrograma> listarProgramas() throws Exception {
+    EntityManager em = emf.createEntityManager();
+    try {
+        List<DtPrograma> resultado = new ArrayList<>();
         
-        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+        List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
+        
+        for (ProgramaFormacion programa : listaAux) {
+            Set<DtCurso> dtCursos = new HashSet<>();
+
+            if (programa.getCursos() != null) {
+                for (Curso c : programa.getCursos()) {
+                    Set<String> nombresCategorias = new HashSet<>();
+                    if (c.getCategorias() != null) {
+                        for (Categoria cat : c.getCategorias()) {
+                            nombresCategorias.add(cat.getNombre());
+                        }
+                    }
+
+                    DtInstituto dtInst = null;
+                    if (c.getInstituto() != null) {
+                        dtInst = new DtInstituto(c.getInstituto().getNombre());
+                    }
+
+                    DtCurso dtc = new DtCurso(
+                        c.getNombre(),
+                        c.getDescripcion(),
+                        c.getDuracion(),
+                        c.getCantidadHoras(),
+                        c.getCreditos(),
+                        c.getUrl(),
+                        c.getFechaRegistro(),
+                        dtInst,
+                        nombresCategorias,
+                        c.getImagen()
+                    );
+
+                    dtCursos.add(dtc);
+                }
+            }
+
+            resultado.add(new DtPrograma(
+                programa.getNombre(), 
+                programa.getDescripcion(), 
+                programa.getFechaRegistro(), 
+                programa.getFechaInicio(), 
+                programa.getFechaFin(),
+                dtCursos,
+                programa.getImagen()
+            ));
+        }
+        
+        return resultado;        
+    } catch (Exception e) {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+        throw e;
+    } finally {
+        em.close();
     }
+}
 
     
     @Override
