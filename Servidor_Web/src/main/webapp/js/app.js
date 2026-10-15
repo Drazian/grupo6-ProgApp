@@ -119,29 +119,32 @@ function verDetallesBusqueda(nombre, tipo){
                 //Si se selecciona al usuario logueado, se va a cargar el modificar y no a ver el perfil.
                 if (nickLimpioLogueado !== '' && nombre.toLowerCase() === nickLimpioLogueado.toLowerCase()) {
                     cargarModificarUsuario();
+                    return;
                 }
             })
             .catch(error => {
                 console.error("Error:", error);
             });
-    } else {
-        //Si no se selecciono el usuario logueado, seguir curso normal
-        switch (tipoNormalizado){
-            case "programa":
-                cargarDetallePrograma(nombre);
-            break;
-
-            case "curso":
-                verDetallesCurso(nombre);
-            break;
-
-            case "docente":
-            case "estudiante":
-                verPerfilUsuario(nombre);
-            break;
-
-        }
     }
+        
+    //Si no se selecciono el usuario logueado, seguir curso normal
+    switch (tipoNormalizado){
+        case "programa":
+            cargarDetallePrograma(nombre);
+        break;
+
+        case "curso":
+            verDetallesCurso(nombre);
+        break;
+
+        case "docente":
+        case "estudiante":
+            cargarConsultaUsuario(() => {
+                cargarDetalleConsultaUsuario(nombre);
+            });
+        break;
+    }
+
 }
 
 function BuscadorServlet(){
@@ -1420,6 +1423,29 @@ function cargarConsultaUsuario() {
             contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
         });
 }
+
+function cargarConsultaUsuario(callback) {
+    const contenedor = document.getElementById('contenido-dinamico');
+    contenedor.innerHTML = '<h3 style="text-align:center; color:#3498db;">Cargando usuarios...</h3>';
+
+    fetch('UsuarioServlet?accion=consultaUsuario')
+        .then(response => {
+            if (!response.ok) throw new Error("Error al cargar la consulta de usuario.");
+            return response.text();
+        })
+        .then(html => {
+            contenedor.innerHTML = html;
+            
+            if (typeof callback === 'function') {
+                callback();
+            }
+        })
+        .catch(error => {
+            contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
+        });
+}
+
+
 
 function cargarDetalleConsultaUsuario(nickname) {
     const contenedor = document.getElementById('contenedor-detalle-consulta-usuario');
