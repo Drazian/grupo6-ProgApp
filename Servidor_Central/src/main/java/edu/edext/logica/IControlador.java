@@ -68,11 +68,11 @@ public interface IControlador {
     //**************************************************************************
     
     void seguirUsuario(String nicknameSeguidor, String nicknameASeguir) throws Exception;
-void dejarDeSeguirUsuario(String nicknameSeguidor, String nicknameADejar) throws Exception;
+    void dejarDeSeguirUsuario(String nicknameSeguidor, String nicknameADejar) throws Exception;
 
-List<String> listarSeguidos(String nickname) throws Exception;
+    List<String> listarSeguidos(String nickname) throws Exception;
 
-List<String> listarSeguidores(String nickname) throws Exception;
+    List<String> listarSeguidores(String nickname) throws Exception;
 
 
     public java.util.List<edu.edext.datatypes.DtInscripcionEdicion> getInscripcionesCompletas(String nombreEdicion) throws Exception;
