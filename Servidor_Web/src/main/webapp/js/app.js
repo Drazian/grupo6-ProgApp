@@ -104,31 +104,31 @@ function initBuscador() {
 }
 
 function verDetallesBusqueda(nombre, tipo){     
-    const tipoNormalizado = (tipo || '').toLowerCase();     
+    const tipoNormalizado = (tipo || '').toLowerCase();
+
+    //**Al ser una parte de una implementacion que no pide la letra procedo a dejarlo todo comentado**
+//    //Si es un usuario, verificamos si es el usuario actual
+//    if (tipoNormalizado === 'docente' || tipoNormalizado === 'estudiante') {
+//        fetch('UsuarioServlet?accion=getLogueado')
+//            .then(response => {
+//                if (!response.ok) throw new Error('Error al obtener usuario logueado');
+//                return response.text();
+//            })
+//            .then(nicknameLogueado => {
+//                const nickLimpioLogueado = (nicknameLogueado || '').trim();
+//                
+//                //Si se selecciona al usuario logueado, se va a cargar el modificar y no a ver el perfil.
+//                if (nickLimpioLogueado !== '' && nombre.toLowerCase() === nickLimpioLogueado.toLowerCase()) {
+//                    cargarModificarUsuario();
+//                }
+//            })
+//            .catch(error => {
+//                console.error("Error:", error);
+//            });
+//    }
     
-    //Si es un usuario, verificamos si es el usuario actual
-    if (tipoNormalizado === 'docente' || tipoNormalizado === 'estudiante') {
-        fetch('UsuarioServlet?accion=getLogueado')
-            .then(response => {
-                if (!response.ok) throw new Error('Error al obtener usuario logueado');
-                return response.text();
-            })
-            .then(nicknameLogueado => {
-                const nickLimpioLogueado = (nicknameLogueado || '').trim();
-                
-                //Si se selecciona al usuario logueado, se va a cargar el modificar y no a ver el perfil.
-                if (nickLimpioLogueado !== '' && nombre.toLowerCase() === nickLimpioLogueado.toLowerCase()) {
-                    cargarModificarUsuario();
-                    return;
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-    }
-        
     //Si no se selecciono el usuario logueado, seguir curso normal
-    switch (tipoNormalizado){
+    switch (tipoNormalizado){     
         case "programa":
             cargarDetallePrograma(nombre);
         break;
@@ -144,7 +144,6 @@ function verDetallesBusqueda(nombre, tipo){
             });
         break;
     }
-
 }
 
 function BuscadorServlet(){
