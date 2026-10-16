@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part; // FIX: Para interceptar el archivo binario
+import jakarta.servlet.http.Part;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -119,6 +119,28 @@ public class CursoServlet extends HttpServlet {
                 }
                 break;
 
+            case "listarInstitutosJSON": 
+                try {
+                    // Obtenemos la lista de institutos desde el controlador
+                    List<edu.edext.datatypes.DtInstituto> listaInst = ic.listarInstitutos();
+                    
+                    // Armamos el JSON manualmente
+                    StringBuilder json = new StringBuilder("[");
+                    for (int i = 0; i < listaInst.size(); i++) {
+                        json.append("\"").append(listaInst.get(i).getNombre()).append("\"");
+                        if (i < listaInst.size() - 1) {
+                            json.append(",");
+                        }
+                    }
+                    json.append("]");
+
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write(json.toString());
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al obtener institutos");
+                }
+                break;
+            
             case "verDetallesCurso": 
                 try {
                     String nombreDelCurso = request.getParameter("nombreCurso");
@@ -200,9 +222,9 @@ public class CursoServlet extends HttpServlet {
                     // 3. Generar la fecha actual del sistema
                     Date fechaRegistro = new Date(); 
 
-                    // --- FIX IMAGEN: 4. Capturar y guardar la imagen del curso ---
-                    String nombreImagen = "usr.png"; // Imagen genérica por defecto
-                    Part filePart = request.getPart("imagen"); // Asegúrate de que el input en tu JSP se llame name="imagen"
+                    // 4. Capturar y guardar la imagen del curso
+                    String nombreImagen = "usr.png"; 
+                    Part filePart = request.getPart("imagen"); 
                     
                     if (filePart != null && filePart.getSize() > 0) {
                         byte[] imgBytes = filePart.getInputStream().readAllBytes();
@@ -216,8 +238,6 @@ public class CursoServlet extends HttpServlet {
                     }
 
                     // 5. Armar el Datatype
-                    // ATENCIÓN: Se añadió 'nombreImagen' al final del constructor.
-                    // Recuerda agregarlo también en DtCurso.java y Curso.java (como hicimos con DtEdicion)
                     DtCurso dtCurso = new DtCurso(
                             nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
                             fechaRegistro, new DtInstituto(nombreInstituto), null, categorias, previas, nombreImagen

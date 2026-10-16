@@ -1523,3 +1523,257 @@ function cargarMiPerfil(nickname) {
             contenedorPrincipal.innerHTML = `<p style="color:red; text-align:center; padding:20px;">${error.message}</p>`;
         });
 }
+
+function cargarFormListarAceptados() {
+    fetch('InscripcionServlet?accion=formularioAceptados')
+        .then(response => {
+            if (!response.ok) throw new Error("Acceso denegado. Función exclusiva para Docentes.");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
+        });
+}
+
+function cargarCursosParaAceptados(nombreInstituto) {
+    const selectCurso = document.getElementById('cursoAceptados');
+    const selectEdicion = document.getElementById('edicionAceptados');
+    const tablaContenedor = document.getElementById('contenedor-tabla-aceptados');
+
+    selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
+    selectEdicion.disabled = true;
+    tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione un Instituto, un Curso y una Edición para visualizar sus datos básicos y los estudiantes aceptados.</p>';
+
+    if (!nombreInstituto) {
+        selectCurso.innerHTML = '<option value="">Primero seleccione un instituto</option>';
+        selectCurso.disabled = true;
+        return;
+    }
+
+    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${encodeURIComponent(nombreInstituto)}`)
+        .then(response => response.json())
+        .then(cursos => {
+            selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
+            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            selectCurso.disabled = false;
+        })
+        .catch(error => console.error("Error al cargar cursos:", error));
+}
+
+function cargarEdicionesParaAceptados(nombreCurso) {
+    const selectEdicion = document.getElementById('edicionAceptados');
+    const tablaContenedor = document.getElementById('contenedor-tabla-aceptados');
+
+    tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione un Instituto, un Curso y una Edición para visualizar sus datos básicos y los estudiantes aceptados.</p>';
+
+    if (!nombreCurso) {
+        selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
+        selectEdicion.disabled = true;
+        return;
+    }
+
+    fetch(`InscripcionServlet?accion=listarEdiciones&curso=${encodeURIComponent(nombreCurso)}`)
+        .then(response => response.json())
+        .then(ediciones => {
+            if (ediciones.length === 0) {
+                selectEdicion.innerHTML = '<option value="">No hay ediciones disponibles</option>';
+                selectEdicion.disabled = true;
+            } else {
+                selectEdicion.innerHTML = '<option value="">Seleccione la Edición...</option>';
+                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
+                selectEdicion.disabled = false;
+            }
+        })
+        .catch(error => console.error("Error al cargar ediciones:", error));
+}
+
+function cargarTablaAceptados(nombreEdicion) {
+    const tablaContenedor = document.getElementById('contenedor-tabla-aceptados');
+
+    if (!nombreEdicion) {
+        tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione un Instituto, un Curso y una Edición para visualizar sus datos básicos y los estudiantes aceptados.</p>';
+        return;
+    }
+
+    tablaContenedor.innerHTML = '<h4 style="text-align:center; color: #27ae60;">Cargando datos de la edición y estudiantes aceptados...</h4>';
+
+    fetch(`InscripcionServlet?accion=listarAceptados&edicion=${encodeURIComponent(nombreEdicion)}`)
+        .then(response => {
+            if (!response.ok) throw new Error("No se pudieron obtener los datos.");
+            return response.text();
+        })
+        .then(html => {
+            tablaContenedor.innerHTML = html;
+        })
+        .catch(error => {
+            tablaContenedor.innerHTML = `<p style="color:red; text-align:center;">Error al cargar los estudiantes aceptados.</p>`;
+        });
+}
+
+function cargarResultadosInscripciones() {
+    fetch('InscripcionServlet?accion=misResultados')
+        .then(response => {
+            if (!response.ok) throw new Error("Acceso denegado. Función exclusiva para Estudiantes.");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
+        });
+}
+
+function filtrarMisInscripciones(estadoSeleccionado) {
+    const filas = document.querySelectorAll('#tablaMisInscripcionesBody tr.fila-mi-inscripcion');
+    filas.forEach(fila => {
+        const estadoFila = fila.getAttribute('data-estado');
+        if (estadoSeleccionado === 'TODOS' || estadoFila === estadoSeleccionado) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+}
+
+// 1. Selector para Consulta de Curso
+function cargarSelectorConsultaCurso() {
+    // Reutilizamos el endpoint de institutos que ya tienes en tus Servlets
+    fetch('EdicionServlet?accion=formularioAltaEdicion') 
+        .then(response => response.text())
+        .then(html => {
+            // Inyectamos un HTML temporal con los combos en cascada
+            const htmlBuscador = `
+                <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px;">
+                    <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Consultar Curso</h2>
+                    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                        <div style="flex: 1;">
+                            <label style="font-weight: bold;">Instituto:</label>
+                            <select id="instBuscadorCurso" onchange="cargarCursosParaBuscador(this.value)" style="width: 100%; padding: 8px;">
+                                <option value="">Seleccione Instituto...</option>
+                                <!-- Aquí deberías cargar los institutos dinámicamente o usar el JS existente -->
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-weight: bold;">Curso:</label>
+                            <select id="cursoBuscadorFinal" onchange="verDetallesCurso(this.value)" disabled style="width: 100%; padding: 8px;">
+                                <option value="">Primero seleccione un instituto</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('contenido-dinamico').innerHTML = htmlBuscador;
+            // Ejecuta una función que ya tienes para rellenar los institutos
+            cargarInstitutosGenericos('instBuscadorCurso'); 
+        })
+        .catch(err => console.error("Error cargando buscador de curso:", err));
+}
+
+// 2. Selector para Consulta de Edición
+function cargarSelectorConsultaEdicion() {
+    const htmlBuscador = `
+        <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px;">
+            <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Consultar Edición de Curso</h2>
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="font-weight: bold;">Instituto:</label>
+                    <select id="instBuscadorEd" onchange="cargarCursosParaBuscadorEdicion(this.value)" style="width: 100%; padding: 8px;">
+                        <option value="">Seleccione Instituto...</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-weight: bold;">Curso:</label>
+                    <select id="cursoBuscadorEd" onchange="cargarEdicionesParaBuscadorEdicion(this.value)" disabled style="width: 100%; padding: 8px;">
+                        <option value="">Primero seleccione instituto</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-weight: bold;">Edición:</label>
+                    <select id="edicionBuscadorFinal" onchange="cargarConsultaEdicion(this.value)" disabled style="width: 100%; padding: 8px;">
+                        <option value="">Primero seleccione curso</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('contenido-dinamico').innerHTML = htmlBuscador;
+    cargarInstitutosGenericos('instBuscadorEd');
+}
+
+// Helpers genéricos de AJAX
+function cargarInstitutosGenericos(selectId) {
+    fetch('UsuarioServlet?accion=listarInstitutosJSON') // Ajusta este endpoint si tienes otro que devuelva JSON de Institutos
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById(selectId);
+            data.forEach(inst => select.innerHTML += `<option value="${inst}">${inst}</option>`);
+        });
+}
+
+function cargarCursosParaBuscador(instituto) {
+    const selectCurso = document.getElementById('cursoBuscadorFinal');
+    selectCurso.innerHTML = '<option value="">Seleccione Curso...</option>';
+    selectCurso.disabled = true;
+    if(!instituto) return;
+    
+    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${encodeURIComponent(instituto)}`)
+        .then(res => res.json())
+        .then(cursos => {
+            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            selectCurso.disabled = false;
+        });
+}
+
+function cargarCursosParaBuscadorEdicion(instituto) {
+    const selectCurso = document.getElementById('cursoBuscadorEd');
+    document.getElementById('edicionBuscadorFinal').innerHTML = '<option value="">Primero seleccione curso</option>';
+    document.getElementById('edicionBuscadorFinal').disabled = true;
+    selectCurso.innerHTML = '<option value="">Seleccione Curso...</option>';
+    selectCurso.disabled = true;
+    
+    if(!instituto) return;
+    
+    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${encodeURIComponent(instituto)}`)
+        .then(res => res.json())
+        .then(cursos => {
+            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            selectCurso.disabled = false;
+        });
+}
+
+function cargarEdicionesParaBuscadorEdicion(curso) {
+    const selectEdicion = document.getElementById('edicionBuscadorFinal');
+    selectEdicion.innerHTML = '<option value="">Seleccione Edición...</option>';
+    selectEdicion.disabled = true;
+    
+    if(!curso) return;
+
+    fetch(`InscripcionServlet?accion=listarEdiciones&curso=${encodeURIComponent(curso)}`)
+        .then(res => res.json())
+        .then(ediciones => {
+            ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
+            selectEdicion.disabled = false;
+        });
+}
+
+function cargarInstitutosGenericos(selectId) {
+    // Apuntamos al endpoint que acabamos de crear en el CursoServlet
+    fetch('CursoServlet?accion=listarInstitutosJSON')
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById(selectId);
+            if (select) {
+                // Mantenemos la opción por defecto y agregamos los institutos
+                data.forEach(inst => select.innerHTML += `<option value="${inst}">${inst}</option>`);
+            }
+        })
+        .catch(err => {
+            console.error("Error cargando institutos:", err);
+            const select = document.getElementById(selectId);
+            if (select) select.innerHTML = '<option value="">Error cargando institutos</option>';
+        });
+}
