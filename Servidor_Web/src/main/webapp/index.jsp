@@ -28,7 +28,7 @@
                         <!-- Foto de perfil servida dinámicamente desde ImagenServlet -->
                         <img src="ImagenServlet?nombre=${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
                              alt="Foto de perfil" 
-                             onclick="cargarMiPerfil('${sessionScope.usuarioLogueado.nickname}');return false;"
+                             onclick="event.preventDefault(); cargarMiPerfil('${sessionScope.usuarioLogueado.nickname}');"
                              style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
 
                         <span style="font-weight: bold;">
