@@ -173,6 +173,7 @@ public class UsuarioServlet extends HttpServlet {
                             List<DtEdicion> edicionesDocente = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
                             request.setAttribute("listaEdicionesDocente", edicionesDocente);
                         }
+                        
 
                         List<DtPrograma> programasUsuario = ic.listarProgramasPorUsuario(dtUsuario.getNickname());
                         request.setAttribute("listaProgramas", programasUsuario);

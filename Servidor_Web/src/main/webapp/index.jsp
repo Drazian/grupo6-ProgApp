@@ -29,7 +29,7 @@
                         <img src="ImagenServlet?nombre=${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
                              alt="Foto de perfil" 
                              onclick="event.preventDefault(); cargarMiPerfil('${sessionScope.usuarioLogueado.nickname}');"
-                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
+                             style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;cursor: pointer;">
 
                         <span style="font-weight: bold;">
                             Hola, ${sessionScope.usuarioLogueado.nombre} ${sessionScope.usuarioLogueado.apellido}
