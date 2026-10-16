@@ -1285,4 +1285,13 @@ public List<DtPrograma> listarProgramas() throws Exception {
         }
     }
 
+    @Override
+    public java.util.List<edu.edext.datatypes.DtInscripcionEdicion> getInscripcionesDeEstudiante(String nicknameEstudiante) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nicknameEstudiante);
+        try {
+            return helper.getInscripcionesDeEstudiante();
+        } finally {
+            helper.kill();
+        }
+    }
 }

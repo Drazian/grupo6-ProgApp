@@ -72,6 +72,7 @@
                             <li><a href="#" onclick="cargarAltaCurso()">Alta Curso</a></li>
                             <li><a href="#" onclick="cargarAltaEdicion()">Alta Edición de Curso</a></li>
                             <li><a href="#" onclick="cargarFormSeleccionEstudiantes()">Evaluar Inscripciones</a></li>
+                            <li><a href="#" onclick="cargarFormListarAceptados()">Listar Aceptados a Edición</a></li>
                         </ul>                      
                     </details>
                     <hr style="opacity: 0.2; margin: 10px 0;">
@@ -88,16 +89,16 @@
                     
                 </c:if>
                 
-                <!-- ESTUDIANTES -->
+                <!-- Grupo: Estudiantes (Restringido a Estudiantes) -->
                 <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'ESTUDIANTE'}">
                     <details>
                         <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Inscripciones</summary>
                         <ul style="list-style: none; padding-left: 15px;">
                             <li><a href="#" onclick="cargarFormInscripcion()">Inscripción a Edición</a></li>
+                            <li><a href="#" onclick="cargarResultadosInscripciones()">Ver Resultados</a></li>
                         </ul>
                     </details>
                     <hr style="opacity: 0.2; margin: 10px 0;">
-
                 </c:if>
                 
                 <!-- Consultas varias -->
@@ -106,7 +107,16 @@
                     <ul style="list-style: none; padding-left: 15px; margin: 5px 0 0 0;">
                         <li style="margin-bottom: 5px;">
                             <a href="#" onclick="event.preventDefault(); cargarConsultaUsuario();">Ver información de usuarios</a>
-                            <li><a href="#" onclick="ProgramaServlet('formVerProgramas')">Ver Programas</a></li>
+                        </li>
+                        <!-- NUEVOS ENLACES DE CONSULTA AGREGADOS AQUÍ -->
+                        <li style="margin-bottom: 5px;">
+                            <a href="#" onclick="cargarSelectorConsultaCurso(); return false;">Consulta de Curso</a>
+                        </li>
+                        <li style="margin-bottom: 5px;">
+                            <a href="#" onclick="cargarSelectorConsultaEdicion(); return false;">Consulta de Edición de Curso</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="ProgramaServlet('formVerProgramas')">Ver Programas</a>
                         </li>
                     </ul>
                 </details>

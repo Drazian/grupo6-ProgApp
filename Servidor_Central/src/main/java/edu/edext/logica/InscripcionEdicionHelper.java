@@ -225,4 +225,38 @@ public class InscripcionEdicionHelper {
             db = null;
         }
     }
+    
+    public List<DtInscripcionEdicion> getInscripcionesDeEstudiante() {
+        db = DB.createEntityManager();
+        List<DtInscripcionEdicion> ret = new ArrayList<>();
+        try {
+            List<InscripcionEdicion> inscripciones = db.createQuery(
+                "SELECT i FROM InscripcionEdicion i WHERE i.estudiante.nickname = :nickname ORDER BY i.fechaInscripcion DESC",
+                InscripcionEdicion.class)
+                .setParameter("nickname", this.nombre)
+                .getResultList();
+
+            for (InscripcionEdicion i : inscripciones) {
+                Estudiante e = i.getEstudiante();
+                DtUsuario dtEst = new DtUsuario(e.getNickname(), e.getPassword(), e.getEmail(), e.getNombre(), e.getApellido(), e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
+
+                Edicion ed = i.getEdicion();
+                String imgCurso = (ed.getCurso() != null && ed.getCurso().getImagen() != null && !ed.getCurso().getImagen().isEmpty()) 
+                        ? ed.getCurso().getImagen() : "usr.png";
+                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), null, null, 0, 0, null, null, null, null, imgCurso);
+
+                String imgEdicion = (ed.getImagen() != null && !ed.getImagen().isEmpty()) 
+                        ? ed.getImagen() : "usr.png";
+                DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, imgEdicion);
+
+                ret.add(new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0));
+            }
+        } catch (Exception e) {
+            Logger.error("Error al obtener inscripciones del estudiante " + this.nombre + ": " + e.getMessage());
+        } finally {
+            if (db != null && db.isOpen()) db.close();
+            db = null;
+        }
+        return ret;
+    }
 }
