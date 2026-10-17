@@ -8,6 +8,7 @@ import edu.edext.datatypes.DtCategoria;
 import edu.edext.datatypes.DtConsultaCurso;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtEdicion;
+import edu.edext.datatypes.DtInscripcionEdicion;
 import edu.edext.datatypes.DtInstituto;
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
@@ -645,10 +646,7 @@ public class ControladorTest {
         List <String> resultado = ic.getEstudiantesCandidatosEdicion(nombre);
         assertNotNull(resultado, "La lista no debe ser nula");
     }
-    
-    
-    //Test restantes
-    
+       
     @Test
     public void testSetInscripcion() throws Exception {
         String estudiante = "roro";
@@ -721,6 +719,146 @@ public class ControladorTest {
         Exception excepcion = assertThrows(Exception.class, () -> {ic.crearCategoria(nombreCategoria);}, "Ya existe");
         assertNotNull(excepcion.getMessage());
     }
+    
+    @Test
+    public void testCrearProgramaWeb() throws Exception {
+        String nombre = "CREACION-WEB";
+        DtPrograma aux = new DtPrograma(nombre, "descripcion", LocalDate.now(), LocalDate.now(), LocalDate.now(), null, "imagen.png");
+        ic.setCrearProgramaFormacion(aux, null, "imagen.png");
+        
+        List<DtPrograma> programas = ic.listarProgramas();
+        assertNotNull(programas, "La lista de programas no debe ser nula");
+        
+        boolean existeEnLista = programas.stream().anyMatch(i -> i.getNombre().equals(nombre));
+        assertTrue(existeEnLista, "El programa creado deberia estar en la lista");
+        
+    }
+       
+    @Test
+    public void testCrearUsuarioWeb() throws Exception{
+        String nickname = "CREACION-WEB";
+        List<String> institutos = new ArrayList<>();
+        Date fecha = new Date();
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email@web", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        ic.crearUsuario(usuario, null, "imagen.png");
+        
+        List<DtUsuario> usuarios = ic.listarUsuarios();
+        assertNotNull(usuarios, "La lista de usuarios no debe ser nula");
+        
+        boolean existeEnLista = usuarios.stream().anyMatch(i -> i.getNickname().equals(nickname));
+        
+        assertTrue(existeEnLista, "El usuario creado deberia estar en la lista");
+    }
+    
+    @Test
+    public void testSeguirUsuario() throws Exception {
+        String usuario1 = "adri"; //+1 nuevo seguido.
+        String usuario2 = "roro"; //+1 nuevo seguidor.
+        
+        ic.seguirUsuario(usuario1, usuario2);
+        
+        List<String> u1_seguidos= ic.listarSeguidos(usuario1);
+        assertNotNull(u1_seguidos, "La lista de usuarios no debe ser nula");
+        List<String> u2_seguidores = ic.listarSeguidores(usuario2);
+        assertNotNull(u2_seguidores, "La lista de usuarios no debe ser nula");
+        
+        boolean existeEnLista1 = u1_seguidos.stream().anyMatch(i -> i.equals(usuario2));
+        boolean existeEnLista2 = u2_seguidores.stream().anyMatch(i -> i.equals(usuario1));
+
+        assertAll("Validar relación de seguimiento mutua",
+            () -> assertTrue(existeEnLista1, "El usuario 2 debería estar en la lista de seguidos del usuario 1"),
+            () -> assertTrue(existeEnLista2, "El usuario 1 debería estar en la lista de seguidores del usuario 2")
+        );
+    }
+    
+    @Test
+    public void testSeguirUsuarioInexistente() throws Exception {
+        String usuario1 = "adri"; //+1 nuevo seguido.
+        String usuario2 = "USUARIO-INEXISTENTE"; //+1 nuevo seguidor.
+               
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.seguirUsuario(usuario1, usuario2);}, "Usuario inexistente");        
+        assertNotNull(excepcion.getMessage());
+
+    }
+    
+    @Test
+    public void testSeguirUsuarioNarcisista() throws Exception {
+        String usuario1 = "adri";
+    
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.seguirUsuario(usuario1, usuario1);}, "No puedes autoseguirte");        
+        assertNotNull(excepcion.getMessage());
+
+    }
+    
+    @Test
+    public void dejarSeguirUsuario() throws Exception {
+        String usuario1 = "house"; //-1 nuevo seguido.
+        String usuario2 = "phils"; //-1 nuevo seguidor.
+        
+        ic.seguirUsuario(usuario1, usuario2);
+        
+        List<String> u1_seguidosInicio= ic.listarSeguidos(usuario1);
+        assertNotNull(u1_seguidosInicio, "La lista de usuarios no debe ser nula");
+        List<String> u2_seguidoresInicio = ic.listarSeguidores(usuario2);
+        assertNotNull(u2_seguidoresInicio, "La lista de usuarios no debe ser nula");
+
+        ic.dejarDeSeguirUsuario(usuario1, usuario2);
+
+        List<String> u1_seguidosFin= ic.listarSeguidos(usuario1);
+        assertNotNull(u1_seguidosFin, "La lista de usuarios no debe ser nula");
+        List<String> u2_seguidoresFin = ic.listarSeguidores(usuario2);
+        assertNotNull(u2_seguidoresFin, "La lista de usuarios no debe ser nula");    
+        
+        boolean existeEnLista1 = u1_seguidosFin.stream().anyMatch(i -> i.equals(usuario2));
+        boolean existeEnLista2 = u2_seguidoresFin.stream().anyMatch(i -> i.equals(usuario1));
+        
+        assertAll("Validar relación de seguimiento mutua",
+            () -> assertFalse(existeEnLista1, "El usuario 2 no debería estar en la lista de seguidos del usuario 1"),
+            () -> assertFalse(existeEnLista2, "El usuario 1 no debería estar en la lista de seguidores del usuario 2")
+        );
+    }
+
+    @Test
+    public void testDejarSeguirUsuarioInexistente() throws Exception {
+        String usuario1 = "adri"; //+1 nuevo seguido.
+        String usuario2 = "USUARIO-INEXISTENTE"; //+1 nuevo seguidor.
+               
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.dejarDeSeguirUsuario(usuario1, usuario2);}, "Usuario inexistente");        
+        assertNotNull(excepcion.getMessage());
+    }
+
+    @Test
+    public void testListarCursoPorCategoriaInexistente() throws Exception {
+        String aux = "CATEGORIA-INEXISTENTE";
+        
+        List<String> lista = ic.listarCursosPorCategoria(aux);     
+        
+        assertNotNull(lista, "La lista retornada no debe ser nula");
+        assertTrue(lista.isEmpty(), "La lista de cursos debe estar vacía para una categoría inexistente");
+    }
+    
+    @Test
+    public void testGetInscripcionesCompletas() throws Exception{
+        String edicion = "Dalavuelta - 2025";
+        
+        List<DtInscripcionEdicion> lista = ic.getInscripcionesCompletas(edicion);
+        
+        assertNotNull(lista, "La lista retornada no debe ser nula");
+        assertFalse(lista.isEmpty(), "La lista no debe estar vacía");
+    }
+    
+    @Test
+    public void testGetInscripcionesDeEstudiante() throws Exception{
+        String estudiante = "roro";
+        
+        List<DtInscripcionEdicion> lista = ic.getInscripcionesDeEstudiante(estudiante);
+        
+        assertNotNull(lista, "La lista retornada no debe ser nula");
+        assertFalse(lista.isEmpty(), "La lista no debe estar vacía");
+        
+    }
+    
+    
     
     
     
