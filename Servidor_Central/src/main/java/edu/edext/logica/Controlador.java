@@ -1294,4 +1294,41 @@ public List<DtPrograma> listarProgramas() throws Exception {
             helper.kill();
         }
     }
+    
+    @Override
+    public int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Estudiante est = em.find(Estudiante.class, nomEstudiante);
+            ProgramaFormacion prog = em.find(ProgramaFormacion.class, nomPrograma);
+
+            if (est == null || prog == null) {
+                throw new Exception("El estudiante o el programa no existen.");
+            }
+
+            List<InscripcionPrograma> existentes = em.createQuery(
+                "SELECT ip FROM InscripcionPrograma ip WHERE ip.estudiante.nickname = :est AND ip.programa.nombre = :prog",
+                InscripcionPrograma.class)
+                .setParameter("est", nomEstudiante)
+                .setParameter("prog", nomPrograma)
+                .getResultList();
+
+            if (!existentes.isEmpty()) {
+                return 1;
+            }
+
+            InscripcionPrograma nuevaInscripcion = new InscripcionPrograma(est, prog, java.time.LocalDate.now(), 1);
+            em.persist(nuevaInscripcion);
+
+            em.getTransaction().commit();
+            return 0;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 }

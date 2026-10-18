@@ -1,6 +1,7 @@
 package edu.edext.controlador;
 
 import edu.edext.datatypes.DtEdicion;
+import edu.edext.datatypes.DtInscripcionEdicion;
 import edu.edext.datatypes.DtInstituto;
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
@@ -167,13 +168,13 @@ public class UsuarioServlet extends HttpServlet {
                         }
 
                         if (dtUsuario.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
-                            List<DtEdicion> edicionesEstudiante = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
-                            request.setAttribute("listaInscripciones", edicionesEstudiante);
+                            // Usamos el método que trae el objeto DtInscripcionEdicion completo
+                            List<DtInscripcionEdicion> inscripcionesEstudiante = ic.getInscripcionesDeEstudiante(dtUsuario.getNickname());
+                            request.setAttribute("listaInscripcionesCompletas", inscripcionesEstudiante);
                         } else if (dtUsuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
                             List<DtEdicion> edicionesDocente = ic.listarEdicionesPorUsuario(dtUsuario.getNickname());
                             request.setAttribute("listaEdicionesDocente", edicionesDocente);
                         }
-                        
 
                         List<DtPrograma> programasUsuario = ic.listarProgramasPorUsuario(dtUsuario.getNickname());
                         request.setAttribute("listaProgramas", programasUsuario);
@@ -188,8 +189,7 @@ public class UsuarioServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Error al cargar detalle: " + e.getMessage());
                 }
-            } // Se agregó la llave faltante aquí
-
+            }
         } else if ("getLogueado".equals(accion)) {
             HttpSession session = request.getSession(false);
             DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;

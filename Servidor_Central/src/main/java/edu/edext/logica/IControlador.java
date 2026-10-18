@@ -56,6 +56,7 @@ public interface IControlador {
     DtPrograma buscarPrograma(String nombre) throws Exception;
     List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception;
     List<DtPrograma> listarProgramas() throws Exception;
+    int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception;
     
     
     //*********************** Revisar contribucion de Diego*********************    

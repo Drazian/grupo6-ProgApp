@@ -1777,3 +1777,52 @@ function cargarInstitutosGenericos(selectId) {
             if (select) select.innerHTML = '<option value="">Error cargando institutos</option>';
         });
 }
+
+//#######################################
+//Inscripción a programa
+//#######################################
+
+function cargarFormInscripcionPrograma() {
+    fetch('ProgramaServlet?accion=formInscripcionPrograma')
+        .then(response => {
+            if (!response.ok) throw new Error("Acceso denegado. Función exclusiva para Estudiantes.");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center; padding: 20px;'>${error.message}</h3>`;
+        });
+}
+
+function inscribirPrograma(event) {
+    event.preventDefault();
+    const msgDiv = document.getElementById('mensaje-inscripcion-prog');
+    const form = document.getElementById('formInscripcionPrograma');
+    const datos = new URLSearchParams(new FormData(form));
+    datos.append('accion', 'inscribirPrograma');
+
+    fetch('ProgramaServlet', {
+        method: 'POST',
+        body: datos
+    })
+    .then(response => {
+        return response.text().then(msg => {
+            msgDiv.style.display = 'block';
+            if (response.ok) {
+                msgDiv.style.backgroundColor = '#dff0d8';
+                msgDiv.style.color = '#3c763d';
+                msgDiv.style.border = '1px solid #d6e9c6';
+                msgDiv.innerHTML = "✔ " + msg;
+                form.reset();
+            } else {
+                msgDiv.style.backgroundColor = '#f2dede';
+                msgDiv.style.color = '#a94442';
+                msgDiv.style.border = '1px solid #ebccd1';
+                msgDiv.innerHTML = "<strong>Atención:</strong> " + msg;
+            }
+        });
+    })
+    .catch(error => console.error('Error procesando inscripción a programa:', error));
+}
