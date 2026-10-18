@@ -95,6 +95,7 @@
                         <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Inscripciones</summary>
                         <ul style="list-style: none; padding-left: 15px;">
                             <li><a href="#" onclick="cargarFormInscripcion()">Inscripción a Edición</a></li>
+                            <li><a href="#" onclick="cargarFormInscripcionPrograma(); return false;">Inscripción a Programa de Formación</a></li>
                             <li><a href="#" onclick="cargarResultadosInscripciones()">Ver Resultados</a></li>
                         </ul>
                     </details>

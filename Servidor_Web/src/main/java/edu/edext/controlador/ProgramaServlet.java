@@ -2,6 +2,8 @@ package edu.edext.controlador;
 
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtPrograma;
+import edu.edext.datatypes.DtUsuario;
+import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -76,7 +79,25 @@ public class ProgramaServlet extends HttpServlet {
                 }
             break;
             
-            
+            case "formInscripcionPrograma": {
+                HttpSession session = request.getSession(false);
+                DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+
+                if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso exclusivo para Estudiantes.");
+                    return;
+                }
+
+                try {
+                    List<DtPrograma> programas = ic.listarProgramas();
+                    request.setAttribute("listaProgramas", programas);
+                    request.getRequestDispatcher("fragmentos/inscripcionPrograma.jsp").forward(request, response);
+                } catch (Exception e) {
+                    request.setAttribute("error", e.getMessage());
+                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                }
+                break;
+            }
             
             default:
                 request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
@@ -169,6 +190,39 @@ public class ProgramaServlet extends HttpServlet {
                 }                
 
             break;
+            case "inscribirPrograma": {
+                HttpSession session = request.getSession(false);
+                DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+
+                if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("La sesión expiró o no tienes permisos de Estudiante.");
+                    return;
+                }
+
+                String nombrePrograma = request.getParameter("programa");
+                if (nombrePrograma == null || nombrePrograma.trim().isEmpty()) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("Debe seleccionar un programa de formación.");
+                    return;
+                }
+
+                try {
+                    int res = ic.setInscripcionPrograma(logueado.getNickname(), nombrePrograma.trim());
+
+                    if (res == 0) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.getWriter().write("¡Inscripción al Programa de Formación realizada con éxito!");
+                    } else if (res == 1) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.getWriter().write("Atención: Ya te encuentras inscripto a este programa de formación.");
+                    }
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("Error al procesar la inscripción: " + e.getMessage());
+                }
+                break;
+            }
             
             default:
                 request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
