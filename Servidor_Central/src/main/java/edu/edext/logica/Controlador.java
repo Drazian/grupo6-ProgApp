@@ -163,7 +163,7 @@ public class Controlador implements IControlador {
                     "Ya existe un usuario con el Email '" 
                     + usuario.getEmail() + "'.");
             }
-            String password=Utils.Crypt.encodeBCrypt(Utils.Crypt.descifrarAES(usuario.getPassword()));
+            String password=Utils.Crypt.cifrarAES(usuario.getPassword());
             Usuario nuevoUsuario;
             if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
                 List<Instituto> institutos = new ArrayList<>();
@@ -1019,7 +1019,7 @@ public List<DtPrograma> listarProgramas() throws Exception {
             usuarioModificado.setfNacimiento(usuario.getfNacimiento());
 
             if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
-                String hashPassword = edu.edext.tools.Utils.Crypt.encodeBCrypt(usuario.getPassword().trim());
+                String hashPassword = edu.edext.tools.Utils.Crypt.cifrarAES(usuario.getPassword().trim());
                 usuarioModificado.setPassword(hashPassword);
             }
 
