@@ -1,13 +1,12 @@
 package edu.edext.logica;
 //**************************** Capa Logica *************************************
+import edu.edext.tools.Utils;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import org.tinylog.Logger;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -16,9 +15,14 @@ import java.util.Set;
 public class cargarDatosDePruebaHelper {
     private final EntityManagerFactory emf;
     private EntityManager em;
+    public final int NOINSCRIPTO=0;
+    public final int INSCRIPTO= 1;
+    public final int RECHAZADO=3;
+    public final int ACEPTADO=2;
     
     public cargarDatosDePruebaHelper(EntityManagerFactory emf){
         this.emf=emf;
+        this.em=this.emf.createEntityManager();
     }
     
     public int cargar(){
@@ -42,7 +46,7 @@ public class cargarDatosDePruebaHelper {
     //**************************************************************************
     private void cargarDatosDePrueba() throws Exception {
 
-        EntityManager em = emf.createEntityManager();
+        //EntityManager em = emf.createEntityManager(); 
 
         try {
 
@@ -55,10 +59,11 @@ public class cargarDatosDePruebaHelper {
              */
 
             if (em.find(Instituto.class, "IN") != null
+                    || em.find(Categoria.class,"Social")!=null
                     || em.find(Usuario.class, "eleven11") != null
                     || em.find(Curso.class, "Talleres plenarios") != null
                     || em.find(Edicion.class, "Flor del Ceibo - 2010") != null
-                    || em.find(ProgramaFormacion.class, "EFI Ingeniería Mecánica") != null) {
+                    || em.find(ProgramaFormacion.class, "EFI Ingeniería Mecánica") != null ) {
 
                 throw new Exception("Los datos de prueba ya fueron cargados.");
             }
@@ -84,7 +89,23 @@ public class cargarDatosDePruebaHelper {
             em.persist(ie);
             em.persist(di);
 
+            
+            // ***********************************************************
+            // 9. CATEGORIAS
+            // ***********************************************************
+            
+            Categoria t1=new Categoria("Social");
+            Categoria t2=new Categoria("Industrial");
+            Categoria t3=new Categoria("Educativo");
+            Categoria t4=new Categoria("Interdisciplinar");
 
+
+            em.persist(t1);
+            em.persist(t2);
+            em.persist(t3);
+            em.persist(t4);
+            
+            
             /*
              * ============================================================
              * 2. USUARIOS
@@ -93,13 +114,13 @@ public class cargarDatosDePruebaHelper {
              * ============================================================
              */
 
-            String imagen = "usr.png";
+            String imagen = "usr.png", password=Utils.Crypt.encodeBCrypt("1234");
 
             // ---------------- ESTUDIANTES ----------------
 
-            Estudiante eleven11 = new Estudiante(
+            Estudiante EL = new Estudiante(
                     "eleven11",
-                    "pass",
+                    password,
                     "eleven11@gmail.com",
                     "Eleven",
                     "Twelve",
@@ -107,9 +128,9 @@ public class cargarDatosDePruebaHelper {
                     imagen
             );
 
-            Estudiante costas = new Estudiante(
+            Estudiante CO = new Estudiante(
                     "costas",
-                    "pass",
+                    password,
                     "gcostas@gmail.com",
                     "Gerardo",
                     "Costas",
@@ -117,39 +138,40 @@ public class cargarDatosDePruebaHelper {
                     imagen
             );
 
-            Estudiante roro = new Estudiante(
+            Estudiante RO = new Estudiante(
                     "roro",
-                    "pass",
+                    password,
                     "rcotelo@yahoo.com",
                     "Rodrigo",
                     "Cotelo",
                     java.sql.Date.valueOf(LocalDate.of(1975, 8, 2)),
-                    imagen
+                    "roro.jpeg"
             );
+            
 
-            Estudiante chechi = new Estudiante(
+            Estudiante CH = new Estudiante(
                     "chechi",
-                    "pass",
+                    password,
                     "cgarrido@hotmail.com",
                     "Cecilia",
                     "Garrido",
                     java.sql.Date.valueOf(LocalDate.of(1987, 9, 12)),
-                    imagen
+                    "chechi.jpeg"
             );
 
-            Estudiante jeffw = new Estudiante(
+            Estudiante JW = new Estudiante(
                     "jeffw",
-                    "pass",
+                    password,
                     "jwilliams@gmail.com",
                     "Jeff",
                     "Williams",
                     java.sql.Date.valueOf(LocalDate.of(1964, 11, 27)),
-                    imagen
+                    "jeffw.jpeg"
             );
 
-            Estudiante weiss = new Estudiante(
+            Estudiante WE = new Estudiante(
                     "weiss",
-                    "pass",
+                    password,
                     "aweiss@hotmail.com",
                     "Adrian",
                     "Weiss",
@@ -157,27 +179,20 @@ public class cargarDatosDePruebaHelper {
                     imagen
             );
 
-            em.persist(eleven11);
-            em.persist(costas);
-            em.persist(roro);
-            em.persist(chechi);
-            em.persist(jeffw);
-            em.persist(weiss);
-
-
+            
             // ---------------- DOCENTES ----------------
 
             List<Instituto> institutosWalter = new ArrayList<>();
             institutosWalter.add(in);
 
-            Docente heisenberg = new Docente(
+            Docente WW = new Docente(
                     "heisenberg",
-                    "pass",
+                    password,
                     "heisenberg@gmail.com",
                     "Walter",
                     "White",
                     java.sql.Date.valueOf(LocalDate.of(1956, 3, 7)),
-                    imagen,
+                    "heisenberg.png",
                     institutosWalter
             );
 
@@ -185,14 +200,14 @@ public class cargarDatosDePruebaHelper {
             List<Instituto> institutosObi = new ArrayList<>();
             institutosObi.add(in);
 
-            Docente benkenobi = new Docente(
+            Docente OK = new Docente(
                     "benkenobi",
-                    "pass",
+                    password,
                     "benKenobi@gmail.com",
                     "Obi-Wan",
                     "Kenobi",
                     java.sql.Date.valueOf(LocalDate.of(1914, 4, 2)),
-                    imagen,
+                    "benkenobi.jpg",
                     institutosObi
             );
 
@@ -200,14 +215,14 @@ public class cargarDatosDePruebaHelper {
             List<Instituto> institutosEmma = new ArrayList<>();
             institutosEmma.add(in);
 
-            Docente waston = new Docente(
+            Docente EW = new Docente(
                     "waston",
-                    "pass",
+                    password,
                     "e.watson@gmail.com",
                     "Emma",
                     "Watson",
                     java.sql.Date.valueOf(LocalDate.of(1990, 4, 15)),
-                    imagen,
+                    "waston.jpg",
                     institutosEmma
             );
 
@@ -215,14 +230,14 @@ public class cargarDatosDePruebaHelper {
             List<Instituto> institutosHouse = new ArrayList<>();
             institutosHouse.add(ie);
 
-            Docente house = new Docente(
+            Docente GH = new Docente(
                     "house",
-                    "pass",
+                    password,
                     "greghouse@gmail.com",
                     "Gregory",
                     "House",
                     java.sql.Date.valueOf(LocalDate.of(1959, 5, 15)),
-                    imagen,
+                    "house.jpeg",
                     institutosHouse
             );
 
@@ -230,14 +245,14 @@ public class cargarDatosDePruebaHelper {
             List<Instituto> institutosTim = new ArrayList<>();
             institutosTim.add(il);
 
-            Docente timmy = new Docente(
+            Docente TC = new Docente(
                     "timmy",
-                    "pass",
+                    password,
                     "tim.cook@apple.com",
                     "Tim",
                     "Cook",
                     java.sql.Date.valueOf(LocalDate.of(1960, 11, 1)),
-                    imagen,
+                    "timmy.jpeg",
                     institutosTim
             );
 
@@ -245,9 +260,9 @@ public class cargarDatosDePruebaHelper {
             List<Instituto> institutosDaniel = new ArrayList<>();
             institutosDaniel.add(il);
 
-            Docente danny = new Docente(
+            Docente DR = new Docente(
                     "danny",
-                    "pass",
+                    password,
                     "dan.riccio@gmail.com",
                     "Daniel",
                     "Riccio",
@@ -260,9 +275,9 @@ public class cargarDatosDePruebaHelper {
             List<Instituto> institutosPhilip = new ArrayList<>();
             institutosPhilip.add(im);
 
-            Docente phils = new Docente(
+            Docente PS = new Docente(
                     "phils",
-                    "pass",
+                    password,
                     "schiller@gmail.com",
                     "Philip",
                     "Schiller",
@@ -275,9 +290,9 @@ public class cargarDatosDePruebaHelper {
             List<Instituto> institutosBruce = new ArrayList<>();
             institutosBruce.add(di);
 
-            Docente bruces = new Docente(
+            Docente BS = new Docente(
                     "bruces",
-                    "pass",
+                    password,
                     "sewell@gmail.com",
                     "Bruce",
                     "Sewell",
@@ -290,9 +305,9 @@ public class cargarDatosDePruebaHelper {
             List<Instituto> institutosAdriana = new ArrayList<>();
             institutosAdriana.add(di);
 
-            Docente adri = new Docente(
+            Docente AG = new Docente(
                     "adri",
-                    "pass",
+                    password,
                     "agarcia@gmail.com",
                     "Adriana",
                     "García",
@@ -301,24 +316,86 @@ public class cargarDatosDePruebaHelper {
                     institutosAdriana
             );
 
-
-            em.persist(heisenberg);
-            em.persist(benkenobi);
-            em.persist(waston);
-            em.persist(house);
-            em.persist(timmy);
-            em.persist(danny);
-            em.persist(phils);
-            em.persist(bruces);
-            em.persist(adri);
-
+            // *****************************************************************
+            // SEGUIDOR - SEGUIDO
+            // *****************************************************************
+            
+            EL.agregarSeguido(RO);
+            EL.agregarSeguido(WW);
+            EL.agregarSeguido(EW);
+            CO.agregarSeguido(CH);
+            CO.agregarSeguido(JW);
+            CO.agregarSeguido(OK);
+            CO.agregarSeguido(DR);
+            CO.agregarSeguido(PS);
+            RO.agregarSeguido(CO);
+            RO.agregarSeguido(WE);
+            CH.agregarSeguido(EL);
+            CH.agregarSeguido(JW);
+            CH.agregarSeguido(GH);
+            JW.agregarSeguido(EL);
+            WE.agregarSeguido(CO);
+            WE.agregarSeguido(WW);
+            WE.agregarSeguido(TC);
+            WW.agregarSeguido(RO);
+            WW.agregarSeguido(AG);
+            OK.agregarSeguido(DR);
+            EW.agregarSeguido(WE);
+            EW.agregarSeguido(WW);
+            GH.agregarSeguido(JW);
+            GH.agregarSeguido(WE);
+            GH.agregarSeguido(OK);
+            TC.agregarSeguido(EL);
+            TC.agregarSeguido(CH);
+            TC.agregarSeguido(JW);
+            DR.agregarSeguido(CO);
+            DR.agregarSeguido(WE);
+            DR.agregarSeguido(WW);
+            PS.agregarSeguido(BS);
+            BS.agregarSeguido(PS);
+            AG.agregarSeguido(WW);
+            
+            
+            em.persist(EL);
+            em.persist(CO);
+            em.persist(RO);
+            em.persist(CH);
+            em.persist(JW);
+            em.persist(WE);
+            
+            em.persist(WW);
+            em.persist(OK);
+            em.persist(EW);
+            em.persist(GH);
+            em.persist(TC);
+            em.persist(DR);
+            em.persist(PS);
+            em.persist(BS);
+            em.persist(AG);
 
             /*
              * ============================================================
              * 3. CURSOS
              * ============================================================
              */
-
+            
+            List<Categoria> catc3=new ArrayList<>(), catc4=new ArrayList<>(),
+                            catc5=new ArrayList<>(), catc6=new ArrayList<>(),
+                            catc7=new ArrayList<>(), catc8=new ArrayList<>(),
+                            catc9=new ArrayList<>(), catc10=new ArrayList<>();
+            catc3.add(t1);
+            catc7.add(t1);
+            catc9.add(t1);
+            catc4.add(t2);
+            catc5.add(t2);
+            catc10.add(t2);
+            catc6.add(t3);
+            catc7.add(t3);
+            catc8.add(t3);
+            catc9.add(t3);
+            catc10.add(t3);
+            catc6.add(t4);
+            
             Curso c1 = new Curso(
                     "Talleres plenarios",
                     "Talleres plenarios: presentados por cuatro reconocidos "
@@ -333,7 +410,8 @@ public class cargarDatosDePruebaHelper {
                     java.sql.Date.valueOf(LocalDate.of(2026, 2, 1)),
                     il,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    new ArrayList<>(),
+                    null
             );
 
             Curso c2 = new Curso(
@@ -348,7 +426,8 @@ public class cargarDatosDePruebaHelper {
                     java.sql.Date.valueOf(LocalDate.of(2026, 7, 12)),
                     il,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    new ArrayList<>(),
+                    null
             );
 
             Curso c3 = new Curso(
@@ -366,8 +445,9 @@ public class cargarDatosDePruebaHelper {
                     "https://eva.fing.edu.uy/course/view.php?id=783#section-2",
                     java.sql.Date.valueOf(LocalDate.of(2024, 6, 25)),
                     im,
+                    catc3,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    "Curso.Dalavuelta.png"
             );
 
             Curso c4 = new Curso(
@@ -385,8 +465,9 @@ public class cargarDatosDePruebaHelper {
                     "https://eva.fing.edu.uy/course/view.php?id=783#section-2",
                     java.sql.Date.valueOf(LocalDate.of(2025, 6, 16)),
                     im,
+                    catc4,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    null
             );
 
             Curso c5 = new Curso(
@@ -407,8 +488,9 @@ public class cargarDatosDePruebaHelper {
                     "https://eva.fing.edu.uy/course/view.php?id=783#section-2",
                     java.sql.Date.valueOf(LocalDate.of(2026, 2, 1)),
                     im,
+                    catc5,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    "Curso.Inclusión Energética.jpg"
             );
 
             Curso c6 = new Curso(
@@ -424,8 +506,9 @@ public class cargarDatosDePruebaHelper {
                     "http://www.flordeceibo.edu.uy/",
                     java.sql.Date.valueOf(LocalDate.of(2008, 7, 27)),
                     di,
+                    catc6,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    "Curso.Flor del Ceibo.png"
             );
 
             Curso c7 = new Curso(
@@ -443,8 +526,9 @@ public class cargarDatosDePruebaHelper {
                     "https://eva.fing.edu.uy/course/view.php?id=1187",
                     java.sql.Date.valueOf(LocalDate.of(2024, 2, 2)),
                     in,
+                    catc7,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    "Curso.Taller de robótica educativa.jpg"
             );
 
             Curso c8 = new Curso(
@@ -460,8 +544,9 @@ public class cargarDatosDePruebaHelper {
                     "https://eva.fing.edu.uy/mod/folder/view.php?id=89398",
                     java.sql.Date.valueOf(LocalDate.of(2026, 6, 15)),
                     in,
+                    catc8,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    "Curso.Participación en investigación sobre el empleo del juego Komikan como recurso didáctico en la Escuela.png"
             );
 
             Curso c9 = new Curso(
@@ -478,8 +563,9 @@ public class cargarDatosDePruebaHelper {
                     "https://eva.fing.edu.uy/mod/folder/view.php?id=89398",
                     java.sql.Date.valueOf(LocalDate.of(2026, 5, 24)),
                     in,
+                    catc9,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    null
             );
 
             Curso c10 = new Curso(
@@ -500,8 +586,9 @@ public class cargarDatosDePruebaHelper {
                     "https://www.fing.edu.uy/noticias/extension/modulo-de-tallerextension-microbit",
                     java.sql.Date.valueOf(LocalDate.of(2026, 3, 13)),
                     ie,
+                    catc10,
                     new ArrayList<>(),
-                    new ArrayList<>()
+                    "Curso.MicroBit.jpg"
             );
 
             em.persist(c1);
@@ -537,8 +624,8 @@ public class cargarDatosDePruebaHelper {
              * ============================================================
              */
 
-            Set<Docente> docentesE1 = new HashSet<>();
-            docentesE1.add(bruces);
+            List<Docente> docentesE1 = new ArrayList<>();
+            docentesE1.add(BS);
 
             Edicion e1 = new Edicion(
                     "Flor del Ceibo - 2010",
@@ -547,13 +634,14 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2010, 3, 15),
                     LocalDate.of(2010, 7, 7),
                     c6,
-                    docentesE1
+                    docentesE1,
+                    "Edicion.Flor del Ceibo - 2010.jpeg"
             );
 
 
-            Set<Docente> docentesE2 = new HashSet<>();
-            docentesE2.add(bruces);
-            docentesE2.add(adri);
+            List<Docente> docentesE2 = new ArrayList<>();
+            docentesE2.add(BS);
+            docentesE2.add(AG);
 
             Edicion e2 = new Edicion(
                     "Flor del Ceibo - 2012",
@@ -562,13 +650,14 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2012, 8, 1),
                     LocalDate.of(2012, 11, 20),
                     c6,
-                    docentesE2
+                    docentesE2,
+                    "Edicion.Flor del Ceibo - 2012.jpg"
             );
 
 
-            Set<Docente> docentesE3 = new HashSet<>();
-            docentesE3.add(bruces);
-            docentesE3.add(adri);
+            List<Docente> docentesE3 = new ArrayList<>();
+            docentesE3.add(BS);
+            docentesE3.add(AG);
 
             Edicion e3 = new Edicion(
                     "Flor del Ceibo - 2025",
@@ -577,12 +666,13 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2025, 4, 10),
                     LocalDate.of(2025, 8, 7),
                     c6,
-                    docentesE3
+                    docentesE3,
+                    "Edicion.Flor del Ceibo - 2025.jpeg"
             );
 
 
-            Set<Docente> docentesE4 = new HashSet<>();
-            docentesE4.add(phils);
+            List<Docente> docentesE4 = new ArrayList<>();
+            docentesE4.add(PS);
 
             Edicion e4 = new Edicion(
                     "Dalavuelta - 2025",
@@ -591,12 +681,13 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2024, 8, 20),
                     LocalDate.of(2024, 11, 10),
                     c3,
-                    docentesE4
+                    docentesE4,
+                    "Edicion.Dalavuelta - 2025.jpeg"
             );
 
 
-            Set<Docente> docentesE5 = new HashSet<>();
-            docentesE5.add(phils);
+            List<Docente> docentesE5 = new ArrayList<>();
+            docentesE5.add(PS);
 
             Edicion e5 = new Edicion(
                     "Extensionismo Industrial - 2025",
@@ -605,12 +696,13 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2025, 8, 10),
                     LocalDate.of(2025, 11, 10),
                     c4,
-                    docentesE5
+                    docentesE5,
+                    null
             );
 
 
-            Set<Docente> docentesE6 = new HashSet<>();
-            docentesE6.add(phils);
+            List<Docente> docentesE6 = new ArrayList<>();
+            docentesE6.add(PS);
 
             Edicion e6 = new Edicion(
                     "Inclusión Energética - 2026",
@@ -619,12 +711,13 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 3, 15),
                     LocalDate.of(2026, 4, 30),
                     c5,
-                    docentesE6
+                    docentesE6,
+                    null
             );
 
 
-            Set<Docente> docentesE7 = new HashSet<>();
-            docentesE7.add(heisenberg);
+            List<Docente> docentesE7 = new ArrayList<>();
+            docentesE7.add(WW);
 
             Edicion e7 = new Edicion(
                     "Taller de robótica educativa - 2024",
@@ -633,13 +726,14 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2024, 3, 10),
                     LocalDate.of(2024, 5, 10),
                     c7,
-                    docentesE7
+                    docentesE7,
+                    "Edicion.Taller de robótica educativa - 2024.jpeg"
             );
 
 
-            Set<Docente> docentesE8 = new HashSet<>();
-            docentesE8.add(heisenberg);
-            docentesE8.add(benkenobi);
+            List<Docente> docentesE8 = new ArrayList<>();
+            docentesE8.add(WW);
+            docentesE8.add(OK);
 
             Edicion e8 = new Edicion(
                     "Taller de robótica educativa - 2026",
@@ -648,13 +742,14 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 3, 10),
                     LocalDate.of(2026, 5, 10),
                     c7,
-                    docentesE8
+                    docentesE8,
+                    "Edicion.Taller de robótica educativa - 2026.jpeg"
             );
 
 
-            Set<Docente> docentesE9 = new HashSet<>();
-            docentesE9.add(benkenobi);
-            docentesE9.add(waston);
+            List<Docente> docentesE9 = new ArrayList<>();
+            docentesE9.add(OK);
+            docentesE9.add(EW);
 
             Edicion e9 = new Edicion(
                     "Taller de robótica educativa - 2026-2",
@@ -663,12 +758,13 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 9, 10),
                     LocalDate.of(2026, 11, 8),
                     c7,
-                    docentesE9
+                    docentesE9,
+                    "Edicion.Taller de robótica educativa - 2026-2.jpeg"
             );
 
 
-            Set<Docente> docentesE10 = new HashSet<>();
-            docentesE10.add(waston);
+            List<Docente> docentesE10 = new ArrayList<>();
+            docentesE10.add(EW);
 
             Edicion e10 = new Edicion(
                     "Participación en investigación sobre el empleo del juego Komikan como recurso didáctico en la Escuela - 2026",
@@ -677,12 +773,13 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 7, 29),
                     LocalDate.of(2026, 10, 7),
                     c8,
-                    docentesE10
+                    docentesE10,
+                    null
             );
 
 
-            Set<Docente> docentesE11 = new HashSet<>();
-            docentesE11.add(heisenberg);
+            List<Docente> docentesE11 = new ArrayList<>();
+            docentesE11.add(WW);
 
             Edicion e11 = new Edicion(
                     "Herramientas de apoyo a la enseñanza de inglés. Instalación y evaluación - 26",
@@ -691,12 +788,13 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 9, 15),
                     LocalDate.of(2026, 12, 15),
                     c9,
-                    docentesE11
+                    docentesE11,
+                    null
             );
 
 
-            Set<Docente> docentesE12 = new HashSet<>();
-            docentesE12.add(house);
+            List<Docente> docentesE12 = new ArrayList<>();
+            docentesE12.add(GH);
 
             Edicion e12 = new Edicion(
                     "MicroBit - 2026",
@@ -705,13 +803,14 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 8, 12),
                     LocalDate.of(2026, 12, 5),
                     c10,
-                    docentesE12
+                    docentesE12,
+                    null
             );
 
 
-            Set<Docente> docentesE13 = new HashSet<>();
-            docentesE13.add(timmy);
-            docentesE13.add(danny);
+            List<Docente> docentesE13 = new ArrayList<>();
+            docentesE13.add(TC);
+            docentesE13.add(DR);
 
             Edicion e13 = new Edicion(
                     "Talleres plenarios - 2026",
@@ -720,12 +819,13 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 3, 10),
                     LocalDate.of(2026, 3, 30),
                     c1,
-                    docentesE13
+                    docentesE13,
+                    null
             );
 
 
-            Set<Docente> docentesE14 = new HashSet<>();
-            docentesE14.add(timmy);
+            List<Docente> docentesE14 = new ArrayList<>();
+            docentesE14.add(TC);
 
             Edicion e14 = new Edicion(
                     "Seminarios de Resolución de Problemas - 2026",
@@ -734,7 +834,8 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 9, 10),
                     LocalDate.of(2026, 10, 20),
                     c2,
-                    docentesE14
+                    docentesE14,
+                    null
             );
 
 
@@ -759,145 +860,148 @@ public class cargarDatosDePruebaHelper {
              * 6. INSCRIPCIONES A EDICIONES
              * ============================================================
              */
+            
+            em.persist(new InscripcionEdicion(
+                    EL, e1, LocalDate.of(2010, 2, 20), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    eleven11, e1, LocalDate.of(2010, 2, 20), 0));
+                    CH, e1, LocalDate.of(2010, 2, 25), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    chechi, e1, LocalDate.of(2010, 2, 25), 0));
+                    CO, e2, LocalDate.of(2012, 7, 12), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    costas, e2, LocalDate.of(2012, 7, 12), 0));
+                    RO, e2, LocalDate.of(2012, 7, 15), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e2, LocalDate.of(2012, 7, 15), 0));
+                    WE, e2, LocalDate.of(2012, 7, 30), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e2, LocalDate.of(2012, 7, 30), 0));
+                    RO, e3, LocalDate.of(2025, 3, 10), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e3, LocalDate.of(2025, 3, 10), 0));
+                    JW, e3, LocalDate.of(2025, 3, 15), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    jeffw, e3, LocalDate.of(2025, 3, 15), 0));
+                    CH, e4, LocalDate.of(2024, 7, 25), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    chechi, e4, LocalDate.of(2024, 7, 25), 0));
+                    EL, e4, LocalDate.of(2024, 7, 28), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    eleven11, e4, LocalDate.of(2024, 7, 28), 0));
+                    RO, e4, LocalDate.of(2024, 8, 2), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e4, LocalDate.of(2024, 8, 2), 0));
+                    CO, e4, LocalDate.of(2024, 8, 10), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    costas, e4, LocalDate.of(2024, 8, 10), 0));
+                    JW, e4, LocalDate.of(2024, 8, 15), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    jeffw, e4, LocalDate.of(2024, 8, 15), 0));
+                    CO, e5, LocalDate.of(2025, 7, 18), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    costas, e5, LocalDate.of(2025, 7, 18), 0));
+                    CH, e5, LocalDate.of(2025, 7, 20), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    chechi, e5, LocalDate.of(2025, 7, 20), 0));
+                    EL, e5, LocalDate.of(2025, 7, 29), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    eleven11, e5, LocalDate.of(2025, 7, 29), 0));
+                    WE, e5, LocalDate.of(2025, 8, 5), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e5, LocalDate.of(2025, 8, 5), 0));
+                    RO, e6, LocalDate.of(2026, 2, 23), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e6, LocalDate.of(2026, 2, 23), 0));
+                    WE, e6, LocalDate.of(2026, 2, 25), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e6, LocalDate.of(2026, 2, 25), 0));
+                    CH, e6, LocalDate.of(2026, 2, 28), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    chechi, e6, LocalDate.of(2026, 2, 28), 0));
+                    EL, e6, LocalDate.of(2026, 3, 3), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    eleven11, e6, LocalDate.of(2026, 3, 3), 0));
+                    WE, e7, LocalDate.of(2017, 2, 18), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e7, LocalDate.of(2017, 2, 18), 0));
+                    RO, e7, LocalDate.of(2024, 2, 20), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e7, LocalDate.of(2024, 2, 20), 0));
+                    EL, e7, LocalDate.of(2024, 3, 3), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    eleven11, e7, LocalDate.of(2024, 3, 3), 0));
+                    CH, e7, LocalDate.of(2024, 3, 5), 0));
 
             em.persist(new InscripcionEdicion(
-                    chechi, e7, LocalDate.of(2024, 3, 5), 0));
+                    JW, e8, LocalDate.of(2026, 2, 18), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    jeffw, e8, LocalDate.of(2026, 2, 18), 0));
+                    CO, e8, LocalDate.of(2026, 2, 22), ACEPTADO));
+
+            // E8 - RO no existe fecha en los datos de prueba 
+            em.persist(new InscripcionEdicion(
+                    RO, e8, LocalDate.of(2026, 3, 18), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    costas, e8, LocalDate.of(2026, 2, 22), 0));
+                    WE, e9, LocalDate.of(2026, 8, 18), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e9, LocalDate.of(2026, 8, 18), 0));
+                    CH, e9, LocalDate.of(2026, 8, 22), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    chechi, e9, LocalDate.of(2026, 8, 22), 0));
+                    RO, e9, LocalDate.of(2026, 9, 3), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e9, LocalDate.of(2026, 9, 3), 0));
+                    CH, e10, LocalDate.of(2026, 7, 13), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    chechi, e10, LocalDate.of(2026, 7, 13), 0));
+                    WE, e10, LocalDate.of(2026, 7, 20), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e10, LocalDate.of(2026, 7, 20), 0));
+                    RO, e10, LocalDate.of(2026, 7, 22), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e10, LocalDate.of(2026, 7, 22), 0));
+                    WE, e11, LocalDate.of(2026, 6, 4), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e11, LocalDate.of(2026, 6, 4), 0));
+                    EL, e11, LocalDate.of(2026, 7, 18), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    eleven11, e11, LocalDate.of(2026, 7, 18), 0));
+                    JW, e11, LocalDate.of(2026, 8, 20), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    jeffw, e11, LocalDate.of(2026, 8, 20), 0));
+                    CH, e12, LocalDate.of(2026, 7, 12), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    chechi, e12, LocalDate.of(2026, 7, 12), 0));
+                    RO, e12, LocalDate.of(2026, 7, 14), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e12, LocalDate.of(2026, 7, 14), 0));
+                    EL, e12, LocalDate.of(2026, 7, 25), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    eleven11, e12, LocalDate.of(2026, 7, 25), 0));
+                    JW, e12, LocalDate.of(2026, 8, 5), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
-                    jeffw, e12, LocalDate.of(2026, 8, 5), 0));
+                    CO, e13, LocalDate.of(2026, 3, 5), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    costas, e13, LocalDate.of(2026, 3, 5), 0));
+                    WE, e13, LocalDate.of(2026, 3, 4), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e13, LocalDate.of(2026, 3, 4), 0));
+                    RO, e13, LocalDate.of(2026, 3, 7), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e13, LocalDate.of(2026, 3, 7), 0));
+                    WE, e14, LocalDate.of(2026, 7, 15), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    weiss, e14, LocalDate.of(2026, 7, 15), 0));
+                    CO, e14, LocalDate.of(2026, 7, 20), RECHAZADO));
 
             em.persist(new InscripcionEdicion(
-                    costas, e14, LocalDate.of(2026, 7, 20), 0));
+                    RO, e14, LocalDate.of(2026, 8, 6), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    roro, e14, LocalDate.of(2026, 8, 6), 0));
-
-            em.persist(new InscripcionEdicion(
-                    chechi, e14, LocalDate.of(2026, 8, 30), 0));
-
+                    CH, e14, LocalDate.of(2026, 8, 30), RECHAZADO));
 
             /*
              * ============================================================
@@ -917,7 +1021,9 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 1, 1),
                     LocalDate.of(2026, 5, 1),
                     LocalDate.of(2026, 10, 31),
-                    new HashSet<>()
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    "Programa.EFI Ingeniería Mecánica.jpeg"
             );
 
             ProgramaFormacion p2 = new ProgramaFormacion(
@@ -926,7 +1032,9 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 1, 1),
                     LocalDate.of(2026, 7, 15),
                     LocalDate.of(2027, 1, 1),
-                    new HashSet<>()
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    "Programa.Formación integral.jpeg"
             );
 
             ProgramaFormacion p3 = new ProgramaFormacion(
@@ -935,14 +1043,65 @@ public class cargarDatosDePruebaHelper {
                     LocalDate.of(2026, 1, 1),
                     LocalDate.of(2026, 9, 3),
                     LocalDate.of(2026, 11, 18),
-                    new HashSet<>()
+                    new ArrayList<>(),
+                    new ArrayList<>(),
+                    "Programa.EFI Robótica.jpeg"
             );
 
             em.persist(p1);
             em.persist(p2);
             em.persist(p3);
 
+            
+            // *****************************************************************
+            // 10 INSCRIPCION A PROGRAMA
+            // *****************************************************************
+            
+            em.persist(new InscripcionPrograma(
+                    EL, p1, LocalDate.of(2026, 4, 15), 0));
+            
+            em.persist(new InscripcionPrograma(
+                    CH, p1, LocalDate.of(2026, 4, 20), 0));
 
+            em.persist(new InscripcionPrograma(
+                    CO, p2, LocalDate.of(2026, 7, 10), 0));
+
+            em.persist(new InscripcionPrograma(
+                    CH, p2, LocalDate.of(2026, 7, 10), 0));
+
+            em.persist(new InscripcionPrograma(
+                    EL, p2, LocalDate.of(2026, 7, 12), 0));
+            
+            em.persist(new InscripcionPrograma(
+                    WE, p2, LocalDate.of(2026, 7, 15), 0));
+
+            em.persist(new InscripcionPrograma(
+                    CO, p2, LocalDate.of(2026, 7, 10), 0));
+
+            em.persist(new InscripcionPrograma(
+                    RO, p2, LocalDate.of(2026, 7, 18), 0));
+
+            em.persist(new InscripcionPrograma(
+                    CO, p2, LocalDate.of(2026, 7, 10), 0));
+
+            em.persist(new InscripcionPrograma(
+                    RO, p2, LocalDate.of(2026, 7, 18), 0));
+
+            em.persist(new InscripcionPrograma(
+                    CO, p3, LocalDate.of(2026, 8, 11), 0));
+
+            em.persist(new InscripcionPrograma(
+                    CH, p3, LocalDate.of(2026, 8, 15), 0));
+
+            em.persist(new InscripcionPrograma(
+                    RO, p3, LocalDate.of(2026, 8, 22), 0));
+
+            em.persist(new InscripcionPrograma(
+                    JW, p3, LocalDate.of(2026, 8, 30), 0));
+
+            
+            
+            
             /*
              * ============================================================
              * 8. CURSOS QUE INTEGRAN LOS PROGRAMAS
@@ -963,7 +1122,36 @@ public class cargarDatosDePruebaHelper {
 
 
             em.getTransaction().commit();
+            
+            Utils.Imagen.extractImage(RO.getImagen());
+            Utils.Imagen.extractImage(CH.getImagen());
+            Utils.Imagen.extractImage(JW.getImagen());
+            Utils.Imagen.extractImage(WW.getImagen());
+            Utils.Imagen.extractImage(OK.getImagen());
+            Utils.Imagen.extractImage(EW.getImagen());
+            Utils.Imagen.extractImage(GH.getImagen());
+            Utils.Imagen.extractImage(TC.getImagen());
 
+            Utils.Imagen.extractImage(c3.getImagen());
+            Utils.Imagen.extractImage(c5.getImagen());
+            Utils.Imagen.extractImage(c6.getImagen());
+            Utils.Imagen.extractImage(c7.getImagen());
+            Utils.Imagen.extractImage(c8.getImagen());
+            Utils.Imagen.extractImage(c10.getImagen());
+            
+            Utils.Imagen.extractImage(e1.getImagen());
+            Utils.Imagen.extractImage(e2.getImagen());
+            Utils.Imagen.extractImage(e3.getImagen());
+            Utils.Imagen.extractImage(e4.getImagen());
+            Utils.Imagen.extractImage(e7.getImagen());
+            Utils.Imagen.extractImage(e8.getImagen());
+            Utils.Imagen.extractImage(e9.getImagen());
+
+            Utils.Imagen.extractImage(p1.getImagen());
+            Utils.Imagen.extractImage(p2.getImagen());
+            Utils.Imagen.extractImage(p3.getImagen());
+            
+            
         } catch (Exception e) {
 
             if (em.getTransaction().isActive()) {

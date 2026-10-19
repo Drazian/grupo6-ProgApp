@@ -13,6 +13,11 @@ import org.tinylog.Logger;
  */
 public class ConsultaEdicion extends javax.swing.JPanel {
 
+    private final int FORMCHICO=0;
+    private final int FORMGRANDE=1;
+    private final int formHeigth=410;
+    private final int sizeWForm[]={335,795};
+    
     /**
      * Creates new form consultaEdicionCurso
      */
@@ -71,8 +76,9 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jScrollPane3.setViewportView(jList1);
 
         setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-        setMinimumSize(new java.awt.Dimension(756, 370));
-        setPreferredSize(new java.awt.Dimension(756, 370));
+        setMinimumSize(new java.awt.Dimension(335, 410));
+        setName(""); // NOI18N
+        setPreferredSize(new java.awt.Dimension(335, 410));
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentHidden(java.awt.event.ComponentEvent evt) {
                 formComponentHidden(evt);
@@ -89,6 +95,14 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jCInstituto.addActionListener(this::jCInstitutoActionPerformed);
         add(jCInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 10, 212, 34));
 
+        jPData.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentHidden(java.awt.event.ComponentEvent evt) {
+                jPDataComponentHidden(evt);
+            }
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                jPDataComponentShown(evt);
+            }
+        });
         jPData.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLnombre.setText("Nombre ..:");
@@ -122,7 +136,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jTnombre.setPreferredSize(new java.awt.Dimension(230, 24));
         jTnombre.setRequestFocusEnabled(false);
         jTnombre.setVerifyInputWhenFocusTarget(false);
-        jPData.add(jTnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(96, 12, 168, -1));
+        jPData.add(jTnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(96, 12, 172, -1));
 
         jTFechaFin.setEditable(false);
         jTFechaFin.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -132,7 +146,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jTFechaFin.setPreferredSize(new java.awt.Dimension(85, 24));
         jTFechaFin.setRequestFocusEnabled(false);
         jTFechaFin.setVerifyInputWhenFocusTarget(false);
-        jPData.add(jTFechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 90, 84, -1));
+        jPData.add(jTFechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 90, 90, -1));
 
         jTFechaInicio.setEditable(false);
         jTFechaInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -142,7 +156,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jTFechaInicio.setPreferredSize(new java.awt.Dimension(85, 24));
         jTFechaInicio.setRequestFocusEnabled(false);
         jTFechaInicio.setVerifyInputWhenFocusTarget(false);
-        jPData.add(jTFechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 84, -1));
+        jPData.add(jTFechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 90, -1));
 
         jTcupo.setEditable(false);
         jTcupo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -160,7 +174,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jTffechaPublicacion.setPreferredSize(new java.awt.Dimension(85, 24));
         jTffechaPublicacion.setRequestFocusEnabled(false);
         jTffechaPublicacion.setVerifyInputWhenFocusTarget(false);
-        jPData.add(jTffechaPublicacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 168, 84, -1));
+        jPData.add(jTffechaPublicacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 168, 90, -1));
 
         jTcurso.setEditable(false);
         jTcurso.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -169,7 +183,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jTcurso.setPreferredSize(new java.awt.Dimension(105, 24));
         jTcurso.setRequestFocusEnabled(false);
         jTcurso.setVerifyInputWhenFocusTarget(false);
-        jPData.add(jTcurso, new org.netbeans.lib.awtextra.AbsoluteConstraints(115, 205, 150, -1));
+        jPData.add(jTcurso, new org.netbeans.lib.awtextra.AbsoluteConstraints(115, 205, 155, -1));
 
         jLdocente.setText("Docente ...:");
         jLdocente.setFocusable(false);
@@ -184,9 +198,8 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jLdocentes.setRequestFocusEnabled(false);
         jScrollPane4.setViewportView(jLdocentes);
 
-        jPData.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 240, 160, 100));
+        jPData.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 240, 160, 110));
 
-        jPEInscriptos.setBackground(new java.awt.Color(55, 220, 198));
         jPEInscriptos.setPreferredSize(new java.awt.Dimension(190, 270));
         jPEInscriptos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -194,13 +207,12 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jLInscriptos.setRequestFocusEnabled(false);
         jScrollPane5.setViewportView(jLInscriptos);
 
-        jPEInscriptos.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 150, 300));
+        jPEInscriptos.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 160, 325));
 
-        jPData.add(jPEInscriptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 20, 152, 310));
+        jPData.add(jPEInscriptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 20, 160, 340));
 
         add(jPData, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, 440, 350));
 
-        jPEdiciones.setBackground(new java.awt.Color(197, 74, 74));
         jPEdiciones.setPreferredSize(new java.awt.Dimension(190, 270));
         jPEdiciones.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -209,9 +221,8 @@ public class ConsultaEdicion extends javax.swing.JPanel {
 
         jPEdiciones.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 145, 300));
 
-        add(jPEdiciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(165, 54, 146, 308));
+        add(jPEdiciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(165, 54, 146, 320));
 
-        jPCursos.setBackground(new java.awt.Color(224, 212, 59));
         jPCursos.setPreferredSize(new java.awt.Dimension(170, 260));
         jPCursos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -257,10 +268,24 @@ public class ConsultaEdicion extends javax.swing.JPanel {
 
     private void jLEdicionesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLEdicionesValueChanged
         if(!evt.getValueIsAdjusting())
-            if(jLEdiciones.getSelectedValue()!=null)
+            if(jLEdiciones.getSelectedValue()!=null){
+                Utils.GUI.reSizePadre(this, sizeWForm[FORMGRANDE], formHeigth);
                 loadData();
-            else jPData.setVisible(false);
+                }
+            else{
+                jPData.setVisible(false);
+                Utils.GUI.reSizePadre(this, sizeWForm[FORMCHICO], formHeigth);
+
+            }
     }//GEN-LAST:event_jLEdicionesValueChanged
+
+    private void jPDataComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPDataComponentShown
+        
+    }//GEN-LAST:event_jPDataComponentShown
+
+    private void jPDataComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPDataComponentHidden
+
+    }//GEN-LAST:event_jPDataComponentHidden
 
     private void loadData(){
         ConsultaEdicionHelper ceh=new ConsultaEdicionHelper();
@@ -288,6 +313,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         tmpSet=null;
     }
     private void cargaIntituto(){
+        Utils.GUI.reSizePadre(this, sizeWForm[FORMCHICO], formHeigth);
         ConsultaEdicionHelper hlp=new ConsultaEdicionHelper();
         DefaultComboBoxModel<String> tmp=new DefaultComboBoxModel<>();
         String[] data=hlp.getListInstitutos();

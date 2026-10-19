@@ -1,8 +1,7 @@
 package edu.edext.logica;
 
-import edu.edext.logica.Curso;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.time.LocalDate;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -11,7 +10,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import java.util.Objects;
 
 /**
  *
@@ -31,7 +29,6 @@ public class ProgramaFormacion {
     private LocalDate fechaInicio;
     @Column(nullable=false)
     private LocalDate fechaFin;
-    
     private String imagen;
 
     @ManyToMany
@@ -39,47 +36,52 @@ public class ProgramaFormacion {
         name="Integra",
         joinColumns=@JoinColumn(name="programa"),
         inverseJoinColumns=@JoinColumn(name="curso"))
-    private Set<Curso> cursos=new HashSet<>();
+    private List<Curso> cursos;
+
+    @ManyToMany
+    @JoinTable(
+    //    name="Programa_Categoria",
+        name="Clasifica",
+        joinColumns=@JoinColumn(name="programa"),
+        inverseJoinColumns=@JoinColumn(name="categoria")
+    )
+    private List<Categoria> categorias;
 //    @ManyToMany
 //    private List<Curso> cursos = new ArrayList<>(); //Los programas inicializan sin cursos asociados.
-//        
+//
     public ProgramaFormacion(){}
     
-    public ProgramaFormacion(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, Set<Curso> cursos ){
-        this.descripcion=descripcion;
+    public ProgramaFormacion(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio,
+                             LocalDate fechaFin, List<Curso> cursos, List<Categoria> categorias, String imagen){
         this.fechaRegistro=fechaRegistro;
         this.fechaInicio=fechaInicio;
-        this.fechaFin=fechaFin;
-        this.cursos=cursos;
-        this.nombre=nombre;
-    }
-
-        public ProgramaFormacion(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, Set<Curso> cursos, String imagen){
         this.descripcion=descripcion;
-        this.fechaRegistro=fechaRegistro;
-        this.fechaInicio=fechaInicio;
+        this.categorias=categorias;
         this.fechaFin=fechaFin;
         this.cursos=cursos;
         this.nombre=nombre;
         this.imagen=imagen;
     }
-    
-    
+
 //    public void setCursos (List<Curso> cursos){this.cursos=cursos;}
-//    public void setNombre(String nombre){ this.nombre=nombre;  }
-//    public void setCursos(Set<Curso> cursos) { this.cursos=cursos; }
-//    public void setFechaFin(LocalDate fechaFin){ this.fechaFin=fechaFin; }
-//    public void setDescripcion(String descripcion){ this.descripcion=descripcion; }
-//    public void setFechaInicio(LocalDate fechaInicio){ this.fechaInicio=fechaInicio; }
-//    public void setFechaRegistro(LocalDate fechaRegistro){ this.fechaRegistro=fechaRegistro; }
-//    public void setImagen (String imagen){this.imagen=imagen;}
+    public void setImagen(String imagen){ this.imagen=imagen; }
+    public void setNombre(String nombre){ this.nombre=nombre;   }
+    public void setCursos(List<Curso> cursos) { this.cursos=cursos; }
+    public void setFechaFin(LocalDate fechaFin){ this.fechaFin=fechaFin; }
+    public void setDescripcion(String descripcion){ this.descripcion=descripcion; }
+    public void setFechaInicio(LocalDate fechaInicio){ this.fechaInicio=fechaInicio; }
+    public void setCategorias(List<Categoria> categorias){this.categorias=categorias;   }
+    public void setFechaRegistro(LocalDate fechaRegistro){ this.fechaRegistro=fechaRegistro; }
         
-    public String getImagen(){return this.imagen;}
-    public LocalDate getFechaRegistro (){ return this.fechaRegistro; }
+    public LocalDate getFechaRegistro (){ return this.fechaRegistro;  }
+    public List<Categoria> getCategorias(){ return this.categorias; }
     public LocalDate getFechaInicio(){ return this.fechaInicio; }
     public String getDescripcion(){ return this.descripcion; }
     public LocalDate getFechaFin(){ return this.fechaFin; }
-    public Set<Curso> getCursos(){ return  this.cursos; }
+    public List<Curso> getCursos(){ return this.cursos; }
+    public String getNombre(){ return this.nombre;   }
+    public String getImagen(){ return this.imagen; }
+
 //    public Set<DtCurso> getDtCursos(){
 //        Set<DtCurso> ret= new HashSet<>();
 //        for (Curso c : cursos) {
@@ -94,8 +96,6 @@ public class ProgramaFormacion {
 //        return null;
 //    }
                     
-    public String getNombre(){ return this.nombre; }
-    //public List<Curso> getCursos() { return this.cursos;}
 
     @Override
     public int hashCode() {

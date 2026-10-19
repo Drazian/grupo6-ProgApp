@@ -1,9 +1,8 @@
 package edu.edext.datatypes;
 
 public class DtCategoria {
-    private String nombre;
+    private final String nombre;
 
-    public DtCategoria(){}
     public DtCategoria(String nombre){
         this.nombre=nombre;
     }

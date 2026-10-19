@@ -21,11 +21,12 @@ import jakarta.validation.constraints.NotNull;
 @IdClass(InscripcionEdicionID.class)
 @Table(name="InscripcionEdicion")
 public class InscripcionEdicion {
-    
+
     @Id
     @ManyToOne
     @NotNull
     @JoinColumn(nullable=false)
+    //@JoinColumn(name = "estudiante", nullable=false)
     private Estudiante estudiante;
 
     @NotNull

@@ -4,10 +4,10 @@ import edu.edext.datatypes.DtInstituto;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
-import edu.edext.logica.GestorImagenes;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
+import edu.edext.tools.cfg;
 import java.awt.Image;
 import java.io.File;
 import java.time.Instant;
@@ -33,32 +33,34 @@ public class AltaUsuario extends javax.swing.JPanel {
      */
     private final Mouse mouse=new Mouse();
     private File imagenSeleccionada;
-    private final String RUTADEFAULT="imagenes"+Utils.OS.getSeparador();
-    private final String IMAGEDEFAULT="usr.png";
-    private final int[] heightForm={380, 535};
+    private final int FORMGRANDE=1, FORMCHICO=0;
+    private final int[] heightForm={345, 445};
     private final int widthForm;
-    
+    private int modoForm;
+
     public AltaUsuario() {
         initComponents();
-        widthForm=500;
-        imagenSeleccionada = new File (RUTADEFAULT+IMAGEDEFAULT);
+        this.modoForm=0;
+        widthForm=475;
+        imagenSeleccionada = new File (cfg.pathImagen()+Utils.OS.getSeparador()+cfg.IMAGE_USER);
+        Utils.GUI.assignFormato(txtNacimiento);
         jPInstituto.setVisible(false);
-        btnGuardarCambios.setVisible(false);
-        btnGuardarCambios1.setVisible(false);
+        btnGuardarCambios.setVisible(false); btnGuardarCambios1.setVisible(false);
+        btnCancelar1.setFocusable(false); btnGuardarCambios1.setFocusable(false);
         btnQuitarInstituto.setEnabled(false);
         btnAceptar1.setFocusable(false);
-        btnCancelar1.setFocusable(false);
-        btnGuardarCambios1.setFocusable(false);
+        formResize(FORMCHICO);
         cargarInstitutos();
 
         DefaultListModel<String> model = new DefaultListModel<>();
         lisInstitutos.setModel(model);
 
-        SwingUtilities.invokeLater(() -> {cargarImagen(IMAGEDEFAULT);}); 
+        SwingUtilities.invokeLater(() -> {cargarImagen(cfg.IMAGE_USER);}); 
     }
     // Constructor i = 1 ModificarUsuario , i = 2 ConsultaUsuario
     public AltaUsuario(int i) {
         initComponents();
+        this.modoForm=i;
         widthForm=650;
         txtNickname.setEditable(false);
         txtNickname.setFocusable(false);
@@ -69,8 +71,8 @@ public class AltaUsuario extends javax.swing.JPanel {
         jPBotones.setVisible(false);
         jPInstituto.setVisible(false);
         btnQuitarInstituto.setEnabled(false);
-        
-        btnAceptar.setVisible(false);
+        formResize(FORMGRANDE);
+        //btnAceptar.setVisible(false);
         //txtEmail.setEditable(false);
         
         DefaultListModel<String> model = new DefaultListModel<>();
@@ -86,6 +88,7 @@ public class AltaUsuario extends javax.swing.JPanel {
             btnGuardarCambios.setVisible(false);
             btnAgregarImagen.setVisible(false);
             btnCancelar.setText("Volver");
+            Utils.GUI.setDisable(chbDocente);
         }
     }
     /**
@@ -110,6 +113,8 @@ public class AltaUsuario extends javax.swing.JPanel {
         txtApellido = new javax.swing.JTextField();
         txtEmail = new javax.swing.JTextField();
         btnAgregarImagen = new javax.swing.JButton();
+        txtNacimiento = new javax.swing.JFormattedTextField();
+        jBNacimiento = new javax.swing.JButton();
         dchFechaDeNacimiento = new com.toedter.calendar.JDateChooser();
         chbDocente = new javax.swing.JCheckBox();
         jPBotones = new javax.swing.JPanel();
@@ -128,8 +133,8 @@ public class AltaUsuario extends javax.swing.JPanel {
         lisInstitutos = new javax.swing.JList<>();
         btnQuitarInstituto = new javax.swing.JButton();
 
-        setMinimumSize(new java.awt.Dimension(500, 380));
-        setPreferredSize(new java.awt.Dimension(500, 380));
+        setMinimumSize(new java.awt.Dimension(475, 345));
+        setPreferredSize(new java.awt.Dimension(475, 345));
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 formMouseDragged(evt);
@@ -143,48 +148,66 @@ public class AltaUsuario extends javax.swing.JPanel {
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblNickname.setText("Nickname ....:");
-        add(lblNickname, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 27, -1, -1));
+        add(lblNickname, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 27, -1, -1));
 
         lblPassword.setText("Contraseña .:");
-        add(lblPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 67, -1, -1));
+        add(lblPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 67, -1, -1));
 
         lblNombre.setText("Nombre .......:");
-        add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 109, -1, -1));
+        add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 109, -1, -1));
 
         lblApellido.setText("Apellido .......:");
-        add(lblApellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 151, -1, -1));
+        add(lblApellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 151, -1, -1));
 
         lblEmail.setText("Email  ...........:");
-        add(lblEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 196, -1, 24));
+        add(lblEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 196, -1, 24));
 
-        lblFechaDeNacimiento.setText("Fecha de Nacimiento ..:");
-        add(lblFechaDeNacimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 242, -1, 25));
+        lblFechaDeNacimiento.setText("Nacimiento ..:");
+        add(lblFechaDeNacimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 235, -1, 25));
 
         lblImagen.setBackground(new java.awt.Color(102, 204, 255));
         lblImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
         lblImagen.setFocusable(false);
         lblImagen.setRequestFocusEnabled(false);
-        add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(315, 34, 160, 160));
-        add(txtNickname, new org.netbeans.lib.awtextra.AbsoluteConstraints(119, 22, 178, -1));
-        add(txtPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(119, 64, 178, -1));
-        add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(119, 106, 178, -1));
-        add(txtApellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(119, 148, 178, -1));
-        add(txtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(119, 196, 178, -1));
+        add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(287, 20, 160, 160));
+        add(txtNickname, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 22, 170, -1));
+        add(txtPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 64, 170, -1));
+        add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 106, 170, -1));
+        add(txtApellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 148, 170, -1));
+        add(txtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 196, 170, -1));
 
         btnAgregarImagen.setText("Agregar Imagen");
         btnAgregarImagen.addActionListener(this::btnAgregarImagenActionPerformed);
-        add(btnAgregarImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(315, 200, 160, 30));
+        add(btnAgregarImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(287, 190, 160, 30));
+
+        txtNacimiento.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtNacimiento.setPreferredSize(new java.awt.Dimension(85, 24));
+        txtNacimiento.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtNacimientoFocusLost(evt);
+            }
+        });
+        txtNacimiento.addActionListener(this::txtNacimientoActionPerformed);
+        add(txtNacimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 235, 99, -1));
+
+        jBNacimiento.setText("...");
+        jBNacimiento.addActionListener(this::jBNacimientoActionPerformed);
+        add(jBNacimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 235, 32, 20));
 
         dchFechaDeNacimiento.setDateFormatString("d M y");
+        dchFechaDeNacimiento.setFocusable(false);
         dchFechaDeNacimiento.setMaxSelectableDate(new java.util.Date(1798776104000L));
         dchFechaDeNacimiento.setNextFocusableComponent(chbDocente);
-        add(dchFechaDeNacimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(194, 236, 130, -1));
+        dchFechaDeNacimiento.setRequestFocusEnabled(false);
+        dchFechaDeNacimiento.setVerifyInputWhenFocusTarget(false);
+        dchFechaDeNacimiento.addPropertyChangeListener(this::dchFechaDeNacimientoPropertyChange);
+        add(dchFechaDeNacimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(245, 243, 5, 5));
 
         chbDocente.setText("Docente");
         chbDocente.setRequestFocusEnabled(false);
         chbDocente.addActionListener(this::chbDocenteActionPerformed);
-        add(chbDocente, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 279, -1, -1));
+        add(chbDocente, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 225, -1, -1));
 
         jPBotones.setBackground(new java.awt.Color(172, 91, 91));
         jPBotones.setFocusable(false);
@@ -211,7 +234,7 @@ public class AltaUsuario extends javax.swing.JPanel {
                 .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnGuardarCambios)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPBotonesLayout.setVerticalGroup(
             jPBotonesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -223,7 +246,7 @@ public class AltaUsuario extends javax.swing.JPanel {
                 .addGap(0, 4, Short.MAX_VALUE))
         );
 
-        add(jPBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 310, -1, -1));
+        add(jPBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 275, 420, -1));
 
         jPBotones1.setBackground(new java.awt.Color(172, 91, 91));
         jPBotones1.setFocusable(false);
@@ -250,7 +273,7 @@ public class AltaUsuario extends javax.swing.JPanel {
                 .addComponent(btnCancelar1, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnGuardarCambios1)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPBotones1Layout.setVerticalGroup(
             jPBotones1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -259,48 +282,47 @@ public class AltaUsuario extends javax.swing.JPanel {
                     .addComponent(btnAceptar1)
                     .addComponent(btnCancelar1)
                     .addComponent(btnGuardarCambios1))
-                .addGap(0, 4, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        add(jPBotones1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 460, -1, -1));
+        add(jPBotones1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 373, -1, 40));
 
         jPInstituto.setBackground(new java.awt.Color(102, 132, 145));
         jPInstituto.setFocusable(false);
         jPInstituto.setOpaque(false);
         jPInstituto.setRequestFocusEnabled(false);
-        jPInstituto.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jPInstitutoMouseDragged(evt);
-            }
-        });
         jPInstituto.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblInstituto.setText("Instituto ...:");
-        jPInstituto.add(lblInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
+        jPInstituto.add(lblInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(5, 30, -1, -1));
 
-        jPInstituto.add(cbInstitutos, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 178, 34));
+        jPInstituto.add(cbInstitutos, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 178, 34));
 
         btnAgregarInstituto.setText("->");
         btnAgregarInstituto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnAgregarInstituto.addActionListener(this::btnAgregarInstitutoActionPerformed);
-        jPInstituto.add(btnAgregarInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 60, 45, 35));
+        jPInstituto.add(btnAgregarInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 50, 45, 35));
 
         lisInstitutos.setRequestFocusEnabled(false);
         lisInstitutos.addListSelectionListener(this::lisInstitutosValueChanged);
         scpInstituos.setViewportView(lisInstitutos);
 
-        jPInstituto.add(scpInstituos, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 5, 150, 170));
+        jPInstituto.add(scpInstituos, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 12, 160, 120));
 
         btnQuitarInstituto.setText("X");
         btnQuitarInstituto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnQuitarInstituto.addActionListener(this::btnQuitarInstitutoActionPerformed);
-        jPInstituto.add(btnQuitarInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 30, 49, 30));
+        jPInstituto.add(btnQuitarInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 90, 49, 30));
 
-        add(jPInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 271, 475, 180));
+        add(jPInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 430, 140));
     }// </editor-fold>//GEN-END:initComponents
     //Mostrar Institutos solo si el nuevo usuario es docente
     private void chbDocenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chbDocenteActionPerformed
-        mostrarInstitutos(chbDocente.isSelected());
+        //mostrarInstitutos(chbDocente.isSelected());
+        if(chbDocente.isSelected())
+            formResize(FORMGRANDE);
+        else
+            formResize(FORMCHICO);
     }//GEN-LAST:event_chbDocenteActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
@@ -316,45 +338,17 @@ public class AltaUsuario extends javax.swing.JPanel {
     }//GEN-LAST:event_btnAceptarActionPerformed
     //seleccionar imagen desde archivo
     private void btnAgregarImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarImagenActionPerformed
-        JFileChooser selector = new JFileChooser();
-        
-    
-        FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imágenes (PNG, JPG)","png", "jpg");
-        selector.setFileFilter(filtro);
-        int ancho = 124;
-        int alto = 116;
-        int resultado = selector.showOpenDialog(this);
-
-        if (resultado == JFileChooser.APPROVE_OPTION) {
-
-            imagenSeleccionada = selector.getSelectedFile();
-
-            ImageIcon icono = new ImageIcon(imagenSeleccionada.getAbsolutePath());
-
-            Image imagen = icono.getImage();
-
-            Image imagenEscalada = imagen.getScaledInstance(
-                lblImagen.getWidth(),
-                lblImagen.getHeight(),
-                Image.SCALE_SMOOTH
-            );
-
-            lblImagen.setIcon(new ImageIcon(imagenEscalada));
-            
-                // Mantener el tamaño del JLabel
-            lblImagen.setPreferredSize(
-                    new java.awt.Dimension(ancho, alto)
-            );
-            lblImagen.setMinimumSize(
-                    new java.awt.Dimension(ancho, alto)
-            );
-            lblImagen.setMaximumSize(
-                    new java.awt.Dimension(ancho, alto)
-            );
-
-            revalidate();
-            repaint();
-        }        
+        File tmp=Utils.Imagen.openSO();
+        if(tmp!=null){
+            imagenSeleccionada=tmp;
+            lblImagen.setIcon(
+                    Utils.Imagen.resize(
+                            lblImagen.getWidth(), 
+                            lblImagen.getHeight(), 
+                            Utils.Imagen.loadSO(
+                                    imagenSeleccionada.getAbsolutePath())));
+        }
+        //loadImagen();
     }//GEN-LAST:event_btnAgregarImagenActionPerformed
 
     private void btnAgregarInstitutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarInstitutoActionPerformed
@@ -404,10 +398,6 @@ public class AltaUsuario extends javax.swing.JPanel {
             btnQuitarInstituto.setEnabled(false);
     }//GEN-LAST:event_lisInstitutosValueChanged
 
-    private void jPInstitutoMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPInstitutoMouseDragged
-        
-    }//GEN-LAST:event_jPInstitutoMouseDragged
-
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
         mouse.MousePressed(evt);
     }//GEN-LAST:event_formMousePressed
@@ -416,58 +406,110 @@ public class AltaUsuario extends javax.swing.JPanel {
         mouse.MouseContenedorDragged(evt);
     }//GEN-LAST:event_formMouseDragged
 
+    private void jBNacimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBNacimientoActionPerformed
+        dchFechaDeNacimiento.getCalendarButton().doClick();
+    }//GEN-LAST:event_jBNacimientoActionPerformed
+
+    private void dchFechaDeNacimientoPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dchFechaDeNacimientoPropertyChange
+        if(dchFechaDeNacimiento.getDate()!=null)
+            txtNacimiento.setText(Utils.Fecha.assignFormato(dchFechaDeNacimiento.getDate()));
+    }//GEN-LAST:event_dchFechaDeNacimientoPropertyChange
+
+    private void txtNacimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNacimientoActionPerformed
+        if(!Utils.GUI.isEmpty(txtNacimiento))
+            dchFechaDeNacimiento.setDate(Utils.Cast.valudf(txtNacimiento.getText()));
+    }//GEN-LAST:event_txtNacimientoActionPerformed
+
+    private void txtNacimientoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNacimientoFocusLost
+        if(!Utils.GUI.isEmpty(txtNacimiento))
+            dchFechaDeNacimiento.setDate(Utils.Cast.valudf(txtNacimiento.getText()));
+    }//GEN-LAST:event_txtNacimientoFocusLost
+
+    private void formResize(int modo){
+        if(modo==FORMGRANDE){
+            jPBotones.setVisible(false);
+            jPBotones1.setVisible(true);
+            jPInstituto.setVisible(true);
+        }else{
+            jPBotones1.setVisible(false);
+            jPInstituto.setVisible(false);
+            jPBotones.setVisible(true);
+        }
+        if(this.modoForm==0) Utils.GUI.reSizePadre(this, widthForm, heightForm[modo]);
+    }  
+    
+    private void loadImagen(){
+        JFileChooser selector = new JFileChooser();
+        
+    
+        FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imágenes (PNG, JPG)","png", "jpg");
+        selector.setFileFilter(filtro);
+        int ancho = 124;
+        int alto = 116;
+        int resultado = selector.showOpenDialog(this);
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+
+            imagenSeleccionada = selector.getSelectedFile();
+
+            ImageIcon icono = new ImageIcon(imagenSeleccionada.getAbsolutePath());
+
+            Image imagen = icono.getImage();
+
+            Image imagenEscalada = imagen.getScaledInstance(
+                lblImagen.getWidth(),
+                lblImagen.getHeight(),
+                Image.SCALE_SMOOTH
+            );
+
+            lblImagen.setIcon(new ImageIcon(imagenEscalada));
+            
+                // Mantener el tamaño del JLabel
+            lblImagen.setPreferredSize(
+                    new java.awt.Dimension(ancho, alto)
+            );
+            lblImagen.setMinimumSize(
+                    new java.awt.Dimension(ancho, alto)
+            );
+            lblImagen.setMaximumSize(
+                    new java.awt.Dimension(ancho, alto)
+            );
+
+            revalidate();
+            repaint();
+        }
+    }        
+    
     public void limpiarCampos() {
         txtNickname.setText("");
         txtPassword.setText("");
         txtEmail.setText("");
         txtNombre.setText("");
         txtApellido.setText("");
-
+        txtNacimiento.setText("");
         dchFechaDeNacimiento.setDate(null);
-
         chbDocente.setSelected(false);
+        imagenSeleccionada=null;
 
         if (cbInstitutos.getItemCount() > 0) {
             cbInstitutos.setSelectedIndex(0);
         }
         
-        lisInstitutos.setVisible(false);
-        btnAgregarInstituto.setVisible(false);
-        btnQuitarInstituto.setVisible(false);
-        scpInstituos.setVisible(false);
-        lblInstituto.setVisible(false);
-        cbInstitutos.setVisible(false);
-        
-        
         ((DefaultListModel<String>) lisInstitutos.getModel()).clear();
-        imagenSeleccionada = new File (RUTADEFAULT+IMAGEDEFAULT);
-        cargarImagen(IMAGEDEFAULT);
+        imagenSeleccionada = new File (cfg.pathImagen()+Utils.OS.getSeparador()+cfg.IMAGE_USER);
+        mostrarInstitutos(false);
+        cargarImagen(cfg.IMAGE_USER);
     }
     
     private void mostrarInstitutos(boolean mostrar) {
-        jPInstituto.setVisible(mostrar);
-        if(mostrar){
-            btnAceptar.setFocusable(false);
-            btnCancelar.setFocusable(false);
-            btnGuardarCambios.setFocusable(false);
-            jPBotones.setVisible(false);
-            btnAceptar1.setFocusable(true);
-            btnCancelar1.setFocusable(true);
-            btnGuardarCambios1.setFocusable(true);
-            Utils.FX.reSizePadre(this, widthForm, heightForm[1]);
-        }else{
-            btnAceptar.setFocusable(true);
-            btnCancelar.setFocusable(true);
-            btnGuardarCambios.setFocusable(true);
-            jPBotones.setVisible(true);
-            btnAceptar1.setFocusable(false);
-            btnCancelar1.setFocusable(false);
-            btnGuardarCambios1.setFocusable(false);
-            Utils.FX.reSizePadre(this, widthForm, heightForm[0]);
-        }
+        if(mostrar)
+            formResize(FORMGRANDE);
+        else
+            formResize(FORMCHICO);
     }
 
     public void cargarFormulario (DtUsuario usuario){
+        String pathImagen=cfg.pathImagen();
         txtNickname.setText(usuario.getNickname());
         txtPassword.setText("********");
          txtEmail.setText(usuario.getEmail());
@@ -475,85 +517,74 @@ public class AltaUsuario extends javax.swing.JPanel {
         txtApellido.setText(usuario.getApellido());
         dchFechaDeNacimiento.setDate(usuario.getfNacimiento());
 //        chbDocente.setEnabled(false);
-
         DefaultListModel<String> model =
                 (DefaultListModel<String>) lisInstitutos.getModel();
 
         if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
-            Utils.FX.reSizePadre(this, widthForm, heightForm[1]);
-            jPBotones.setVisible(false);
-            jPBotones1.setVisible(true);
+            formResize(FORMGRANDE);
+//            jPBotones.setVisible(false);
+//            jPBotones1.setVisible(true);
             chbDocente.setVisible(true);
             chbDocente.setSelected(true);
-            jPInstituto.setVisible(true);
+//            jPInstituto.setVisible(true);
+            if(this.modoForm==2){
+                cbInstitutos.setVisible(false);
+                btnQuitarInstituto.setVisible(false);
+                btnAgregarInstituto.setVisible(false);
+            }
             for (String instituto : usuario.getInstitutos()) {
                 model.addElement(instituto);
             }
         } else {
-            Utils.FX.reSizePadre(this, widthForm, heightForm[0]);
+            formResize(FORMCHICO);
             chbDocente.setVisible(false);
-            jPInstituto.setVisible(false);
-            jPBotones.setVisible(true);
+//            jPInstituto.setVisible(false);
+//            jPBotones.setVisible(true);
         }
 
-        cargarImagen(usuario.getImagen());
+        cargarImagen(pathImagen+Utils.OS.getSeparador()+usuario.getImagen());
 
-        imagenSeleccionada =
-                //new File(RUTADEFAULT.substring(0, RUTADEFAULT.length()-1), usuario.getImagen()); 
-                new File(RUTADEFAULT, usuario.getImagen()); 
+        imagenSeleccionada =new File(pathImagen, usuario.getImagen()); 
+        //System.out.println("muestro : "+pathImagen+Utils.OS.getSeparador()+usuario.getImagen());
+        //System.out.println("file : "+ imagenSeleccionada.getAbsolutePath());
         //System.out.println(RUTADEFAULT.substring(0, RUTADEFAULT.length()-1)); 
-        System.out.println(RUTADEFAULT); 
+        //System.out.println(RUTADEFAULT); 
 //        imagenSeleccionada =
 //                new File("imagenes", usuario.getImagen()); 
         
     }
     //carga una imagen generica de usuario en el formulario
-// Carga la imagen de usuario en el JLabel del formulario Swing
-   private void cargarImagen(String s) {
-    if (s == null || s.trim().isEmpty()) {
-        s = IMAGEDEFAULT;
+    private void cargarImagen(String s) {
+        int width=lblImagen.getWidth()<160?160:lblImagen.getWidth(),
+            height=lblImagen.getHeight()<160?160:lblImagen.getHeight();
+
+        if(s.contains(Utils.OS.getSeparador()))
+            //lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight()+20, Utils.Imagen.loadSO(s)));
+            lblImagen.setIcon(Utils.Imagen.resize(width, height, Utils.Imagen.loadSO(s)));
+        else
+            lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadJVM(s)));
+        
+//        File archivo = new File("imagenes", s);
+//        ImageIcon icono = new ImageIcon(archivo.getAbsolutePath());
+//
+//        Image imagen = icono.getImage();
+//
+//        if (lblImagen.getWidth() <= 0 || lblImagen.getHeight() <= 0) {
+//            SwingUtilities.invokeLater(() -> cargarImagen(s));
+//            return;
+//        }
+//
+//        Image imagenEscalada = imagen.getScaledInstance(
+//            lblImagen.getWidth(),
+//            lblImagen.getHeight(),
+//            Image.SCALE_SMOOTH
+//        );
+//
+//        lblImagen.setIcon(new ImageIcon(imagenEscalada));
     }
 
-    // 1. Buscar primero en la carpeta compartida central de GestorImagenes
-    File archivo = new File(GestorImagenes.getRutaBase(), s);
-
-    // 2. Si no existe allí, buscar en la carpeta del proyecto (fallback para 'usr.png')
-    if (!archivo.exists()) {
-        archivo = new File(RUTADEFAULT, s);
-    }
-
-    // 3. Si aún no existe, fallback final a la imagen genérica por defecto
-    if (!archivo.exists()) {
-        archivo = new File(RUTADEFAULT, IMAGEDEFAULT);
-    }
-
-    // 4. Si Swing no ha calculado las dimensiones del contenedor aún
-    if (lblImagen.getWidth() <= 0 || lblImagen.getHeight() <= 0) {
-        final String nombreFinal = s;
-        SwingUtilities.invokeLater(() -> cargarImagen(nombreFinal));
-        return;
-    }
-
-    // 5. Cargar y redimensionar la imagen proporcionalmente
-    try {
-        ImageIcon iconoOriginal = new ImageIcon(archivo.getAbsolutePath());
-        Image imagen = iconoOriginal.getImage();
-
-        Image imagenEscalada = imagen.getScaledInstance(
-            lblImagen.getWidth(),
-            lblImagen.getHeight(),
-            Image.SCALE_SMOOTH
-        );
-
-        lblImagen.setIcon(new ImageIcon(imagenEscalada));
-        lblImagen.setText("");
-    } catch (Exception e) {
-        lblImagen.setIcon(null);
-        lblImagen.setText("Sin Imagen");
-    }
-}
     private void cargarInstitutos() {
-        Utils.FX.reSizePadre(this, widthForm, heightForm[0]);   
+        formResize(FORMCHICO);
         try {
             IControlador ic = Fabrica.getInstance().getIControlador();
 
@@ -592,38 +623,36 @@ public class AltaUsuario extends javax.swing.JPanel {
         String email = txtEmail.getText().trim();
         String nombre = txtNombre.getText().trim();
         String apellido = txtApellido.getText().trim();
-        Date fNacimiento = dchFechaDeNacimiento.getDate();
-
-        if(nickname==null || nickname.isBlank()){
+        Date nacimiento=Utils.Cast.valudf(txtNacimiento.getText());   //  campo formateado no necesita trim()
+        
+        if(Utils.Validate.isEmpty(nickname)){
             alertMessage("Nickname vacio", "Error");
             txtNickname.requestFocus();
             return; }
-        if(password==null || password.isBlank()){
+        if(Utils.Validate.isEmpty(password)){
             alertMessage("Contraseña vacia", "Error");
             txtPassword.requestFocus();
             return; }
-        if(nombre.isBlank() || apellido.isBlank()) {
+        if(Utils.Validate.isEmpty(nombre) || Utils.Validate.isEmpty(apellido)){
             alertMessage("Debe ingresar "+(nombre.isBlank()?"nombre":"apellido")+" ", "Error");
-            if(nombre.isBlank()) txtNombre.requestFocus();
-            else if(apellido.isBlank()) txtApellido.requestFocus();
+            if(Utils.Validate.isEmpty(nombre)) txtNombre.requestFocus();
+            else if(Utils.Validate.isEmpty(apellido)) txtApellido.requestFocus();
             return; }
         if(!Utils.Validate.isEmail(email)){
                 alertMessage("El email ingresado no es válido.", "Error");
                 txtEmail.requestFocus();
                 txtEmail.setSelectionStart(0);
                 return; }
-        if(fNacimiento == null){
+        if(nacimiento == null){
             alertMessage("Debe seleccionar una fecha de nacimiento.", "Error");
             dchFechaDeNacimiento.requestFocus();
             return; }
-        else if(!Utils.Fecha.isCoherente(fNacimiento, Date.from(Instant.now()))){
+        else if(!Utils.Fecha.isCoherente(nacimiento, Date.from(Instant.now()))){
             alertMessage("La fecha tiene que ser anterior a la fecha actual", "Error");
             dchFechaDeNacimiento.requestFocus();
             return; }
-        
         List<String> institutos = new ArrayList<>();
         TipoUsuario tipo;
-
         if (chbDocente.isSelected()) {
             tipo = TipoUsuario.DOCENTE;
             DefaultListModel<String> model = (DefaultListModel<String>) lisInstitutos.getModel();
@@ -633,7 +662,6 @@ public class AltaUsuario extends javax.swing.JPanel {
                 cbInstitutos.requestFocus();
                 return; } }
         else tipo = TipoUsuario.ESTUDIANTE;
-
         try {
             if (ic.existeUsuario(nickname)) {
                 alertMessage("Ya existe un usuario con el nickname '" + nickname + "'.", "Error");
@@ -646,84 +674,101 @@ public class AltaUsuario extends javax.swing.JPanel {
             alertMessage(ex.getMessage(), "ERROR");
             return;
         }
+
         try {
-            String imagen=IMAGEDEFAULT;
-            if(imagenSeleccionada.getAbsolutePath().endsWith(IMAGEDEFAULT)){
-                System.out.println("Entre a "+IMAGEDEFAULT);
-                Utils.Imagen.save(Utils.OS.getWorkPath()+Utils.OS.getSeparador()+RUTADEFAULT, nickname+".png");
-            }
-            else{
-                System.out.println("NO Entre a "+IMAGEDEFAULT);
-                imagen = GestorImagenes.guardarImagen(imagenSeleccionada, nickname);
-                
-            }
-            
+            Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nickname);
             DtUsuario dtUsuario = new DtUsuario(
                 nickname,
                 getContraseña(password),
                 email==null||email.isBlank()?"":email,
                 nombre,
                 apellido,
-                imagen,
-                fNacimiento,
+                imagenSeleccionada==null?cfg.IMAGE_USER:nickname+imagenSeleccionada.getName()
+                        .substring(imagenSeleccionada.getName().lastIndexOf(".")),
+                nacimiento,
                 institutos,
                 tipo
             );
             ic.crearUsuario(dtUsuario);
-            limpiarCampos();
             Logger.info("Usuario {} con mombre {} {} creado correctamente.", nickname, nombre, apellido);
-            JOptionPane.showMessageDialog(this,"Usuario creado correctamente.","Alta de usuario",JOptionPane.INFORMATION_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this,"Usuario creado correctamente.","Alta de usuario",JOptionPane.INFORMATION_MESSAGE);
+            limpiarCampos();
         } catch (Exception ex) {
             Logger.error(ex.getMessage(),"ERROR");
             JOptionPane.showMessageDialog(this,ex.getMessage(),"ERROR",JOptionPane.ERROR_MESSAGE
             );
         }   
     }
-    // *************************************************************************
+    //*********** No eliminar, necesita subir cifrada por seguridad **********//
     private String getContraseña(String password){
-        return Utils.Crypt.BCrypt(password, 7); // 2^7 iteraciones
+        return Utils.Crypt.cifrarAES(password); 
     }
-    
+    //************************************************************************//
     
     private void guardarCambios(){
+        IControlador ic = Fabrica.getInstance().getIControlador();
         String nickname = txtNickname.getText().trim();
-        String password=txtPassword.getText().trim();
+        //String password=txtPassword.getText().trim();
         String email = txtEmail.getText().trim();
         String nombre = txtNombre.getText().trim();
         String apellido = txtApellido.getText().trim();
-        int emailEmpty=0;
-        Date fNacimiento = dchFechaDeNacimiento.getDate();
+        Date nacimiento=Utils.Cast.valudf(txtNacimiento.getText());   //  campo formateado no necesita trim()
         
         
-        if(password==null && password.isBlank()){
-            JOptionPane.showMessageDialog(this,"Contraseña vacia","Error",JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        
+        //int emailEmpty=0;
+        //Date fNacimiento = dchFechaDeNacimiento.getDate();
+        
+        
+//        if(password==null && password.isBlank()){
+//            JOptionPane.showMessageDialog(this,"Contraseña vacia","Error",JOptionPane.ERROR_MESSAGE);
+//            return;
+//        }
 
-        if(email!=null && !email.isEmpty()) 
-            emailEmpty=JOptionPane.showOptionDialog(this, "Email vacio, ¿desea continuar?", "Confirme acción", 
-                       JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+//        if(email!=null && !email.isEmpty()) 
+//            emailEmpty=JOptionPane.showOptionDialog(this, "Email vacio, ¿desea continuar?", "Confirme acción", 
+//                       JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 
-        if(emailEmpty==0)
-            if(!Utils.Validate.isEmail(email)){
-                JOptionPane.showMessageDialog(this,
-                            "Email invalido","Error",JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        else return;
+//        if(emailEmpty==0)
+//            if(!Utils.Validate.isEmail(email)){
+//                JOptionPane.showMessageDialog(this,
+//                            "Email invalido","Error",JOptionPane.ERROR_MESSAGE);
+//                return;
+//            }
+//        else return;
         
         
 
-        if ((fNacimiento == null)  || nombre.isEmpty() || apellido.isEmpty()) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Debe completar todos los campos.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
+//        if ((fNacimiento == null)  || nombre.isEmpty() || apellido.isEmpty()) {
+//            JOptionPane.showMessageDialog(
+//                this,
+//                "Debe completar todos los campos.",
+//                "Error",
+//                JOptionPane.ERROR_MESSAGE
+//            );
+//            return;
+//        }
+
+        
+        
+        if(Utils.Validate.isEmpty(nombre) || Utils.Validate.isEmpty(apellido)){
+            alertMessage("Debe ingresar "+(nombre.isBlank()?"nombre":"apellido")+" ", "Error");
+            if(Utils.Validate.isEmpty(nombre)) txtNombre.requestFocus();
+            else if(Utils.Validate.isEmpty(apellido)) txtApellido.requestFocus();
+            return; }
+        if(!Utils.Validate.isEmail(email)){
+                alertMessage("El email ingresado no es válido.", "Error");
+                txtEmail.requestFocus();
+                txtEmail.setSelectionStart(0);
+                return; }
+        if(nacimiento == null){
+            alertMessage("Debe seleccionar una fecha de nacimiento.", "Error");
+            dchFechaDeNacimiento.requestFocus();
+            return; }
+        else if(!Utils.Fecha.isCoherente(nacimiento, Date.from(Instant.now()))){
+            alertMessage("La fecha tiene que ser anterior a la fecha actual", "Error");
+            dchFechaDeNacimiento.requestFocus();
+            return; }
 
         
         List<String> institutos = new ArrayList<>();
@@ -754,24 +799,25 @@ public class AltaUsuario extends javax.swing.JPanel {
         }
 
         try {
-
-            String imagen = GestorImagenes.guardarImagen(imagenSeleccionada,nickname);
-
-    
-
+            Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nickname); 
+            //String imagen = GestorImagenes.guardarImagen(imagenSeleccionada,nickname);
+            //System.out.println("guardo : "+imagenSeleccionada.getAbsolutePath());
+            
+            //System.out.println("ebtro con mail : "+ email);
             DtUsuario usuarioModificado = new DtUsuario(
                 nickname,
-                Utils.Crypt.BCrypt(password),
+                null,
                 email,
                 nombre,
                 apellido,
-                imagen,
-                fNacimiento,
+                nickname+imagenSeleccionada.getName()
+                        .substring(imagenSeleccionada.getName().lastIndexOf(".")),
+                nacimiento,
                 institutos,
                 tipo
             );
 
-            IControlador ic = Fabrica.getInstance().getIControlador();
+            //IControlador ic = Fabrica.getInstance().getIControlador();
 
             ic.modificarUsuario(usuarioModificado);
 
@@ -806,6 +852,7 @@ public class AltaUsuario extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> cbInstitutos;
     private javax.swing.JCheckBox chbDocente;
     private com.toedter.calendar.JDateChooser dchFechaDeNacimiento;
+    private javax.swing.JButton jBNacimiento;
     private javax.swing.JPanel jPBotones;
     private javax.swing.JPanel jPBotones1;
     private javax.swing.JPanel jPInstituto;
@@ -821,6 +868,7 @@ public class AltaUsuario extends javax.swing.JPanel {
     private javax.swing.JScrollPane scpInstituos;
     private javax.swing.JTextField txtApellido;
     private javax.swing.JTextField txtEmail;
+    private javax.swing.JFormattedTextField txtNacimiento;
     private javax.swing.JTextField txtNickname;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtPassword;

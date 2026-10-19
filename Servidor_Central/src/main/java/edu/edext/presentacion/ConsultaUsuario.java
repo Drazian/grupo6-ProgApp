@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package edu.edext.presentacion;
 
+import edu.edext.presentacion.AltaUsuario;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtEdicion;
@@ -12,7 +9,11 @@ import javax.swing.table.DefaultTableModel;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.presentacion.ConsultaCurso;
+import edu.edext.presentacion.ConsultaEdicion;
+import edu.edext.presentacion.ConsultaPrograma;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -31,6 +32,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
      */
     private AltaUsuario formularioUsuario;
     private List<DtUsuario> usuarios;
+    private String selected=null;
     
     public ConsultaUsuario() {
         initComponents();
@@ -72,10 +74,13 @@ public class ConsultaUsuario extends javax.swing.JPanel {
             DefaultListModel<String> model = new DefaultListModel<>();
 
             for (DtUsuario aux: usuarios){
-                model.addElement(aux.getNickname());
+                //model.addElement(aux.getNickname());
+                model.addElement(aux.getNombre()+" "+aux.getApellido());
             }
 
             lisUsuario.setModel(model);
+            lisUsuario.setSelectedValue(selected, true);
+            
 
         } catch (Exception e){
             JOptionPane.showMessageDialog(
@@ -110,35 +115,56 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         scpProgramas = new javax.swing.JScrollPane();
         tblProgramas = new javax.swing.JTable();
 
-        lisUsuario.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        setMinimumSize(new java.awt.Dimension(640, 550));
+        setPreferredSize(new java.awt.Dimension(640, 550));
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
         });
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
         lisUsuario.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        lisUsuario.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                lisUsuarioFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                lisUsuarioFocusLost(evt);
+            }
+        });
         lisUsuario.addListSelectionListener(this::lisUsuarioValueChanged);
         scpUsuarios.setViewportView(lisUsuario);
+
+        add(scpUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 170, 350));
 
         javax.swing.GroupLayout panUsuarioLayout = new javax.swing.GroupLayout(panUsuario);
         panUsuario.setLayout(panUsuarioLayout);
         panUsuarioLayout.setHorizontalGroup(
             panUsuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 524, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
         panUsuarioLayout.setVerticalGroup(
             panUsuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 278, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        add(panUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 0, 465, 350));
+
         tbCursosYProgramas.setBorder(javax.swing.BorderFactory.createMatteBorder(3, 3, 3, 3, new java.awt.Color(0, 0, 0)));
+        tbCursosYProgramas.setMinimumSize(new java.awt.Dimension(623, 158));
+        tbCursosYProgramas.setPreferredSize(new java.awt.Dimension(623, 158));
+        tbCursosYProgramas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                bCursosYProgramasMouseClicked(evt);
+            }
+        });
 
         panCursos.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, new java.awt.Color(0, 0, 0)));
+        panCursos.setLayout(new java.awt.BorderLayout());
 
         tblCursos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -167,29 +193,16 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         scpCursos.setViewportView(tblCursos);
         tblCursos.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        javax.swing.GroupLayout panCursosLayout = new javax.swing.GroupLayout(panCursos);
-        panCursos.setLayout(panCursosLayout);
-        panCursosLayout.setHorizontalGroup(
-            panCursosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpCursos, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
-        );
-        panCursosLayout.setVerticalGroup(
-            panCursosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panCursosLayout.createSequentialGroup()
-                .addComponent(scpCursos, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 4, Short.MAX_VALUE))
-        );
+        panCursos.add(scpCursos, java.awt.BorderLayout.CENTER);
 
         tbCursosYProgramas.addTab("Cursos", panCursos);
         panCursos.getAccessibleContext().setAccessibleName("");
 
         panEdicionesDeCursos.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, new java.awt.Color(0, 0, 0)));
+        panEdicionesDeCursos.setLayout(new java.awt.BorderLayout());
 
         tblEdicionDeCursos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -218,28 +231,15 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         scpEdicionDeCursos.setViewportView(tblEdicionDeCursos);
         tblEdicionDeCursos.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        javax.swing.GroupLayout panEdicionesDeCursosLayout = new javax.swing.GroupLayout(panEdicionesDeCursos);
-        panEdicionesDeCursos.setLayout(panEdicionesDeCursosLayout);
-        panEdicionesDeCursosLayout.setHorizontalGroup(
-            panEdicionesDeCursosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpEdicionDeCursos, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
-        );
-        panEdicionesDeCursosLayout.setVerticalGroup(
-            panEdicionesDeCursosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panEdicionesDeCursosLayout.createSequentialGroup()
-                .addComponent(scpEdicionDeCursos, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 4, Short.MAX_VALUE))
-        );
+        panEdicionesDeCursos.add(scpEdicionDeCursos, java.awt.BorderLayout.CENTER);
 
         tbCursosYProgramas.addTab("Ediciones de Cursos", panEdicionesDeCursos);
 
         panProgramas.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, new java.awt.Color(0, 0, 0)));
+        panProgramas.setLayout(new java.awt.BorderLayout());
 
         tblProgramas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -268,44 +268,11 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         scpProgramas.setViewportView(tblProgramas);
         tblProgramas.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        javax.swing.GroupLayout panProgramasLayout = new javax.swing.GroupLayout(panProgramas);
-        panProgramas.setLayout(panProgramasLayout);
-        panProgramasLayout.setHorizontalGroup(
-            panProgramasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scpProgramas, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
-        );
-        panProgramasLayout.setVerticalGroup(
-            panProgramasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panProgramasLayout.createSequentialGroup()
-                .addComponent(scpProgramas, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 4, Short.MAX_VALUE))
-        );
+        panProgramas.add(scpProgramas, java.awt.BorderLayout.CENTER);
 
         tbCursosYProgramas.addTab("Programas", panProgramas);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scpUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(tbCursosYProgramas)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scpUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(panUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(tbCursosYProgramas, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+        add(tbCursosYProgramas, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 355, 637, 193));
     }// </editor-fold>//GEN-END:initComponents
 
     private void lisUsuarioValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lisUsuarioValueChanged
@@ -315,6 +282,8 @@ public class ConsultaUsuario extends javax.swing.JPanel {
                 int indice = lisUsuario.getSelectedIndex();
                 crearFormulario();
                 if (indice != -1) {
+                    selected=lisUsuario.getSelectedValue();
+                    
                     DtUsuario usuario = usuarios.get(indice);
                      
                     formularioUsuario.cargarFormulario(usuario);
@@ -327,6 +296,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
     }//GEN-LAST:event_lisUsuarioValueChanged
 
     private void tblCursosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCursosMouseClicked
+
 
         int fila = tblCursos.getSelectedRow();
 
@@ -436,6 +406,36 @@ public class ConsultaUsuario extends javax.swing.JPanel {
 
     }//GEN-LAST:event_tblProgramasMouseClicked
 
+    private void lisUsuarioFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_lisUsuarioFocusGained
+        listarUsuarios();
+    }//GEN-LAST:event_lisUsuarioFocusGained
+
+    private void lisUsuarioFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_lisUsuarioFocusLost
+        listarUsuarios();
+    }//GEN-LAST:event_lisUsuarioFocusLost
+
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        SwingUtilities.invokeLater(() -> {resizeTab();}); 
+    }//GEN-LAST:event_formComponentResized
+
+    private void bCursosYProgramasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bCursosYProgramasMouseClicked
+        SwingUtilities.invokeLater(() -> {resizeTab();}); 
+    }//GEN-LAST:event_bCursosYProgramasMouseClicked
+
+    private void resizeTab(){
+        tbCursosYProgramas.setSize(this.getWidth(), this.getHeight()-tbCursosYProgramas.getY());
+        System.out.println("X : "+tbCursosYProgramas.getSize());
+        Dimension size=tbCursosYProgramas.getSize();//new Dimension(623, 185);
+        tblCursos.setSize(size);
+        tblCursos.setPreferredSize(size);
+        tblCursos.setMinimumSize(size);
+        tblEdicionDeCursos.setSize(size);
+        tblEdicionDeCursos.setPreferredSize(size);
+        tblEdicionDeCursos.setMinimumSize(size);
+        tblProgramas.setSize(size);
+        tblProgramas.setPreferredSize(size);
+        tblProgramas.setMinimumSize(size);
+    }
     private void configurarPestanas(DtUsuario usuario) {
 
         if (tbCursosYProgramas.indexOfComponent(panCursos) == -1) {

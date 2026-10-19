@@ -1,17 +1,22 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
- */
 package edu.edext.presentacion;
 
+import edu.edext.datatypes.DtCategoria;
 import edu.edext.datatypes.DtConsultaCurso;
+import edu.edext.datatypes.DtCurso;
+import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtInstituto;
+import edu.edext.datatypes.DtPrograma;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.tools.Utils;
+import edu.edext.tools.Utils.Mouse;
+import edu.edext.tools.cfg;
+import edu.edext.tools.jTable;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import javax.swing.DefaultListModel;
+import java.util.Set;
 import javax.swing.JOptionPane;
+import org.tinylog.Logger;
 
 /**
  *
@@ -20,16 +25,32 @@ import javax.swing.JOptionPane;
 public class ConsultaCurso extends javax.swing.JInternalFrame {
 
     private IControlador control;
+    private final Mouse mouse=new Mouse();
+//    private final jTable tablePrevias;
+    private final jTable tableEdiciones;
+    private final jTable tableProgramas;
+    private final jTable tableCategorias;
 
     /**
      * Creates new form consultaCurso
      */
     public ConsultaCurso() {
         initComponents();
+//        tablePrevias=new jTable(tblPrevias);
+        tableEdiciones=new jTable(tblEdiciones);
+        tableProgramas=new jTable(tblProgramas);
+        tableCategorias=new jTable(tblCategorias);
         
         // Inicializar la conexión con la lógica y cargar datos
         control = Fabrica.getInstance().getIControlador();
         cargarInstitutos();
+    }
+    
+    private String concatena(Set<String> coleccion){
+        String tmp="";
+        for(String cat : coleccion) tmp+=cat+", ";
+        if(tmp.length()>3) tmp=tmp.substring(0, tmp.length()-2);
+        return tmp;
     }
     
     private void cargarInstitutos() {
@@ -53,8 +74,14 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         textoCreditos.setText("");
         textoURL.setText("");
         textoFechaAlta.setText("");
-        jList1.setModel(new DefaultListModel<>());
-        jList2.setModel(new DefaultListModel<>());
+//        tablePrevias.clear();
+        Utils.GUI.clear(tblPrevias);
+        tableEdiciones.clear();
+        tableProgramas.clear();
+        tableCategorias.clear();
+        lblImagen.setIcon(null);
+//        jList1.setModel(new DefaultListModel<>());
+//        jList2.setModel(new DefaultListModel<>());
     }
 
     /**
@@ -84,210 +111,308 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         textoURL = new javax.swing.JTextField();
         textoFechaAlta = new javax.swing.JTextField();
         listasAsociadas = new javax.swing.JTabbedPane();
+        jPanel4 = new javax.swing.JPanel();
+        scpCursos = new javax.swing.JScrollPane();
+        tblPrevias = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        scpEdicionDeCursos = new javax.swing.JScrollPane();
+        tblEdiciones = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList<>();
+        scpEdicionDeCursos1 = new javax.swing.JScrollPane();
+        tblProgramas = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jList3 = new javax.swing.JList<>();
-        verDetalleButton = new javax.swing.JButton();
-        cerrarButton = new javax.swing.JButton();
+        scpEdicionDeCursos2 = new javax.swing.JScrollPane();
+        tblCategorias = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
         textoDescripcion = new javax.swing.JTextArea();
+        lblImagen = new javax.swing.JLabel();
 
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
         setTitle("Consulta Curso");
-        setMinimumSize(new java.awt.Dimension(628, 505));
-        setPreferredSize(new java.awt.Dimension(628, 505));
-        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        setMinimumSize(new java.awt.Dimension(795, 485));
+        setPreferredSize(new java.awt.Dimension(795, 485));
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+        });
 
-        institutoLabel.setText("Seleccionar Instituto:");
+        institutoLabel.setText("Instituto .:");
         institutoLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        institutoLabel.setMinimumSize(null);
-        getContentPane().add(institutoLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
 
         institutoSeleccion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         institutoSeleccion.setMaximumSize(new java.awt.Dimension(200, 22));
         institutoSeleccion.setMinimumSize(null);
         institutoSeleccion.addActionListener(this::institutoSeleccionActionPerformed);
-        getContentPane().add(institutoSeleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, 150, -1));
 
-        cursoLabel.setText("Seleccionar Curso:");
+        cursoLabel.setText("Curso .:");
         cursoLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        cursoLabel.setMinimumSize(null);
-        getContentPane().add(cursoLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 20, -1, -1));
 
         cursoSeleccion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cursoSeleccion.setMaximumSize(new java.awt.Dimension(200, 22));
         cursoSeleccion.setMinimumSize(null);
         cursoSeleccion.addActionListener(this::cursoSeleccionActionPerformed);
-        getContentPane().add(cursoSeleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 10, 170, -1));
 
-        nombreLabel.setText("Nombre:");
+        nombreLabel.setText("Nombre .:");
         nombreLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        nombreLabel.setMinimumSize(null);
-        getContentPane().add(nombreLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, -1));
 
-        descripcionLabel.setText("Descripcion:");
+        descripcionLabel.setText("Descripcion .:");
         descripcionLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        descripcionLabel.setMinimumSize(null);
-        getContentPane().add(descripcionLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, -1, -1));
 
-        duracionLabel.setText("Duracion:");
+        duracionLabel.setText("Duracion .:");
         duracionLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        duracionLabel.setMinimumSize(null);
-        getContentPane().add(duracionLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 190, -1, -1));
 
-        horasLabel.setText("Horas:");
+        horasLabel.setText("Horas .:");
         horasLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        horasLabel.setMinimumSize(null);
-        getContentPane().add(horasLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 60, -1, -1));
 
-        creditosLabel.setText("Creditos:");
+        creditosLabel.setText("Creditos .:");
         creditosLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        creditosLabel.setMinimumSize(null);
-        getContentPane().add(creditosLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 90, -1, -1));
 
-        urlLabel.setText("URL:");
+        urlLabel.setText("URL  .:");
         urlLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        urlLabel.setMinimumSize(null);
-        getContentPane().add(urlLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 120, -1, -1));
 
-        fechaAltaLabel.setText("Fecha de Alta:");
+        fechaAltaLabel.setText("Fecha de Alta .:");
         fechaAltaLabel.setMaximumSize(new java.awt.Dimension(200, 22));
-        fechaAltaLabel.setMinimumSize(null);
-        getContentPane().add(fechaAltaLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 150, -1, -1));
 
         textoNombre.setEditable(false);
         textoNombre.setMaximumSize(new java.awt.Dimension(200, 22));
         textoNombre.setMinimumSize(null);
-        getContentPane().add(textoNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 60, 210, -1));
 
         textoDuracion.setEditable(false);
+        textoDuracion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         textoDuracion.setMaximumSize(new java.awt.Dimension(200, 22));
         textoDuracion.setMinimumSize(null);
-        getContentPane().add(textoDuracion, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 190, 90, -1));
 
         textoHoras.setEditable(false);
         textoHoras.setMaximumSize(new java.awt.Dimension(200, 22));
         textoHoras.setMinimumSize(null);
-        getContentPane().add(textoHoras, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 60, 160, -1));
 
         textoCreditos.setEditable(false);
         textoCreditos.setMaximumSize(new java.awt.Dimension(200, 22));
         textoCreditos.setMinimumSize(null);
-        getContentPane().add(textoCreditos, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 90, 160, -1));
 
         textoURL.setEditable(false);
         textoURL.setMaximumSize(new java.awt.Dimension(200, 22));
         textoURL.setMinimumSize(null);
-        getContentPane().add(textoURL, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 120, 180, -1));
 
         textoFechaAlta.setEditable(false);
         textoFechaAlta.setMaximumSize(new java.awt.Dimension(200, 22));
         textoFechaAlta.setMinimumSize(null);
         textoFechaAlta.addActionListener(this::textoFechaAltaActionPerformed);
-        getContentPane().add(textoFechaAlta, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 150, 130, -1));
 
         listasAsociadas.setMaximumSize(new java.awt.Dimension(200, 22));
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        tblPrevias.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Nombre", "Duracion", "Horas", "Creditos", "Registrado", "Categorias", "Descripcion"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
-        jScrollPane1.setViewportView(jList1);
+        tblPrevias.setColumnSelectionAllowed(true);
+        tblPrevias.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblPreviasMouseClicked(evt);
+            }
+        });
+        scpCursos.setViewportView(tblPrevias);
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scpCursos, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(scpCursos, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+        );
+
+        listasAsociadas.addTab("Previas", jPanel4);
+
+        tblEdiciones.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Nombre", "Cupo", "Inicio", "Fin", "Publicado", "Docentes"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblEdiciones.setColumnSelectionAllowed(true);
+        tblEdiciones.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblEdicionesMouseClicked(evt);
+            }
+        });
+        scpEdicionDeCursos.setViewportView(tblEdiciones);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(162, Short.MAX_VALUE))
+            .addComponent(scpEdicionDeCursos, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(scpEdicionDeCursos, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
         );
 
         listasAsociadas.addTab("Ediciones", jPanel1);
 
-        jList2.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        tblProgramas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Nombre", "Inicio", "Fin", "Registrado", "Categorias", "Descripcion"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
-        jScrollPane2.setViewportView(jList2);
+        tblProgramas.setColumnSelectionAllowed(true);
+        tblProgramas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblProgramasMouseClicked(evt);
+            }
+        });
+        scpEdicionDeCursos1.setViewportView(tblProgramas);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(208, Short.MAX_VALUE))
+            .addComponent(scpEdicionDeCursos1, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+            .addComponent(scpEdicionDeCursos1, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
         );
 
         listasAsociadas.addTab("Programas de Formacion", jPanel2);
 
-        jList3.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        tblCategorias.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null},
+                {null}
+            },
+            new String [] {
+                "Nombre"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
-        jScrollPane4.setViewportView(jList3);
+        tblCategorias.setColumnSelectionAllowed(true);
+        tblCategorias.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCategoriasMouseClicked(evt);
+            }
+        });
+        scpEdicionDeCursos2.setViewportView(tblCategorias);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(210, Short.MAX_VALUE))
+            .addComponent(scpEdicionDeCursos2, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+            .addComponent(scpEdicionDeCursos2, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
         );
 
         listasAsociadas.addTab("Categorias", jPanel3);
-
-        getContentPane().add(listasAsociadas, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 240, -1, -1));
-
-        verDetalleButton.setText("Ver Detalle");
-        verDetalleButton.setMaximumSize(new java.awt.Dimension(200, 22));
-        verDetalleButton.setMinimumSize(null);
-        verDetalleButton.addActionListener(this::verDetalleButtonActionPerformed);
-        getContentPane().add(verDetalleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 430, -1, -1));
-
-        cerrarButton.setText("Cerrar");
-        cerrarButton.setMaximumSize(new java.awt.Dimension(200, 22));
-        cerrarButton.setMinimumSize(null);
-        cerrarButton.addActionListener(this::cerrarButtonActionPerformed);
-        getContentPane().add(cerrarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 430, -1, -1));
 
         textoDescripcion.setColumns(20);
         textoDescripcion.setLineWrap(true);
@@ -295,12 +420,128 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         textoDescripcion.setWrapStyleWord(true);
         jScrollPane3.setViewportView(textoDescripcion);
 
-        getContentPane().add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 90, 200, 90));
+        lblImagen.setBackground(new java.awt.Color(102, 204, 255));
+        lblImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        lblImagen.setFocusable(false);
+        lblImagen.setRequestFocusEnabled(false);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(institutoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(16, 16, 16)
+                                .addComponent(institutoSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(cursoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(33, 33, 33)
+                                .addComponent(cursoSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(urlLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(45, 45, 45)
+                                .addComponent(textoURL, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(descripcionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(50, 50, 50)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(25, 25, 25)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(nombreLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(17, 17, 17)
+                        .addComponent(textoNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(fechaAltaLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(11, 11, 11)
+                        .addComponent(textoFechaAlta, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(duracionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(41, 41, 41)
+                        .addComponent(textoDuracion, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(horasLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(63, 63, 63)
+                        .addComponent(textoHoras, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(creditosLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(45, 45, 45)
+                        .addComponent(textoCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(15, 15, 15)
+                .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(listasAsociadas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(nombreLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(textoNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(26, 26, 26)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(10, 10, 10)
+                                        .addComponent(fechaAltaLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(textoFechaAlta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(22, 22, 22)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(10, 10, 10)
+                                        .addComponent(duracionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(textoDuracion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(22, 22, 22)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(10, 10, 10)
+                                        .addComponent(horasLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(textoHoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(22, 22, 22)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(creditosLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(textoCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addComponent(institutoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(institutoSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addComponent(cursoLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(cursoSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(urlLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(textoURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(6, 6, 6)
+                        .addComponent(descripcionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(listasAsociadas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void institutoSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_institutoSeleccionActionPerformed
+        if(institutoSeleccion.hasFocus()){
         if (institutoSeleccion.getSelectedIndex() > 0) {
             String instSeleccionado = (String) institutoSeleccion.getSelectedItem();
             try {
@@ -318,10 +559,13 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
             cursoSeleccion.removeAllItems();
             limpiarCampos();
         }
+        }
     }//GEN-LAST:event_institutoSeleccionActionPerformed
 
     private void cursoSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cursoSeleccionActionPerformed
-        if (cursoSeleccion.getSelectedItem() != null && cursoSeleccion.getSelectedIndex() > 0) {
+       if(cursoSeleccion.hasFocus()){
+           if (cursoSeleccion.getSelectedItem() != null && cursoSeleccion.getSelectedIndex() > 0) {
+            limpiarCampos();
             String cursoSeleccionado = (String) cursoSeleccion.getSelectedItem();
             try {
                 DtConsultaCurso dt = control.obtenerDatosCurso(cursoSeleccionado);
@@ -332,41 +576,194 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
                 textoHoras.setText(String.valueOf(dt.getCantidadHoras()));
                 textoCreditos.setText(String.valueOf(dt.getCreditos()));
                 textoURL.setText(dt.getUrl());
+                lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(cfg.fullpathImagen()+dt.getImagen())));
                 
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 textoFechaAlta.setText(sdf.format(dt.getFechaRegistro()));
 
-                DefaultListModel<String> modEdiciones = new DefaultListModel<>();
-                for (String ed : dt.getEdiciones()) modEdiciones.addElement(ed);
-                jList1.setModel(modEdiciones);
-
-                DefaultListModel<String> modProgramas = new DefaultListModel<>();
-                for (String pr : dt.getProgramas()) modProgramas.addElement(pr);
-                jList2.setModel(modProgramas);
+                //DefaultTableModel modelPrevias=(DefaultTableModel) tblCursos.getModel();
+                //DefaultTableCellRenderer CENTRO= new DefaultTableCellRenderer();
+                //CENTRO.setHorizontalAlignment(SwingConstants.CENTER);
+//                DefaultTableCellRenderer derecha = new DefaultTableCellRenderer().setHorizontalAlignment(SwingConstants.RIGHT);
+//                DefaultTableCellRenderer izquierda = new DefaultTableCellRenderer().setHorizontalAlignment(SwingConstants.LEFT);
                 
-                DefaultListModel<String> modCategorias=new DefaultListModel<>();
-                for (String ca : dt.getCategorias()) modCategorias.addElement(ca);
-                jList3.setModel(modCategorias);
+                // Duración
+//                tblCursos.getColumnModel().getColumn(1).setPreferredWidth(12);
+                //tblCursos.getColumnModel().getColumn(1).setCellRenderer(CENTRO);
+                //Utils.GUI.setSizeColumn(tblCursos, 1, 200);
+                //tblCursos.setAutoResizeMode(5);
+                
+//                Utils.GUI.sizeColumn(tblPrevias, 1, 25, Utils.ALIGN_CENTER);
+//                Utils.GUI.sizeColumn(tblPrevias, 2, 15);
+//                Utils.GUI.sizeColumn(tblPrevias, 3, 15);
+//                Utils.GUI.sizeColumn(tblPrevias, 4, 20, Utils.ALIGN_CENTER);
+//                Utils.GUI.sizeColumn(tblPrevias, 5, Utils.ALIGN_LEFT);
+//                tableEdiciones.sizeColumn(1, 20, tableEdiciones.ALIGN_CENTER);
+//                tableEdiciones.sizeColumn(2, 60, tableEdiciones.ALIGN_CENTER);
+//                tableEdiciones.sizeColumn(3, 60, tableEdiciones.ALIGN_CENTER);
+//                tableEdiciones.sizeColumn(4, 60, tableEdiciones.ALIGN_RIGHT);
+//                tableEdiciones.alignment(5, tableEdiciones.ALIGN_LEFT);
+//                tableProgramas.sizeColumn(1, 60, tableProgramas.ALIGN_CENTER);
+//                tableProgramas.sizeColumn(2, 60, tableProgramas.ALIGN_CENTER);
+//                tableProgramas.sizeColumn(3, 60, tableProgramas.ALIGN_CENTER);
+//                tableProgramas.alignment(4, tableProgramas.ALIGN_LEFT);
+//                tableProgramas.alignment(5, tableProgramas.ALIGN_LEFT);
+//                tableCategorias.alignment(0, tableCategorias.ALIGN_LEFT);
+//                
+                
+                if(dt.getPrevias()!=null){
+                    Utils.GUI.clear(tblPrevias);
+                    for(DtCurso p : dt.getPrevias())
+                        Utils.GUI.addRow(tblPrevias, new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), Utils.Fecha.assignFormato(p.getFechaRegistro()), concatena(dt.getNamePrevias()), p.getDescripcion()}); 
+                    Utils.GUI.getModel(tblPrevias).setRowCount(8);
+                }
+        //(new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), p.getFechaRegistro(), concatena(dt.getNamePrevias()), p.getDescripcion()});
+                    //tablePrevias.assignData(); }
+
+
+
+//                if(dt.getPrevias()!=null){
+//                    for(DtCurso p : dt.getPrevias())
+//                        tablePrevias.addRow(new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), p.getFechaRegistro(), concatena(dt.getNamePrevias()), p.getDescripcion()});
+//                    tablePrevias.assignData(); }
+                if(dt.getEdiciones()!=null){ 
+                    for(DtEdicion p : dt.getEdiciones())
+                        tableEdiciones.addRow(new Object[]{p.getNombre(), p.getCupo(), p.getFechaInicio(), p.getFechaFin(), p.getFechaPublicacion(), concatena(p.getNameDocentes())});
+                    tableEdiciones.assignData(); }
+                if(dt.getProgramas()!=null){
+                    for(DtPrograma p : dt.getProgramas())
+                        tableProgramas.addRow(new Object[]{p.getNombre(), p.getFechaInicio(), p.getFechaFin(), p.getFechaRegistro(), concatena(p.getCategorias()), p.getDescripcion()});
+                    tableProgramas.assignData(); }
+                if(dt.getCategorias()!=null){
+                    for(DtCategoria p : dt.getCategorias()){
+                        tableCategorias.addRow(new Object[]{p.getNombre()});
+                    }
+                    
+                    tableCategorias.assignData(); }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+//                DefaultListModel<String> modEdiciones = new DefaultListModel<>();
+//                for (String ed : dt.getEdiciones()) modEdiciones.addElement(ed);
+//                jList1.setModel(modEdiciones);
+//
+//                DefaultListModel<String> modProgramas = new DefaultListModel<>();
+//                for (String pr : dt.getProgramas()) modProgramas.addElement(pr);
+//                jList2.setModel(modProgramas);
+//                
+//                DefaultListModel<String> modCategorias=new DefaultListModel<>();
+//                for (String ca : dt.getCategorias()) modCategorias.addElement(ca);
+//                jList3.setModel(modCategorias);
+
+
 
             } catch (Exception e) {
+                Logger.error(e, "Error");
                 JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+       }
     }//GEN-LAST:event_cursoSeleccionActionPerformed
 
     private void textoFechaAltaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textoFechaAltaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_textoFechaAltaActionPerformed
 
-    private void verDetalleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verDetalleButtonActionPerformed
-        JOptionPane.showMessageDialog(this, "Esta función se implementará al desarrollar los casos de uso correspondientes.", "Información", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_verDetalleButtonActionPerformed
+    private void tblPreviasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblPreviasMouseClicked
 
-    private void cerrarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cerrarButtonActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_cerrarButtonActionPerformed
+//        int fila = tblCursos.getSelectedRow();
+//
+//        if (fila != -1) {
+//
+//            String nombreCurso = tblCursos.getValueAt(fila, 0).toString();
+//
+//            ConsultaCurso ventana = new ConsultaCurso();
+//
+//            ventana.cargarCurso(nombreCurso);
+//
+//            // Buscar el JDesktopPane que contiene a ConsultaUsuario
+//            JDesktopPane desktop = (JDesktopPane) SwingUtilities.getAncestorOfClass(
+//                JDesktopPane.class, this);
+//
+//            if (desktop != null) {
+//                desktop.add(ventana);
+//                ventana.setVisible(true);
+//
+//                try {
+//                    ventana.setSelected(true);
+//                } catch (java.beans.PropertyVetoException e) {
+//
+//                }
+//            }
+//        }
+
+    }//GEN-LAST:event_tblPreviasMouseClicked
+
+    private void tblEdicionesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEdicionesMouseClicked
+//        int fila = tblEdicionDeCursos.getSelectedRow();
+//
+//        if (fila != -1) {
+//
+//            String nombreEdicion =
+//            tblEdicionDeCursos.getValueAt(fila, 0).toString();
+//
+//            ConsultaEdicion formulario = new ConsultaEdicion();
+//
+//            formulario.cargarEdicion(nombreEdicion);
+//
+//            JDesktopPane desktop = (JDesktopPane) SwingUtilities.getAncestorOfClass(
+//                JDesktopPane.class, this);
+//
+//            if (desktop != null) {
+//
+//                // Crear ventana interna
+//                JInternalFrame ventana = new JInternalFrame(
+//                    "Consulta Edición",
+//                    true,
+//                    true,
+//                    true,
+//                    false
+//                );
+//
+//                ventana.getContentPane().add(formulario);
+//                ventana.pack();
+//
+//                desktop.add(ventana);
+//                ventana.setVisible(true);
+//
+//                try {
+//                    ventana.setMaximum(true);
+//                    ventana.setSelected(true);
+//                } catch (java.beans.PropertyVetoException e) {
+//
+//                }
+//            }
+//        }
+    }//GEN-LAST:event_tblEdicionesMouseClicked
+
+    private void tblProgramasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProgramasMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblProgramasMouseClicked
+
+    private void tblCategoriasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCategoriasMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblCategoriasMouseClicked
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_formMouseDragged
 
 
+
+    
     //*********************** Revisar contribucion de Diego*********************    
     public void cargarCurso(String nombreCurso) {
         try {
@@ -389,7 +786,6 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cerrarButton;
     private javax.swing.JLabel creditosLabel;
     private javax.swing.JLabel cursoLabel;
     private javax.swing.JComboBox<String> cursoSeleccion;
@@ -399,18 +795,22 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
     private javax.swing.JLabel horasLabel;
     private javax.swing.JLabel institutoLabel;
     private javax.swing.JComboBox<String> institutoSeleccion;
-    private javax.swing.JList<String> jList1;
-    private javax.swing.JList<String> jList2;
-    private javax.swing.JList<String> jList3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JLabel lblImagen;
     private javax.swing.JTabbedPane listasAsociadas;
     private javax.swing.JLabel nombreLabel;
+    private javax.swing.JScrollPane scpCursos;
+    private javax.swing.JScrollPane scpEdicionDeCursos;
+    private javax.swing.JScrollPane scpEdicionDeCursos1;
+    private javax.swing.JScrollPane scpEdicionDeCursos2;
+    private javax.swing.JTable tblCategorias;
+    private javax.swing.JTable tblEdiciones;
+    private javax.swing.JTable tblPrevias;
+    private javax.swing.JTable tblProgramas;
     private javax.swing.JTextField textoCreditos;
     private javax.swing.JTextArea textoDescripcion;
     private javax.swing.JTextField textoDuracion;
@@ -419,6 +819,5 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
     private javax.swing.JTextField textoNombre;
     private javax.swing.JTextField textoURL;
     private javax.swing.JLabel urlLabel;
-    private javax.swing.JButton verDetalleButton;
     // End of variables declaration//GEN-END:variables
 }

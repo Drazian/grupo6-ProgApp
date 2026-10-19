@@ -78,16 +78,20 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
         labelNombreEdicion = new javax.swing.JLabel();
         textoNombreEdicion = new javax.swing.JTextField();
         labelFechaInicio = new javax.swing.JLabel();
-        textoFechaInicio = new javax.swing.JTextField();
         labelCupos = new javax.swing.JLabel();
         textoCupos = new javax.swing.JTextField();
         labelFechaFin = new javax.swing.JLabel();
-        textoFechaFin = new javax.swing.JTextField();
         labelDocentes = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         listaDocentes = new javax.swing.JList<>();
         buttonDarAlta = new javax.swing.JButton();
         buttonCancelar = new javax.swing.JButton();
+        textoFechaInicio = new javax.swing.JFormattedTextField();
+        jBfechaInicio = new javax.swing.JButton();
+        jDfechaInicio = new com.toedter.calendar.JDateChooser();
+        textoFechaFin = new javax.swing.JFormattedTextField();
+        jBfechaFin = new javax.swing.JButton();
+        jDfechaFin = new com.toedter.calendar.JDateChooser();
 
         setClosable(true);
         setIconifiable(true);
@@ -97,12 +101,10 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
 
         institutoLabel.setText("Instituto:");
 
-        seleccionInstituto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         seleccionInstituto.addActionListener(this::seleccionInstitutoActionPerformed);
 
         labelCurso.setText("Curso:");
 
-        seleccionCurso.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         seleccionCurso.addActionListener(this::seleccionCursoActionPerformed);
 
         labelNombreEdicion.setText("Nombre Edicion:");
@@ -111,15 +113,12 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
 
         labelCupos.setText("Cupos:");
 
+        textoCupos.addActionListener(this::textoCuposActionPerformed);
+
         labelFechaFin.setText("Fecha Fin:");
 
         labelDocentes.setText("Docentes Participantes:");
 
-        listaDocentes.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane1.setViewportView(listaDocentes);
 
         buttonDarAlta.setText("Dar de Alta");
@@ -127,6 +126,44 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
 
         buttonCancelar.setText("Cancelar");
         buttonCancelar.addActionListener(this::buttonCancelarActionPerformed);
+
+        textoFechaInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        textoFechaInicio.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                textoFechaInicioFocusLost(evt);
+            }
+        });
+        textoFechaInicio.addActionListener(this::textoFechaInicioActionPerformed);
+
+        jBfechaInicio.setText("......");
+        jBfechaInicio.addActionListener(this::jBfechaInicioActionPerformed);
+
+        jDfechaInicio.setDateFormatString("d M y");
+        jDfechaInicio.setFocusable(false);
+        jDfechaInicio.setMaxSelectableDate(new java.util.Date(1798776104000L));
+        jDfechaInicio.setOpaque(false);
+        jDfechaInicio.setRequestFocusEnabled(false);
+        jDfechaInicio.setVerifyInputWhenFocusTarget(false);
+        jDfechaInicio.addPropertyChangeListener(this::jDfechaInicioPropertyChange);
+
+        textoFechaFin.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        textoFechaFin.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                textoFechaFinFocusLost(evt);
+            }
+        });
+        textoFechaFin.addActionListener(this::textoFechaFinActionPerformed);
+
+        jBfechaFin.setText("......");
+        jBfechaFin.addActionListener(this::jBfechaFinActionPerformed);
+
+        jDfechaFin.setDateFormatString("d M y");
+        jDfechaFin.setFocusable(false);
+        jDfechaFin.setMaxSelectableDate(new java.util.Date(1798776104000L));
+        jDfechaFin.setOpaque(false);
+        jDfechaFin.setRequestFocusEnabled(false);
+        jDfechaFin.setVerifyInputWhenFocusTarget(false);
+        jDfechaFin.addPropertyChangeListener(this::jDfechaFinPropertyChange);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -144,30 +181,44 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(institutoLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(seleccionInstituto, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(seleccionInstituto, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(labelCurso, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(labelFechaInicio)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(textoFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(labelCupos)
-                                    .addComponent(labelCurso))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(seleccionCurso, 0, 164, Short.MAX_VALUE)
-                                    .addComponent(textoCupos)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(labelFechaFin)
-                                .addGap(5, 5, 5)
-                                .addComponent(textoFechaFin, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))))
+                                .addComponent(seleccionCurso, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(labelCupos)
+                                .addGap(18, 18, 18)
+                                .addComponent(textoCupos, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(37, 37, 37))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(labelDocentes)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(13, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(labelFechaInicio)
+                        .addGap(18, 18, 18)
+                        .addComponent(textoFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(1, 1, 1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(jDfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jBfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(31, 31, 31)
+                        .addComponent(labelFechaFin)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(textoFechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(1, 1, 1)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jBfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(jDfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(18, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(buttonDarAlta)
@@ -191,20 +242,28 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
                     .addComponent(labelCupos)
                     .addComponent(textoCupos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelFechaInicio)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(textoFechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(labelFechaFin))
+                    .addComponent(jBfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(textoFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelFechaFin)
-                    .addComponent(textoFechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jBfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jDfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jDfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelDocentes)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(buttonCancelar)
                     .addComponent(buttonDarAlta))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         pack();
@@ -256,11 +315,8 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
             }
             
             // Construir el Datatype y mandarlo a la lógica
-            DtEdicion dt = new DtEdicion(
-                    textoNombreEdicion.getText().trim(), cupo, Utils.Cast.valueOf(dIni), Utils.Cast.valueOf(dFin), Utils.Cast.valueOf(dAlta), 
-                    new DtCurso(title, null, null, 0, 0, null, null, 
-                            new DtInstituto(seleccionInstituto.getSelectedItem().toString()), new HashSet<>()), 
-                    docentes);
+            DtEdicion dt = new DtEdicion(textoNombreEdicion.getText().trim(), cupo, Utils.Cast.valueOf(dIni), Utils.Cast.valueOf(dFin), Utils.Cast.valueOf(dAlta), 
+                    new DtCurso(title, null, null, 0, 0, null, null, new DtInstituto(seleccionInstituto.getSelectedItem().toString()), null), docentes);
             
             control.altaEdicionCurso((String) seleccionCurso.getSelectedItem(), dt);
             
@@ -282,11 +338,57 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_seleccionCursoActionPerformed
 
+    private void textoFechaInicioFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textoFechaInicioFocusLost
+        if(!Utils.GUI.isEmpty(textoFechaInicio))
+        jDfechaInicio.setDate(Utils.Cast.valudf(textoFechaInicio.getText()));
+    }//GEN-LAST:event_textoFechaInicioFocusLost
+
+    private void textoFechaInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textoFechaInicioActionPerformed
+        if(!Utils.GUI.isEmpty(textoFechaInicio))
+        jDfechaInicio.setDate(Utils.Cast.valudf(textoFechaInicio.getText()));
+    }//GEN-LAST:event_textoFechaInicioActionPerformed
+
+    private void jBfechaInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBfechaInicioActionPerformed
+        jDfechaInicio.getCalendarButton().doClick();
+    }//GEN-LAST:event_jBfechaInicioActionPerformed
+
+    private void jDfechaInicioPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDfechaInicioPropertyChange
+        if(jDfechaInicio.getDate()!=null)
+        textoFechaInicio.setText(Utils.Fecha.assignFormato(jDfechaInicio.getDate()));
+    }//GEN-LAST:event_jDfechaInicioPropertyChange
+
+    private void textoFechaFinFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textoFechaFinFocusLost
+        if(!Utils.GUI.isEmpty(textoFechaInicio))
+        jDfechaInicio.setDate(Utils.Cast.valudf(textoFechaInicio.getText()));
+    }//GEN-LAST:event_textoFechaFinFocusLost
+
+    private void textoFechaFinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textoFechaFinActionPerformed
+        if(!Utils.GUI.isEmpty(textoFechaInicio))
+        jDfechaInicio.setDate(Utils.Cast.valudf(textoFechaInicio.getText()));
+    }//GEN-LAST:event_textoFechaFinActionPerformed
+
+    private void jBfechaFinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBfechaFinActionPerformed
+        jDfechaInicio.getCalendarButton().doClick();
+    }//GEN-LAST:event_jBfechaFinActionPerformed
+
+    private void jDfechaFinPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDfechaFinPropertyChange
+        if(jDfechaInicio.getDate()!=null)
+        textoFechaInicio.setText(Utils.Fecha.assignFormato(jDfechaInicio.getDate()));
+    }//GEN-LAST:event_jDfechaFinPropertyChange
+
+    private void textoCuposActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textoCuposActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_textoCuposActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonCancelar;
     private javax.swing.JButton buttonDarAlta;
     private javax.swing.JLabel institutoLabel;
+    private javax.swing.JButton jBfechaFin;
+    private javax.swing.JButton jBfechaInicio;
+    private com.toedter.calendar.JDateChooser jDfechaFin;
+    private com.toedter.calendar.JDateChooser jDfechaInicio;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labelCupos;
     private javax.swing.JLabel labelCurso;
@@ -298,8 +400,8 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox<String> seleccionCurso;
     private javax.swing.JComboBox<String> seleccionInstituto;
     private javax.swing.JTextField textoCupos;
-    private javax.swing.JTextField textoFechaFin;
-    private javax.swing.JTextField textoFechaInicio;
+    private javax.swing.JFormattedTextField textoFechaFin;
+    private javax.swing.JFormattedTextField textoFechaInicio;
     private javax.swing.JTextField textoNombreEdicion;
     // End of variables declaration//GEN-END:variables
 }

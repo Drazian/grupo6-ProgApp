@@ -1,4 +1,4 @@
-package edu.edext.presentacion.pasado;
+package edu.edext.presentacion;
 
 import edu.edext.datatypes.DtCategoria;
 import edu.edext.logica.Fabrica;
@@ -35,8 +35,8 @@ public class AltaCategoria extends javax.swing.JPanel {
         btnActualizar = new javax.swing.JButton();
         btnActualizar.setVisible(false);
 
-        setMinimumSize(new java.awt.Dimension(406, 276));
-        setPreferredSize(new java.awt.Dimension(425, 324));
+        setMinimumSize(new java.awt.Dimension(320, 240));
+        setPreferredSize(new java.awt.Dimension(425, 318));
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 formMouseDragged(evt);
