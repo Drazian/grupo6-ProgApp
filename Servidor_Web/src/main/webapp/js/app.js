@@ -14,7 +14,7 @@ function cargarSeccion(opcion) {
 // Función para el botón de búsqueda del Sector 1
 function ejecutarBusqueda() {
     const query = document.getElementById('input-busqueda').value;
-    const contenedor = document.getElementById('contenido-dinamico');
+    const contenedor = document.getElementById('contenido-dinamico'); 
 
     fetch(`MiControladorServlet?accion=buscar&query=${encodeURIComponent(query)}`)
         .then(response => response.text())

@@ -22,7 +22,7 @@ public class UsuarioHelper {
     
     public DtSessionUsuario validarEmail(String email, String pass){
         return toDTO(validateEmail(email, pass));
-    }
+    } 
 
     private DtSessionUsuario toDTO(Usuario data){
         DtSessionUsuario ret=null;

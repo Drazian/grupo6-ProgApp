@@ -4,7 +4,7 @@
 <div style="max-width: 600px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
     <h2 style="color: #2c3e50; border-bottom: 2px solid #8e44ad; padding-bottom: 10px; margin-top: 0;">
         Inscripción a Programa de Formación
-    </h2>
+    </h2> 
 
     <div id="mensaje-inscripcion-prog" style="display: none; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold;"></div>
 

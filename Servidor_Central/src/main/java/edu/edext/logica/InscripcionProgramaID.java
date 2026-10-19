@@ -2,7 +2,7 @@ package edu.edext.logica;
 
 import java.io.Serializable;
 import java.util.Objects;
-
+ 
 /**
  *
  * @author vdraco

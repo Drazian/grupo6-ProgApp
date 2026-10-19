@@ -13,8 +13,6 @@ import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.tools.Utils;
-import edu.edext.tools.Utils.dbData;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -165,7 +163,7 @@ public class Controlador implements IControlador {
                     "Ya existe un usuario con el Email '" 
                     + usuario.getEmail() + "'.");
             }
-            String password=Utils.Crypt.encodeBCrypt(Utils.Crypt.descifrarAES(usuario.getPassword()));
+            String password=Utils.Crypt.cifrarAES(usuario.getPassword());
             Usuario nuevoUsuario;
             if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
                 List<Instituto> institutos = new ArrayList<>();
@@ -358,7 +356,7 @@ public class Controlador implements IControlador {
     @Override
     public List<String> listarCursosPorCategoria(String nombreCategoria) throws Exception {
         try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery("SELECT c.nombre FROM Curso c WHERE :cat MEMBER OF c.categorias", String.class)
+            return em.createQuery("SELECT c.nombre FROM Curso c JOIN c.categorias cat WHERE cat.nombre = :cat", String.class)
                      .setParameter("cat", nombreCategoria)
                      .getResultList();
         }    
@@ -749,18 +747,72 @@ public class Controlador implements IControlador {
             em.getTransaction().commit();
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
-    @Override
-    public List<DtPrograma> listarProgramas() throws Exception{
-        EntityManager em = emf.createEntityManager();
-        try{
-            List<DtPrograma> resultado = new ArrayList<>();
-            List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
-            for (ProgramaFormacion aux: listaAux){
-                resultado.add(new DtPrograma(aux.getNombre(), aux.getDescripcion(),aux.getFechaRegistro(),aux.getFechaInicio(),aux.getFechaFin()));
+
+@Override
+public List<DtPrograma> listarProgramas() throws Exception {
+    EntityManager em = emf.createEntityManager();
+    try {
+        List<DtPrograma> resultado = new ArrayList<>();
+        
+        List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
+        
+        for (ProgramaFormacion programa : listaAux) {
+            List<DtCurso> dtCursos = new ArrayList<>();
+
+            if (programa.getCursos() != null) {
+                for (Curso c : programa.getCursos()) {
+                    Set<String> nombresCategorias = new HashSet<>();
+                    if (c.getCategorias() != null) {
+                        for (Categoria cat : c.getCategorias()) {
+                            nombresCategorias.add(cat.getNombre());
+                        }
+                    }
+
+                    DtInstituto dtInst = null;
+                    if (c.getInstituto() != null) {
+                        dtInst = new DtInstituto(c.getInstituto().getNombre());
+                    }
+
+                    DtCurso dtc = new DtCurso(
+                        c.getNombre(),
+                        c.getDescripcion(),
+                        c.getDuracion(),
+                        c.getCantidadHoras(),
+                        c.getCreditos(),
+                        c.getUrl(),
+                        c.getFechaRegistro(),
+                        dtInst,
+                        null,
+                        nombresCategorias,
+                        c.getImagen()
+                    );
+
+                    dtCursos.add(dtc);
+                }
             }
-            return resultado;          
-        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+
+            resultado.add(new DtPrograma(
+                programa.getNombre(), 
+                programa.getDescripcion(), 
+                programa.getFechaRegistro(), 
+                programa.getFechaInicio(), 
+                programa.getFechaFin(),
+                dtCursos,
+                programa.getImagen()
+            ));
+        }
+        
+        return resultado;        
+    } catch (Exception e) {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+        throw e;
+    } finally {
+        em.close();
     }
+}
+
     @Override
     public List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception{//
         EntityManager em = emf.createEntityManager();
@@ -800,6 +852,7 @@ public class Controlador implements IControlador {
             return resultado;
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
+    
     @Override
     public List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception {
         try (EntityManager em = emf.createEntityManager()) {
@@ -809,6 +862,9 @@ public class Controlador implements IControlador {
                 throw new Exception("No existe el usuario '" + nickname + "'.");
             }
             List<ProgramaFormacion> programas;
+            
+            List<DtCurso> dtCursos = new ArrayList<>();
+            
             if (usuario instanceof Docente) {
                 programas = em.createQuery(
                     "SELECT DISTINCT p " +
@@ -840,12 +896,15 @@ public class Controlador implements IControlador {
                     aux.getDescripcion(),
                     aux.getFechaRegistro(),
                     aux.getFechaInicio(),
-                    aux.getFechaFin()
+                    aux.getFechaFin(),
+                    dtCursos,
+                    aux.getImagen()
                 ));
             }
             return resultado;
         }
     }
+    
     @Override
     public DtPrograma buscarPrograma(String nombre) throws Exception {
         EntityManager em = emf.createEntityManager();
@@ -880,28 +939,15 @@ public class Controlador implements IControlador {
                     dtCursos.add(dtc);
                 }
             }
-            //  pero si el DTO maneja localDate y la Entity tambien la maneja
-            //  porque hacer  Entity -> localDate -> Object -> localDate -> DTO
-            //  serian un casteo innecesario y hasta se podria considerar un antipatron,
-            //  porque java ya tiene un fuerte tipado
-//            LocalDate fRegistro = parseToLocalDate(programa.getFechaRegistro());
-//            LocalDate fInicio   = parseToLocalDate(programa.getFechaInicio());
-//            LocalDate fFin      = parseToLocalDate(programa.getFechaFin());
-//            return new DtPrograma(
-//                programa.getNombre(), 
-//                programa.getDescripcion(), 
-//                fRegistro, 
-//                fInicio, 
-//                fFin,
-//                dtCursos
-//            );
+
             return new DtPrograma(
                 programa.getNombre(), 
                 programa.getDescripcion(), 
                 programa.getFechaRegistro(),
                 programa.getFechaInicio(),
                 programa.getFechaFin(),
-                dtCursos
+                dtCursos,
+                programa.getImagen()
             );
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -922,22 +968,22 @@ public class Controlador implements IControlador {
     //            Utils.Cast.valueOf(fecha) la cual convierte Date->localDate y localDate->Date
     //            esta ultima es para facilitar la conversion para los que 
     //            prefieran seguir utilizando algo que lleva obsoleto 29 años
-    private java.time.LocalDate parseToLocalDate(Object fecha) {
-        if (fecha == null) return null;
-        if (fecha instanceof java.time.LocalDate) {
-            return (java.time.LocalDate) fecha;
-        }
-        if (fecha instanceof String) {
-            String str = (String) fecha;
-            return str.isEmpty() ? null : java.time.LocalDate.parse(str);
-        }
-        if (fecha instanceof java.util.Date) {
-            return ((java.util.Date) fecha).toInstant()
-                    .atZone(java.time.ZoneId.systemDefault())
-                    .toLocalDate();
-        }
-        return null;
-    }
+//    private java.time.LocalDate parseToLocalDate(Object fecha) {
+//        if (fecha == null) return null;
+//        if (fecha instanceof java.time.LocalDate) {
+//            return (java.time.LocalDate) fecha;
+//        }
+//        if (fecha instanceof String) {
+//            String str = (String) fecha;
+//            return str.isEmpty() ? null : java.time.LocalDate.parse(str);
+//        }
+//        if (fecha instanceof java.util.Date) {
+//            return ((java.util.Date) fecha).toInstant()
+//                    .atZone(java.time.ZoneId.systemDefault())
+//                    .toLocalDate();
+//        }
+//        return null;
+//    }
 
 //***************************** Datos de Prueba ******************************//
     @Override
@@ -973,7 +1019,7 @@ public class Controlador implements IControlador {
             usuarioModificado.setfNacimiento(usuario.getfNacimiento());
 
             if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
-                String hashPassword = edu.edext.tools.Utils.Crypt.encodeBCrypt(usuario.getPassword().trim());
+                String hashPassword = edu.edext.tools.Utils.Crypt.cifrarAES(usuario.getPassword().trim());
                 usuarioModificado.setPassword(hashPassword);
             }
 

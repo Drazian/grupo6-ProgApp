@@ -18,6 +18,7 @@ public class jTable {
     private boolean empty=true;
     private final JTable obj;
 
+    
     public jTable(JTable obj){
         this.obj=obj;
         this.rowCount=obj.getRowCount();

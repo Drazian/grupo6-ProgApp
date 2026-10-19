@@ -10,7 +10,7 @@
                  alt="Foto Perfil" 
                  style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; cursor: pointer;"
                  onclick="event.preventDefault(); cargarMiPerfil('${requestScope.usuarioPerfil.nickname}');">
-
+ 
             <div style="line-height: 1.5;">
                 <h2 style="margin: 0; color: #2c3e50; font-size: 22px;">
                     ${requestScope.usuarioPerfil.nombre} ${requestScope.usuarioPerfil.apellido}

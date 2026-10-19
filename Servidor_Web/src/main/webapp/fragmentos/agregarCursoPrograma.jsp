@@ -6,7 +6,7 @@
     <h2 style="margin-top: 0; color: #333; font-size: 24px;">Agregar Curso a Programa de Formación</h2>
     <hr style="opacity: 0.3; margin: 15px 0 20px 0;">
 
-    <form id="formAgregarCursoPrograma">
+    <form id="formAgregarCursoPrograma"> 
         
         <!-- Selección de Programa -->
         <div style="margin-bottom: 20px;">

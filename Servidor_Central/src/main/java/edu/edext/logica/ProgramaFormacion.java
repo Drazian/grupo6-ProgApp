@@ -18,7 +18,7 @@ import jakarta.persistence.ManyToMany;
 @Entity
 @Table(name="ProgramaFormacion")
 public class ProgramaFormacion {
-
+ 
     @Id
     private String nombre;
     @Column(length = 2000)

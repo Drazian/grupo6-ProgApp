@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.OutputStream; 
 
 @WebServlet(name = "ImagenServlet", urlPatterns = {"/ImagenServlet"})
 public class ImagenServlet extends HttpServlet {

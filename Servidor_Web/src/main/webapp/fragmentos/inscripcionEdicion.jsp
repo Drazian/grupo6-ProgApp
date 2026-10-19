@@ -9,7 +9,7 @@
     <div id="mensaje-inscripcion" style="display: none; margin-bottom: 15px; padding: 12px; border-radius: 4px;"></div>
 
     <form id="formInscripcionEdicion" onsubmit="inscribirEdicion(event)">
-        
+         
         <!-- 1. Selección de Instituto -->
         <div class="form-group">
             <label for="instInscripcion" style="font-weight: bold;">1. Seleccione el Instituto:</label>

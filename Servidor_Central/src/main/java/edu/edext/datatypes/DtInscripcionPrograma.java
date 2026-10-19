@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 /**
  *
- * @author vdraco
+ * @author vdraco 
  * 0 sin accion
  * 1 inscripto
  * 2 aceptado

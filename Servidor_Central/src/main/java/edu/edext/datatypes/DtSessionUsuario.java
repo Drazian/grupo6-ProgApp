@@ -2,7 +2,7 @@ package edu.edext.datatypes;
 
 /**
  *
- * @author vdraco
+ * @author vdraco 
  */
 public class DtSessionUsuario {
 

@@ -231,7 +231,7 @@ public class ControladorTest {
         
         List<DtCurso> previas = ic.listarCursosPorUsuario("heisenberg");
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new HashSet<String>());
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new ArrayList<>(), "img");
         
         ic.altaCurso(curso, nombreInstituto);
         
@@ -251,12 +251,12 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso previa = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, new HashSet<String>());
+        DtCurso previa = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
         
         List<DtCurso> previas = ic.listarCursosPorUsuario("heisenberg");
         previas.add(previa);
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new HashSet<String>());
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new ArrayList<>(), "img");
                
         Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, nombreInstituto);}, "No existe la previa");        
         assertNotNull(excepcion.getMessage());
@@ -272,7 +272,7 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, new HashSet<String>());
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
         
         ic.altaCurso(curso, nombreInstituto);
         
@@ -290,7 +290,7 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, new HashSet<String>());
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, "INSTITUTO_INEXISTENTE33");}, "Instituto inexistente");        
         assertNotNull(excepcion.getMessage());
@@ -723,7 +723,7 @@ public class ControladorTest {
     @Test
     public void testCrearProgramaWeb() throws Exception {
         String nombre = "CREACION-WEB";
-        DtPrograma aux = new DtPrograma(nombre, "descripcion", LocalDate.now(), LocalDate.now(), LocalDate.now(), null, "imagen.png");
+        DtPrograma aux = new DtPrograma(nombre, "descripcion", LocalDate.now(), LocalDate.now(), LocalDate.now());
         ic.setCrearProgramaFormacion(aux, null, "imagen.png");
         
         List<DtPrograma> programas = ic.listarProgramas();

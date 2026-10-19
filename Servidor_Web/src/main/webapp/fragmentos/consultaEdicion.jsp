@@ -20,7 +20,7 @@
                 <li><strong>Fecha de Fin:</strong> ${edicion.fechaFin}</li>
                 <li><strong>Cupo Máximo:</strong> ${empty edicion.cupo ? 'Sin límite' : edicion.cupo}</li>
             </ul>
-        </div>
+        </div> 
 
         <!-- Columna de Docentes con Imagen -->
         <div style="flex: 1; min-width: 300px;">

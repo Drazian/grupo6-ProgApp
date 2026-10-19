@@ -18,7 +18,7 @@
                 <option value="usuario">Usuarios</option>
                 <option value="docente">Docentes</option>
                 <option value="estudiante">Estudiantes</option>
-            </select>
+            </select> 
         </div>
 
         <div style="flex: 1; min-width: 220px;">

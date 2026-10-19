@@ -12,8 +12,7 @@ import java.util.List;
  */
 public class InscripcionEdicionHelper {
 
-    public InscripcionEdicionHelper(){
-        
+    public InscripcionEdicionHelper(){     
     }
     
     public int  setInscripcion(String estudiante, String edicion) throws Exception{

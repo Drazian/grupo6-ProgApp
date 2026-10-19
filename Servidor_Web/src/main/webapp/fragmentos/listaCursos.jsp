@@ -9,7 +9,7 @@
     <!-- SECCIÓN DE CURSOS -->
     <div style="margin-bottom: 25px;">
         <h3 style="color: #444; font-size: 18px; margin-bottom: 12px; border-bottom: 2px solid #f1f3f5; padding-bottom: 6px;">Cursos</h3>
-        
+         
         <c:choose>
             <c:when test="${not empty listaCursos}">
                 <ul style="list-style: none; padding: 0; margin: 0; border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden;">

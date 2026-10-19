@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.tinylog.Logger;
-
+ 
 // Nota: Si usas una versión muy antigua de Java EE, cambia "jakarta" por "javax"
 @WebServlet("/MiControladorServlet")
 public class MiControladorServlet extends HttpServlet {

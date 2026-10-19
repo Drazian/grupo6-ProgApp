@@ -13,7 +13,7 @@
     <!-- Iteramos la lista que guardó el Servlet -->
     <c:forEach var="prod" items="${listaProductos}">
         <tr>
-            <td>${prod.id}</td>
+            <td>${prod.id}</td> 
             <td>${prod.nombre}</td>
             <td>$${prod.precio}</td>
         </tr>

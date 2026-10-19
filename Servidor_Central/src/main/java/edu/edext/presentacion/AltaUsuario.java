@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;//para que no de error al cargar el formulario
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.tinylog.Logger;
 
+
 /**
  *
  * @author usuario

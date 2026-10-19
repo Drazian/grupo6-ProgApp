@@ -27,6 +27,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
     private IControlador control;
     private final Mouse mouse=new Mouse();
 //    private final jTable tablePrevias;
+    
     private final jTable tableEdiciones;
     private final jTable tableProgramas;
     private final jTable tableCategorias;

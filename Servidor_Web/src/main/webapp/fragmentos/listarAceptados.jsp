@@ -5,7 +5,7 @@
     <h2 style="color: #2c3e50; border-bottom: 2px solid #27ae60; padding-bottom: 10px;">
         Estudiantes Aceptados por Edición de Curso
     </h2>
-
+ 
     <!-- Filtros Superiores en Cascada: Instituto -> Curso -> Edición -->
     <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 220px;">

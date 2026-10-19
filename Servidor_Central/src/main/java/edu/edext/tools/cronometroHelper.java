@@ -18,7 +18,8 @@ public class cronometroHelper {
     private final JList lista;
     private final ArrayList<String> cronoError=new ArrayList<>();
     private boolean enable=true;
-        
+
+    
     public cronometroHelper(int milisegundos, Component objeto, JButton boton){
         this(milisegundos, objeto, null, boton, null);
     }

@@ -14,7 +14,7 @@
             Rol: ${requestScope.usuarioPerfil.tipoUsuario}
         </span>
     </div>
-
+ 
     <!-- Botón Seguir / Dejar de seguir -->
     <div>
         <c:choose>

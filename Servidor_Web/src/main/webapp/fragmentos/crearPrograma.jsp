@@ -7,7 +7,7 @@
     <hr style="opacity: 0.3; margin: 15px 0 20px 0;">
 
     <form id="formCrearPrograma" enctype="multipart/form-data">
-        
+         
         <!-- Nombre -->
         <div style="margin-bottom: 15px;">
             <label for="nombre" style="display: block; font-weight: bold; margin-bottom: 5px; color: #444; font-size: 14px;">Nombre:</label>

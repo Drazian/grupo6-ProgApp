@@ -23,6 +23,7 @@ public class indexHelper {
     public indexHelper(JDesktopPane obj){
         this.dpIndex=obj;
     }
+
     
     public void cargarPanel(String titulo, Component panel, int with, int height){
         cargarPanel(titulo, panel, true, false, false, true, true, true, with, height);

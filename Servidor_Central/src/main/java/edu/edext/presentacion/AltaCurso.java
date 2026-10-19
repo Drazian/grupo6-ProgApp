@@ -15,7 +15,7 @@ import org.tinylog.Logger;
 
 public class AltaCurso extends javax.swing.JInternalFrame {
 
-    private final Utils.Mouse mouse=new Utils.Mouse();
+    private final Utils.Mouse mouse=new Utils.Mouse(); 
     private IControlador control;
     private File imagen;
 

@@ -18,7 +18,7 @@
             </div>
         </c:if>
     </div>
-
+ 
     <c:choose>
         <c:when test="${not empty misInscripciones}">
             <table style="width: 100%; border-collapse: collapse; text-align: left;">

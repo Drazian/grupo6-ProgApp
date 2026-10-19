@@ -9,7 +9,6 @@ import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtCurso;
-import edu.edext.tools.Utils.dbData;
 import java.util.List;
 import java.util.Map;
 

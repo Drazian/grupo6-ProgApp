@@ -9,7 +9,7 @@
 
     <!-- EL FIX: Se agregó enctype="multipart/form-data" para permitir envío de imágenes -->
     <form id="formAltaEdicion" enctype="multipart/form-data" onsubmit="altaEdicion(event)">
-        <!-- 1. Selección de Instituto -->
+        <!-- 1. Selección de Instituto --> 
         <div class="form-group">
             <label for="institutoEdicion">Instituto que lo brinda:</label>
             <select id="institutoEdicion" name="instituto" onchange="cargarCursosDeInstituto(this.value)" required>

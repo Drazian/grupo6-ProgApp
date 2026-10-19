@@ -16,7 +16,7 @@
                     <option value="${inst.nombre}">${inst.nombre}</option>
                 </c:forEach>
             </select>
-        </div>
+        </div> 
         <div style="flex: 1;">
             <label style="font-weight: bold; color: #34495e;">Curso:</label>
             <select id="cursoSeleccion" onchange="cargarEdicionesParaSeleccion(this.value)" disabled style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #bdc3c7;">

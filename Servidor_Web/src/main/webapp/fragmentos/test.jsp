@@ -19,5 +19,5 @@
         <input type="text" id="nombre" placeholder="Ejemplito">
         <button type="button" onclick="crearInstituto()">Crear</button>
             
-    </body>
+    </body> 
 </html>

@@ -16,6 +16,7 @@ public final class Arbol extends javax.swing.JPanel {
         cargar();
     }
 
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

@@ -14,7 +14,7 @@
                    onkeyup="filtrarUsuariosRedSocial()" 
                    style="width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 3px;">
         </div>
-
+ 
         <!-- CONTENEDOR SCROLLEABLE (Límite aproximado de 10 usuarios visibles) -->
         <div style="max-height: 480px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 3px;">
             <table id="tablaUsuariosSocial" style="width: 100%; border-collapse: collapse; background: #fff;">

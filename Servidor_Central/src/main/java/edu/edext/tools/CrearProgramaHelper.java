@@ -19,8 +19,7 @@ public class CrearProgramaHelper{
     //private List<String> listaData=new ArrayList<>();
      
     public CrearProgramaHelper(){
-        
-        
+       
         listData.add("Programa 1 ");
         listData.add("Edicion 2 ");
         listData.add("Inscripcion 3 ");

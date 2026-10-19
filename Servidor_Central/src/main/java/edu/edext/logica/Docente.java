@@ -7,7 +7,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import java.util.List;
 
-@Entity
+@Entity 
 @DiscriminatorValue("DOCENTE")
 public class Docente extends Usuario {
 

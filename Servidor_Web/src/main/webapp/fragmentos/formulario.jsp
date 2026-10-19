@@ -10,7 +10,7 @@
     <input type="number" step="0.01" name="precioProd" required><br><br>
     
     <button type="submit">Guardar Producto</button>
-</form>
+</form> 
 
 <div id="resultado-registro" style="margin-top:15px;"></div>
 
