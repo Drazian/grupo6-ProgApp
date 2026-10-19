@@ -16,6 +16,7 @@ public class cfg {
     public static final String IMAGE_USER = "usr.png";
     private static final String SYM_HOME="~";
     
+ 
     
     public static void init(){
         if(!Utils.Disk.isExist(cfg.PATH_FILE))

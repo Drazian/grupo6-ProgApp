@@ -3,7 +3,6 @@ package edu.edext.logica;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import java.util.List;
 
 /**
  *

@@ -24,7 +24,7 @@ import java.util.List;
 /**
  *
  * @author Diego
- */
+ */ 
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

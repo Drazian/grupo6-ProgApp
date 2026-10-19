@@ -25,6 +25,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
     private String descripcion;
     private String nombre;
 
+    
     /**
      * Creates new form crearProgramaFormacion
      */

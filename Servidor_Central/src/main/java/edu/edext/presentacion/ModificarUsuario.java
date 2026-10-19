@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
  */
 public class ModificarUsuario extends javax.swing.JPanel {
 
+    
     /**
      * Creates new form ModifcarUsuario
      */

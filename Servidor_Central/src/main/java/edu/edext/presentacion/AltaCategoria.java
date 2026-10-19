@@ -16,7 +16,7 @@ public class AltaCategoria extends javax.swing.JPanel {
     public AltaCategoria() {
         initComponents();
         cargarTabla();
-    }
+    } 
 
     /**
      * This method is called from within the constructor to initialize the form.

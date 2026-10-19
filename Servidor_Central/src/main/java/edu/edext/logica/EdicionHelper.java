@@ -8,7 +8,7 @@ import edu.edext.datatypes.DtUsuario;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
-/**
+/** 
  *
  * @author vdraco
  */

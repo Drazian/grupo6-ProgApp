@@ -17,6 +17,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
     private final int FORMGRANDE=1;
     private final int formHeigth=410;
     private final int sizeWForm[]={335,795};
+ 
     
     /**
      * Creates new form consultaEdicionCurso

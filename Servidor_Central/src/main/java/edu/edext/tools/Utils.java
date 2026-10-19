@@ -62,6 +62,7 @@ import javax.swing.text.MaskFormatter;
  * @author vdraco
  */
 public class Utils {
+ 
     
     private static final String FORMATO_FECHA="dd/MM/yyyy";
     private static final String MASK_FECHA="##/##/####";

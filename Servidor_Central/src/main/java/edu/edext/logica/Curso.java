@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-@Entity
+@Entity 
 @Table(name="Curso") // Aporte de Draco conservado
 public class Curso {
     

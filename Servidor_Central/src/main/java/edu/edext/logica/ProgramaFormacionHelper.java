@@ -21,7 +21,7 @@ public class ProgramaFormacionHelper{
         DB=obj;
         DTO=dto;
     }
-    
+     
     public boolean validate(){
         return validateData(DTO);
     }

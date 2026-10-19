@@ -20,6 +20,7 @@ public class ConsultaEdicionHelper {
     //private List<String> listCursos=new ArrayList<>();
     //private List<String> listEdiciones=new ArrayList<>();
 
+    
     private String nombre;
     private Integer cupo;
     private LocalDate fechaInicio;

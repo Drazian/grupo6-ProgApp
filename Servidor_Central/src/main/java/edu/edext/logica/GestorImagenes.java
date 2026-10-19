@@ -11,7 +11,7 @@ public class GestorImagenes {
     private static final String RUTA_BASE = cfg.fullpathImagen();
 //            System.getProperty("user.home") 
 //            + File.separator + "edext_imagenes" + File.separator;
-
+ 
     public static String getRutaBase() {
         File dir = new File(RUTA_BASE);
         if (!dir.exists()) {

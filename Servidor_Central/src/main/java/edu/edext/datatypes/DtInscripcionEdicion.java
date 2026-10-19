@@ -7,7 +7,7 @@ import java.time.LocalDate;
  * @author vdraco
  * 0 sin accion
  * 1 inscripto
- * 2 aceptado
+ * 2 aceptado 
  * 3 recharado
  */
 public class DtInscripcionEdicion {

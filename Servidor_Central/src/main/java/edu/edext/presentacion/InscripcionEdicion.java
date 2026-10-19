@@ -17,6 +17,7 @@ import org.tinylog.Logger;
 public class InscripcionEdicion extends javax.swing.JPanel {
     private String oldInscriptoSelect="", oldCandidatoSelect="", estadoCruce;
     private final int INSCRIPTOS=1, CANDIDATOS=2;
+
     /**
      * Creates new form InscEditCursoForm
      */

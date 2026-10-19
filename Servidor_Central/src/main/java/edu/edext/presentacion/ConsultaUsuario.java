@@ -1,6 +1,5 @@
 package edu.edext.presentacion;
 
-import edu.edext.presentacion.AltaUsuario;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtEdicion;
@@ -9,9 +8,6 @@ import javax.swing.table.DefaultTableModel;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
-import edu.edext.presentacion.ConsultaCurso;
-import edu.edext.presentacion.ConsultaEdicion;
-import edu.edext.presentacion.ConsultaPrograma;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.List;

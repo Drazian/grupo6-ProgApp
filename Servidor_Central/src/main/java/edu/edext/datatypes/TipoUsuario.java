@@ -2,7 +2,7 @@ package edu.edext.datatypes;
 
 /**
  *
- * @author Diego
+ * @author Diego 
  */
 public enum TipoUsuario {
     DOCENTE, ESTUDIANTE

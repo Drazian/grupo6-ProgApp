@@ -9,4 +9,4 @@ public class DtCategoria {
     
     public String getNombre() {return nombre;}
     
-}
+} 
