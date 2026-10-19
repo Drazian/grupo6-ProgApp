@@ -1,7 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <div class="contenedor-formulario">
-    <h2>Alta de Usuario</h2>
+    <h2>Alta de Usuario</h2> 
     <hr>
     
     <form id="formAltaUsuario" enctype="multipart/form-data">

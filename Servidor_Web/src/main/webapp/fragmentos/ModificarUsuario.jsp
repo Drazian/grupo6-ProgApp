@@ -3,7 +3,7 @@
 
 <div class="contenedor-formulario" style="max-width: 550px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff;">
     <h2>Modificar Perfil</h2>
-    <hr style="margin-bottom: 20px;">
+    <hr style="margin-bottom: 20px;"> 
 
     <div id="mensaje-error-modificar" style="display:none; background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;"></div>
 

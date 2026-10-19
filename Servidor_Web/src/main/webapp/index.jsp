@@ -4,7 +4,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>EDEXT</title>
+    <title>EDEXT</title> 
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>

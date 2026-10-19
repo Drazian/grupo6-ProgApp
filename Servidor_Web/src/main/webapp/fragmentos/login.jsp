@@ -5,7 +5,7 @@
     <hr>
     
     <div id="mensaje-error-login" style="color: red; display: none; margin-bottom: 15px;"></div>
-
+ 
     <form id="formLogin">
         <div class="form-group">
             <label for="identificador">Nickname o Correo electrónico:</label>

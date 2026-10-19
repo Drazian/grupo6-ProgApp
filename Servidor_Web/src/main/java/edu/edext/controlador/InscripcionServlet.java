@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Enumeration;
+import java.util.Enumeration; 
 
 @WebServlet("/InscripcionServlet")
 public class InscripcionServlet extends HttpServlet {

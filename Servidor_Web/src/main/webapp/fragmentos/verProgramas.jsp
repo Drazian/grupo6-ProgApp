@@ -6,7 +6,7 @@
     <h2 style="margin-top: 0; color: #333; font-size: 24px;">Programas de Formación</h2>
     <p style="color: #666; font-size: 14px; margin-top: 5px; margin-bottom: 0;">Selecciona un programa para consultar sus datos.</p>
     <hr style="opacity: 0.3; margin: 15px 0 20px 0;">
-
+ 
     <c:choose>
         <c:when test="${not empty listaProgramas}">
             <ul style="list-style: none; padding: 0; margin: 0; border: 1px solid #dee2e6; border-radius: 6px; overflow: hidden;">

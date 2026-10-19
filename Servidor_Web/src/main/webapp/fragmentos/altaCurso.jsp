@@ -11,7 +11,7 @@
     <form id="formAltaCurso">
         
         <div class="form-group">
-            <label for="instituto">Instituto que lo brinda:</label>
+            <label for="instituto">Instituto que lo brinda:</label> 
             <select id="instituto" name="instituto" required>
                 <option value="" disabled selected>Seleccione un Instituto...</option>
                 <!-- Itera sobre la lista de DtInstituto -->

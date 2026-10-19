@@ -13,7 +13,7 @@
                 <a href="#" onclick="cargarConsultaEdicion('${edicion.nombre}'); return false;" style="color: #2c3e50; text-decoration: none;">
                     ${edicion.nombre}
                 </a>
-            </h3>
+            </h3> 
             <div>
                 <a href="#" onclick="verDetallesCurso('${edicion.curso.nombre}'); return false;" style="color: #2980b9; font-weight: bold; text-decoration: underline; font-size: 14px;">
                     Ver información del Curso (${edicion.curso.nombre})

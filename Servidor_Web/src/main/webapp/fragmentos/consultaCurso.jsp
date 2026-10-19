@@ -23,7 +23,7 @@
         <p><strong>Créditos:</strong> ${curso.creditos}</p>
         <p><strong>URL:</strong> <a href="${curso.url}" target="_blank" style="color: #3498db;">${curso.url}</a></p>
         <p><strong>Fecha de Alta:</strong> ${curso.fechaRegistro}</p>
-        <p><strong>Categorías:</strong> 
+        <p><strong>Categorías:</strong>  
             <c:choose>
                 <c:when test="${not empty curso.categorias}">
                     <c:forEach var="cat" items="${curso.categorias}" varStatus="loop">

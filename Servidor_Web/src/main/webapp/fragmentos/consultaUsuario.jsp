@@ -10,7 +10,7 @@
         <label style="font-weight: bold; color: #34495e; display: block; margin-bottom: 8px;">
             Seleccione un usuario para consultar su información:
         </label>
-        
+         
         <div style="max-height: 480px; overflow-y: auto; border: 1px solid #ddd; border-radius: 5px;">
             <table class="table" style="width: 100%; border-collapse: collapse; margin: 0; background: #fff;">
                 <thead style="position: sticky; top: 0; background: #f2f2f2; z-index: 1;">

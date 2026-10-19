@@ -12,7 +12,7 @@
                 onmouseout="this.style.backgroundColor='#6c757d';">
             ← Volver a Programas
         </button>
-    </div>
+    </div> 
     <hr style="opacity: 0.3; margin: 15px 0 20px 0;">
 
     <!-- Sección Principal: Info y Imagen -->

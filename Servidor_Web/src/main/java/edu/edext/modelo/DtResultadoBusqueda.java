@@ -15,7 +15,7 @@ public class DtResultadoBusqueda {
         this.descripcion=descripcion;
         this.fechaPublicacion=fechaPublicacion;
         this.imagen=imagen;
-        this.tipo=tipo;
+        this.tipo=tipo; 
     }
     
     public String getNombre(){return nombre;}
