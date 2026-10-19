@@ -1,0 +1,865 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
+ */
+package edu.edext.logica;
+
+import edu.edext.datatypes.DtCategoria;
+import edu.edext.datatypes.DtConsultaCurso;
+import edu.edext.datatypes.DtCurso;
+import edu.edext.datatypes.DtEdicion;
+import edu.edext.datatypes.DtInscripcionEdicion;
+import edu.edext.datatypes.DtInstituto;
+import edu.edext.datatypes.DtPrograma;
+import edu.edext.datatypes.DtUsuario;
+import edu.edext.datatypes.TipoUsuario;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
+
+/**
+ *
+ * @author pipo
+ */
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class ControladorTest {
+    
+    private IControlador ic;
+    
+    public ControladorTest() {
+    }
+    
+    @BeforeAll
+    public static void setUpClass() {
+    }
+    
+    @AfterAll
+    public static void tearDownClass() {
+    }
+    
+    @BeforeEach
+    public void setUp() {
+        ic = Fabrica.getInstance().getIControlador();
+    }
+    
+    @AfterEach
+    public void tearDown() {
+    }
+
+    
+    @Test
+    @Order(1)
+    public void testCargarDatosDePrueba() throws Exception {
+        int resultado = assertDoesNotThrow(() -> ic.cargarDatosDePrueba(), 
+        "La carga de datos de prueba no debería lanzar una excepción.");
+        assertNotEquals(-1, resultado, "El método debería retornar un valor distinto de -1 en caso de éxito.");
+    }
+    
+    @Test
+    @Order(2)
+    public void testCargarDatosDePruebaDuplicado() throws Exception {
+        int resultadoSegundaCarga = assertDoesNotThrow(() -> ic.cargarDatosDePrueba());
+
+        // Si la arquitectura idempotente/autogenerada devuelve 1 (o el código de retorno del controlador)
+        assertEquals(1, resultadoSegundaCarga, "La segunda carga fue procesada devolviendo el código 1.");   
+    }
+    
+    @Test
+    public void testCrearInstituto() throws Exception{
+        String nombreInstituto = "Instituto1";
+        ic.crearInstituto(nombreInstituto);
+        
+        List<DtInstituto> institutos = ic.listarInstitutos();
+        assertNotNull(institutos, "La lista de institutos no debe ser nula");
+        
+        boolean existeEnLista = institutos.stream().anyMatch(i -> i.getNombre().equals(nombreInstituto));
+        
+        assertTrue(existeEnLista, "El instituto creado deberia estar en la lista");
+        
+    }
+     
+    @Test
+    public void testCrearInstitutoDuplicado() throws Exception{
+        String nombreInstituto = "Instituto2";
+        
+        ic.crearInstituto(nombreInstituto);
+  
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.crearInstituto(nombreInstituto);}, "Ya existe");        
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testEliminarInstitutoBasico() throws Exception{
+        String nombreInstituto = "Instituto3";
+        ic.crearInstituto(nombreInstituto);
+        ic.eliminarInstituto(nombreInstituto);
+        
+        List<DtInstituto> institutos = ic.listarInstitutos();
+        
+        assertNotNull(institutos, "La lista de institutos no debe ser nula");
+    
+        boolean existeEnLista = institutos.stream().anyMatch(i -> i.getNombre().equals(nombreInstituto));
+        
+        assertFalse(existeEnLista, "El instituto creado deberia estar en la lista");
+    
+    }
+    
+    @Test
+    public void testEliminarInstitutoFallido() throws Exception{
+        String nombreInstituto = "InstitutoFallido";
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.eliminarInstituto(nombreInstituto);}, "Instituto inexistente");
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testCrearUsuarioEstudiante() throws Exception{
+        String nickname = "NICKNAME";
+        List<String> institutos = new ArrayList<>();
+        Date fecha = new Date();
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        ic.crearUsuario(usuario);
+        
+        List<DtUsuario> usuarios = ic.listarUsuarios();
+        assertNotNull(usuarios, "La lista de institutos no debe ser nula");
+        
+        boolean existeEnLista = usuarios.stream().anyMatch(i -> i.getNickname().equals(nickname));
+        
+        assertTrue(existeEnLista, "El usuario creado deberia estar en la lista");
+    }
+    
+    @Test
+    public void testCrearUsuarioEstudianteDuplicadoPorNickName() throws Exception{
+        String nickname = "NICKNAME2";
+        List<String> institutos = new ArrayList<>();
+        Date fecha = new Date();
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email221", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario2 = new DtUsuario(nickname, "password", "email222", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        ic.crearUsuario(usuario);
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario2);}, "Ya existe");        
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testCrearUsuarioEstudianteDuplicadoPorCorreo() throws Exception{
+        String nickname = "NICKNAME31";
+        String nickname2 = "NICKNAME32";
+        List<String> institutos = new ArrayList<>();
+        Date fecha = new Date();
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario2 = new DtUsuario(nickname2, "password", "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        ic.crearUsuario(usuario);
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario2);}, "Ya existe");        
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testCrearUsuarioDocente() throws Exception{
+        String nickname = "NICKNAME_DOCENTE";
+        List<String> institutos = new ArrayList<>();
+        Date fecha = new Date();
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
+        ic.crearUsuario(usuario);
+        
+        List<DtUsuario> usuarios = ic.listarUsuarios();
+        assertNotNull(usuarios, "La lista de institutos no debe ser nula");
+        
+        boolean existeEnLista = usuarios.stream().anyMatch(i -> i.getNickname().equals(nickname));
+        
+        assertTrue(existeEnLista, "El usuario creado deberia estar en la lista");
+    }
+    
+    @Test
+    public void testCrearUsuarioDocenteInstitutoFalso() throws Exception{
+        String nickname = "NICKNAME_DOCENTE2";
+        List<String> institutos = new ArrayList<>();
+        institutos.add("Instituto manolo");
+        
+        Date fecha = new Date();
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente2", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario);}, "No existe el Instituto");        
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testListarEdicionesPorUsuarioEstudiante() throws Exception{
+        String nickname = "roro";
+        List<DtEdicion> lista = ic.listarEdicionesPorUsuario(nickname);
+        assertNotNull(lista, "La lista no debe ser nula");
+    }
+    
+    @Test
+    public void testListarEdicionesPorUsuarioDocente() throws Exception{
+        String nickname = "heisenberg";
+        List<DtEdicion> lista = ic.listarEdicionesPorUsuario(nickname);
+        assertNotNull(lista, "La lista no debe ser nula");
+    }
+    
+    @Test
+    public void testListarEdicionesPorUsuarioFallido() throws Exception{
+        String nickname = "USUARIO_INEXISTENTE";        
+        Exception excepcion = assertThrows(Exception.class, () -> {List<DtEdicion> lista = ic.listarEdicionesPorUsuario(nickname);}, "No existe el usuario");        
+        assertNotNull(excepcion.getMessage());
+    }
+   
+    @Test
+    public void testAltaCurso() throws Exception {    
+        String nombreInstituto = "DISI";
+        String nombreCurso = "CURSITO1";
+
+        DtInstituto instituto = ic.listarInstitutos().stream()
+            .filter(inst -> inst.getNombre().equalsIgnoreCase(nombreInstituto))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
+        
+        List<DtCurso> previas = ic.listarCursosPorUsuario("heisenberg");
+        
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new ArrayList<>(), "img");
+        
+        ic.altaCurso(curso, nombreInstituto);
+        
+        List<DtCurso> cursos = ic.listarCursos();
+        assertNotNull(cursos, "La lista de cursos no debe ser nula");
+        boolean existeEnLista = cursos.stream().anyMatch(i -> i.getNombre().equals(nombreCurso));
+        assertTrue(existeEnLista, "El curso creado deberia estar en la lista");
+    }
+    
+    @Test
+    public void testAltaCursoPreviaInexistente() throws Exception {    
+        String nombreInstituto = "DISI";
+        String nombreCurso = "CURSITO2";
+
+        DtInstituto instituto = ic.listarInstitutos().stream()
+            .filter(inst -> inst.getNombre().equalsIgnoreCase(nombreInstituto))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
+        
+        DtCurso previa = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+        
+        List<DtCurso> previas = ic.listarCursosPorUsuario("heisenberg");
+        previas.add(previa);
+        
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new ArrayList<>(), "img");
+               
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, nombreInstituto);}, "No existe la previa");        
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testAltaCursoDuplicado() throws Exception {    
+        String nombreInstituto = "DISI";
+        String nombreCurso = "CURSITO3";
+
+        DtInstituto instituto = ic.listarInstitutos().stream()
+            .filter(inst -> inst.getNombre().equalsIgnoreCase(nombreInstituto))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
+        
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+        
+        ic.altaCurso(curso, nombreInstituto);
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, nombreInstituto);}, "Ya existe");        
+        assertNotNull(excepcion.getMessage());
+    }
+
+    @Test
+    public void testAltaCursoInstitutoInexistente() throws Exception {    
+        String nombreInstituto = "DISI";
+        String nombreCurso = "CURSITO4";
+
+        DtInstituto instituto = ic.listarInstitutos().stream()
+            .filter(inst -> inst.getNombre().equalsIgnoreCase(nombreInstituto))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
+        
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, "INSTITUTO_INEXISTENTE33");}, "Instituto inexistente");        
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testAltaEdicionCurso() throws Exception {
+        String nombreInstituto = "DISI";
+        String nombreCurso = "MicroBit";
+        String nombreEdicion = "MicroBit-2026";
+        String nombreDocente = "heisenberg";
+        
+        Set<String> docentes = new HashSet<>();
+        docentes.add(nombreDocente);
+        
+        DtCurso curso = ic.listarCursos().stream().filter(inst -> inst.getNombre().equalsIgnoreCase(nombreCurso))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
+        
+        DtEdicion edicion = new DtEdicion(nombreEdicion, 1, LocalDate.now(), LocalDate.now(), LocalDate.now(),curso, docentes);
+        
+        ic.altaEdicionCurso(nombreCurso, edicion);      
+   
+        List<DtEdicion> cursos = ic.listarEdicionPorCurso(nombreCurso);
+        assertNotNull(cursos, "La lista de ediciones no debe ser nula");
+        boolean existeEnLista = cursos.stream().anyMatch(i -> i.getNombre().equals(nombreEdicion));
+        assertTrue(existeEnLista, "La edicion creada deberia estar en la lista");
+    }
+    
+    @Test
+    public void testAltaEdicionCursoDuplicado() throws Exception {
+        String nombreInstituto = "DISI";
+        String nombreCurso = "MicroBit";
+        String nombreEdicion = "MicroBit-2026-2";
+        String nombreDocente = "heisenberg";
+        
+        Set<String> docentes = new HashSet<>();
+        docentes.add(nombreDocente);
+        
+        DtCurso curso = ic.listarCursos().stream().filter(inst -> inst.getNombre().equalsIgnoreCase(nombreCurso))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
+        
+        DtEdicion edicion = new DtEdicion(nombreEdicion, 1, LocalDate.now(), LocalDate.now(), LocalDate.now(),curso, docentes);
+        
+        ic.altaEdicionCurso(nombreCurso, edicion);      
+           
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.altaEdicionCurso(nombreCurso, edicion);}, "Ya existe");        
+        assertNotNull(excepcion.getMessage());
+    }
+   
+    @Test
+    public void testAltaEdicionCursoInexistente() throws Exception {
+        String nombreInstituto = "DISI";
+        String nombreCurso = "MicroBit";
+        String nombreEdicion = "MicroBit-2026-3";
+        String nombreDocente = "heisenberg";
+        
+        Set<String> docentes = new HashSet<>();
+
+        docentes.add(nombreDocente);
+        
+        DtCurso curso = ic.listarCursos().stream().filter(inst -> inst.getNombre().equalsIgnoreCase(nombreCurso))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
+        
+        DtEdicion edicion = new DtEdicion(nombreEdicion, 1, LocalDate.now(), LocalDate.now(), LocalDate.now(),curso, docentes);  
+           
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.altaEdicionCurso("CURSO_INEXISTENTE", edicion);}, "Ya existe");        
+        assertNotNull(excepcion.getMessage());
+    }
+
+    @Test
+    public void testListarCursosPorPrograma() throws Exception {
+        String nombre = "EFI Ingeniería Mecánica";
+        List<DtCurso> cursos = ic.listarCursosPorPrograma(nombre);
+        assertNotNull(cursos, "La lista de cursos no debe ser nula");
+    }
+    
+    @Test
+    public void testListarCursosPorProgramaFallido() throws Exception {
+        String nombre = "CURSO_INEXISTENTE";        
+        Exception excepcion = assertThrows(Exception.class, () -> {List<DtCurso> cursos = ic.listarCursosPorPrograma(nombre);}, "No existe");        
+        assertNotNull(excepcion.getMessage());
+    }    
+    
+    @Test
+    public void testListarCursosPorInstituto() throws Exception {
+        String nombre = "DISI";
+        List<String> cursos = ic.listarCursosPorInstituto(nombre);
+        assertNotNull(cursos, "La lista de cursos no debe ser nula");
+    }    
+    
+    @Test
+    public void testListarCursosPorUsuarioFallido() throws Exception {
+        String nombre = "USUARIO_INEXISTENTE";        
+        Exception excepcion = assertThrows(Exception.class, () -> {List<DtCurso> cursos = ic.listarCursosPorUsuario(nombre);}, "No existe");        
+        assertNotNull(excepcion.getMessage());
+    } 
+
+    @Test
+    public void testListarProgramas() throws Exception {
+        List<DtPrograma> cursos = ic.listarProgramas();
+        assertNotNull(cursos, "La lista de programas no debe ser nula");
+    }  
+    
+    @Test
+    public void testListarProgramasPorUsuarioEstudiante() throws Exception {
+        String nombre = "roro";
+        List<DtPrograma> cursos = ic.listarProgramasPorUsuario(nombre);
+        assertNotNull(cursos, "La lista de programas no debe ser nula");
+    }  
+
+    @Test
+    public void testListarProgramasPorUsuarioDocente() throws Exception {
+        String nombre = "heisenberg";
+        List<DtPrograma> cursos = ic.listarProgramasPorUsuario(nombre);
+        assertNotNull(cursos, "La lista de programas no debe ser nula");
+    }  
+    
+    @Test
+    public void testListarProgramasPorUsuarioFallido() throws Exception {
+        String nombre = "USUARIO_INEXISTENTE";        
+        Exception excepcion = assertThrows(Exception.class, () -> {List<DtPrograma> cursos = ic.listarProgramasPorUsuario(nombre);}, "No existe");        
+        assertNotNull(excepcion.getMessage());
+    } 
+    
+    @Test
+    public void testAgregarProgramaCurso() throws Exception {
+        String programa = "Formación integral";
+        String curso = "MicroBit";
+        ic.agregarProgramaCurso(programa, curso);
+        
+        List<DtCurso> cursos = ic.listarCursosPorPrograma(programa);
+        assertNotNull(cursos, "La lista de programas no debe ser nula");
+                
+        boolean existeEnLista = cursos.stream().anyMatch(i -> i.getNombre().equals(curso));
+        
+        assertTrue(existeEnLista, "El curso deberia estar en la lista");
+    }
+    
+    @Test
+    public void testAgregarProgramaCursoDuplicado() throws Exception {
+        String programa = "Formación integral";
+        String curso = "Flor del Ceibo";
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.agregarProgramaCurso(programa, curso);}, "Ya existe");        
+        assertNotNull(excepcion.getMessage());        
+    }
+    
+    @Test
+    public void testAgregarProgramaCursoInexistente() throws Exception {
+        String programa = "Formación integral";
+        String curso = "CURSO_INEXISTENTE";
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.agregarProgramaCurso(programa, curso);}, "No existe");        
+        assertNotNull(excepcion.getMessage());        
+    }
+    
+    @Test
+    public void testBuscarPrograma() throws Exception {
+        String nombre = "Formación integral";
+        DtPrograma programa = ic.buscarPrograma(nombre);
+        assertEquals(nombre, programa.getNombre(), "El nombre del programa buscado debe coincidir");
+    }
+    
+    @Test
+    public void testBuscarProgramaInexistente() throws Exception {
+        String programa = "PROGRAMA_INEXISTENTE";
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.buscarPrograma(programa);}, "No existe");        
+        assertNotNull(excepcion.getMessage());   
+    }
+
+    @Test
+    public void testObtenerDatosCurso() throws Exception {
+        String nombre = "MicroBit";
+        DtConsultaCurso curso = ic.obtenerDatosCurso(nombre);
+        assertEquals(nombre, curso.getNombre(), "El nombre del programa buscado debe coincidir");    
+    }
+    
+    @Test
+    public void testObtenerDatosCursoInexistente() throws Exception {
+        String curso = "CURSO_INEXISTENTE";
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.obtenerDatosCurso(curso);}, "No existe");        
+        assertNotNull(excepcion.getMessage());      
+    }
+    
+    @Test
+    public void testModificarUsuarioDocente() throws Exception {
+        String nombre = "heisenberg";
+        String nuevoApellido = "Black";
+        
+        DtUsuario usuarioOriginal = ic.listarUsuarios().stream().filter(inst -> inst.getNickname().equalsIgnoreCase(nombre))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el usuario: " + nombre));        
+        
+        DtUsuario usuarioModificado = new DtUsuario(
+        usuarioOriginal.getNickname(),     // Mantiene nickname
+        usuarioOriginal.getPassword(),
+        usuarioOriginal.getEmail(),        // Mantiene email
+        usuarioOriginal.getNombre(),       // Mantiene nombre
+        nuevoApellido,                     // <--- Apellido cambiado
+        usuarioOriginal.getImagen(),       // Mantiene imagen
+        usuarioOriginal.getfNacimiento(),  // Mantiene fecha nacimiento
+        usuarioOriginal.getInstitutos(),   // Mantiene institutos
+        usuarioOriginal.getTipoUsuario()   // Mantiene tipo de usuario
+    );
+        
+        ic.modificarUsuario(usuarioModificado);
+        
+        DtUsuario usuarioFinal = ic.listarUsuarios().stream().filter(inst -> inst.getNickname().equalsIgnoreCase(nombre))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el usuario: " + nombre)); 
+        
+        assertEquals(usuarioModificado.getApellido(), usuarioFinal.getApellido() , "El apellido buscado debe coincidir");
+        
+    }
+    
+    @Test
+    public void testModificarUsuarioInexistente() throws Exception {
+        String nickname = "NICKNAME44";
+        List<String> institutos = new ArrayList<>();
+        Date fecha = new Date();
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.modificarUsuario(usuario);}, "No existe");        
+        assertNotNull(excepcion.getMessage());      
+    
+    }
+    
+    @Test
+    public void testListarDocentes() throws Exception {
+        List<String> lista = ic.listarDocentes();
+        assertNotNull(lista, "La lista de programas no debe ser nula");
+    }
+    
+    @Test
+    public void testNombreCursos() throws Exception {
+        List<String> lista = ic.listarNombresCursos();
+        assertNotNull(lista, "La lista de programas no debe ser nula");
+    }
+    
+    @Test
+    public void testGetEdicion() throws Exception {
+        String nombre = "Dalavuelta - 2025";
+        DtEdicion edicion = ic.getEdicion(nombre);
+
+        assertEquals(nombre, edicion.getNombre(), "El nombre buscado debe coincidir");
+    }
+    
+    @Test
+    public void testBuscarEdicion() throws Exception {
+        String nombre = "Dalavuelta - 2025";
+        DtEdicion edicion = ic.buscarEdicion(nombre);
+
+        assertEquals(nombre, edicion.getNombre(), "El nombre buscado debe coincidir");
+    }
+    
+    @Test
+    public void testObtenerInstitutoPorCurso() throws Exception {
+        String curso = "Dalavuelta";
+        String instituto = "IMPII";
+        
+        String resultado = ic.obtenerInstitutoPorCurso(curso);
+        
+        assertEquals(resultado, instituto, "El instituto buscado debe coincidir");
+    }
+    
+    @Test
+    public void testExisteUsuario() throws Exception {
+        String nickname = "heisenberg";
+        boolean resultado = ic.existeUsuario(nickname);
+        assertTrue(resultado, "El usuario deberia estar");
+    }
+
+    @Test
+    public void testExisteUsuarioInexistente() throws Exception {
+        String nickname = "USUARIO_INEXISTENTE";
+        boolean resultado = ic.existeUsuario(nickname);
+        assertFalse(resultado, "El usuario no deberia estar");
+    }
+    
+    @Test
+    public void testExisteCorreo() throws Exception {
+        String correo = "heisenberg@gmail.com";
+        boolean resultado = ic.existeEmail(correo);
+        assertTrue(resultado, "El usuario deberia estar");
+    }
+
+    @Test
+    public void testExisteCorreoInexistente() throws Exception {
+        String correo = "CORREO_INEXISTENTE";
+        boolean resultado = ic.existeEmail(correo);
+        assertFalse(resultado, "El usuario no deberia estar");
+    }
+
+    @Test
+    public void testListaEdicionPorCurso() throws Exception {
+        String curso = "MicroBit";
+        List<String> lista = ic.listaEdicionPorCurso(curso);
+        assertNotNull(lista, "La lista no debe ser nula");
+    }
+ 
+    @Test
+    public void testSetCrearProgramaFormacion() throws Exception {
+        String nombre = "PROGRAMITA";
+        
+        DtPrograma programa = new DtPrograma(nombre, "desc", LocalDate.now(), LocalDate.now(), LocalDate.now());
+        ic.setCrearProgramaFormacion(programa);
+        
+        List<DtPrograma> programas = ic.listarProgramas();
+        assertNotNull(programas, "La lista de programas no debe ser nula");
+        
+        boolean existeEnLista = programas.stream().anyMatch(i -> i.getNombre().equals(nombre));
+        assertTrue(existeEnLista, "El programa creado deberia estar en la lista");
+    }
+    
+    @Test
+    public void testSetCrearProgramaFormacionDuplicado() throws Exception {
+        String nombre = "PROGRAMITA2";
+        DtPrograma programa = new DtPrograma(nombre, "desc", LocalDate.now(), LocalDate.now(), LocalDate.now());
+        DtPrograma programa2 = new DtPrograma(nombre, "desc", LocalDate.now(), LocalDate.now(), LocalDate.now());
+        ic.setCrearProgramaFormacion(programa);
+        
+        boolean resultadoSegundaCarga = assertDoesNotThrow(() -> ic.setCrearProgramaFormacion(programa2));
+        assertEquals(false, resultadoSegundaCarga, "La segunda carga fue procesada sin duplicados."); 
+    }    
+    
+    @Test
+    public void testGetEstudiantesInscriptosEdicion() throws Exception {
+        String nombre = "Dalavuelta - 2025";
+        List<String> resultado = ic.getEstudiantesInscriptosEdicion(nombre);
+        assertNotNull(resultado, "La lista no debe ser nula");
+    }
+ 
+    @Test
+    public void testGetEstudiantesCandidatosEdicion() throws Exception {
+        String nombre = "Dalavuelta - 2025";
+        List <String> resultado = ic.getEstudiantesCandidatosEdicion(nombre);
+        assertNotNull(resultado, "La lista no debe ser nula");
+    }    
+
+    @Test
+    public void testGetEstudiantesInscriptosEdicionInexistente() throws Exception {
+        String nombre = "EDICION_INEXISTENTE";
+        List<String> resultado = ic.getEstudiantesInscriptosEdicion(nombre);
+        assertEquals(resultado, Collections.emptyList());
+    }
+ 
+    @Test
+    public void testGetEstudiantesCandidatosEdicionInexistente() throws Exception {
+        String nombre = "EDICION_INEXISTENTE";
+        List <String> resultado = ic.getEstudiantesCandidatosEdicion(nombre);
+        assertNotNull(resultado, "La lista no debe ser nula");
+    }
+       
+    @Test
+    public void testSetInscripcion() throws Exception {
+        String estudiante = "roro";
+        String edicion = "MicroBit - 2026";
+        ic.setInscripcion(estudiante, edicion);
+        
+        List<String> resultado = ic.getEstudiantesInscriptosEdicion(edicion);
+        boolean existeEnLista = resultado.stream().anyMatch(i -> i.equals(estudiante));
+        assertTrue(existeEnLista, "El estudiante deberia estar en la lista");
+    }
+
+    @Test
+    public void testSetInscripcionEstudianteInexistente() throws Exception {
+        String estudiante = "";
+        String edicion = "MicroBit - 2026";
+        int resultado = ic.setInscripcion(estudiante, edicion);
+        assertEquals(resultado, 1); //Codigo de error por estudiante inexeistente.
+    }
+
+    @Test
+    public void testSetInscripcionEdicionInexistente() throws Exception {
+        String estudiante = "roro";
+        String edicion = "";
+        int resultado = ic.setInscripcion(estudiante, edicion);
+        assertEquals(resultado, 2); //Codigo de error por edicion inexistente.
+    }
+    
+    @Test
+    public void testDelInscripcion() throws Exception {
+        String estudiante = "weiss";
+        String edicion = "MicroBit - 2026";
+        ic.setInscripcion(estudiante, edicion);
+        ic.delInscripcion(estudiante, edicion);
+        
+        List<String> resultado = ic.getEstudiantesInscriptosEdicion(edicion);
+        boolean existeEnLista = resultado.stream().anyMatch(i -> i.equals(estudiante));
+        assertFalse(existeEnLista, "El estudiante no deberia estar en la lista");
+    }
+    
+    @Test
+    public void testDelInscripcionEstudianteInexistente() throws Exception {
+        String estudiante = "";
+        String edicion = "MicroBit - 2026";
+        ic.delInscripcion(estudiante, edicion);
+        
+        int resultado = ic.delInscripcion(estudiante, edicion);
+        assertEquals(resultado, -1); //Codigo de error generico/default.
+    }
+    
+    @Test
+    public void testAltaCategoria() throws Exception {
+        String nombreCategoria = "CAT1";
+        ic.crearCategoria(nombreCategoria);
+        
+        List<DtCategoria> categorias = ic.listarCategorias();
+        assertNotNull(categorias, "La lista no debe ser nula");
+        
+        boolean existeEnLista = categorias.stream().anyMatch(i -> i.getNombre().equals(nombreCategoria));
+        assertTrue(existeEnLista, "La categoria creada deberia estar en la lista");
+    }
+    
+    @Test
+    public void testAltaCategoriaDuplicado() throws Exception {
+        String nombreCategoria = "CAT2";
+        ic.crearCategoria(nombreCategoria);
+        
+        List<DtCategoria> categorias = ic.listarCategorias();
+        assertNotNull(categorias, "La lista no debe ser nula");
+        
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.crearCategoria(nombreCategoria);}, "Ya existe");
+        assertNotNull(excepcion.getMessage());
+    }
+    
+    @Test
+    public void testCrearProgramaWeb() throws Exception {
+        String nombre = "CREACION-WEB";
+        DtPrograma aux = new DtPrograma(nombre, "descripcion", LocalDate.now(), LocalDate.now(), LocalDate.now());
+        ic.setCrearProgramaFormacion(aux, null, "imagen.png");
+        
+        List<DtPrograma> programas = ic.listarProgramas();
+        assertNotNull(programas, "La lista de programas no debe ser nula");
+        
+        boolean existeEnLista = programas.stream().anyMatch(i -> i.getNombre().equals(nombre));
+        assertTrue(existeEnLista, "El programa creado deberia estar en la lista");
+        
+    }
+       
+    @Test
+    public void testCrearUsuarioWeb() throws Exception{
+        String nickname = "CREACION-WEB";
+        List<String> institutos = new ArrayList<>();
+        Date fecha = new Date();
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email@web", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        ic.crearUsuario(usuario, null, "imagen.png");
+        
+        List<DtUsuario> usuarios = ic.listarUsuarios();
+        assertNotNull(usuarios, "La lista de usuarios no debe ser nula");
+        
+        boolean existeEnLista = usuarios.stream().anyMatch(i -> i.getNickname().equals(nickname));
+        
+        assertTrue(existeEnLista, "El usuario creado deberia estar en la lista");
+    }
+    
+    @Test
+    public void testSeguirUsuario() throws Exception {
+        String usuario1 = "adri"; //+1 nuevo seguido.
+        String usuario2 = "roro"; //+1 nuevo seguidor.
+        
+        ic.seguirUsuario(usuario1, usuario2);
+        
+        List<String> u1_seguidos= ic.listarSeguidos(usuario1);
+        assertNotNull(u1_seguidos, "La lista de usuarios no debe ser nula");
+        List<String> u2_seguidores = ic.listarSeguidores(usuario2);
+        assertNotNull(u2_seguidores, "La lista de usuarios no debe ser nula");
+        
+        boolean existeEnLista1 = u1_seguidos.stream().anyMatch(i -> i.equals(usuario2));
+        boolean existeEnLista2 = u2_seguidores.stream().anyMatch(i -> i.equals(usuario1));
+
+        assertAll("Validar relación de seguimiento mutua",
+            () -> assertTrue(existeEnLista1, "El usuario 2 debería estar en la lista de seguidos del usuario 1"),
+            () -> assertTrue(existeEnLista2, "El usuario 1 debería estar en la lista de seguidores del usuario 2")
+        );
+    }
+    
+    @Test
+    public void testSeguirUsuarioInexistente() throws Exception {
+        String usuario1 = "adri"; //+1 nuevo seguido.
+        String usuario2 = "USUARIO-INEXISTENTE"; //+1 nuevo seguidor.
+               
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.seguirUsuario(usuario1, usuario2);}, "Usuario inexistente");        
+        assertNotNull(excepcion.getMessage());
+
+    }
+    
+    @Test
+    public void testSeguirUsuarioNarcisista() throws Exception {
+        String usuario1 = "adri";
+    
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.seguirUsuario(usuario1, usuario1);}, "No puedes autoseguirte");        
+        assertNotNull(excepcion.getMessage());
+
+    }
+    
+    @Test
+    public void dejarSeguirUsuario() throws Exception {
+        String usuario1 = "house"; //-1 nuevo seguido.
+        String usuario2 = "phils"; //-1 nuevo seguidor.
+        
+        ic.seguirUsuario(usuario1, usuario2);
+        
+        List<String> u1_seguidosInicio= ic.listarSeguidos(usuario1);
+        assertNotNull(u1_seguidosInicio, "La lista de usuarios no debe ser nula");
+        List<String> u2_seguidoresInicio = ic.listarSeguidores(usuario2);
+        assertNotNull(u2_seguidoresInicio, "La lista de usuarios no debe ser nula");
+
+        ic.dejarDeSeguirUsuario(usuario1, usuario2);
+
+        List<String> u1_seguidosFin= ic.listarSeguidos(usuario1);
+        assertNotNull(u1_seguidosFin, "La lista de usuarios no debe ser nula");
+        List<String> u2_seguidoresFin = ic.listarSeguidores(usuario2);
+        assertNotNull(u2_seguidoresFin, "La lista de usuarios no debe ser nula");    
+        
+        boolean existeEnLista1 = u1_seguidosFin.stream().anyMatch(i -> i.equals(usuario2));
+        boolean existeEnLista2 = u2_seguidoresFin.stream().anyMatch(i -> i.equals(usuario1));
+        
+        assertAll("Validar relación de seguimiento mutua",
+            () -> assertFalse(existeEnLista1, "El usuario 2 no debería estar en la lista de seguidos del usuario 1"),
+            () -> assertFalse(existeEnLista2, "El usuario 1 no debería estar en la lista de seguidores del usuario 2")
+        );
+    }
+
+    @Test
+    public void testDejarSeguirUsuarioInexistente() throws Exception {
+        String usuario1 = "adri"; //+1 nuevo seguido.
+        String usuario2 = "USUARIO-INEXISTENTE"; //+1 nuevo seguidor.
+               
+        Exception excepcion = assertThrows(Exception.class, () -> {ic.dejarDeSeguirUsuario(usuario1, usuario2);}, "Usuario inexistente");        
+        assertNotNull(excepcion.getMessage());
+    }
+
+    @Test
+    public void testListarCursoPorCategoriaInexistente() throws Exception {
+        String aux = "CATEGORIA-INEXISTENTE";
+        
+        List<String> lista = ic.listarCursosPorCategoria(aux);     
+        
+        assertNotNull(lista, "La lista retornada no debe ser nula");
+        assertTrue(lista.isEmpty(), "La lista de cursos debe estar vacía para una categoría inexistente");
+    }
+    
+    @Test
+    public void testGetInscripcionesCompletas() throws Exception{
+        String edicion = "Dalavuelta - 2025";
+        
+        List<DtInscripcionEdicion> lista = ic.getInscripcionesCompletas(edicion);
+        
+        assertNotNull(lista, "La lista retornada no debe ser nula");
+        assertFalse(lista.isEmpty(), "La lista no debe estar vacía");
+    }
+    
+    @Test
+    public void testGetInscripcionesDeEstudiante() throws Exception{
+        String estudiante = "roro";
+        
+        List<DtInscripcionEdicion> lista = ic.getInscripcionesDeEstudiante(estudiante);
+        
+        assertNotNull(lista, "La lista retornada no debe ser nula");
+        assertFalse(lista.isEmpty(), "La lista no debe estar vacía");
+        
+    }
+    
+    
+    
+    
+    
+}
