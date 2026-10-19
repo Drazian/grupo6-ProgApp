@@ -281,12 +281,12 @@ public class ConsultaPrograma extends javax.swing.JPanel {
             DefaultTableModel model = (DefaultTableModel) tbl.getModel();
             model.setRowCount(0);
             for (DtCurso aux: lista){
-                String strPrevias = (aux.getListPrevias() != null && !aux.getListPrevias().isEmpty()) 
-                                        ? String.join(", ", aux.getListPrevias()) 
+                String strPrevias = (aux.getPrevias_toArray() != null && !aux.getPrevias_toArray().isEmpty()) 
+                                        ? String.join(", ", aux.getPrevias_toArray()) 
                                         : "---";
                 
-                String strCategorias = (aux.getListCategorias() != null && !aux.getListCategorias().isEmpty()) 
-                                        ? String.join(", ", aux.getListCategorias()) 
+                String strCategorias = (aux.getCategorias_toArray() != null && !aux.getCategorias_toArray().isEmpty()) 
+                                        ? String.join(", ", aux.getCategorias_toArray()) 
                                         : "---";
                 
                 model.addRow(new Object[]{

@@ -198,7 +198,7 @@ public class ConsultaEdicionHelper {
         private List<String> getPipeInscriptos(String nombre) throws Exception{
             return Fabrica.getInstance().getIControlador().getEstudiantesInscriptosEdicion(nombre);
         }
-        
+      
     }//*************************************************************************
     
 }

@@ -1,7 +1,7 @@
 package edu.edext.datatypes;
 
 public class DtInstituto {
-    private String nombre;
+    private final String nombre;
 
     public DtInstituto(String nombre){
         this.nombre=nombre;

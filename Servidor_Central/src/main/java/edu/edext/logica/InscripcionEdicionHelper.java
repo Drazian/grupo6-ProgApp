@@ -20,7 +20,7 @@ import org.tinylog.Logger;
  */
 public class InscripcionEdicionHelper {
     private final EntityManagerFactory DB;
-    private String nombre; // Nombre de la Edición
+    private String nombre;
     private DtEdicion DTO;
     private EntityManager db;
     private EntityTransaction hiloTransaction;
@@ -30,6 +30,10 @@ public class InscripcionEdicionHelper {
         this.nombre=nombre;
     }
     
+    
+//    public List<String> getEstudiantesInscriptos(){
+//        return getInscriptos();
+//    }
     public List<String> getEstudiantesInscriptos(){
         return getInscriptos();
     }
@@ -44,6 +48,7 @@ public class InscripcionEdicionHelper {
         DTO=null;
         db=null;
     }
+    
     
     //***************************** pipeline ***********************************
     
@@ -74,7 +79,7 @@ public class InscripcionEdicionHelper {
         return ret;
     }
     
-    public int inscribirEstudiante(String nomEstudiante, String nomEdicion){ 
+    public int inscribirEstudiante(String nomEstudiante, String nomEdicion){ // incompleta falta aislacion y modularizacion
         int ret=-1;
         db=DB.createEntityManager();
         try {
@@ -86,7 +91,7 @@ public class InscripcionEdicionHelper {
             InscripcionEdicionID idDual = new InscripcionEdicionID(nomEstudiante, nomEdicion);
             InscripcionEdicion isExist = db.find(InscripcionEdicion.class, idDual);
             if(isExist==null){
-                InscripcionEdicion newInscripcion=new InscripcionEdicion(estudiante, edicion, LocalDate.now(), 1);
+                InscripcionEdicion newInscripcion=new InscripcionEdicion(estudiante, edicion, LocalDate.now(), 0);
                 db.persist(newInscripcion);
                 db.getTransaction().commit();
                 Logger.info("Se Inscribio el Estudiante {} en la edicion {}", nomEstudiante, nomEdicion);
@@ -102,7 +107,12 @@ public class InscripcionEdicionHelper {
         return ret;
     }
  
-    public int cancelarInscripcion(String nomEstudiante, String nomEdicion){ 
+    // 0 exito
+    // 1 estudiante no existe
+    // 2 edicion no existe
+    // -1 error
+    
+    public int cancelarInscripcion(String nomEstudiante, String nomEdicion){ // incompleta falta aislacion y modularizacion
         int ret=-1;
         db=DB.createEntityManager();
         try {
@@ -126,8 +136,8 @@ public class InscripcionEdicionHelper {
         
         return ret;
     }
-
-    // =========================================================================
+    
+  // =========================================================================
     // NUEVOS MÉTODOS PARA EL CASO DE USO "SELECCIONAR ESTUDIANTES"
     // =========================================================================
 
@@ -174,7 +184,11 @@ public class InscripcionEdicionHelper {
                 DtUsuario dtEst = new DtUsuario(e.getNickname(), e.getPassword(), e.getEmail(), e.getNombre(), e.getApellido(), e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
 
                 Edicion ed = i.getEdicion();
-                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), null, null, 0, 0, null, null, null, null, "usr.png");
+                
+                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), "usr.png");
+//                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), null, null, 0, 0, null, null, null, null, null, "usr.png");
+                
+                
                 DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, "usr.png");
 
                 // Cálculo en caliente del requerimiento 7.5
@@ -243,7 +257,7 @@ public class InscripcionEdicionHelper {
                 Edicion ed = i.getEdicion();
                 String imgCurso = (ed.getCurso() != null && ed.getCurso().getImagen() != null && !ed.getCurso().getImagen().isEmpty()) 
                         ? ed.getCurso().getImagen() : "usr.png";
-                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), null, null, 0, 0, null, null, null, null, imgCurso);
+                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), imgCurso);
 
                 String imgEdicion = (ed.getImagen() != null && !ed.getImagen().isEmpty()) 
                         ? ed.getImagen() : "usr.png";
@@ -258,5 +272,9 @@ public class InscripcionEdicionHelper {
             db = null;
         }
         return ret;
-    }
+    }  
+    
+    
+    
+    
 }

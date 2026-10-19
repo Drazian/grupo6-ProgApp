@@ -1,9 +1,8 @@
-package edu.edext.presentacion.pasado;
+package edu.edext.presentacion;
 
 import edu.edext.datatypes.DtInstituto;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
-import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -17,7 +16,7 @@ public class AltaInstituto extends javax.swing.JPanel {
         initComponents();
         cargarTabla();
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -35,7 +34,9 @@ public class AltaInstituto extends javax.swing.JPanel {
         btnActualizar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
 
-        setMinimumSize(new java.awt.Dimension(406, 276));
+        setMinimumSize(new java.awt.Dimension(320, 240));
+        setName(""); // NOI18N
+        setPreferredSize(new java.awt.Dimension(425, 318));
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 formMouseDragged(evt);
@@ -54,6 +55,10 @@ public class AltaInstituto extends javax.swing.JPanel {
 
         tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null},
+                {null},
+                {null},
+                {null},
                 {null},
                 {null},
                 {null},
@@ -102,18 +107,18 @@ public class AltaInstituto extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(17, 17, 17)
                         .addComponent(lblNombre)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtNombre)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnCrear))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addComponent(btnActualizar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 222, Short.MAX_VALUE)
+                        .addComponent(btnEliminar))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btnActualizar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnEliminar)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -125,8 +130,8 @@ public class AltaInstituto extends javax.swing.JPanel {
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCrear))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnActualizar)
                     .addComponent(btnEliminar))
@@ -214,6 +219,7 @@ public class AltaInstituto extends javax.swing.JPanel {
             for (DtInstituto aux: lista){
             model.addRow(new Object[]{aux.getNombre()});
             }
+
         } catch (Exception e){
             JOptionPane.showMessageDialog(this, "Error al actualizar la tabla: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }

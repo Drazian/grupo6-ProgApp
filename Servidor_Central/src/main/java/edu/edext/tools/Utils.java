@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.awt.FileDialog;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.io.InputStream;
+import java.nio.file.Path;
 import javax.swing.JFrame;
 import org.tinylog.Logger;
 import java.awt.Component;
@@ -31,22 +33,180 @@ import java.util.Date;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Point;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.InputStream;
+import java.io.FileWriter;
 import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.List;
+import java.util.Set;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import javax.swing.DefaultListSelectionModel;
+import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.JList;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
 /**
  *
  * @author vdraco
  */
 public class Utils {
     
-    public final class FX{
+    private static final String FORMATO_FECHA="dd/MM/yyyy";
+    private static final String MASK_FECHA="##/##/####";
+    public static final int ALIGN_LEFT=SwingConstants.LEFT;
+    public static final int ALIGN_CENTER=SwingConstants.CENTER;
+    public static final int ALIGN_RIGHT=SwingConstants.RIGHT;
+    public record CfgDB(String clave, String valor) {}
+    public record dbData(String clave, String valor) {}
+    public static final int PATHFILE=0;
+    public static final int NAMEFILE=1;
+    public static final int EXTFILE=2;     
+    public static final int SAVEINTERNAL=0;
+    public static final int SAVEEXTERNAL=1;
+            
+    
+    public static String[] ArrayNull(){
+        String[] ret=null;
+        return ret;
+    }
+    
+    public final class GUI{
+
+        public static void sizeColumn(JTable obj, int column, int size){
+            if(obj!=null)
+                obj.getColumnModel().getColumn(column).setPreferredWidth(size);
+        }
+
+        public static void sizeColumn(JTable obj, int column, int size, int Alignment){
+            if(obj!=null){
+                obj.getColumnModel().getColumn(column).setPreferredWidth(size);
+                alignment(obj, column, Alignment); }
+        }
+
+        public static void alignment(JTable obj, int column, int Alignment){
+            if(obj!=null)
+                obj.getColumnModel().getColumn(column).setCellRenderer(getAlignCell(Alignment));
+        }
+
+        private static DefaultTableCellRenderer getAlignCell(int Alignment){
+            DefaultTableCellRenderer tmp=new DefaultTableCellRenderer();
+            tmp.setHorizontalAlignment(Alignment);
+            return tmp;
+        }
+
+        public static DefaultTableModel getModel(JTable obj){
+            if(obj!=null)
+                return (DefaultTableModel) obj.getModel();
+            else return null;
+        }
+
+        public static void addRow(JTable obj, Object[] rowData){
+            if(obj!=null){
+                DefaultTableModel model=getModel(obj);
+                if(model!=null){
+                    model.addRow(rowData);
+                    obj.setModel(model); }
+            }
+        }
         
+        public static DefaultTableModel clear(JTable obj){
+            DefaultTableModel model=null;
+            if(obj!=null){
+                model=getModel(obj);
+                if(model!=null)
+                    model.setRowCount(0); }
+            return model;
+        }
+
+        public static void setDisable(JList obj){
+            obj.setSelectionModel(new DefaultListSelectionModel(){
+                @Override
+                public void setSelectionInterval(int index0, int index1){}
+
+                @Override
+                public void addSelectionInterval(int index0, int index1){}
+            });
+        }
+        
+        
+        public static void setDisable(JCheckBox obj){
+            obj.setModel(new javax.swing.DefaultButtonModel(){
+                @Override
+                public void setPressed(boolean b) {}
+//                @Override
+//                public void setSelected(boolean b) {}
+            });
+        }
+            
+        public static void soloNumeros(Component obj){
+            soloNumeros(obj, false);
+        }
+        
+        public static void soloNumeros(Component obj, boolean espacios){
+            obj.addKeyListener(new java.awt.event.KeyAdapter(){
+                @Override
+                public void keyTyped(java.awt.event.KeyEvent evt){
+                    char c = evt.getKeyChar();
+                    if(espacios){
+                        if (!Character.isDigit(c) && c != ' ')
+                            evt.consume();
+                    }else
+                        if (!Character.isDigit(c))
+                            evt.consume(); } });
+        }
+        
+        public static void soloLetras(Component obj){
+            soloLetras(obj, false);
+        }
+        
+        public static void soloLetras(Component obj, boolean espacios){
+            obj.addKeyListener(new java.awt.event.KeyAdapter(){
+                @Override
+                public void keyTyped(java.awt.event.KeyEvent evt){
+                    char c = evt.getKeyChar();
+                    if(espacios){
+                        if (!Character.isLetter(c) && c != ' ')
+                            evt.consume();
+                    }else
+                        if (!Character.isLetter(c))
+                            evt.consume(); } });
+        }
+        
+        public static boolean isEmpty(JFormattedTextField obj){
+            return obj.getText().equals("--/--/----");
+        }
+        
+        public static void assignFormato(JFormattedTextField obj){
+            assignFormato(obj, MASK_FECHA);
+        }
+        
+        public static void assignFormato(JFormattedTextField obj, String formato){
+            try {
+                MaskFormatter tmp = new MaskFormatter(formato);
+                tmp.setPlaceholderCharacter('-');
+                obj.setFormatterFactory(new DefaultFormatterFactory(tmp));
+            } catch (java.text.ParseException e){
+                Logger.error(e.getMessage(), "Error al formatear : {} ", obj);
+            }
+        }
+
         public static JInternalFrame getContenedor(Component obj){
-            return (JInternalFrame) SwingUtilities.getAncestorOfClass(JInternalFrame.class, obj);
+            if(obj instanceof JInternalFrame)
+                return (JInternalFrame) obj;
+            else
+                return (JInternalFrame) SwingUtilities.getAncestorOfClass(JInternalFrame.class, obj);
         }
         
         public static void reSizePadre(Component obj, int width, int height){
@@ -59,19 +219,35 @@ public class Utils {
             tmp=null;
             System.gc();
         }
+        
+        private static void repaint(Component obj){
+            obj.revalidate();
+            obj.repaint();
+        }
+        
     }
     
     public final class Validate{
         
         public static boolean isFecha(String fecha){
-            return fechavalidate(fecha);
+            boolean ret=false;
+            try{
+                LocalDate.parse(fecha, DateTimeFormatter.ofPattern(FORMATO_FECHA));
+                ret=true;
+            } catch (Exception e) {}
+            return ret;
         }
         
         public static boolean isEmpty(String cadena){
-            boolean ret=false;
-            if(cadena==null)  ret=true;
-            else if (cadena.isEmpty())  ret=true;
-            return ret;
+            return cadena==null||cadena.isBlank();
+        }
+        
+        public static boolean isEmpty(List<?> coleccion){
+            return coleccion==null||coleccion.isEmpty();
+        }
+        
+        public static boolean isEmpty(Set<?> coleccion){
+            return coleccion==null||coleccion.isEmpty();
         }
         
         public static boolean isEmail(String email){
@@ -89,15 +265,23 @@ public class Utils {
     public final class Fecha{
         
         public static String assignFormato(Date fecha){
-            return fecha!=null?(new SimpleDateFormat("dd/MM/yy")).format(fecha):null;
+            return assignFormato(fecha, FORMATO_FECHA);
         }
         
         public static String assignFormato(LocalDate fecha){
-            return fecha!=null?DateTimeFormatter.ofPattern("dd/MM/yy").format(fecha):null;
+            return assignFormato(fecha, FORMATO_FECHA);
+        }
+
+        public static String assignFormato(Date fecha, String formato){
+            return fecha!=null?(new SimpleDateFormat(formato)).format(fecha):null;
+        }
+        
+        public static String assignFormato(LocalDate fecha, String formato){
+            return fecha!=null?DateTimeFormatter.ofPattern(formato).format(fecha):null;
         }
 
         public static boolean validate(String fecha){
-            return fechavalidate(fecha);
+            return Validate.isFecha(fecha);
         }
 
         public static boolean isCoherente(Date fecha1, Date fecha2){
@@ -117,17 +301,26 @@ public class Utils {
         }
         
         public static Date valueOf(LocalDate fecha){
-            return  fecha!=null?java.sql.Date.valueOf(fecha):null;
+            return fecha!=null?Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant()):null;
         }
 
         public static LocalDate valueOf(String fecha){
-            try{ return LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd/MM/yy")); }
+            try{ return LocalDate.parse(fecha, DateTimeFormatter.ofPattern(FORMATO_FECHA)); }
             catch (Exception e) { return null; }
+        }
+        
+        public static Date valudf(String fecha){
+            return valueOf(valueOf(fecha));
         }
 
         public static Integer valuOf(String cadena){
             try { return Integer.valueOf(cadena); }
             catch (NumberFormatException e) { return null; }
+        }
+        
+        public static int valueof(String cadena){
+            try { return Integer.parseInt(cadena); }
+            catch (NumberFormatException e) { return Integer.MIN_VALUE ; }
         }
         
         public static String valueOf(Integer numero){
@@ -138,23 +331,48 @@ public class Utils {
     }
 
     public final class Crypt{
+        private static final String CLAVE_AES="ClaveSecreta1234"; 
+        private static final String ALGORITMO="AES";
         
-        public static String BCrypt(String password){
-            return BCrypt(password, 10);
+        public static String encodeBCrypt(String password){
+            return encodeBCrypt(password, 7);
         }
         // level = 2^n, donde n=level
-        public static String BCrypt(String password, int level){
+        public static String encodeBCrypt(String password, int level){
             return BCrypt.hashpw(password, BCrypt.gensalt(level));
         }
-    }
+        
+        public static boolean compareBCrypt(String password, String passSaved){
+            return BCrypt.checkpw(password, passSaved);
+        }
+        
+        public static String cifrarAES(String password){
+            try {
+                SecretKeySpec secretKey = new SecretKeySpec(CLAVE_AES.getBytes(), ALGORITMO);
+                Cipher cipher = Cipher.getInstance(ALGORITMO);
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                byte[] textoCifradoBytes = cipher.doFinal(password.getBytes());
+                return Base64.getEncoder().encodeToString(textoCifradoBytes);
+            } catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
+                Logger.error(e, "Error al cifrar");
+                throw new RuntimeException("Error al cifrar", e);
+            }
+        }
+        
+        public static String descifrarAES(String password) {
+            try {
+                SecretKeySpec secretKey = new SecretKeySpec(CLAVE_AES.getBytes(), ALGORITMO);
+                Cipher cipher = Cipher.getInstance(ALGORITMO);
+                cipher.init(Cipher.DECRYPT_MODE, secretKey);
+                byte[] textoCifradoBytes = Base64.getDecoder().decode(password);
+                byte[] textoPlanoBytes = cipher.doFinal(textoCifradoBytes);
+                return new String(textoPlanoBytes);
+            } catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
+                Logger.error(e, "Error al cifrar");
+                throw new RuntimeException("Error al descifrar", e);
+            }
+        }
     
-    private static boolean fechavalidate(String fecha){
-        boolean ret=false;
-        try{
-            LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd/MM/yy"));
-            ret=true;
-        } catch (Exception e) {}
-        return ret;
     }
     
     public final class Imagen {
@@ -234,8 +452,8 @@ public class Utils {
             ImageIcon retFoto=null;
             try {
                 //retFoto = new ImageIcon(Imagen.class.getClassLoader().getResource(Imagen.class.getPackageName()+"/"+ruta));
-                retFoto=new ImageIcon(Imagen.class.getResource("/Images/"+nombre));
-            } catch (Exception e) {  if(Logger.isErrorEnabled()) Logger.error("Error con load JM Foto ...: {} ", e.getMessage());  }
+                retFoto=new ImageIcon(Imagen.class.getResource("/Images/"+nombre)); }
+            catch (Exception e) {  if(Logger.isErrorEnabled()) Logger.error("Error con load JM Foto ...: {} ", e.getMessage());  }
             return retFoto;        
         }
     /**
@@ -245,8 +463,8 @@ public class Utils {
         public static ImageIcon loadSO(String ruta){
             ImageIcon retFoto=null;
             try {
-                retFoto=new ImageIcon(new File(ruta).getAbsolutePath());
-            } catch (Exception e) {  if(Logger.isErrorEnabled()) Logger.error("Error con load SO Foto ...: {} ", e.getMessage());  }
+                retFoto=new ImageIcon(new File(ruta).getAbsolutePath()); }
+            catch (Exception e) {  if(Logger.isErrorEnabled()) Logger.error("Error con load SO Foto ...: {} ", e.getMessage());  }
             return retFoto;
         }
     /**
@@ -264,6 +482,11 @@ public class Utils {
             } catch (IOException | URISyntaxException e) {  Logger.error("Error con load WWW Foto ...: {}", e.getMessage());  }
             return retFoto;
         }
+        
+        public static InputStream toStream(String ruta) throws IOException {
+            return Files.newInputStream(Path.of(OS.getHomePath()+OS.getSeparador()+".edEXT"+OS.getSeparador()+"imagen"+OS.getSeparador()+ruta));
+        }
+        
     /// @return      Devuelve el objeto que representa la imagen seleccionada
         public static File openJVM() {
             File retFile=null;
@@ -282,7 +505,7 @@ public class Utils {
         public static File openSO(){
             File retFile=null;
             FileDialog tmpPath = new FileDialog((Frame) null, "Selecciona una Imagen (JPG, PNG)", FileDialog.LOAD);
-            if(isWin()) tmpPath.setFile("*.jpg;*.jpeg;*.png");
+            if(OS.isWin()) tmpPath.setFile("*.jpg;*.jpeg;*.png");
             else{
                 tmpPath.setFilenameFilter((dir, name) -> {
                     String lowerCaseName = name.toLowerCase();
@@ -299,27 +522,79 @@ public class Utils {
             return retFile;
         }
         
-        public static void save(String ruta, String nombre){
-            String path=ruta+(ruta.endsWith(OS.getSeparador())?"":OS.getSeparador())+nombre;
-            if(!Disk.isExist(path)) Disk.createFolder(path);
-            try (InputStream tmp = Imagen.class.getResourceAsStream("/Images/usr.png")) {
-                if(tmp!= null)
-                    Files.copy(tmp, Path.of(path), StandardCopyOption.REPLACE_EXISTING);
-                Logger.info("Archivo guardado en ..: {}", ruta+(ruta.endsWith(OS.getSeparador())?"":OS.getSeparador())+nombre);
-            } catch(IOException e) {
-                Logger.error(e.getMessage(), "Error al escribir el archivo en disco: "); }
-            path=null;
+//        public static void save(String ruta, String nombre){
+//            String path=ruta+(ruta.endsWith(OS.getSeparador())?"":OS.getSeparador())+nombre;
+//            if(!Disk.isExist(path)) Disk.createFolder(path);
+//            try (InputStream tmp = Imagen.class.getResourceAsStream("/Images/usr.png")) {
+//                if(tmp!= null)
+//                    Files.copy(tmp, Path.of(path), StandardCopyOption.REPLACE_EXISTING);
+//                Logger.info("Imagen guardada en ..: {}", ruta+(ruta.endsWith(OS.getSeparador())?"":OS.getSeparador())+nombre);
+//            } catch(IOException e) {
+//                Logger.error(e.getMessage(), "Error al escribir la Imagen en disco: "); }
+//            path=null;
+//        }
+//                    || pathOrigen.endsWith("#@.png") 
+//                    || pathOrigen.endsWith("#@.jpeg")
+//                    || pathOrigen.endsWith("#@.jpg")){
+        public static void extractImage(String nombre){
+            save("#@."+cfg.PATH_INTERNAL+nombre, nombre);
         }
+                    
+        
+        
 
-        private static boolean isWin(){
-            return System.getProperty("os.name").toLowerCase().contains("win");
+        public static void save(String path, String nombre){
+            String Origen=path.endsWith(Utils.OS.getSeparador())?path.substring(0, path.length()-1):path,
+                   ext=!path.endsWith(Utils.OS.getSeparador())?path.substring(path.lastIndexOf(".")):"",
+                   Destino=cfg.pathImagen()+Utils.OS.getSeparador()+nombre+ext;
+                   if(Destino.contains(ext+ext)) Destino=Destino.substring(0, Destino.length()-ext.length());
+            Disk.createFolder(cfg.pathImagen());
+            try {
+                if(path.endsWith(cfg.IMAGE_USER) || path.startsWith("#@.")){
+                    if(path.startsWith("#@."))
+                        Origen=Origen.substring(3);
+                    else
+                        Origen=cfg.PATH_INTERNAL+cfg.IMAGE_USER;                    
+                    InputStream tmp = Imagen.class.getResourceAsStream(Origen);
+                    if(tmp!=null){
+                        Files.copy(tmp, Path.of(Destino), StandardCopyOption.REPLACE_EXISTING);
+                        Logger.info("Imagen de '{}', guardada en .: {}", nombre, Destino);
+                    }
+                }else{
+                    File destino=new File(Destino);
+                    Files.copy(Path.of(Origen), destino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Logger.info("Imagen de '{}', guardada en .: {}", nombre, Destino);
+                }
+            } catch(IOException e) {
+                Logger.error(e.getMessage(), "Error al escribir la Imagen en disco: ");
+            }
+            Origen=Destino=ext=null;
+            System.gc();
+        }   
+        
+        public static boolean save(InputStream imagen, String nombre, String contenido){
+            //String path=OS.getWorkPath()+OS.getSeparador()+"imagen",
+            String path=OS.getHomePath()+OS.getSeparador()+".edEXT"+OS.getSeparador()+"imagen",
+                   //file=nombre+"."+contenido.substring(contenido.lastIndexOf("/")+1),
+                   nameFile=path+OS.getSeparador()+nombre;
+            long ret=0;
+            try {
+                if(!Disk.isExist(path)) Disk.createFolder(path);
+                ret=Files.copy(imagen, Path.of(nameFile), StandardCopyOption.REPLACE_EXISTING);
+                Logger.info("Imagen guardada en ..: {}", nameFile);
+            } catch (IOException e) {
+                Logger.error(e.getMessage(), "Error al escribir el Imagen en disco: "); }
+            path=nameFile=null;
+            //file=null;
+            System.gc();
+            return ret!=0;
         }
+        
     }
     
     public final class Disk {
-        public static final int PATHFILE=0;
-        public static final int NAMEFILE=1;
-        public static final int EXTFILE=2; 
+
+        
     /**
      * @param ruta      Ruta a evaluar
      * @return          Devuelve la existencia del archivo/directorio
@@ -499,10 +774,10 @@ public class Utils {
         //********************* working *************************
 
 
-        public record CfgDB(String clave, String valor) {}
-        public static CfgDB[] loadCFG(String path){
+        
+        public static CfgDB[] loadCFG(String pathFile){
             ArrayList<CfgDB> tmp=new ArrayList<>();
-            try (BufferedReader tmpCFG = new BufferedReader(new FileReader(path))){
+            try (BufferedReader tmpCFG = new BufferedReader(new FileReader(pathFile))){
                 String tmpText; int pos=-1;
                 while((tmpText=tmpCFG.readLine())!=null){
                     tmpText=tmpText.trim();
@@ -517,12 +792,35 @@ public class Utils {
             return tmp.toArray(CfgDB[]::new);
         }
 
+
+    public static void saveCfgPath(String clave, String valor){
+        saveCfgPath(clave, valor, true);
+    }
+    
+    public static void saveCfgPath(String clave, String valor, boolean modo){
+        createFolder(cfg.PATH);
+        try (BufferedWriter tmpLog = new BufferedWriter(new FileWriter(cfg.PATH_FILE, modo))) {
+            // mas adelante tengo que agregar busqueda y remplazo del parametro
+            if("\n".equals(clave))
+                tmpLog.write("\n"+valor);
+            else if("#".equals(clave))
+                tmpLog.write(clave+valor);
+            else
+                tmpLog.write(clave+" : "+valor);
+            Logger.debug("Archivo CFG guardado en ..: {}",cfg.PATH_FILE);
+        } catch (IOException e) {
+            Logger.error(e.getMessage(),"Error al guardar CFG... ");
+        }
+    }// en faltan los demas parametros
+        
        //******************************************************** 
 
     }
-    
+
     public final class OS {
 
+        public static final String SymHome="~";
+        
     ///@return   Devuelve el nombre del paquete
         public static String getPaqueteName(Object obj){
             return obj.getClass().getPackageName();
@@ -545,6 +843,7 @@ public class Utils {
         public static String getName(){
             return System.getProperty("os.name");
         }
+        
     /// @return   Devuelve el directorio de trabajo actual
         public static String getWorkPath(){
             return System.getProperty("user.dir");
@@ -596,7 +895,7 @@ public class Utils {
             
             
             Point point = MouseInfo.getPointerInfo().getLocation();
-            Utils.FX.getContenedor(evt.getComponent()).setLocation(point.x - mfX, point.y - mfY);
+            GUI.getContenedor(evt.getComponent()).setLocation(point.x - mfX, point.y - mfY);
         }
     }
 }

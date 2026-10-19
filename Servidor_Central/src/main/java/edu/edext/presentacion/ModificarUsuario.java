@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package edu.edext.presentacion;
 
 import edu.edext.datatypes.DtUsuario;
@@ -35,7 +31,6 @@ public class ModificarUsuario extends javax.swing.JPanel {
         panModificar.add(formularioUsuario, BorderLayout.CENTER);
 
         listarUsuarios();
-        
     }
     private void listarUsuarios(){
         try{
@@ -71,59 +66,44 @@ public class ModificarUsuario extends javax.swing.JPanel {
     private void initComponents() {
 
         panModificar = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jSUsuario = new javax.swing.JScrollPane();
         lisUsuario = new javax.swing.JList<>();
 
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                formComponentResized(evt);
-            }
-        });
-
-        panModificar.setBackground(new java.awt.Color(180, 46, 46));
+        setMinimumSize(new java.awt.Dimension(635, 445));
+        setPreferredSize(new java.awt.Dimension(635, 445));
 
         javax.swing.GroupLayout panModificarLayout = new javax.swing.GroupLayout(panModificar);
         panModificar.setLayout(panModificarLayout);
         panModificarLayout.setHorizontalGroup(
             panModificarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 500, Short.MAX_VALUE)
+            .addGap(0, 480, Short.MAX_VALUE)
         );
         panModificarLayout.setVerticalGroup(
             panModificarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        jScrollPane1.setMinimumSize(new java.awt.Dimension(64, 380));
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(64, 535));
-
-        lisUsuario.setBackground(new java.awt.Color(131, 164, 169));
-        lisUsuario.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        lisUsuario.setMinimumSize(new java.awt.Dimension(0, 0));
+        lisUsuario.setMinimumSize(new java.awt.Dimension(2, 2));
         lisUsuario.addListSelectionListener(this::lisUsuarioValueChanged);
-        jScrollPane1.setViewportView(lisUsuario);
+        jSUsuario.setViewportView(lisUsuario);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(panModificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(159, 159, 159)
+                .addComponent(panModificar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jSUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
             .addComponent(panModificar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jSUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void lisUsuarioValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lisUsuarioValueChanged
-        
         if (evt.getValueIsAdjusting()) {
             return;
         }
@@ -144,19 +124,16 @@ public class ModificarUsuario extends javax.swing.JPanel {
 
         panModificar.revalidate();
         panModificar.repaint();
+        panModificar.setSize(this.getWidth(), this.getHeight()+20);
 
         SwingUtilities.invokeLater(() -> {
             formularioUsuario.cargarFormulario(usuario);
-        });       
+        });  
     }//GEN-LAST:event_lisUsuarioValueChanged
-
-    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        
-    }//GEN-LAST:event_formComponentResized
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jSUsuario;
     private javax.swing.JList<String> lisUsuario;
     private javax.swing.JPanel panModificar;
     // End of variables declaration//GEN-END:variables

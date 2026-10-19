@@ -17,6 +17,7 @@ public class cronometroHelper {
     private final JLabel message;
     private final JList lista;
     private final ArrayList<String> cronoError=new ArrayList<>();
+    private boolean enable=true;
         
     public cronometroHelper(int milisegundos, Component objeto, JButton boton){
         this(milisegundos, objeto, null, boton, null);
@@ -42,24 +43,24 @@ public class cronometroHelper {
     }
 
     public void alarm(boolean estado, String alert){
-        if(estado){
-            if(!cronoError.contains(alert)){
-                cronoError.add(alert);
-                if(message!=null) message.setText(alert);
+        if(enable){
+            obj.setVisible(true);
+            if(estado){
+                if(!cronoError.contains(alert)){
+                    cronoError.add(alert);
+                    if(message!=null) message.setText(alert);
+                }
+                cronoTimer.start();
+            }else{
+                if(!cronoError.isEmpty() && cronoError.contains(alert)) cronoError.remove(cronoError.indexOf(alert));
+                if(!cronoError.isEmpty()) message.setText(cronoError.getLast());
+                if(cronoError.isEmpty()){
+                    cronoTimer.stop();
+                    if(message!=null) message.setText("");
+                    if(obj!=null) obj.setVisible(false);
+                }
             }
-            cronoTimer.start();
-        }else{
-            if(!cronoError.isEmpty() && cronoError.contains(alert)) cronoError.remove(cronoError.indexOf(alert));
-            if(!cronoError.isEmpty()) message.setText(cronoError.getLast());
-            if(cronoError.isEmpty()){
-                cronoTimer.stop();
-                if(message!=null) message.setText("");
-                if(obj!=null) obj.setVisible(false);
-            }
-        }
-//        if(lista!=null) lista.setListData(ArrayNull());   // debuger
-//        if(lista!=null) lista.setListData(getLista());    // debuger
-//        System.out.println(" elemntos : "+cronoError.size()); // debuger
+        }else kill();
     }
     
     public String[] ArrayNull(){
@@ -89,8 +90,14 @@ public class cronometroHelper {
     public String getFirst(){
         return cronoError.getFirst();
     }
+    public void enabled(boolean estado){
+        this.enable=estado;
+    }
+    
     public void kill(){
         cronoError.clear();
         cronoTimer.stop();
+        this.enable=false;
+        obj.setVisible(false);
     }
 }

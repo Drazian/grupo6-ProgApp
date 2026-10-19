@@ -1,20 +1,14 @@
 package edu.edext.tools;
 //************************* Capa Presentacion **********************************
-import edu.edext.datatypes.DtInstituto;
 import edu.edext.logica.Fabrica;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.beans.PropertyVetoException;
-import java.util.List;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import org.tinylog.Logger;
 
 /**
@@ -34,8 +28,16 @@ public class indexHelper {
         cargarPanel(titulo, panel, true, false, false, true, true, true, with, height);
       //cargarPanel(titulo, panel, unique, rendOnDrag, resizable, closable, maximizable, minimizable, int with, int height){
     }
+    public void cargarPanel(Component panel){
+        cargarPanel(null, panel, true, true, false, true, false, true);
+    }
+
     public void cargarPanel(String titulo, Component panel){
         cargarPanel(titulo, panel, true);
+    }
+
+    public void cargarPanel(Component panel, boolean unique){
+        cargarPanel(null, panel, unique);
     }
 
     public void cargarPanel(String titulo, Component panel, boolean unique){
@@ -69,14 +71,11 @@ public class indexHelper {
                         panels.setSelected(true);
                     }catch(PropertyVetoException e){}
                     break;                    
-                    }
-                }
-            }
-        }
+                    } } } }
         if(flag){
-            JInternalFrame internalFrame;
             try{
                 if(panel instanceof JPanel) {
+                    JInternalFrame internalFrame;
                     internalFrame=new JInternalFrame(titulo, resizable, closable, maximizable, minimizable);
                     internalFrame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
                     internalFrame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter(){
@@ -85,8 +84,7 @@ public class indexHelper {
                             internalFrame.getContentPane().remove(panel);
                             dpIndex.remove(internalFrame); 
                             dpIndex.repaint();
-                        }
-                    });
+                        } });
                     internalFrame.getContentPane().add(panel);
                     internalFrame.setPreferredSize(panel.getPreferredSize());
                     internalFrame.setMinimumSize(panel.getMinimumSize());
@@ -94,8 +92,26 @@ public class indexHelper {
                     this.dpIndex.add(internalFrame);
                     if(!rendOnDrag)  this.dpIndex.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
                     internalFrame.setVisible(true);   
-                }else if(panel instanceof JInternalFrame){
-                    // para implementar
+                }else if(panel instanceof JInternalFrame internalFrame){
+                    internalFrame.setTitle(titulo!=null?titulo:((JInternalFrame) panel).getTitle());
+                    internalFrame.setResizable(((JInternalFrame) panel).isResizable());
+                    internalFrame.setClosable(((JInternalFrame) panel).isClosable());
+                    internalFrame.setMaximizable(((JInternalFrame) panel).isMaximizable());
+                    internalFrame.setIconifiable(((JInternalFrame) panel).isIconifiable());
+                    internalFrame.setPreferredSize(panel.getPreferredSize());
+                    internalFrame.setMinimumSize(panel.getMinimumSize());
+                    //if(with>0 && height>0){
+                    //internalFrame.setSize(with, height);
+                    internalFrame.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+                    internalFrame.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter(){
+                        @Override
+                        public void internalFrameClosed(javax.swing.event.InternalFrameEvent e){
+                            dpIndex.remove(internalFrame);
+                            dpIndex.repaint();
+                        } });
+                    this.dpIndex.add(internalFrame);
+                    if(!rendOnDrag)  this.dpIndex.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+                    internalFrame.setVisible(true);   
                 }
                 this.panelX=with;
                 this.panelY=height;
@@ -146,9 +162,7 @@ public class indexHelper {
     public int cargarDatosdePrueba(){
         return setDatosPrueba();
     }
-    
-    
-    
+
     private void refreshPane(){
         if(activeScroll){
            int maxX = 0, maxY = 0, rightX, bottomY;
@@ -195,11 +209,5 @@ public class indexHelper {
         }
         
     }
-    
-    
  
-    
-   
-    
-    
 }

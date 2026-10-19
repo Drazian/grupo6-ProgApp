@@ -7,104 +7,88 @@ import java.util.List;
 import java.util.Set;
 
 public class DtCurso {
-    private String nombre;
-    private String descripcion;
-    private String duracion;
-    private int cantidadHoras;
-    private int creditos;
-    private String url;
-    private Date fechaRegistro;
+    private final String nombre;
+    private final String descripcion;
+    private final String duracion;
+    private final int cantidadHoras;
+    private final int creditos;
+    private final String url;
+    private final String imagen;
+    private final Date fechaRegistro;
+    private final DtInstituto instituto;
     private Set<String> namePrevias;
+    private Set<String> nameCategorias;
     private List<DtCurso> previas;
-    private DtInstituto instituto;
-    private Set<String> categorias;
-    private String imagen; // Atributo portada
-
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, 
-            int creditos, String url, Date fechaRegistro, DtInstituto instituto, List<DtCurso> previas, Set<String> categorias) {
-        this.nombre = nombre; this.descripcion = descripcion; this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras; this.creditos = creditos; this.url = url;
-        this.fechaRegistro = fechaRegistro; this.instituto = instituto;
-        this.categorias = (categorias != null) ? categorias : new HashSet<>();
-        this.previas = (previas != null) ? previas : new ArrayList<>();
-        Set<String> tmpPrevias = new HashSet<>();
-        if (this.previas != null) {
-            for (DtCurso previa : this.previas) tmpPrevias.add(previa.getNombre());
-        }
-        this.namePrevias = tmpPrevias;
-        this.imagen = "usr.png";
-    }
-
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, 
-                   int creditos, String url, Date fechaRegistro, DtInstituto instituto ,Set<String> previas, Set<String> categorias) {
-        this.nombre = nombre; this.descripcion = descripcion; this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras; this.creditos = creditos; this.url = url;
-        this.fechaRegistro = fechaRegistro; this.instituto = instituto;
-        this.categorias = (categorias != null) ? categorias : new HashSet<>();
-        this.namePrevias = (previas != null) ? previas : new HashSet<>();
-        this.previas = new ArrayList<>();
-        this.imagen = "usr.png";
-    }
-
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, 
-                   String url, Date fechaRegistro, DtInstituto instituto, Set<String> categorias){
-        this.nombre = nombre; this.descripcion = descripcion; this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras; this.creditos = creditos; this.url = url;
-        this.fechaRegistro = fechaRegistro; this.instituto = instituto;
-        this.categorias = (categorias != null) ? categorias : new HashSet<>();
-        this.namePrevias = new HashSet<>();
-        this.previas = new ArrayList<>();
-        this.imagen = "usr.png";
+    private List<DtCategoria> categorias;
+    
+    public DtCurso(String nombre, String imagen){
+        this(nombre, null, null, 0, 0, null, null, null, null, null, null, null, imagen);
     }
     
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, 
-                   String url, Date fechaRegistro, DtInstituto instituto, Set<String> previas, Set<String> categorias, Set<String> namePrevias){
-        this.nombre = nombre; this.descripcion = descripcion; this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras; this.creditos = creditos; this.url = url;
-        this.fechaRegistro = fechaRegistro; this.instituto = instituto;
-        this.categorias = (categorias != null) ? categorias : new HashSet<>();
-        this.namePrevias = (namePrevias != null) ? namePrevias : new HashSet<>();
-        this.previas = new ArrayList<>();
-        this.imagen = "usr.png";
+    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, 
+            DtInstituto instituto, String imagen){
+        this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, instituto, null, null, null, null, imagen);
+    }
+    
+    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, 
+            DtInstituto instituto, Set<String> namePrevias, Set<String> nameCategorias, String imagen){
+        this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, instituto, null, null, namePrevias, nameCategorias, imagen);
     }
 
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, 
-                   String url, Date fechaRegistro, DtInstituto instituto, Set<String> setGenerico, String imagen){
-        this.nombre = nombre; this.descripcion = descripcion; this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras; this.creditos = creditos; this.url = url;
-        this.fechaRegistro = fechaRegistro; this.instituto = instituto;
-        // Se inyecta en ambos Sets para evitar nulos ya que el Controlador mezcla envíos en esta firma
-        this.categorias = (setGenerico != null) ? setGenerico : new HashSet<>();
-        this.namePrevias = (setGenerico != null) ? setGenerico : new HashSet<>();
-        this.previas = new ArrayList<>();
-        this.imagen = (imagen != null && !imagen.isEmpty()) ? imagen : "usr.png";
+    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, 
+            DtInstituto instituto, List<DtCurso> previas, List<DtCategoria> categorias, String imagen){
+        this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, instituto, previas, categorias, null, null, imagen);
+        for(DtCategoria categoria : categorias)
+            this.nameCategorias.add(categoria.getNombre());
+        for (DtCurso curso : previas)
+            this.namePrevias.add(curso.getNombre());
     }
 
-    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras,
-                   int creditos, String url, Date fechaRegistro, DtInstituto instituto,
-                   List<DtCurso> listaPrevias, Set<String> categorias, Set<String> previasSet, String imagen) {
-        this.nombre = nombre; this.descripcion = descripcion; this.duracion = duracion;
-        this.cantidadHoras = cantidadHoras; this.creditos = creditos; this.url = url;
-        this.fechaRegistro = fechaRegistro; this.instituto = instituto;
-        this.categorias = (categorias != null) ? categorias : new HashSet<>();
-        this.namePrevias = (previasSet != null) ? previasSet : new HashSet<>();
-        this.previas = (listaPrevias != null) ? listaPrevias : new ArrayList<>();
-        this.imagen = (imagen != null && !imagen.isEmpty()) ? imagen : "usr.png";
+    public DtCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, 
+            DtInstituto instituto, List<DtCurso> previas, List<DtCategoria> categorias, Set<String> namePrevias, Set<String> nameCategorias, String imagen){
+        Set<String> tmpPrevias=new HashSet<>(), tmpCategorias=new HashSet<>();
+        if(namePrevias!=null)
+            tmpPrevias=namePrevias;
+        else if(previas!=null)
+            for(DtCurso previa : previas)
+                tmpPrevias.add(previa.getNombre());
+        if(nameCategorias!=null)
+            tmpCategorias=nameCategorias;
+        else if(categorias!=null)
+            for(DtCategoria categoria : categorias)
+                tmpCategorias.add(categoria.getNombre());
+        this.namePrevias=tmpPrevias;
+        this.nameCategorias=tmpCategorias;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.duracion = duracion;
+        this.cantidadHoras = cantidadHoras;
+        this.creditos = creditos;
+        this.url = url;
+        this.imagen=imagen;
+        this.fechaRegistro = fechaRegistro;
+        this.instituto=instituto;
+//        System.out.println("cantidas de previas : "+this.namePrevias.size()+", llego : "+namePrevias.size());
+//        System.out.println("cantidas de categorias : "+this.nameCategorias.size()+", llego : "+nameCategorias.size());
+        this.previas=previas;
+        this.categorias=categorias;
     }
-
-    // Getters
+    
     public String getNombre() { return nombre; }
     public String getDescripcion() { return descripcion; }
     public String getDuracion() { return duracion; }
     public int getCantidadHoras() { return cantidadHoras; }
     public int getCreditos() { return creditos; }
     public String getUrl() { return url; }
+    public String getImagen(){ return this.imagen; }
     public Date getFechaRegistro() { return fechaRegistro; }
     public DtInstituto getInstituto() { return  this.instituto; }
+    public Set<String> getNamePrevias(){ return this.namePrevias; }
+    public Set<String> getNameCategorias(){ return this.nameCategorias; }
     public List<DtCurso> getPrevias() { return this.previas; }
-    public Set<String> getSetPrevias() { return namePrevias; }
-    public List<String> getListPrevias() { return new ArrayList<>(this.namePrevias); }
-    public Set<String> getSetCategorias() { return categorias; }
-    public List<String> getListCategorias() { return new ArrayList<>(this.categorias); }
-    public String getImagen() { return imagen; }
+    public List<DtCategoria> getCategorias(){ return this.categorias; }
+    
+    public List<String> getPrevias_toArray() { return new ArrayList<>(this.namePrevias); }
+    public List<String> getCategorias_toArray() { return new ArrayList<>(this.nameCategorias); }
+
 }

@@ -57,10 +57,9 @@ public class Usuario {
     private Date fNacimiento;
     
     @ManyToMany
-    @JoinTable(
-        name = "usuario_seguidores",
-        joinColumns = @JoinColumn(name = "seguidor_nickname"),
-        inverseJoinColumns = @JoinColumn(name = "seguido_nickname")
+    @JoinTable(name = "vinculos",
+        joinColumns = @JoinColumn(name = "seguidor"),
+        inverseJoinColumns = @JoinColumn(name = "seguido")
     )
     private List<Usuario> seguidos = new ArrayList<>();
 
@@ -68,17 +67,16 @@ public class Usuario {
     private List<Usuario> seguidores = new ArrayList<>();
 
     public Usuario(String nickname, String password, String email, String nombre, String apellido, Date fNacimiento, String imagen) {
-        setNickname(nickname);
-        setPassword(password);
-        setEmail(email);
-        setNombre(nombre);
-        setApellido(apellido);
-        setfNacimiento(fNacimiento);
-        setImagen(imagen);
+        this.nickname=nickname;
+        this.password=password;
+        this.email=email;
+        this.nombre=nombre;
+        this.apellido=apellido;
+        this.fNacimiento=fNacimiento;
+        this.imagen=imagen;
     }
 
-    public Usuario() {
-    }
+    public Usuario() {}
 
     public String getNickname() {
         return nickname;

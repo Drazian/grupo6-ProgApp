@@ -238,9 +238,8 @@ public class CursoServlet extends HttpServlet {
                     }
 
                     // 5. Armar el Datatype
-                    DtCurso dtCurso = new DtCurso(
-                            nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
-                            fechaRegistro, new DtInstituto(nombreInstituto), null, categorias, previas, nombreImagen
+                    DtCurso dtCurso = new DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
+                            fechaRegistro, new DtInstituto(nombreInstituto), previas, categorias, nombreImagen
                     );
 
                     // 6. Llamar a la lógica del controlador

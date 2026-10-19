@@ -12,7 +12,7 @@ public class Instituto {
     
     public Instituto(){}
     public Instituto(String nombre){
-        setNombre(nombre);
+        this.nombre=nombre;
     }
     
     public String getNombre() {return nombre;}
