@@ -68,28 +68,29 @@ public class Curso {
         this.imagen=imagen;
     }
 
+//    public void setNombre(String nombre) { this.nombre = nombre; }
+//    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+//    public void setDuracion(String duracion) { this.duracion = duracion; }
+//    public void setCantidadHoras(int cantidadHoras) { this.cantidadHoras = cantidadHoras; }
+//    public void setCreditos(int creditos) { this.creditos = creditos; }
+//    public void setUrl(String url) { this.url = url; }
+//    public void setFechaRegistro(Date fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+//    public void setInstituto(Instituto instituto) { this.instituto = instituto; }
+//    public void setCategorias(List<Categoria> categorias) { this.categorias=categorias; }
+//    public void setPrevias(List<Curso> previas) { this.previas = previas; }
+//    public void setImagen(String imagen){ this.imagen=imagen; }
+        
     public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
     public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     public String getDuracion() { return duracion; }
-    public void setDuracion(String duracion) { this.duracion = duracion; }
     public int getCantidadHoras() { return cantidadHoras; }
-    public void setCantidadHoras(int cantidadHoras) { this.cantidadHoras = cantidadHoras; }
     public int getCreditos() { return creditos; }
-    public void setCreditos(int creditos) { this.creditos = creditos; }
     public String getUrl() { return url; }
-    public void setUrl(String url) { this.url = url; }
     public Date getFechaRegistro() { return fechaRegistro; }
-    public void setFechaRegistro(Date fechaRegistro) { this.fechaRegistro = fechaRegistro; }
     public Instituto getInstituto() { return instituto; }
-    public void setInstituto(Instituto instituto) { this.instituto = instituto; }
     public List<Categoria> getCategorias() { return categorias; }
-    public void setCategorias(List<Categoria> categorias) { this.categorias=categorias; }
     public List<Curso> getPrevias() { return previas; }
-    public void setPrevias(List<Curso> previas) { this.previas = previas; }
     public String getImagen(){ return this.imagen; }
-    public void setImagen(String imagen){ this.imagen=imagen; }
     
     @Override
     public boolean equals(Object o) {
