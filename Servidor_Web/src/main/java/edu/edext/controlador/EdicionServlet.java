@@ -18,6 +18,8 @@ import jakarta.servlet.http.Part;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import edu.edext.datatypes.DtInscripcionEdicion;
+import java.util.ArrayList;
 import java.util.HashSet; 
 import java.util.List;
 import java.util.Set;
@@ -77,20 +79,32 @@ public class EdicionServlet extends HttpServlet {
             
             case "consultaEdicion":
                 try {
-                    String nombreEdicion = request.getParameter("nombre");
-                    DtEdicion edicion = ic.getEdicion(nombreEdicion);
-                    
-                    if (edicion == null) {
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "La edición no existe.");
-                        return;
-                    }
-                    
-                    request.setAttribute("edicion", edicion);
-                    request.getRequestDispatcher("fragmentos/consultaEdicion.jsp").forward(request, response);
-                } catch (Exception e) {
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error cargando la edición: " + e.getMessage());
-                }
-                break;    
+                 String nombreEdicion = request.getParameter("nombre");
+                 DtEdicion edicion = ic.getEdicion(nombreEdicion);
+
+                 if (edicion == null) {
+                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "La edición no existe.");
+                     return;
+                 }
+
+                 List<DtInscripcionEdicion> todasLasInscripciones = ic.getInscripcionesCompletas(nombreEdicion);
+                 List<DtInscripcionEdicion> aceptadas = new ArrayList<>();
+
+                 if (todasLasInscripciones != null) {
+                     for (DtInscripcionEdicion ins : todasLasInscripciones) {
+                         if (ins.getValorEstado() == 2) {
+                             aceptadas.add(ins);
+                         }
+                     }
+                 }
+
+                 request.setAttribute("edicion", edicion);
+                 request.setAttribute("inscripcionesAceptadas", aceptadas); // Pasamos la lista al JSP
+                 request.getRequestDispatcher("fragmentos/consultaEdicion.jsp").forward(request, response);
+             } catch (Exception e) {
+                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error cargando la edición: " + e.getMessage());
+             }
+             break; 
         }
     }
 
