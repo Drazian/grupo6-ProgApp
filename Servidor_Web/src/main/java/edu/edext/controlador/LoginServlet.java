@@ -47,7 +47,10 @@ public class LoginServlet extends HttpServlet {
                                     // Opción B: Si tu clase Utils tiene el método checkpw
                                     // passValida = edu.edext.tools.Utils.Crypt.checkpw(password, u.getPassword());
                                 } else {
-                                    passValida = u.getPassword().equals(password);
+                                    //REVISAR
+                                    String passDescifrada = edu.edext.tools.Utils.Crypt.descifrarAES(u.getPassword());
+                                    passValida = password.equals(passDescifrada);
+                                    //passValida = u.getPassword().equals(password);
                                 }
                             } catch (Exception ex) {
                                 passValida = u.getPassword().equals(password);
