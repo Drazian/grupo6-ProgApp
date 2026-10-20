@@ -702,7 +702,8 @@ public class AltaUsuario extends javax.swing.JPanel {
     }
     //*********** No eliminar, necesita subir cifrada por seguridad **********//
     private String getContraseña(String password){
-        return Utils.Crypt.cifrarAES(password); 
+        return password;
+        //return Utils.Crypt.cifrarAES(password);
     }
     //************************************************************************//
     

@@ -12,6 +12,7 @@ import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,7 +27,7 @@ import javax.swing.JOptionPane;
 public class AltaEdicion extends javax.swing.JInternalFrame {
 
     private final IControlador control;
-
+    private File imagen;
     /**
      * Creates new form editarCurso
      */
@@ -91,40 +92,56 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
         textoFechaFin = new javax.swing.JFormattedTextField();
         jBfechaFin = new javax.swing.JButton();
         jDfechaFin = new com.toedter.calendar.JDateChooser();
+        lblImagen = new javax.swing.JLabel();
+        btnAgregarImagen = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
-        setMaximizable(true);
-        setResizable(true);
         setTitle("Editar Curso");
+        setMinimumSize(new java.awt.Dimension(520, 405));
+        setPreferredSize(new java.awt.Dimension(520, 405));
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         institutoLabel.setText("Instituto:");
+        getContentPane().add(institutoLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 25, -1, -1));
 
         seleccionInstituto.addActionListener(this::seleccionInstitutoActionPerformed);
+        getContentPane().add(seleccionInstituto, new org.netbeans.lib.awtextra.AbsoluteConstraints(95, 14, 165, -1));
 
         labelCurso.setText("Curso:");
+        getContentPane().add(labelCurso, new org.netbeans.lib.awtextra.AbsoluteConstraints(278, 25, 48, -1));
 
         seleccionCurso.addActionListener(this::seleccionCursoActionPerformed);
+        getContentPane().add(seleccionCurso, new org.netbeans.lib.awtextra.AbsoluteConstraints(338, 14, 165, -1));
 
         labelNombreEdicion.setText("Nombre Edicion:");
+        getContentPane().add(labelNombreEdicion, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 75, -1, -1));
+        getContentPane().add(textoNombreEdicion, new org.netbeans.lib.awtextra.AbsoluteConstraints(147, 72, 179, -1));
 
         labelFechaInicio.setText("Fecha Inicio:");
+        getContentPane().add(labelFechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(21, 108, -1, -1));
 
         labelCupos.setText("Cupos:");
-
-        textoCupos.addActionListener(this::textoCuposActionPerformed);
+        getContentPane().add(labelCupos, new org.netbeans.lib.awtextra.AbsoluteConstraints(353, 75, -1, -1));
+        getContentPane().add(textoCupos, new org.netbeans.lib.awtextra.AbsoluteConstraints(419, 72, 47, -1));
 
         labelFechaFin.setText("Fecha Fin:");
+        getContentPane().add(labelFechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(286, 111, -1, -1));
 
-        labelDocentes.setText("Docentes Participantes:");
+        labelDocentes.setText("Docentes ..:");
+        getContentPane().add(labelDocentes, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 150, -1, -1));
 
         jScrollPane1.setViewportView(listaDocentes);
 
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(272, 160, 230, 150));
+
         buttonDarAlta.setText("Dar de Alta");
         buttonDarAlta.addActionListener(this::buttonDarAltaActionPerformed);
+        getContentPane().add(buttonDarAlta, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 320, -1, -1));
 
         buttonCancelar.setText("Cancelar");
         buttonCancelar.addActionListener(this::buttonCancelarActionPerformed);
+        getContentPane().add(buttonCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 320, -1, -1));
 
         textoFechaInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         textoFechaInicio.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -133,9 +150,11 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
             }
         });
         textoFechaInicio.addActionListener(this::textoFechaInicioActionPerformed);
+        getContentPane().add(textoFechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(123, 108, 99, -1));
 
         jBfechaInicio.setText("......");
         jBfechaInicio.addActionListener(this::jBfechaInicioActionPerformed);
+        getContentPane().add(jBfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(223, 108, 32, 19));
 
         jDfechaInicio.setDateFormatString("d M y");
         jDfechaInicio.setFocusable(false);
@@ -144,6 +163,7 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
         jDfechaInicio.setRequestFocusEnabled(false);
         jDfechaInicio.setVerifyInputWhenFocusTarget(false);
         jDfechaInicio.addPropertyChangeListener(this::jDfechaInicioPropertyChange);
+        getContentPane().add(jDfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(238, 115, 5, 5));
 
         textoFechaFin.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         textoFechaFin.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -152,9 +172,11 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
             }
         });
         textoFechaFin.addActionListener(this::textoFechaFinActionPerformed);
+        getContentPane().add(textoFechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(367, 108, 99, -1));
 
         jBfechaFin.setText("......");
         jBfechaFin.addActionListener(this::jBfechaFinActionPerformed);
+        getContentPane().add(jBfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(467, 108, 32, 19));
 
         jDfechaFin.setDateFormatString("d M y");
         jDfechaFin.setFocusable(false);
@@ -163,107 +185,18 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
         jDfechaFin.setRequestFocusEnabled(false);
         jDfechaFin.setVerifyInputWhenFocusTarget(false);
         jDfechaFin.addPropertyChangeListener(this::jDfechaFinPropertyChange);
+        getContentPane().add(jDfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(482, 115, 5, 5));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(labelNombreEdicion)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(textoNombreEdicion))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(institutoLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(seleccionInstituto, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(labelCurso, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(seleccionCurso, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(labelCupos)
-                                .addGap(18, 18, 18)
-                                .addComponent(textoCupos, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(37, 37, 37))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelDocentes)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelFechaInicio)
-                        .addGap(18, 18, 18)
-                        .addComponent(textoFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(1, 1, 1)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addComponent(jDfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jBfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(31, 31, 31)
-                        .addComponent(labelFechaFin)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textoFechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(1, 1, 1)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jBfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addComponent(jDfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(18, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(buttonDarAlta)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(buttonCancelar)
-                .addGap(26, 26, 26))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(institutoLabel)
-                    .addComponent(seleccionInstituto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelCurso)
-                    .addComponent(seleccionCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelNombreEdicion)
-                    .addComponent(textoNombreEdicion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelCupos)
-                    .addComponent(textoCupos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelFechaInicio)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(textoFechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(labelFechaFin))
-                    .addComponent(jBfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(textoFechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jBfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(7, 7, 7)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jDfechaFin, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jDfechaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 5, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(28, 28, 28)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelDocentes)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(buttonCancelar)
-                    .addComponent(buttonDarAlta))
-                .addContainerGap(14, Short.MAX_VALUE))
-        );
+        lblImagen.setBackground(new java.awt.Color(102, 204, 255));
+        lblImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        lblImagen.setFocusable(false);
+        lblImagen.setRequestFocusEnabled(false);
+        getContentPane().add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 160, 160));
+
+        btnAgregarImagen.setText("Agregar Imagen");
+        btnAgregarImagen.addActionListener(this::btnAgregarImagenActionPerformed);
+        getContentPane().add(btnAgregarImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 320, 160, 30));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -301,6 +234,8 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
                 cupo = Integer.valueOf(textoCupos.getText());
             }
 
+            String nombre=textoNombreEdicion.getText().trim(),
+                   image="Edicion."+nombre+Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
             
             // Capturar la lista de docentes seleccionados (con Ctrl+Clic)
             List<String> docentesSel = listaDocentes.getSelectedValuesList();
@@ -313,9 +248,10 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
                 docentes.add(new DtUsuario(nomDocente, null, null, null, null, null, null, new ArrayList<>(), TipoUsuario.DOCENTE));
             }
             
+            Utils.Imagen.save(imagen.getAbsolutePath(), nombre);
             // Construir el Datatype y mandarlo a la lógica
-            DtEdicion dt = new DtEdicion(textoNombreEdicion.getText().trim(), cupo, Utils.Cast.valueOf(dIni), Utils.Cast.valueOf(dFin), Utils.Cast.valueOf(dAlta), 
-                    new DtCurso(title, null, null, 0, 0, null, null, new DtInstituto(seleccionInstituto.getSelectedItem().toString()), null), docentes);
+            DtEdicion dt = new DtEdicion(nombre, cupo, Utils.Cast.valueOf(dIni), Utils.Cast.valueOf(dFin), Utils.Cast.valueOf(dAlta), 
+                    new DtCurso(title, null, null, 0, 0, null, null, new DtInstituto(seleccionInstituto.getSelectedItem().toString()), null), docentes, image);
             
             control.altaEdicionCurso((String) seleccionCurso.getSelectedItem(), dt);
             
@@ -375,12 +311,22 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
         textoFechaInicio.setText(Utils.Fecha.assignFormato(jDfechaInicio.getDate()));
     }//GEN-LAST:event_jDfechaFinPropertyChange
 
-    private void textoCuposActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textoCuposActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_textoCuposActionPerformed
+    private void btnAgregarImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarImagenActionPerformed
+        File tmp=Utils.Imagen.openSO();
+        if(tmp!=null){
+            imagen=tmp;
+            lblImagen.setIcon(
+                Utils.Imagen.resize(
+                    lblImagen.getWidth(),
+                    lblImagen.getHeight(),
+                    Utils.Imagen.loadSO(
+                        imagen.getAbsolutePath())));
+        }
+    }//GEN-LAST:event_btnAgregarImagenActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregarImagen;
     private javax.swing.JButton buttonCancelar;
     private javax.swing.JButton buttonDarAlta;
     private javax.swing.JLabel institutoLabel;
@@ -395,6 +341,7 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
     private javax.swing.JLabel labelFechaFin;
     private javax.swing.JLabel labelFechaInicio;
     private javax.swing.JLabel labelNombreEdicion;
+    private javax.swing.JLabel lblImagen;
     private javax.swing.JList<String> listaDocentes;
     private javax.swing.JComboBox<String> seleccionCurso;
     private javax.swing.JComboBox<String> seleccionInstituto;

@@ -3,6 +3,7 @@ package edu.edext.presentacion;
 import edu.edext.tools.ConsultaEdicionHelper;
 import javax.swing.DefaultComboBoxModel;
 import edu.edext.tools.Utils;
+import edu.edext.tools.cfg;
 import java.awt.HeadlessException;
 import javax.swing.JOptionPane;
 import org.tinylog.Logger;
@@ -27,6 +28,8 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jPCursos.setVisible(false);
         jPEdiciones.setVisible(false);
         jPData.setVisible(false);
+        Utils.GUI.setDisable(jLdocentes);
+        Utils.GUI.setDisable(jLInscriptos);
         cargaIntituto();
     }
 
@@ -62,6 +65,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jPEInscriptos = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         jLInscriptos = new javax.swing.JList<>();
+        lblImagen = new javax.swing.JLabel();
         jPEdiciones = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jLEdiciones = new javax.swing.JList<>();
@@ -141,7 +145,6 @@ public class ConsultaEdicion extends javax.swing.JPanel {
 
         jTFechaFin.setEditable(false);
         jTFechaFin.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTFechaFin.setText("99/99/99");
         jTFechaFin.setFocusable(false);
         jTFechaFin.setMinimumSize(new java.awt.Dimension(85, 24));
         jTFechaFin.setPreferredSize(new java.awt.Dimension(85, 24));
@@ -151,7 +154,6 @@ public class ConsultaEdicion extends javax.swing.JPanel {
 
         jTFechaInicio.setEditable(false);
         jTFechaInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTFechaInicio.setText("99/99/99");
         jTFechaInicio.setFocusable(false);
         jTFechaInicio.setMinimumSize(new java.awt.Dimension(85, 24));
         jTFechaInicio.setPreferredSize(new java.awt.Dimension(85, 24));
@@ -162,11 +164,11 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jTcupo.setEditable(false);
         jTcupo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTcupo.setFocusable(false);
-        jTcupo.setMinimumSize(new java.awt.Dimension(90, 24));
-        jTcupo.setPreferredSize(new java.awt.Dimension(90, 24));
+        jTcupo.setMinimumSize(new java.awt.Dimension(80, 24));
+        jTcupo.setPreferredSize(new java.awt.Dimension(80, 24));
         jTcupo.setRequestFocusEnabled(false);
         jTcupo.setVerifyInputWhenFocusTarget(false);
-        jPData.add(jTcupo, new org.netbeans.lib.awtextra.AbsoluteConstraints(96, 121, 90, -1));
+        jPData.add(jTcupo, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 123, 80, -1));
 
         jTffechaPublicacion.setEditable(false);
         jTffechaPublicacion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -190,11 +192,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jLdocente.setFocusable(false);
         jPData.add(jLdocente, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 255, -1, -1));
 
-        jLdocentes.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
+        jLdocentes.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLdocentes.setFocusable(false);
         jLdocentes.setRequestFocusEnabled(false);
         jScrollPane4.setViewportView(jLdocentes);
@@ -204,19 +202,28 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         jPEInscriptos.setPreferredSize(new java.awt.Dimension(190, 270));
         jPEInscriptos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLInscriptos.setToolTipText("");
         jLInscriptos.setFocusable(false);
         jLInscriptos.setRequestFocusEnabled(false);
         jScrollPane5.setViewportView(jLInscriptos);
 
-        jPEInscriptos.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 160, 325));
+        jPEInscriptos.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 160, 170));
 
-        jPData.add(jPEInscriptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 20, 160, 340));
+        jPData.add(jPEInscriptos, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 180, 160, 180));
+
+        lblImagen.setBackground(new java.awt.Color(102, 204, 255));
+        lblImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        lblImagen.setFocusable(false);
+        lblImagen.setRequestFocusEnabled(false);
+        jPData.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 10, 160, 160));
 
         add(jPData, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, 440, 350));
 
         jPEdiciones.setPreferredSize(new java.awt.Dimension(190, 270));
         jPEdiciones.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLEdiciones.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLEdiciones.addListSelectionListener(this::jLEdicionesValueChanged);
         jScrollPane2.setViewportView(jLEdiciones);
 
@@ -232,6 +239,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
+        jLCursos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLCursos.addListSelectionListener(this::jLCursosValueChanged);
         jScrollPane1.setViewportView(jLCursos);
 
@@ -243,6 +251,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
     private void jCInstitutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCInstitutoActionPerformed
         refreschCombo();
         jPData.setVisible(false);
+        Utils.GUI.reSizePadre(this, sizeWForm[FORMCHICO], formHeigth);
     }//GEN-LAST:event_jCInstitutoActionPerformed
 
     private void jCInstitutoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCInstitutoItemStateChanged
@@ -301,6 +310,11 @@ public class ConsultaEdicion extends javax.swing.JPanel {
             jTcurso.setText(ceh.getCurso());
             jLdocentes.setListData(ceh.getDocentes().toArray(String[]::new));
             //jTdocentej.setText(ceh.));
+            if(!Utils.Validate.isEmpty(ceh.getImagen())){
+                System.out.println("Entre con"+cfg.fullpathImagen()+ceh.getImagen());
+                
+                lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(cfg.fullpathImagen()+ceh.getImagen())));
+            }
             jLInscriptos.setListData(ceh.getListaInscriptos(edicion));
             jPData.setVisible(true);
         }
@@ -408,5 +422,6 @@ public class ConsultaEdicion extends javax.swing.JPanel {
     private javax.swing.JTextField jTcurso;
     private javax.swing.JTextField jTffechaPublicacion;
     private javax.swing.JTextField jTnombre;
+    private javax.swing.JLabel lblImagen;
     // End of variables declaration//GEN-END:variables
 }

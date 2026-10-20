@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtEdicion;
+import edu.edext.datatypes.DtInstituto;
 import edu.edext.datatypes.DtUsuario;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -39,15 +40,22 @@ public class EdicionHelper {
         if(tmp!=null){
             List<DtUsuario> docentes=new ArrayList<>();
             for(Usuario d : tmp.getDocentes())
-                docentes.add(new DtUsuario(d.getNickname(), null, null, d.getNombre(), d.getApellido(), null, null, null, null));
+                docentes.add(new DtUsuario(d.getNickname(), null, d.getEmail(), 
+                        d.getNombre(), d.getApellido(), d.getImagen(), 
+                        d.getfNacimiento(), null, null));
             return new DtEdicion(
                     tmp.getNombre(), 
                     tmp.getCupo(), 
                     tmp.getFechaInicio(), 
                     tmp.getFechaFin(), 
                     tmp.getFechaPublicacion(), 
-                    new DtCurso(tmp.getNombre(), null, null, 0, 0, null, null, null, null), 
-                    docentes); }
+                    new DtCurso(tmp.getCurso().getNombre(), tmp.getCurso().getDescripcion(), 
+                            tmp.getCurso().getDuracion(), 0, 0, tmp.getCurso().getUrl(), 
+                            tmp.getCurso().getFechaRegistro(), 
+                            new DtInstituto(tmp.getCurso().getInstituto().getNombre()),
+                            tmp.getCurso().getImagen()), 
+                    docentes,
+                    tmp.getImagen()); }
         else return null;
     }
   

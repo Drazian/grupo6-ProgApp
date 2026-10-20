@@ -77,7 +77,6 @@ public class DtPrograma {
     public String getNombre(){ return this.nombre; }
     public LocalDate getFechaFin(){ return this.fechaFin; }
     public List<DtCurso> getCursos(){  return this.cursos; }
-    public List<DtCurso> getDtCursos(){  return this.cursos; }
     public String getDescripcion(){  return this.descripcion; }
     public LocalDate getFechaInicio(){ return this.fechaInicio; }
     public Set<String> getNameCursos(){ return this.nameCursos; }
