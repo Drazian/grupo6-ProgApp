@@ -63,7 +63,7 @@
         <h3 style="margin-top: 0; color: #333; font-size: 18px; margin-bottom: 15px;">Cursos del Programa</h3>
         
         <c:choose>
-            <c:when test="${not empty programa.getDtCursos()}">
+            <c:when test="${not empty programa.getCursos()}">
                 <div style="overflow-x: auto; border: 1px solid #dee2e6; border-radius: 6px;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
                         <thead>
@@ -74,7 +74,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach var="curso" items="${programa.getDtCursos()}">
+                            <c:forEach var="curso" items="${programa.getCursos()}">
                                 <tr style="border-bottom: 1px solid #eee; transition: background 0.15s;"
                                     onmouseover="this.style.backgroundColor='#fcfcfc';" 
                                     onmouseout="this.style.backgroundColor='transparent';">
