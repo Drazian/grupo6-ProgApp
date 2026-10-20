@@ -48,7 +48,7 @@ public class Edicion {
 
     @ManyToOne
     @NotNull
-//    @JoinColumn(name="curso_nombre", nullable=false)
+//  @JoinColumn(name="curso_nombre", nullable=false)
     @JoinColumn(name="curso", nullable=false)
     private Curso curso;
  
