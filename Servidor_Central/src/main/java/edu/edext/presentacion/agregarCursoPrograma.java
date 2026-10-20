@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtCurso;
+import edu.edext.tools.Utils;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -19,6 +20,10 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
      */
     public agregarCursoPrograma() {
         initComponents();
+//        Utils.GUI.sizeColumn(tbl, , , Utils.ALIGN_CENTER),;        Utils.GUI.sizeColumn(tbl, 3, 35, Utils.ALIGN_CENTER);
+        Utils.GUI.sizeColumn(tbl, 3, 35, Utils.ALIGN_CENTER);
+        //Utils.Crypt.compareBCrypt(passIN, passDB)
+        
         cargarProgramas();
         cargarCursos();
     }
@@ -31,20 +36,21 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        cbPrograma = new javax.swing.JComboBox<>();
-        lblPrograma = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl = new javax.swing.JTable();
+        lblSeleccionarCurso = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
         lblCurso = new javax.swing.JLabel();
         txtCurso = new javax.swing.JTextField();
         btnAgregar = new javax.swing.JButton();
-        lblSeleccionarCurso = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        cbPrograma = new javax.swing.JComboBox<>();
+        lblPrograma = new javax.swing.JLabel();
 
-        cbPrograma.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        cbPrograma.addActionListener(this::cbProgramaActionPerformed);
-
-        lblPrograma.setText("Seleccionar Programa de Formacion:");
+        setMinimumSize(new java.awt.Dimension(610, 380));
+        setPreferredSize(new java.awt.Dimension(730, 490));
 
         tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -79,62 +85,87 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tbl);
 
+        lblSeleccionarCurso.setText("Seleccionar curso:");
+
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
         lblCurso.setText("Curso seleccionado:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(29, 38, 0, 0);
+        jPanel1.add(lblCurso, gridBagConstraints);
 
         txtCurso.setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.ipadx = 113;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(26, 18, 0, 0);
+        jPanel1.add(txtCurso, gridBagConstraints);
 
         btnAgregar.setText("Agregar");
         btnAgregar.addActionListener(this::btnAgregarActionPerformed);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(20, 12, 21, 97);
+        jPanel1.add(btnAgregar, gridBagConstraints);
 
-        lblSeleccionarCurso.setText("Seleccionar curso:");
+        jPanel3.setLayout(new java.awt.GridBagLayout());
+
+        cbPrograma.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbPrograma.addActionListener(this::cbProgramaActionPerformed);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.ipadx = 126;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(12, 35, 3, 24);
+        jPanel3.add(cbPrograma, gridBagConstraints);
+
+        lblPrograma.setText("Seleccionar Programa de Formacion:");
+        lblPrograma.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblProgramaMouseClicked(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(23, 12, 0, 0);
+        jPanel3.add(lblPrograma, gridBagConstraints);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblPrograma)
-                                .addGap(18, 18, 18)
-                                .addComponent(cbPrograma, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lblSeleccionarCurso))
-                        .addGap(0, 361, Short.MAX_VALUE)))
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lblCurso)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtCurso, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(235, 235, 235)
-                        .addComponent(btnAgregar)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(lblSeleccionarCurso)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbPrograma, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblPrograma))
-                .addGap(27, 27, 27)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblSeleccionarCurso)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCurso)
-                    .addComponent(txtCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(btnAgregar)
-                .addGap(0, 14, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -228,10 +259,16 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         
     }//GEN-LAST:event_btnAgregarActionPerformed
 
+    private void lblProgramaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblProgramaMouseClicked
+        System.out.println("Dimensiones : "+this.getWidth()+", "+this.getHeight());
+    }//GEN-LAST:event_lblProgramaMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JComboBox<String> cbPrograma;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCurso;
     private javax.swing.JLabel lblPrograma;

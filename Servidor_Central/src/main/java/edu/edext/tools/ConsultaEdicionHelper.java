@@ -27,6 +27,7 @@ public class ConsultaEdicionHelper {
     private LocalDate fechaFin;
     private LocalDate fechaPublicacion;
     private String curso;
+    private String imagen="hola";
     private List<String> docentes;
     private boolean isEmpty;
     
@@ -56,6 +57,7 @@ public class ConsultaEdicionHelper {
    
     public String getNombre(){ return nombre; }
     public Integer getCupo(){ return cupo; }
+    public String getImagen(){ return this.imagen; }
     public LocalDate getFechaInicio(){ return fechaInicio; }
     public LocalDate getFechaFin(){ return fechaFin; }
     public LocalDate getFechaPublicacion(){ return fechaPublicacion; }
@@ -101,6 +103,7 @@ public class ConsultaEdicionHelper {
             this.fechaFin=tmpEdicion.getFechaFin();
             this.fechaInicio=tmpEdicion.getFechaInicio();
             this.curso=tmpEdicion.getCurso().getNombre();
+            this.imagen=tmpEdicion.getImagen();
             this.fechaPublicacion=tmpEdicion.getFechaPublicacion();
             this.docentes=new ArrayList<>(tmpEdicion.getNameDocentes());
             tmpEdicion=null;
@@ -116,6 +119,7 @@ public class ConsultaEdicionHelper {
         this.cupo=0;
         this.curso="";
         this.nombre="";
+        this.imagen="";
         this.isEmpty=true;
         this.fechaFin=null;
         this.fechaInicio=null;

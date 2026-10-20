@@ -7,6 +7,7 @@ import edu.edext.tools.Utils.Mouse;
 import javax.swing.JFormattedTextField;
 import edu.edext.tools.cronometroHelper;
 import edu.edext.tools.CrearProgramaHelper;
+import java.io.File;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 /**
@@ -16,7 +17,8 @@ import static javax.swing.JOptionPane.showMessageDialog;
 public class CrearProgramaForm extends javax.swing.JPanel {
     private final CrearProgramaHelper Values=new CrearProgramaHelper();
     private final int IZQ_DER=0, DER_IZQ=1, FORMCHICO=0, FORMGRANDE=1;
-    private final int[] formWidht={220, 620};
+    private final int[] formWidht={185, 670};
+    private final int formHeight=420;
     private final Mouse mouse=new Mouse();
     private final cronometroHelper reloj;
     private LocalDate fechaRegistro;
@@ -24,7 +26,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
     private LocalDate fechaFin;
     private String descripcion;
     private String nombre;
-
+    private File imagen;
     
     /**
      * Creates new form crearProgramaFormacion
@@ -75,12 +77,14 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         jTAdescripcion = new javax.swing.JTextArea();
         jBCreate = new javax.swing.JButton();
         jBCancel = new javax.swing.JButton();
+        lblImagen = new javax.swing.JLabel();
+        btnAgregarImagen = new javax.swing.JButton();
         jPError = new javax.swing.JPanel();
         jLError = new javax.swing.JLabel();
         jLErrorMsg = new javax.swing.JLabel();
 
-        setMinimumSize(new java.awt.Dimension(220, 420));
-        setPreferredSize(new java.awt.Dimension(220, 420));
+        setMinimumSize(new java.awt.Dimension(185, 420));
+        setPreferredSize(new java.awt.Dimension(185, 420));
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 formMouseDragged(evt);
@@ -107,18 +111,19 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(jLista);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 36, 181, 254));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 36, 150, 254));
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Programas Existentes");
-        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 180, -1));
+        jLabel1.setText("Programas");
+        add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 150, -1));
 
         jBNew.setText("Nuevo Programa");
         jBNew.addActionListener(this::jBNewActionPerformed);
-        add(jBNew, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 160, -1));
+        add(jBNew, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 350, 150, -1));
 
         jPMaster.setFocusable(false);
         jPMaster.setMinimumSize(new java.awt.Dimension(540, 364));
+        jPMaster.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPNuevo.addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentHidden(java.awt.event.ComponentEvent evt) {
@@ -133,7 +138,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         jLnombre.setText("Nombre ..........:");
         jLnombre.setFocusable(false);
         jLnombre.setRequestFocusEnabled(false);
-        jPNuevo.add(jLnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 15, -1, -1));
+        jPNuevo.add(jLnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
 
         jTnombre.setNextFocusableComponent(jFfechaInicio);
         jTnombre.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -141,12 +146,12 @@ public class CrearProgramaForm extends javax.swing.JPanel {
                 jTnombreFocusLost(evt);
             }
         });
-        jPNuevo.add(jTnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 10, 202, -1));
+        jPNuevo.add(jTnombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 5, 202, -1));
 
         jLfechaInicio.setText("Fecha de Inicio .......:");
         jLfechaInicio.setFocusable(false);
         jLfechaInicio.setRequestFocusEnabled(false);
-        jPNuevo.add(jLfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, -1, -1));
+        jPNuevo.add(jLfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 45, -1, -1));
 
         jFfechaInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jFfechaInicio.setNextFocusableComponent(jFfechaFin);
@@ -156,23 +161,23 @@ public class CrearProgramaForm extends javax.swing.JPanel {
                 jFfechaInicioFocusLost(evt);
             }
         });
-        jPNuevo.add(jFfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 50, 99, -1));
+        jPNuevo.add(jFfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(175, 40, 99, -1));
 
         jBfechaInicio.setText("......");
         jBfechaInicio.addActionListener(this::jBfechaInicioActionPerformed);
-        jPNuevo.add(jBfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 50, 32, 19));
+        jPNuevo.add(jBfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(275, 40, 32, 19));
 
         jDfechaInicio.setDateFormatString("ddMMyy");
         jDfechaInicio.setFocusable(false);
         jDfechaInicio.setOpaque(false);
         jDfechaInicio.setRequestFocusEnabled(false);
         jDfechaInicio.addPropertyChangeListener(this::jDfechaInicioPropertyChange);
-        jPNuevo.add(jDfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 55, 10, 10));
+        jPNuevo.add(jDfechaInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(285, 40, 10, 10));
 
-        jLfechaFin.setText("Fecha de Finalizacion ...:");
+        jLfechaFin.setText("Fecha de Finalizacion .:");
         jLfechaFin.setFocusable(false);
         jLfechaFin.setRequestFocusEnabled(false);
-        jPNuevo.add(jLfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, -1, -1));
+        jPNuevo.add(jLfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 85, -1, -1));
 
         jFfechaFin.setNextFocusableComponent(jFfechaPublic);
         jFfechaFin.addCaretListener(this::jFfechaFinCaretUpdate);
@@ -181,21 +186,21 @@ public class CrearProgramaForm extends javax.swing.JPanel {
                 jFfechaFinFocusLost(evt);
             }
         });
-        jPNuevo.add(jFfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 90, 99, -1));
+        jPNuevo.add(jFfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(175, 80, 99, -1));
 
         jBfechaFin.setText("......");
         jBfechaFin.addActionListener(this::jBfechaFinActionPerformed);
-        jPNuevo.add(jBfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 90, 32, 19));
+        jPNuevo.add(jBfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(275, 80, 32, 19));
 
         jDfechaFin.setFocusable(false);
         jDfechaFin.setRequestFocusEnabled(false);
         jDfechaFin.addPropertyChangeListener(this::jDfechaFinPropertyChange);
-        jPNuevo.add(jDfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 95, 10, 10));
+        jPNuevo.add(jDfechaFin, new org.netbeans.lib.awtextra.AbsoluteConstraints(285, 88, 10, 10));
 
-        jLfechaPublic.setText("Fecha de Publicacion ...:");
+        jLfechaPublic.setText("Fecha de Publicacion .:");
         jLfechaPublic.setFocusable(false);
         jLfechaPublic.setRequestFocusEnabled(false);
-        jPNuevo.add(jLfechaPublic, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, -1, -1));
+        jPNuevo.add(jLfechaPublic, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 125, -1, -1));
 
         jFfechaPublic.setNextFocusableComponent(jBCreate);
         jFfechaPublic.addCaretListener(this::jFfechaPublicCaretUpdate);
@@ -204,21 +209,21 @@ public class CrearProgramaForm extends javax.swing.JPanel {
                 jFfechaPublicFocusLost(evt);
             }
         });
-        jPNuevo.add(jFfechaPublic, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 130, 99, -1));
+        jPNuevo.add(jFfechaPublic, new org.netbeans.lib.awtextra.AbsoluteConstraints(175, 120, 99, -1));
 
         jBfechaPublic.setText("......");
         jBfechaPublic.addActionListener(this::jBfechaPublicActionPerformed);
-        jPNuevo.add(jBfechaPublic, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 130, 32, 19));
+        jPNuevo.add(jBfechaPublic, new org.netbeans.lib.awtextra.AbsoluteConstraints(275, 120, 32, 19));
 
         jDfechaPublic.setFocusable(false);
         jDfechaPublic.setRequestFocusEnabled(false);
         jDfechaPublic.addPropertyChangeListener(this::jDfechaPublicPropertyChange);
-        jPNuevo.add(jDfechaPublic, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 135, 10, 10));
+        jPNuevo.add(jDfechaPublic, new org.netbeans.lib.awtextra.AbsoluteConstraints(285, 125, 10, 10));
 
         jLdescripcion.setText("Descripcion ...:");
         jLdescripcion.setFocusable(false);
         jLdescripcion.setRequestFocusEnabled(false);
-        jPNuevo.add(jLdescripcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, -1, -1));
+        jPNuevo.add(jLdescripcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, -1, -1));
 
         jTAdescripcion.setColumns(20);
         jTAdescripcion.setRows(5);
@@ -229,7 +234,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         });
         jSPdescripcion.setViewportView(jTAdescripcion);
 
-        jPNuevo.add(jSPdescripcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 170, 270, 130));
+        jPNuevo.add(jSPdescripcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 270, 130));
 
         jBCreate.setBackground(new java.awt.Color(9, 104, 21));
         jBCreate.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
@@ -237,33 +242,29 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         jBCreate.setText("Crear");
         jBCreate.setNextFocusableComponent(jBCancel);
         jBCreate.addActionListener(this::jBCreateActionPerformed);
-        jPNuevo.add(jBCreate, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 325, 210, -1));
+        jPNuevo.add(jBCreate, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 340, 210, -1));
 
         jBCancel.setBackground(new java.awt.Color(131, 46, 46));
         jBCancel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         jBCancel.setText("Cancelar");
         jBCancel.setNextFocusableComponent(jTnombre);
         jBCancel.addActionListener(this::jBCancelActionPerformed);
-        jPNuevo.add(jBCancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 325, -1, -1));
+        jPNuevo.add(jBCancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 340, -1, -1));
 
-        javax.swing.GroupLayout jPMasterLayout = new javax.swing.GroupLayout(jPMaster);
-        jPMaster.setLayout(jPMasterLayout);
-        jPMasterLayout.setHorizontalGroup(
-            jPMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPMasterLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 398, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(130, Short.MAX_VALUE))
-        );
-        jPMasterLayout.setVerticalGroup(
-            jPMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPMasterLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPNuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        lblImagen.setBackground(new java.awt.Color(102, 204, 255));
+        lblImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
+        lblImagen.setFocusable(false);
+        lblImagen.setRequestFocusEnabled(false);
+        jPNuevo.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(315, 40, 160, 160));
 
-        add(jPMaster, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 10, 420, 410));
+        btnAgregarImagen.setText("Agregar Imagen");
+        btnAgregarImagen.addActionListener(this::btnAgregarImagenActionPerformed);
+        jPNuevo.add(btnAgregarImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(315, 210, 160, 30));
+
+        jPMaster.add(jPNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 480, 386));
+
+        add(jPMaster, new org.netbeans.lib.awtextra.AbsoluteConstraints(175, 0, 490, 410));
 
         jPError.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -272,15 +273,15 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         jLError.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLError.setText("Ingreso Incorrecto");
         jLError.setFocusable(false);
-        jPError.add(jLError, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 181, 30));
+        jPError.add(jLError, new org.netbeans.lib.awtextra.AbsoluteConstraints(-9, 0, 170, 30));
 
         jLErrorMsg.setFont(new java.awt.Font("Ubuntu", 1, 16)); // NOI18N
         jLErrorMsg.setForeground(new java.awt.Color(255, 0, 0));
         jLErrorMsg.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLErrorMsg.setFocusable(false);
-        jPError.add(jLErrorMsg, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 181, 20));
+        jPError.add(jLErrorMsg, new org.netbeans.lib.awtextra.AbsoluteConstraints(-9, 30, 170, 20));
 
-        add(jPError, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 210, 60));
+        add(jPError, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 170, 60));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jPNuevoComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPNuevoComponentShown
@@ -414,8 +415,10 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         else message="Confirme creación de Programa de Edición";
         int tmp=confirm(message);
         if(tmp==0){
+            String image="Programa."+nombre+Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
+            Utils.Imagen.save(imagen.getAbsolutePath(), image);
             try {
-                flag=Values.setData(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin);
+                flag=Values.setData(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, image);
                 message=jTnombre.getText();
                 resize(FORMCHICO);
             } catch (Exception ex) {
@@ -457,6 +460,19 @@ public class CrearProgramaForm extends javax.swing.JPanel {
     private void jListaMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jListaMouseDragged
         mouse.MouseContenedorDragged(evt);
     }//GEN-LAST:event_jListaMouseDragged
+
+    private void btnAgregarImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarImagenActionPerformed
+        File tmp=Utils.Imagen.openSO();
+        if(tmp!=null){
+            imagen=tmp;
+            lblImagen.setIcon(
+                Utils.Imagen.resize(
+                    lblImagen.getWidth(),
+                    lblImagen.getHeight(),
+                    Utils.Imagen.loadSO(
+                        imagen.getAbsolutePath())));
+        }
+    }//GEN-LAST:event_btnAgregarImagenActionPerformed
 
     private boolean isChanged(){
         boolean flag=false;
@@ -513,7 +529,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
             jPNuevo.setVisible(true);
             reloj.enabled(true);
         }
-        Utils.GUI.reSizePadre(this, formWidht[modo], 420);
+        Utils.GUI.reSizePadre(this, formWidht[modo], formHeight);
     }
     
     private void refresh(){
@@ -531,6 +547,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregarImagen;
     private javax.swing.JButton jBCancel;
     private javax.swing.JButton jBCreate;
     private javax.swing.JButton jBNew;
@@ -559,5 +576,6 @@ public class CrearProgramaForm extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTAdescripcion;
     private javax.swing.JTextField jTnombre;
+    private javax.swing.JLabel lblImagen;
     // End of variables declaration//GEN-END:variables
 }

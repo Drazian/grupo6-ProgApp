@@ -1,6 +1,5 @@
 package edu.edext.presentacion;
 
-import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
 import edu.edext.tools.indexHelper;
@@ -9,9 +8,6 @@ import org.tinylog.Logger;
 
 public class index extends javax.swing.JFrame {
     
-//    private javax.swing.JInternalFrame ventanaAltaUsuario;
-//    private javax.swing.JInternalFrame ventanaConsultaUsuario;
-//    private javax.swing.JInternalFrame ventanaModificarUsuario;
     private final indexHelper form;
     private final Mouse mouse= new Mouse();
     
@@ -26,8 +22,7 @@ public class index extends javax.swing.JFrame {
         form.setScroll(true);  // Activa o desactiva el Scroll de la ventana padre
         form.setLimiteMin(true);  // true = Impide que el formulario salga fuera de la ventana del lado izquierdo
     }
-// (titulo, panel, unique, rendOnDrag, resizable, closable, maximizable, minimizable)
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -195,7 +190,7 @@ public class index extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+        // (titulo, panel, unique, rendOnDrag, resizable, closable, maximizable, minimizable)
     private void miInstitutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miInstitutoActionPerformed
         form.cargarPanel("Institutos", new AltaInstituto(), true, true, true, true, true, true);
     }//GEN-LAST:event_miInstitutoActionPerformed
@@ -213,21 +208,13 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_miModificarUsuarioActionPerformed
 
     private void miAgregarProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miAgregarProgramaActionPerformed
-        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Agregar curso a programas",true,true,true,true);
-        internalFrame.getContentPane().add(new agregarCursoPrograma());
-        internalFrame.pack();
-        this.dpIndex.add(internalFrame);
-        internalFrame.setVisible(true);
+        form.cargarPanel("Agregar curso a programas", new agregarCursoPrograma(), true, true, true, true, true, true);
     }//GEN-LAST:event_miAgregarProgramaActionPerformed
 
     private void miConsultaProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miConsultaProgramaActionPerformed
-        javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame("Consultar programas",true,true,true,true);
-        internalFrame.getContentPane().add(new ConsultaPrograma());
-        internalFrame.pack();
-        this.dpIndex.add(internalFrame);
-        internalFrame.setVisible(true);
+        form.cargarPanel("Consultar programas", new ConsultaPrograma(), true, true, true, true, false, true);
     }//GEN-LAST:event_miConsultaProgramaActionPerformed
-
+        // (titulo, panel, unique, rendOnDrag, resizable, closable, maximizable, minimizable)
     private void altaCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_altaCursoActionPerformed
         form.cargarPanel(new AltaCurso());
     }//GEN-LAST:event_altaCursoActionPerformed

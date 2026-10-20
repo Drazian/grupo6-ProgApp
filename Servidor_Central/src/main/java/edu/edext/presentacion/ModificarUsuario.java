@@ -42,7 +42,7 @@ public class ModificarUsuario extends javax.swing.JPanel {
             DefaultListModel<String> model = new DefaultListModel<>();
 
             for (DtUsuario aux: usuarios){
-                model.addElement(aux.getNickname());
+                model.addElement(aux.getNombre()+" "+aux.getApellido());
             }
 
             lisUsuario.setModel(model);

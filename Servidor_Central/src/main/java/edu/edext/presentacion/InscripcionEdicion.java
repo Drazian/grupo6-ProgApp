@@ -89,6 +89,7 @@ public class InscripcionEdicion extends javax.swing.JPanel {
         jSCursos.setFocusable(false);
         jSCursos.setPreferredSize(new java.awt.Dimension(151, 300));
 
+        jLCursos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLCursos.addListSelectionListener(this::jLCursosValueChanged);
         jSCursos.setViewportView(jLCursos);
 
@@ -103,6 +104,7 @@ public class InscripcionEdicion extends javax.swing.JPanel {
         jPEdiciones.setPreferredSize(new java.awt.Dimension(190, 270));
         jPEdiciones.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLEdiciones.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLEdiciones.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLEdicionesMouseClicked(evt);
@@ -124,6 +126,7 @@ public class InscripcionEdicion extends javax.swing.JPanel {
         jPEInscriptos.setPreferredSize(new java.awt.Dimension(190, 270));
         jPEInscriptos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLInscriptos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLInscriptos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jLInscriptosMouseReleased(evt);
@@ -139,6 +142,7 @@ public class InscripcionEdicion extends javax.swing.JPanel {
         jPECandidatos.setPreferredSize(new java.awt.Dimension(190, 270));
         jPECandidatos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLCandidatos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jLCandidatos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jLCandidatosMouseReleased(evt);

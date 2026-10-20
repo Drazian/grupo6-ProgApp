@@ -1056,15 +1056,16 @@ public class cargarDatosDePruebaHelper {
             // *****************************************************************
             // 10 INSCRIPCION A PROGRAMA
             // *****************************************************************
-            
+
+
             em.persist(new InscripcionPrograma(
                     EL, p1, LocalDate.of(2026, 4, 15), 0));
             
             em.persist(new InscripcionPrograma(
                     CH, p1, LocalDate.of(2026, 4, 20), 0));
 
-            //em.persist(new InscripcionPrograma(
-            //        CO, p2, LocalDate.of(2026, 7, 10), 0));
+            em.persist(new InscripcionPrograma(
+                    CO, p2, LocalDate.of(2026, 7, 10), 0));
 
             em.persist(new InscripcionPrograma(
                     CH, p2, LocalDate.of(2026, 7, 10), 0));
@@ -1074,15 +1075,6 @@ public class cargarDatosDePruebaHelper {
             
             em.persist(new InscripcionPrograma(
                     WE, p2, LocalDate.of(2026, 7, 15), 0));
-
-            //em.persist(new InscripcionPrograma(
-            //        CO, p2, LocalDate.of(2026, 7, 10), 0));
-
-            //em.persist(new InscripcionPrograma(
-            //        RO, p2, LocalDate.of(2026, 7, 18), 0));
-
-            em.persist(new InscripcionPrograma(
-                    CO, p2, LocalDate.of(2026, 7, 10), 0));
 
             em.persist(new InscripcionPrograma(
                     RO, p2, LocalDate.of(2026, 7, 18), 0));
@@ -1098,8 +1090,6 @@ public class cargarDatosDePruebaHelper {
 
             em.persist(new InscripcionPrograma(
                     JW, p3, LocalDate.of(2026, 8, 30), 0));
-
-            
             
             
             /*

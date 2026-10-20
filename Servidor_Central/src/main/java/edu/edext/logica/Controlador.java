@@ -163,8 +163,15 @@ public class Controlador implements IControlador {
                     "Ya existe un usuario con el Email '" 
                     + usuario.getEmail() + "'.");
             }
-            String password=Utils.Crypt.cifrarAES(usuario.getPassword());
+            //String password=Utils.Crypt.encodeBCrypt(Utils.Crypt.descifrarAES(usuario.getPassword()));    // BCrypt es una encriptador y es mucho mas seguro ya que es irreversible
+            String password=Utils.Crypt.cifrarAES(usuario.getPassword());   // AES solo sirve para transporte, no para persistencia, ya que es solo un cifrador, mientras BCrypt es unidireccional, AES es bidireccional, por lo que es facil de decifrar si se expone la clave de cifrado
             Usuario nuevoUsuario;
+            char letra;
+            String tmpNombre=usuario.getNombre(), tmpApellido=usuario.getApellido();
+            letra=tmpNombre.charAt(0);
+            tmpNombre=String.valueOf(letra).toUpperCase()+tmpNombre.substring(1);
+            letra=tmpApellido.charAt(0);
+            tmpApellido=String.valueOf(letra).toUpperCase()+tmpApellido.substring(1);
             if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
                 List<Instituto> institutos = new ArrayList<>();
                 for (String nombre : usuario.getInstitutos()) {
@@ -175,12 +182,13 @@ public class Controlador implements IControlador {
                     }
                     institutos.add(instituto);
                 }
+                
                 nuevoUsuario = new Docente(
                     usuario.getNickname(),
                     password,
                     usuario.getEmail(),
-                    usuario.getNombre(),
-                    usuario.getApellido(),
+                    tmpNombre,
+                    tmpApellido,
                     usuario.getfNacimiento(),
                     usuario.getImagen(),
                     institutos
@@ -190,8 +198,8 @@ public class Controlador implements IControlador {
                     usuario.getNickname(),
                     password,
                     usuario.getEmail(),
-                    usuario.getNombre(),
-                    usuario.getApellido(),
+                    tmpNombre,
+                    tmpApellido,
                     usuario.getfNacimiento(),
                     usuario.getImagen()
                 );
@@ -356,6 +364,9 @@ public class Controlador implements IControlador {
     @Override
     public List<String> listarCursosPorCategoria(String nombreCategoria) throws Exception {
         try (EntityManager em = emf.createEntityManager()) {
+//            return em.createQuery("SELECT c.nombre FROM Curso c WHERE :cat MEMBER OF c.categorias", String.class)
+//                     .setParameter("cat", nombreCategoria)
+//                     .getResultList();
             return em.createQuery("SELECT c.nombre FROM Curso c JOIN c.categorias cat WHERE cat.nombre = :cat", String.class)
                      .setParameter("cat", nombreCategoria)
                      .getResultList();
@@ -748,70 +759,83 @@ public class Controlador implements IControlador {
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
 
-@Override
-public List<DtPrograma> listarProgramas() throws Exception {
-    EntityManager em = emf.createEntityManager();
-    try {
-        List<DtPrograma> resultado = new ArrayList<>();
-        
-        List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
-        
-        for (ProgramaFormacion programa : listaAux) {
-            List<DtCurso> dtCursos = new ArrayList<>();
+//    @Override
+//    public List<DtPrograma> listarProgramas() throws Exception{
+//        EntityManager em = emf.createEntityManager();
+//        try{
+//            List<DtPrograma> resultado = new ArrayList<>();
+//            List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
+//            for (ProgramaFormacion aux: listaAux){
+//                resultado.add(new DtPrograma(aux.getNombre(), aux.getDescripcion(),aux.getFechaRegistro(),aux.getFechaInicio(),aux.getFechaFin()));
+//            }
+//            return resultado;          
+//        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+//    }
+    
+    @Override
+    public List<DtPrograma> listarProgramas() throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            List<DtPrograma> resultado = new ArrayList<>();
 
-            if (programa.getCursos() != null) {
-                for (Curso c : programa.getCursos()) {
-                    Set<String> nombresCategorias = new HashSet<>();
-                    if (c.getCategorias() != null) {
-                        for (Categoria cat : c.getCategorias()) {
-                            nombresCategorias.add(cat.getNombre());
+            List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
+
+            for (ProgramaFormacion programa : listaAux) {
+                List<DtCurso> dtCursos = new ArrayList<>();
+
+                if (programa.getCursos() != null) {
+                    for (Curso c : programa.getCursos()) {
+                        Set<String> nombresCategorias = new HashSet<>();
+                        if (c.getCategorias() != null) {
+                            for (Categoria cat : c.getCategorias()) {
+                                nombresCategorias.add(cat.getNombre());
+                            }
                         }
+
+                        DtInstituto dtInst = null;
+                        if (c.getInstituto() != null) {
+                            dtInst = new DtInstituto(c.getInstituto().getNombre());
+                        }
+
+                        DtCurso dtc = new DtCurso(
+                            c.getNombre(),
+                            c.getDescripcion(),
+                            c.getDuracion(),
+                            c.getCantidadHoras(),
+                            c.getCreditos(),
+                            c.getUrl(),
+                            c.getFechaRegistro(),
+                            dtInst,
+                            null,
+                            nombresCategorias,
+                            c.getImagen()
+                        );
+
+                        dtCursos.add(dtc);
                     }
-
-                    DtInstituto dtInst = null;
-                    if (c.getInstituto() != null) {
-                        dtInst = new DtInstituto(c.getInstituto().getNombre());
-                    }
-
-                    DtCurso dtc = new DtCurso(
-                        c.getNombre(),
-                        c.getDescripcion(),
-                        c.getDuracion(),
-                        c.getCantidadHoras(),
-                        c.getCreditos(),
-                        c.getUrl(),
-                        c.getFechaRegistro(),
-                        dtInst,
-                        null,
-                        nombresCategorias,
-                        c.getImagen()
-                    );
-
-                    dtCursos.add(dtc);
                 }
+
+                resultado.add(new DtPrograma(
+                    programa.getNombre(), 
+                    programa.getDescripcion(), 
+                    programa.getFechaRegistro(), 
+                    programa.getFechaInicio(), 
+                    programa.getFechaFin(),
+                    dtCursos,
+                    programa.getImagen()
+                ));
             }
 
-            resultado.add(new DtPrograma(
-                programa.getNombre(), 
-                programa.getDescripcion(), 
-                programa.getFechaRegistro(), 
-                programa.getFechaInicio(), 
-                programa.getFechaFin(),
-                dtCursos,
-                programa.getImagen()
-            ));
+            return resultado;        
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
         }
-        
-        return resultado;        
-    } catch (Exception e) {
-        if (em.getTransaction().isActive()) {
-            em.getTransaction().rollback();
-        }
-        throw e;
-    } finally {
-        em.close();
     }
-}
 
     @Override
     public List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception{//
@@ -1019,7 +1043,9 @@ public List<DtPrograma> listarProgramas() throws Exception {
             usuarioModificado.setfNacimiento(usuario.getfNacimiento());
 
             if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
-                String hashPassword = edu.edext.tools.Utils.Crypt.cifrarAES(usuario.getPassword().trim());
+                
+                //String hashPassword = Utils.Crypt.encodeBCrypt(usuario.getPassword().trim());   //  bis
+                String hashPassword = Utils.Crypt.cifrarAES(usuario.getPassword().trim());  //  bis 2
                 usuarioModificado.setPassword(hashPassword);
             }
 

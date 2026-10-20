@@ -63,8 +63,8 @@ public class CrearProgramaHelper{
     
     //******************** Pipeline Presentacion -> Logica *********************
     
-    public boolean setData(String nom, String desc, LocalDate fReg, LocalDate fStart, LocalDate fEnd) throws Exception{
-        return sendData(new DtPrograma(nom, desc, fReg, fStart, fEnd));
+    public boolean setData(String nom, String desc, LocalDate fReg, LocalDate fStart, LocalDate fEnd, String imagen) throws Exception{
+        return sendData(new DtPrograma(nom, desc, fReg, fStart, fEnd, imagen));
     }
     
     private boolean sendData(DtPrograma DTO) throws Exception{
