@@ -44,8 +44,8 @@
                     <ul style="list-style: none; padding: 0;">
                         <c:forEach var="edicionName" items="${curso.ediciones}">
                             <li style="margin-bottom: 8px;">
-                                <a href="#" onclick="cargarConsultaEdicion('${edicionName}')" style="text-decoration: none; color: #2980b9; font-weight: bold;">
-                                    <span style="margin-right: 5px;">📘</span> ${edicionName}
+                                <a href="#" onclick="cargarConsultaEdicion('${edicionName.getNombre()}')" style="text-decoration: none; color: #2980b9; font-weight: bold;">
+                                    <span style="margin-right: 5px;">📘</span> ${edicionName.getNombre()}
                                 </a>
                             </li>
                         </c:forEach>
@@ -65,8 +65,8 @@
                     <ul style="list-style: none; padding: 0;">
                         <c:forEach var="progName" items="${curso.programas}">
                             <li style="margin-bottom: 8px;">
-                                <a href="#" onclick="cargarDetallePrograma('${progName}')" style="text-decoration: none; color: #8e44ad; font-weight: bold;">
-                                    <span style="margin-right: 5px;">🎓</span> ${progName}
+                                <a href="#" onclick="cargarDetallePrograma('${progName.getNombre()}')" style="text-decoration: none; color: #8e44ad; font-weight: bold;">
+                                    <span style="margin-right: 5px;">🎓</span> ${progName.getNombre()}
                                 </a>
                             </li>
                         </c:forEach>
