@@ -82,9 +82,9 @@ public class Usuario {
         return nickname;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
+//    public void setNickname(String nickname) {
+//        this.nickname = nickname;
+//    }
 
     public String getPassword(){ return this.password; }
 
@@ -134,17 +134,17 @@ public class Usuario {
         return seguidos;
     }
 
-    public void setSeguidos(List<Usuario> seguidos) {
-        this.seguidos = seguidos;
-    }
+//    public void setSeguidos(List<Usuario> seguidos) {
+//        this.seguidos = seguidos;
+//    }
 
     public List<Usuario> getSeguidores() {
         return seguidores;
     }
 
-    public void setSeguidores(List<Usuario> seguidores) {
-        this.seguidores = seguidores;
-    }
+//    public void setSeguidores(List<Usuario> seguidores) {
+//        this.seguidores = seguidores;
+//    }
 
     public void agregarSeguido(Usuario u) {
         if (!this.seguidos.contains(u)) {
