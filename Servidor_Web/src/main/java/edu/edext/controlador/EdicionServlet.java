@@ -216,7 +216,7 @@ public class EdicionServlet extends HttpServlet {
                 response.getWriter().write(e.getMessage());
             }
         } else if ("quitarDocente".equals(accion)) {
-            // NUEVO BLOQUE: Recibe la petición para quitar un docente
+            // Recibe la petición para quitar un docente
             try {
                 String edicion = request.getParameter("edicion");
                 String docente = request.getParameter("docente");
