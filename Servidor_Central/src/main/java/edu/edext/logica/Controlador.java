@@ -546,7 +546,10 @@ public class Controlador implements IControlador {
                 nuevaEdicion.setCupo(dt.getCupo());
             }
             nuevaEdicion.setFechaPublicacion(dt.getFechaPublicacion()); 
-            nuevaEdicion.setCurso(curso); 
+            nuevaEdicion.setCurso(curso);
+            if (dt.getImagen() != null) {
+                nuevaEdicion.setImagen(dt.getImagen());
+            }
             List<Docente> docentesAsignados = new ArrayList<>();
             for (String nick : dt.getNameDocentes()) {
                 Docente d = em.find(Docente.class, nick);
@@ -1293,7 +1296,64 @@ public class Controlador implements IControlador {
             em.close();
         }
     }
+    
+    @Override
+ public void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
+     EntityManager em = emf.createEntityManager();
+     try {
+         em.getTransaction().begin();
 
+         Edicion edicion = em.find(Edicion.class, nombreEdicion);
+         Docente docente = em.find(Docente.class, nicknameDocente);
+
+         if (edicion == null) throw new Exception("La edición no existe.");
+         if (docente == null) throw new Exception("El docente no existe.");
+
+         // Si el docente no está en la lista de la edición, lo agregamos
+         if (!edicion.getDocentes().contains(docente)) {
+             edicion.getDocentes().add(docente);
+             em.merge(edicion); // Actualizamos la base de datos
+         } else {
+             throw new Exception("Este docente ya está asignado a esta edición.");
+         }
+
+         em.getTransaction().commit();
+     } catch (Exception e) {
+         if (em.getTransaction().isActive()) em.getTransaction().rollback();
+         throw e;
+     } finally {
+         em.close();
+     }
+ }
+ 
+ @Override
+    public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            
+            Edicion edicion = em.find(Edicion.class, nombreEdicion);
+            Docente docente = em.find(Docente.class, nicknameDocente);
+            
+            if (edicion == null) throw new Exception("La edición no existe.");
+            if (docente == null) throw new Exception("El docente no existe.");
+
+            // Verificamos que el docente realmente esté en la lista antes de quitarlo
+            if (edicion.getDocentes().contains(docente)) {
+                edicion.getDocentes().remove(docente);
+                em.merge(edicion); // Actualizamos la base de datos
+            } else {
+                throw new Exception("Este docente no está asignado a esta edición.");
+            }
+            
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
 
 
     

@@ -165,5 +165,21 @@
     </div>
 
     <script src="js/app.js"></script>
+    
+    <!-- CONTENEDOR MAESTRO DE MODALES (Pop-ups modernos) -->
+    <div id="modal-global" class="modal-oculto">
+        <div class="modal-contenido">
+            <div class="modal-cabecera">
+                <h3 id="modal-titulo">Notificación</h3>
+                <span class="modal-cerrar" onclick="cerrarModal()">&times;</span>
+            </div>
+            <div id="modal-cuerpo" class="modal-cuerpo">
+                <!-- El contenido dinámico se inyectará aquí -->
+            </div>
+            <div class="modal-pie" id="modal-pie">
+                <button class="btn-moderno" style="background-color: #bdc3c7;" onclick="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

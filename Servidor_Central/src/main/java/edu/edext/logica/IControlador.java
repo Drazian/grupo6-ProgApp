@@ -90,5 +90,6 @@ public interface IControlador {
     List<DtInscripcionEdicion> getInscripcionesDeEstudiante(String nicknameEstudiante) throws Exception;
 
     int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception;
-    
+    public void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception;
+    public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception;
 }

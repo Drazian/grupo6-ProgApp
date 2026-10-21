@@ -266,7 +266,7 @@ function testServlet(){
         .then(html => {
             contenedor.innerHTML = html;
         })
-        .catch(error => console.error('Error al cargar la sección:', error));    
+        .catch(error => console.error('Error al cargar la sección:', error));   
 }
 
 function crearInstituto(){
@@ -1447,7 +1447,8 @@ function cargarConsultaUsuario(callback) {
 
 
 function cargarDetalleConsultaUsuario(nickname) {
-    const contenedor = document.getElementById('contenedor-detalle-consulta-usuario');
+    // Apuntamos al nuevo ID donde se inyectan los datos de la tarjeta
+    const contenedor = document.getElementById('detalle-usuario-contenido');
     if (!contenedor) return;
 
     contenedor.innerHTML = '<h4 style="text-align:center; color:#3498db;">Cargando detalles del usuario...</h4>';
@@ -1492,10 +1493,7 @@ function cargarMiPerfil(nickname) {
     }
 
     const contenedorPrincipal = document.getElementById('contenido-dinamico');
-    if (!contenedorPrincipal) {
-        console.error("No se encontró el elemento 'contenido-principal' en el DOM.");
-        return;
-    }
+    if (!contenedorPrincipal) return;
 
     contenedorPrincipal.innerHTML = '<h4 style="text-align:center; color:#3498db; margin-top:20px;">Cargando Mi Perfil...</h4>';
 
@@ -1508,8 +1506,16 @@ function cargarMiPerfil(nickname) {
         .then(htmlConsulta => {
             contenedorPrincipal.innerHTML = htmlConsulta;
 
-            const lista = document.getElementById('bloque-lista-usuarios');
+            // Usamos los NUEVOS IDs para ocultar la tabla y mostrar la tarjeta
+            const lista = document.getElementById('contenedor-lista-usuarios');
             if (lista) lista.style.display = 'none';
+
+            const detalle = document.getElementById('contenedor-detalle-usuario');
+            if (detalle) detalle.style.display = 'block';
+
+            // Ocultamos el botón "Volver" porque en Mi Perfil no tiene sentido
+            const btnVolver = contenedorPrincipal.querySelector('button[onclick="volverAListaUsuarios()"]');
+            if (btnVolver) btnVolver.style.display = 'none';
 
             const titulo = contenedorPrincipal.querySelector('h2');
             if (titulo) {
@@ -1825,4 +1831,241 @@ function inscribirPrograma(event) {
         });
     })
     .catch(error => console.error('Error procesando inscripción a programa:', error));
+}
+
+// =====================================================================
+// NAVEGABILIDAD SPA: FLECHA ATRÁS Y GUARDADO DE HISTORIAL (CORREGIDO)
+// =====================================================================
+(function inicializarHistorialSPA() {
+    const contenedor = document.getElementById('contenido-dinamico');
+    if (!contenedor) return;
+
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a[href="#"]');
+        if (link) {
+            e.preventDefault(); // Evita que el navegador ensucie el historial con el símbolo #
+        }
+    });
+
+    let navegandoHaciaAtras = false;
+    let timeoutMutacion;
+
+    // 2. Guardamos la pantalla inicial (Bienvenida)
+    history.replaceState({ html: contenedor.innerHTML }, document.title);
+
+    // 3. Observador Inteligente (Espera a que el fetch termine de dibujar todo)
+    const observador = new MutationObserver(() => {
+        if (navegandoHaciaAtras) return;
+        
+        clearTimeout(timeoutMutacion);
+        timeoutMutacion = setTimeout(() => {
+            // Guardamos la foto de la pantalla 100ms después de que dejó de mutar
+            history.pushState({ html: contenedor.innerHTML }, document.title);
+        }, 100); 
+    });
+
+    observador.observe(contenedor, { childList: true, subtree: true });
+
+    // 4. Acción al presionar la flecha "Atrás" o "Adelante"
+    window.addEventListener("popstate", (evento) => {
+        if (evento.state && evento.state.html) {
+            naveandoHaciaAtras = true; // Pausamos el observador
+            contenedor.innerHTML = evento.state.html; // Restauramos la vista
+            
+            // Reactivamos el observador un instante después
+            setTimeout(() => { navegandoHaciaAtras = false; }, 150);
+        }
+    });
+})();
+
+// =====================================================================
+// CONTROLADOR DE MODALES MODERNOS
+// =====================================================================
+function mostrarModal(titulo, htmlCuerpo, botonesHtml = null) {
+    document.getElementById('modal-titulo').innerText = titulo;
+    document.getElementById('modal-cuerpo').innerHTML = htmlCuerpo;
+    
+    const pie = document.getElementById('modal-pie');
+    if (botonesHtml) {
+        pie.innerHTML = botonesHtml;
+    } else {
+        pie.innerHTML = `<button class="btn-moderno" style="background-color: #3498db;" onclick="cerrarModal()">Aceptar</button>`;
+    }
+    
+    const modal = document.getElementById('modal-global');
+    modal.classList.remove('modal-oculto');
+    modal.classList.add('modal-visible');
+}
+
+function cerrarModal() {
+    const modal = document.getElementById('modal-global');
+    modal.classList.remove('modal-visible');
+    modal.classList.add('modal-oculto');
+}
+
+// =====================================================================
+// FUNCIONES PARA AGREGAR DOCENTE A EDICIÓN
+// =====================================================================
+
+function cargarFormularioAgregarDocente(nombreEdicion) {
+    // 1. Pedimos los docentes al Servlet
+    fetch('EdicionServlet?accion=listarDocentesJSON')
+        .then(res => res.json())
+        .then(docentes => {
+            // 2. Armamos las opciones del <select>
+            let opcionesHtml = '<option value="">Seleccione un docente...</option>';
+            docentes.forEach(doc => {
+                opcionesHtml += `<option value="${doc}">${doc}</option>`;
+            });
+
+            // 3. Diseñamos el cuerpo del Modal
+            const htmlCuerpo = `
+                <div style="margin-bottom: 15px;">
+                    <p style="margin-top: 0; color: #7f8c8d;">Selecciona el docente que deseas añadir a la edición <strong>${nombreEdicion}</strong>.</p>
+                    <label style="font-weight: bold; color: #2c3e50;">Docente:</label>
+                    <select id="select-nuevo-docente" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #bdc3c7; margin-top: 5px;">
+                        ${opcionesHtml}
+                    </select>
+                </div>
+            `;
+
+            // 4. Diseñamos los botones del Modal
+            const htmlBotones = `
+                <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-moderno" style="background-color: #2ecc71; margin-left: 10px;" onclick="guardarDocenteEdicion('${nombreEdicion}')">Guardar Docente</button>
+            `;
+
+            // 5. ¡Llamamos a nuestro sistema de Modales modernos!
+            mostrarModal('Asignar Nuevo Docente', htmlCuerpo, htmlBotones);
+        })
+        .catch(err => {
+            alert("Error cargando la lista de docentes.");
+            console.error(err);
+        });
+}
+
+function guardarDocenteEdicion(nombreEdicion) {
+    const nicknameDocente = document.getElementById('select-nuevo-docente').value;
+    
+    if (!nicknameDocente) {
+        alert("Por favor, selecciona un docente de la lista.");
+        return;
+    }
+
+    // Enviamos el dato al backend usando POST (Formulario invisible)
+    const params = new URLSearchParams();
+    params.append('accion', 'agregarDocente');
+    params.append('edicion', nombreEdicion);
+    params.append('docente', nicknameDocente);
+
+    fetch('EdicionServlet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params
+    })
+    .then(response => {
+        if (response.ok) {
+            cerrarModal(); // Cerramos el pop-up bonito
+            cargarConsultaEdicion(nombreEdicion); // Refrescamos la vista para que el docente aparezca inmediatamente!
+        } else {
+            response.text().then(errorMsg => alert("Error: " + errorMsg));
+        }
+    });
+}
+
+// =====================================================================
+// FUNCIONES PARA QUITAR DOCENTE DE EDICIÓN (MODAL)
+// =====================================================================
+
+function confirmarQuitarDocente(nombreEdicion, nicknameDocente, nombreCompleto) {
+    // 1. Diseñamos el cuerpo del Pop-up
+    const htmlCuerpo = `
+        <div style="text-align: center; padding: 10px;">
+            <p style="font-size: 15px; color: #2c3e50;">¿Estás seguro de que deseas quitar al docente <strong style="color: #e74c3c;">${nombreCompleto}</strong> de esta edición?</p>
+            <p style="font-size: 13px; color: #7f8c8d;">Se actualizará la base de datos inmediatamente.</p>
+        </div>
+    `;
+
+    // 2. Diseñamos los botones
+    const htmlBotones = `
+        <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn-moderno" style="background-color: #e74c3c; margin-left: 10px;" onclick="ejecutarQuitarDocente('${nombreEdicion}', '${nicknameDocente}')">Sí, Quitar</button>
+    `;
+
+    // 3. Mostramos el Modal
+    mostrarModal('Confirmar Eliminación', htmlCuerpo, htmlBotones);
+}
+
+function ejecutarQuitarDocente(nombreEdicion, nicknameDocente) {
+    const params = new URLSearchParams();
+    params.append('accion', 'quitarDocente');
+    params.append('edicion', nombreEdicion);
+    params.append('docente', nicknameDocente);
+
+    fetch('EdicionServlet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params
+    })
+    .then(response => {
+        if (response.ok) {
+            cerrarModal(); // Cerramos el pop-up
+            cargarConsultaEdicion(nombreEdicion); // Refrescamos la vista (el docente desaparecerá instantáneamente)
+        } else {
+            response.text().then(errorMsg => alert("Error al quitar: " + errorMsg));
+        }
+    });
+}
+
+// =====================================================================
+// FUNCIONES PARA CONSULTA DE USUARIO (MOSTRAR/OCULTAR Y CARGAR DATOS)
+// =====================================================================
+
+function seleccionarUsuario(nickname) {
+    // 1. Ocultamos la tabla de arriba y mostramos el contenedor de la tarjeta
+    document.getElementById('contenedor-lista-usuarios').style.display = 'none';
+    document.getElementById('contenedor-detalle-usuario').style.display = 'block';
+    
+    const contenedorDetalle = document.getElementById('detalle-usuario-contenido');
+    if (!contenedorDetalle) return;
+
+    contenedorDetalle.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 40px;">Cargando datos del usuario...</p>';
+
+    // 2. Hacemos la petición al backend para traer la información real del usuario
+    // NOTA: Asegúrate de que el endpoint 'detalleConsultaUsuario' existe en tu UsuarioServlet y devuelve la tarjeta HTML.
+    fetch(`UsuarioServlet?accion=detalleConsultaUsuario&nickname=${encodeURIComponent(nickname)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+            return response.text(); // Esperamos el fragmento de HTML o JSP
+        })
+        .then(html => {
+            contenedorDetalle.innerHTML = html;
+        })
+        .catch(error => {
+            console.error("Error al cargar el usuario:", error);
+            contenedorDetalle.innerHTML = `
+                <div style="background: #fadbd8; color: #c0392b; padding: 15px; border-radius: 6px; text-align: center; margin-top: 20px;">
+                    <strong>Error:</strong> No se pudo cargar la información de @${nickname}.<br>
+                    Verifique la conexión o el código del UsuarioServlet.
+                </div>
+            `;
+        });
+}
+
+function volverAListaUsuarios() {
+    // Ocultamos la tarjeta y mostramos la lista nuevamente
+    document.getElementById('contenedor-detalle-usuario').style.display = 'none';
+    document.getElementById('contenedor-lista-usuarios').style.display = 'block';
+    
+    // Limpiamos el contenido anterior para el próximo clic
+    const contenedorDetalle = document.getElementById('detalle-usuario-contenido');
+    if (contenedorDetalle) {
+        contenedorDetalle.innerHTML = `
+            <p style="color: #7f8c8d; font-style: italic; text-align: center; margin-top: 60px;">
+                Cargando información del usuario...
+            </p>
+        `;
+    }
 }

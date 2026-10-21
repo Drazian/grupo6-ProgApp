@@ -105,6 +105,23 @@ public class EdicionServlet extends HttpServlet {
                  response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error cargando la edición: " + e.getMessage());
              }
              break; 
+             
+             case "listarDocentesJSON":
+             try {
+                 // Reutilizamos la misma lista de tu Alta Edición
+                 List<String> docentesList = ic.listarDocentes(); 
+                 StringBuilder jsonDoc = new StringBuilder("[");
+                 for (int i = 0; i < docentesList.size(); i++) {
+                     jsonDoc.append("\"").append(docentesList.get(i)).append("\"");
+                     if (i < docentesList.size() - 1) jsonDoc.append(",");
+                 }
+                 jsonDoc.append("]");
+                 response.setContentType("application/json; charset=UTF-8");
+                 response.getWriter().write(jsonDoc.toString());
+             } catch (Exception e) {
+                 response.sendError(500, "Error cargando docentes");
+             }
+             break;
         }
     }
 
@@ -114,6 +131,7 @@ public class EdicionServlet extends HttpServlet {
         response.setContentType("text/plain; charset=UTF-8");
         
         String accion = request.getParameter("accion");
+        
         if ("altaEdicion".equals(accion)) {
             try {
                 // 1. Extraer datos simples
@@ -146,7 +164,7 @@ public class EdicionServlet extends HttpServlet {
                     cupo = Integer.parseInt(cupoStr);
                 }
 
-                // --- FIX IMAGEN: 5. Capturar y guardar la imagen de la edición ---
+                // --- 5. Capturar y guardar la imagen de la edición ---
                 String nombreImagen = "usr.png"; // Imagen genérica por defecto
                 Part filePart = request.getPart("imagen"); // Asegúrate de que el input en tu JSP se llame name="imagen"
                 
@@ -162,8 +180,6 @@ public class EdicionServlet extends HttpServlet {
                 }
 
                 // 6. Instanciar el DtEdicion
-                // ATENCIÓN: Se añadió 'nombreImagen' al final. Si NetBeans te marca error aquí, 
-                // lee la advertencia importante debajo de este código.
                 DtEdicion dt = new DtEdicion(
                     nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen
                 );
@@ -180,6 +196,35 @@ public class EdicionServlet extends HttpServlet {
             } catch (NumberFormatException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("El cupo debe ser un número válido.");
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(e.getMessage());
+            }
+            
+        } else if ("agregarDocente".equals(accion)) {
+            // Recibe la petición del modal para guardar un docente en una edición
+            try {
+                String edicion = request.getParameter("edicion");
+                String docente = request.getParameter("docente");
+                
+                ic.agregarDocenteAEdicion(edicion, docente);
+                
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write("Docente agregado exitosamente.");
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(e.getMessage());
+            }
+        } else if ("quitarDocente".equals(accion)) {
+            // Recibe la petición para quitar un docente
+            try {
+                String edicion = request.getParameter("edicion");
+                String docente = request.getParameter("docente");
+                
+                ic.quitarDocenteDeEdicion(edicion, docente);
+                
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write("Docente removido exitosamente.");
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write(e.getMessage());
