@@ -36,18 +36,19 @@
                                 </td>
                                 
                                 <td style="padding: 8px; text-align: center;">
+                                    <!-- IMPORTANTE: El botón ahora tiene un ID dinámico (btn-social-...) -->
                                     <c:choose>
                                         <c:when test="${requestScope.misSeguidos.contains(usr.nickname)}">
-                                            <button type="button" 
-                                                    onclick="dejarDeSeguirRapido('${usr.nickname}')"
-                                                    style="background-color: #d9534f; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                                            <button type="button" id="btn-social-${usr.nickname}"
+                                                    onclick="toggleSeguirUsuario(this, '${usr.nickname}', 'dejarSeguir')"
+                                                    style="background-color: #d9534f; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; transition: 0.2s;">
                                                 Dejar de seguir
                                             </button>
                                         </c:when>
                                         <c:otherwise>
-                                            <button type="button" 
-                                                    onclick="seguirRapido('${usr.nickname}')"
-                                                    style="background-color: #0275d8; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                                            <button type="button" id="btn-social-${usr.nickname}"
+                                                    onclick="toggleSeguirUsuario(this, '${usr.nickname}', 'seguir')"
+                                                    style="background-color: #0275d8; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; transition: 0.2s;">
                                                 Seguir
                                             </button>
                                         </c:otherwise>
@@ -69,11 +70,50 @@
         </div>
     </div>
 
-    <!-- PANEL DERECHO: Detalle del Perfil -->
-    <div id="detalle-perfil-usuario" style="flex: 2; background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 5px; min-height: 350px;">
-        <p style="color: #777; font-style: italic; text-align: center; margin-top: 50px;">
-            Seleccione un usuario de la lista y haga clic en "Ver perfil" para ver su información.
-        </p>
-    </div>
+    <!-- PANEL DERECHO: MIS LISTAS Y DETALLE DEL PERFIL -->
+    <div style="flex: 2; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- CAJAS SUPERIORES: SEGUIDORES Y SEGUIDOS (Siempre Visibles) -->
+        <div style="display: flex; gap: 15px;">
+            <!-- Caja Seguidores -->
+            <div style="flex: 1; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                <h4 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px;">Mis Seguidores</h4>
+                <ul id="lista-mis-seguidores-social" style="list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; font-size: 13px;">
+                    <c:forEach var="seguidor" items="${requestScope.misSeguidores}">
+                         <li style="padding: 6px 0; border-bottom: 1px solid #eee;">👤 <strong>${seguidor}</strong></li>
+                    </c:forEach>
+                    <c:if test="${empty requestScope.misSeguidores}">
+                         <li style="color: #999; font-style: italic;">Aún no tienes seguidores.</li>
+                    </c:if>
+                </ul>
+            </div>
 
+            <!-- Caja Seguidos -->
+            <div style="flex: 1; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                <h4 style="margin: 0; color: #2c3e50; border-bottom: 2px solid #2ecc71; padding-bottom: 5px; display: flex; justify-content: space-between;">
+                    Mis Seguidos
+                </h4>
+                <ul id="lista-mis-seguidos-social" style="list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; font-size: 13px;">
+                    <c:forEach var="seguido" items="${requestScope.misSeguidos}">
+                         <li id="social-seguido-${seguido}" style="padding: 6px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
+                             <span>👤 <strong>${seguido}</strong></span>
+                             <!-- Botoncito "X" para dejar de seguir desde la lista -->
+                             <span onclick="toggleSeguirUsuario(document.getElementById('btn-social-${seguido}'), '${seguido}', 'dejarSeguir')" style="color: #e74c3c; cursor: pointer; font-weight: bold;" title="Dejar de seguir">X</span>
+                         </li>
+                    </c:forEach>
+                    <c:if test="${empty requestScope.misSeguidos}">
+                         <li id="social-sin-seguidos" style="color: #999; font-style: italic;">No sigues a nadie.</li>
+                    </c:if>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR PARA EL PERFIL (Se carga al dar click a "Ver Perfil") -->
+        <div id="detalle-perfil-usuario" style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 5px; min-height: 250px;">
+            <p style="color: #777; font-style: italic; text-align: center; margin-top: 50px;">
+                Seleccione un usuario de la lista y haga clic en "Ver perfil" para ver su información aquí abajo.
+            </p>
+        </div>
+
+    </div>
 </div>

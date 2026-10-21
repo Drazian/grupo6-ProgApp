@@ -1,6 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
+<!-- CAMPO OCULTO: Guarda el nickname del usuario logueado para que JS lo pueda usar -->
+<c:if test="${not empty sessionScope.usuarioLogueado}">
+    <input type="hidden" id="nickname-usuario-logueado" value="${sessionScope.usuarioLogueado.nickname}">
+</c:if>
+
 <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px;">
     <!-- Imagen de perfil -->
     <img src="ImagenServlet?nombre=${empty requestScope.usuarioPerfil.imagen ? 'usr.png' : requestScope.usuarioPerfil.imagen}" 
@@ -15,18 +20,20 @@
         </span>
     </div>
  
-    <!-- Botón Seguir / Dejar de seguir -->
+    <!-- Botón Seguir / Dejar de seguir (CON FIX DE SINCRONIZACIÓN) -->
     <div>
         <c:choose>
             <c:when test="${requestScope.loSigo}">
-                <button type="button" onclick="dejarDeSeguirRapido('${requestScope.usuarioPerfil.nickname}')" 
-                        style="background-color: #d95f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                <button type="button" id="btn-perfil-${requestScope.usuarioPerfil.nickname}"
+                        onclick="toggleSeguirUsuario(this, '${requestScope.usuarioPerfil.nickname}', 'dejarSeguir')" 
+                        style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                     Dejar de seguir
                 </button>
             </c:when>
             <c:otherwise>
-                <button type="button" onclick="seguirRapido('${requestScope.usuarioPerfil.nickname}')" 
-                        style="background-color: #0275d8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                <button type="button" id="btn-perfil-${requestScope.usuarioPerfil.nickname}"
+                        onclick="toggleSeguirUsuario(this, '${requestScope.usuarioPerfil.nickname}', 'seguir')" 
+                        style="background-color: #0275d8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                     Seguir
                 </button>
             </c:otherwise>
@@ -53,16 +60,16 @@
         <!-- Caja 1: Seguidores -->
         <div style="background: #fcfcfc; border: 1px solid #e0e0e0; padding: 10px; border-radius: 4px;">
             <h4 style="margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">
-                Seguidores (${requestScope.seguidoresPerfil.size()})
+                Seguidores (<span id="contador-seguidores-perfil">${requestScope.seguidoresPerfil.size()}</span>)
             </h4>
-            <ul style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
+            <ul id="lista-seguidores-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                 <c:forEach var="seguidor" items="${requestScope.seguidoresPerfil}">
-                    <li style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+                    <li id="li-seguidor-perfil-${seguidor}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
                         👤 <b>${seguidor}</b>
                     </li>
                 </c:forEach>
                 <c:if test="${empty requestScope.seguidoresPerfil}">
-                    <li style="font-size: 12px; color: #888;">Sin seguidores aún</li>
+                    <li id="mensaje-sin-seguidores-perfil" style="font-size: 12px; color: #888;">Sin seguidores aún</li>
                 </c:if>
             </ul>
         </div>
@@ -70,16 +77,16 @@
         <!-- Caja 2: Seguidos -->
         <div style="background: #fcfcfc; border: 1px solid #e0e0e0; padding: 10px; border-radius: 4px;">
             <h4 style="margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #333;">
-                Seguidos (${requestScope.seguidosPerfil.size()})
+                Seguidos (<span id="contador-seguidos-perfil">${requestScope.seguidosPerfil.size()}</span>)
             </h4>
-            <ul style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
+            <ul id="lista-mis-seguidos-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                 <c:forEach var="seguido" items="${requestScope.seguidosPerfil}">
-                    <li style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+                    <li id="li-seguido-${seguido}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
                          <b>${seguido}</b>
                     </li>
                 </c:forEach>
                 <c:if test="${empty requestScope.seguidosPerfil}">
-                    <li style="font-size: 12px; color: #888;">No sigue a ningún usuario</li>
+                    <li id="mensaje-sin-seguidos" style="font-size: 12px; color: #888;">No sigue a ningún usuario</li>
                 </c:if>
             </ul>
         </div>
