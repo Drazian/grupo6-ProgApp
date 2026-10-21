@@ -168,7 +168,6 @@ public class UsuarioServlet extends HttpServlet {
                         }
 
                         if (dtUsuario.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
-                            // Usamos el método que trae el objeto DtInscripcionEdicion completo
                             List<DtInscripcionEdicion> inscripcionesEstudiante = ic.getInscripcionesDeEstudiante(dtUsuario.getNickname());
                             request.setAttribute("listaInscripcionesCompletas", inscripcionesEstudiante);
                         } else if (dtUsuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
@@ -178,6 +177,17 @@ public class UsuarioServlet extends HttpServlet {
 
                         List<DtPrograma> programasUsuario = ic.listarProgramasPorUsuario(dtUsuario.getNickname());
                         request.setAttribute("listaProgramas", programasUsuario);
+
+                        // --- FIX DE RED SOCIAL ---
+                        // Solicitamos y enviamos las listas de seguidores y seguidos al JSP
+                        List<String> listaSeguidores = ic.listarSeguidores(dtUsuario.getNickname());
+                        List<String> listaSeguidos = ic.listarSeguidos(dtUsuario.getNickname());
+                        
+                        request.setAttribute("listaSeguidores", listaSeguidores);
+                        request.setAttribute("cantidadSeguidores", listaSeguidores.size());
+                        request.setAttribute("listaSeguidos", listaSeguidos);
+                        request.setAttribute("cantidadSeguidos", listaSeguidos.size());
+                        // -------------------------
 
                         request.setAttribute("usuarioPerfil", dtUsuario);
                         request.setAttribute("esPropioPerfil", esPropioPerfil);

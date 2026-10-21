@@ -3,36 +3,28 @@
 
 <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px;">
     
-    <div style="display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
+    <!-- CAMPO OCULTO: Guarda el nickname del usuario logueado para que JS lo pueda usar -->
+    <c:if test="${not empty sessionScope.usuarioLogueado}">
+        <input type="hidden" id="nickname-usuario-logueado" value="${sessionScope.usuarioLogueado.nickname}">
+    </c:if>
 
-        <div style="display: flex; gap: 20px; align-items: flex-start;">
+    <!-- ========================================================================= -->
+    <!-- CABECERA: FOTO, DATOS PRINCIPALES Y BOTÓN (Seguir / Modificar)            -->
+    <!-- ========================================================================= -->
+    <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+        <div style="display: flex; gap: 20px; align-items: center;">
             <img src="ImagenServlet?nombre=${empty requestScope.usuarioPerfil.imagen ? 'usr.png' : requestScope.usuarioPerfil.imagen}" 
                  alt="Foto Perfil" 
-                 style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db; cursor: pointer;"
-                 onclick="event.preventDefault(); cargarMiPerfil('${requestScope.usuarioPerfil.nickname}');">
- 
-            <div style="line-height: 1.5;">
-                <h2 style="margin: 0; color: #2c3e50; font-size: 22px;">
+                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;">
+            
+            <div>
+                <h2 style="margin: 0; color: #2c3e50; font-size: 20px;">
                     ${requestScope.usuarioPerfil.nombre} ${requestScope.usuarioPerfil.apellido}
                 </h2>
-                <p style="margin: 2px 0; color: #7f8c8d; font-weight: bold;">@${requestScope.usuarioPerfil.nickname}</p>
-                <p style="margin: 2px 0; font-size: 14px;"><b>Correo electronico:</b> ${requestScope.usuarioPerfil.email}</p>
-                <p style="margin: 2px 0; font-size: 14px;"><b>Fecha de Nacimiento:</b> ${requestScope.usuarioPerfil.fNacimiento}</p>
-                
-                <!-- Informacion de institutos para docentes -->
-                <c:if test="${requestScope.usuarioPerfil.tipoUsuario == 'DOCENTE'}">
-                    <p style="margin: 5px 0 0 0; font-size: 14px;">
-                        <b>Institutos a los que pertenece:</b> 
-                        <c:choose>
-                            <c:when test="${not empty requestScope.usuarioPerfil.institutos}">
-                                <c:forEach var="inst" items="${requestScope.usuarioPerfil.institutos}" varStatus="loop">
-                                    <span style="background: #e8f4f8; color: #2980b9; padding: 2px 6px; border-radius: 3px; font-size: 12px; font-weight: bold;">${inst}</span>${!loop.last ? ' ' : ''}
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise><span style="color: #95a5a6; font-style: italic;">Sin institutos asignados</span></c:otherwise>
-                        </c:choose>
-                    </p>
-                </c:if>
+                <p style="margin: 2px 0; color: #7f8c8d; font-size: 14px;">@${requestScope.usuarioPerfil.nickname} / ${requestScope.usuarioPerfil.email}</p>
+                <span style="font-size: 11px; background: #e9ecef; padding: 3px 6px; border-radius: 3px; font-weight: bold; color: #555;">
+                    Rol: ${requestScope.usuarioPerfil.tipoUsuario}
+                </span>
             </div>
         </div>
 
@@ -47,20 +39,19 @@
                             Modificar Perfil
                         </button>
                     </c:when>
-
                     <c:otherwise>
                         <c:choose>
                             <c:when test="${requestScope.loSigo}">
-                                <button type="button" 
-                                        onclick="dejarDeSeguirRapido('${requestScope.usuarioPerfil.nickname}')" 
-                                        style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                <button type="button" class="btn-moderno" id="btn-perfil-${requestScope.usuarioPerfil.nickname}"
+                                        onclick="toggleSeguirUsuario(this, '${requestScope.usuarioPerfil.nickname}', 'dejarSeguir')" 
+                                        style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                                     Dejar de seguir
                                 </button>
                             </c:when>
                             <c:otherwise>
-                                <button type="button" 
-                                        onclick="seguirRapido('${requestScope.usuarioPerfil.nickname}')" 
-                                        style="background-color: #0275d8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                <button type="button" class="btn-moderno" id="btn-perfil-${requestScope.usuarioPerfil.nickname}"
+                                        onclick="toggleSeguirUsuario(this, '${requestScope.usuarioPerfil.nickname}', 'seguir')" 
+                                        style="background-color: #0275d8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                                     Seguir
                                 </button>
                             </c:otherwise>
@@ -69,11 +60,86 @@
                 </c:choose>
             </div>
         </c:if>
+    </div>
 
+    <!-- ========================================================================= -->
+    <!-- CUERPO: INFORMACIÓN GENERAL Y COLUMNAS DE RED SOCIAL (NUEVO DISEÑO)       -->
+    <!-- ========================================================================= -->
+    <div style="display: flex; gap: 20px;">
+        
+        <!-- Columna 1: Información General -->
+        <div style="flex: 1;">
+            <h4 style="border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-top: 0; color: #2c3e50;">Información General</h4>
+            <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                <li><b>Nickname:</b> ${requestScope.usuarioPerfil.nickname}</li>
+                <li><b>Nombre:</b> ${requestScope.usuarioPerfil.nombre}</li>
+                <li><b>Apellido:</b> ${requestScope.usuarioPerfil.apellido}</li>
+                <li><b>Correo electrónico:</b> ${requestScope.usuarioPerfil.email}</li>
+                <li><b>Fecha de Nacimiento:</b> ${requestScope.usuarioPerfil.fNacimiento}</li>
+                
+                <c:if test="${requestScope.usuarioPerfil.tipoUsuario == 'DOCENTE'}">
+                    <li>
+                        <b>Institutos a los que pertenece:</b> 
+                        <c:choose>
+                            <c:when test="${not empty requestScope.usuarioPerfil.institutos}">
+                                <c:forEach var="inst" items="${requestScope.usuarioPerfil.institutos}" varStatus="loop">
+                                    <span style="background: #e8f4f8; color: #2980b9; padding: 2px 6px; border-radius: 3px; font-size: 12px; font-weight: bold;">${inst}</span>${!loop.last ? ' ' : ''}
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise><span style="color: #95a5a6; font-style: italic;">Sin institutos asignados</span></c:otherwise>
+                        </c:choose>
+                    </li>
+                </c:if>
+            </ul>
+        </div>
+
+        <!-- Columna 2: Cajas de Red Social (Seguidores / Seguidos) -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 15px;">
+            
+            <!-- Caja de Seguidores -->
+            <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
+                <!-- FIX: Se agregó el ID "contador-seguidores-perfil" al span del número -->
+                <h5 style="margin: 0 0 10px 0; color: #333;">
+                    Seguidores (<span id="contador-seguidores-perfil">${requestScope.cantidadSeguidores != null ? requestScope.cantidadSeguidores : '0'}</span>)
+                </h5>
+                <ul id="lista-seguidores-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto; font-size: 13px;">
+                    <c:forEach var="seguidor" items="${requestScope.listaSeguidores}">
+                        <!-- FIX: ID dinámico para cada seguidor -->
+                        <li id="li-seguidor-perfil-${seguidor}" style="padding: 4px 0; border-bottom: 1px solid #eee;">
+                            <a href="#" onclick="event.preventDefault(); verPerfilUsuario('${seguidor}')" style="color: #2c3e50; font-weight: bold; text-decoration: none;">👤 ${seguidor}</a>
+                        </li>
+                    </c:forEach>
+                    <c:if test="${empty requestScope.listaSeguidores}">
+                        <!-- FIX: ID para ocultar el mensaje cuando llegue el primer seguidor -->
+                        <li id="mensaje-sin-seguidores-perfil" style="color: #999; font-style: italic;">Sin seguidores</li>
+                    </c:if>
+                </ul>
+            </div>
+
+            <!-- Caja de Seguidos -->
+            <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
+                <h5 style="margin: 0 0 10px 0; color: #333;">Seguidos (${requestScope.cantidadSeguidos != null ? requestScope.cantidadSeguidos : '0'})</h5>
+                <ul id="lista-mis-seguidos-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto; font-size: 13px;">
+                    <c:forEach var="seguido" items="${requestScope.listaSeguidos}">
+                        <li id="li-seguido-${seguido}" style="padding: 4px 0; border-bottom: 1px solid #eee;">
+                            <a href="#" onclick="event.preventDefault(); verPerfilUsuario('${seguido}')" style="color: #2c3e50; font-weight: bold; text-decoration: none;">👤 ${seguido}</a>
+                        </li>
+                    </c:forEach>
+                    <c:if test="${empty requestScope.listaSeguidos}">
+                        <li id="mensaje-sin-seguidos" style="color: #999; font-style: italic;">No sigue a nadie</li>
+                    </c:if>
+                </ul>
+            </div>
+
+        </div>
     </div>
 
     <hr style="opacity: 0.3; margin: 20px 0;">
 
+    <!-- ========================================================================= -->
+    <!-- TUS PESTAÑAS ORIGINALES INTACTAS (ESTUDIANTE / DOCENTE / PROGRAMAS)       -->
+    <!-- ========================================================================= -->
+    
     <!-- BARRA DE PESTANAS (TABS) -->
     <div style="border-bottom: 2px solid #ddd; margin-bottom: 15px; display: flex; gap: 5px;">
         <c:choose>

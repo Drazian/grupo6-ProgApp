@@ -106,27 +106,6 @@ function initBuscador() {
 function verDetallesBusqueda(nombre, tipo){     
     const tipoNormalizado = (tipo || '').toLowerCase();
 
-    //**Al ser una parte de una implementacion que no pide la letra procedo a dejarlo todo comentado**
-//    //Si es un usuario, verificamos si es el usuario actual
-//    if (tipoNormalizado === 'docente' || tipoNormalizado === 'estudiante') {
-//        fetch('UsuarioServlet?accion=getLogueado')
-//            .then(response => {
-//                if (!response.ok) throw new Error('Error al obtener usuario logueado');
-//                return response.text();
-//            })
-//            .then(nicknameLogueado => {
-//                const nickLimpioLogueado = (nicknameLogueado || '').trim();
-//                
-//                //Si se selecciona al usuario logueado, se va a cargar el modificar y no a ver el perfil.
-//                if (nickLimpioLogueado !== '' && nombre.toLowerCase() === nickLimpioLogueado.toLowerCase()) {
-//                    cargarModificarUsuario();
-//                }
-//            })
-//            .catch(error => {
-//                console.error("Error:", error);
-//            });
-//    }
-    
     //Si no se selecciono el usuario logueado, seguir curso normal
     switch (tipoNormalizado){     
         case "programa":
@@ -140,7 +119,7 @@ function verDetallesBusqueda(nombre, tipo){
         case "docente":
         case "estudiante":
             cargarConsultaUsuario(() => {
-                cargarDetalleConsultaUsuario(nombre);
+                seleccionarUsuario(nombre);
             });
         break;
     }
@@ -2068,4 +2047,167 @@ function volverAListaUsuarios() {
             </p>
         `;
     }
+}
+
+// =====================================================================
+// FUNCIONALIDAD DE SEGUIR/DEJAR DE SEGUIR EN TIEMPO REAL
+// =====================================================================
+
+function toggleSeguirUsuario(btnElementClickeado, nickname, accionActual) {
+    // PREVENIR SPAM: Si el botón está desactivado por un clic anterior, no hacer nada
+    if (btnElementClickeado && btnElementClickeado.disabled) return;
+
+    // BUSCAMOS TODOS LOS BOTONES DEL USUARIO EN LA PANTALLA
+    const btnLista = document.getElementById(`btn-social-${nickname}`);
+    const btnPerfil = document.getElementById(`btn-perfil-${nickname}`);
+
+    // Bloqueamos los botones momentáneamente
+    if (btnLista) btnLista.disabled = true;
+    if (btnPerfil) btnPerfil.disabled = true;
+
+    // 1. CONEXIONES CON LA VISTA "SOCIAL" (Arriba)
+    const listaSocial = document.getElementById('lista-mis-seguidos-social');
+    const msgVacioSocial = document.getElementById('social-sin-seguidos');
+
+    // 2. CONEXIONES CON LA TARJETA DE "PERFIL" (Abajo)
+    const inputMiNickname = document.getElementById('nickname-usuario-logueado');
+    const miNickname = inputMiNickname ? inputMiNickname.value : null; // Aquí obtenemos tu usuario
+    
+    const contadorSeguidores = document.getElementById('contador-seguidores-perfil');
+    const listaSeguidoresPerfil = document.getElementById('lista-seguidores-perfil');
+    const msgVacioSeguidores = document.getElementById('mensaje-sin-seguidores-perfil');
+
+
+    // =========================================================
+    // ACCIÓN: SEGUIR
+    // =========================================================
+    if (accionActual === 'seguir') {
+        
+        // Pintar botones de rojo
+        const actualizarBotonARojo = (btn) => {
+            if (!btn) return;
+            btn.innerText = 'Dejar de seguir';
+            btn.style.backgroundColor = '#d9534f';
+            btn.setAttribute('onclick', `toggleSeguirUsuario(this, '${nickname}', 'dejarSeguir')`);
+        };
+        actualizarBotonARojo(btnLista);
+        actualizarBotonARojo(btnPerfil);
+        
+        // A) Actualizar caja superior "Mis Seguidos"
+        if (listaSocial && !document.getElementById(`social-seguido-${nickname}`)) {
+            if (msgVacioSocial) msgVacioSocial.style.display = 'none'; 
+            
+            const nuevoLi = document.createElement('li');
+            nuevoLi.id = `social-seguido-${nickname}`;
+            nuevoLi.style.padding = '6px 0';
+            nuevoLi.style.borderBottom = '1px solid #eee';
+            nuevoLi.style.display = 'flex';
+            nuevoLi.style.justifyContent = 'space-between';
+            nuevoLi.innerHTML = `
+                <span>👤 <strong>${nickname}</strong></span>
+                <span onclick="toggleSeguirUsuario(this, '${nickname}', 'dejarSeguir')" style="color: #e74c3c; cursor: pointer; font-weight: bold;" title="Dejar de seguir">X</span>
+            `;
+            listaSocial.appendChild(nuevoLi);
+        }
+
+        // B) Actualizar Tarjeta de Perfil inferior (Contador + Lista de Seguidores)
+        if (contadorSeguidores) {
+            let numActual = parseInt(contadorSeguidores.innerText) || 0;
+            contadorSeguidores.innerText = numActual + 1; // Sumamos 1 al instante
+        }
+        
+        if (miNickname && listaSeguidoresPerfil && !document.getElementById(`li-seguidor-perfil-${miNickname}`)) {
+            if (msgVacioSeguidores) msgVacioSeguidores.style.display = 'none';
+            
+            const nuevoSeguidor = document.createElement('li');
+            nuevoSeguidor.id = `li-seguidor-perfil-${miNickname}`;
+            nuevoSeguidor.style.padding = '4px 0';
+            nuevoSeguidor.style.borderBottom = '1px dashed #eee';
+            nuevoSeguidor.style.fontSize = '13px';
+            nuevoSeguidor.innerHTML = `👤 <b>${miNickname}</b>`;
+            listaSeguidoresPerfil.appendChild(nuevoSeguidor); // Tu nombre entra a su lista
+        }
+
+    // =========================================================
+    // ACCIÓN: DEJAR DE SEGUIR
+    // =========================================================
+    } else { 
+        
+        // Pintar botones de azul
+        const actualizarBotonAAzul = (btn) => {
+            if (!btn) return;
+            btn.innerText = 'Seguir';
+            btn.style.backgroundColor = '#0275d8';
+            btn.setAttribute('onclick', `toggleSeguirUsuario(this, '${nickname}', 'seguir')`);
+        };
+        actualizarBotonAAzul(btnLista);
+        actualizarBotonAAzul(btnPerfil);
+        
+        // A) Actualizar caja superior "Mis Seguidos"
+        const itemSocial = document.getElementById(`social-seguido-${nickname}`);
+        if (itemSocial) {
+            itemSocial.remove();
+            const itemsVisibles = listaSocial.querySelectorAll('li[id^="social-seguido-"]');
+            if (itemsVisibles.length === 0 && msgVacioSocial) {
+                msgVacioSocial.style.display = 'block';
+            }
+        }
+
+        // B) Actualizar Tarjeta de Perfil inferior (Contador + Lista de Seguidores)
+        if (contadorSeguidores) {
+            let numActual = parseInt(contadorSeguidores.innerText) || 0;
+            contadorSeguidores.innerText = Math.max(0, numActual - 1); // Restamos 1, evitando que baje de 0
+        }
+        
+        if (miNickname) {
+            const miItemEnPerfil = document.getElementById(`li-seguidor-perfil-${miNickname}`);
+            if (miItemEnPerfil) {
+                miItemEnPerfil.remove(); // Tu nombre desaparece de su lista
+                
+                // Si la lista de sus seguidores quedó vacía, mostramos el texto "Sin seguidores"
+                if (listaSeguidoresPerfil) {
+                    const itemsRestantes = listaSeguidoresPerfil.querySelectorAll('li[id^="li-seguidor-perfil-"]');
+                    if (itemsRestantes.length === 0 && msgVacioSeguidores) {
+                        msgVacioSeguidores.style.display = 'block';
+                    }
+                }
+            }
+        }
+    }
+
+    // 3. AVISAMOS AL SERVIDOR (En segundo plano)
+    const params = new URLSearchParams();
+    params.append('accion', accionActual);
+    if (accionActual === 'seguir') {
+        params.append('nicknameASeguir', nickname);
+    } else {
+        params.append('nicknameSeleccionado', nickname);
+    }
+
+    fetch('UsuarioServlet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: params
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Fallo en el servidor");
+        if (btnLista) btnLista.disabled = false;
+        if (btnPerfil) btnPerfil.disabled = false;
+    })
+    .catch(error => {
+        console.error("Error de Red:", error);
+        alert("Error de conexión. Recargando la vista para sincronizar...");
+        cargarSocial(); 
+    });
+}
+
+// Mantenemos estas por compatibilidad por si tocaste un botón viejo
+function seguirRapido(nickname) {
+    const btn = document.querySelector(`button[onclick="seguirRapido('${nickname}')"]`);
+    if (btn) toggleSeguirUsuario(btn, nickname, 'seguir');
+}
+
+function dejarDeSeguirRapido(nickname) {
+    const btn = document.querySelector(`button[onclick="dejarDeSeguirRapido('${nickname}')"]`);
+    if (btn) toggleSeguirUsuario(btn, nickname, 'dejarSeguir');
 }
