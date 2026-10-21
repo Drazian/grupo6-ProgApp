@@ -8,7 +8,7 @@
     </h2>
     
     <!-- CONTENEDOR 1: La tabla/lista superior -->
-    <!-- FIX: Le asignamos el ID "contenedor-lista-usuarios" para poder ocultarlo con JS -->
+    <!-- Le asignamos el ID "contenedor-lista-usuarios" para poder ocultarlo con JS -->
     <div id="contenedor-lista-usuarios" style="margin-bottom: 25px;">
         <label style="font-weight: bold; color: #34495e; display: block; margin-bottom: 8px;">
             Seleccione un usuario para consultar su información:
@@ -53,7 +53,7 @@
     </div>
 
     <!-- CONTENEDOR 2: La tarjeta de información inferior -->
-    <!-- FIX: Le asignamos el ID "contenedor-detalle-usuario" y lo ocultamos por defecto con display: none; -->
+    <!-- Le asignamos el ID "contenedor-detalle-usuario" y lo ocultamos por defecto con display: none; -->
     <div id="contenedor-detalle-usuario" style="display: none; background: #fafafa; padding: 20px; border: 1px solid #e0e0e0; border-radius: 6px; min-height: 200px;">
         
         <!-- BOTÓN DE VOLVER -->
