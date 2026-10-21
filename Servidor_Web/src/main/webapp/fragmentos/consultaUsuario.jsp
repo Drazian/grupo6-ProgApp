@@ -6,7 +6,10 @@
     <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 8px; margin-top: 0;">
         Información de Usuario
     </h2>
-    <div id="bloque-lista-usuarios" style="margin-bottom: 25px;">
+    
+    <!-- CONTENEDOR 1: La tabla/lista superior -->
+    <!-- FIX: Le asignamos el ID "contenedor-lista-usuarios" para poder ocultarlo con JS -->
+    <div id="contenedor-lista-usuarios" style="margin-bottom: 25px;">
         <label style="font-weight: bold; color: #34495e; display: block; margin-bottom: 8px;">
             Seleccione un usuario para consultar su información:
         </label>
@@ -24,7 +27,7 @@
                     <c:forEach var="usr" items="${requestScope.todosLosUsuarios}">
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 10px;">
-                                <a href="#" onclick="event.preventDefault(); cargarDetalleConsultaUsuario('${usr.nickname}')" 
+                                <a href="#" onclick="event.preventDefault(); seleccionarUsuario('${usr.nickname}')" 
                                    style="color: #2980b9; font-weight: bold; text-decoration: none;">
                                     👤 ${usr.nickname}
                                 </a>
@@ -49,11 +52,22 @@
         </div>
     </div>
 
-    <!-- Informació-->
-    <div id="contenedor-detalle-consulta-usuario" style="background: #fafafa; padding: 20px; border: 1px solid #e0e0e0; border-radius: 6px; min-height: 200px;">
-        <p style="color: #7f8c8d; font-style: italic; text-align: center; margin-top: 60px;">
-            Haga clic en el nickname de un usuario para desplegar su información completa.
-        </p>
+    <!-- CONTENEDOR 2: La tarjeta de información inferior -->
+    <!-- FIX: Le asignamos el ID "contenedor-detalle-usuario" y lo ocultamos por defecto con display: none; -->
+    <div id="contenedor-detalle-usuario" style="display: none; background: #fafafa; padding: 20px; border: 1px solid #e0e0e0; border-radius: 6px; min-height: 200px;">
+        
+        <!-- BOTÓN DE VOLVER -->
+        <button class="btn-moderno" onclick="volverAListaUsuarios()" style="background-color: #95a5a6; margin-bottom: 20px;">
+            ← Volver a la lista
+        </button>
+        
+        <!-- Aquí es donde tu JavaScript 'cargarDetalleConsultaUsuario' va a inyectar el HTML con la tarjeta del usuario -->
+        <div id="detalle-usuario-contenido">
+             <p style="color: #7f8c8d; font-style: italic; text-align: center; margin-top: 60px;">
+                 Cargando información del usuario...
+             </p>
+        </div>
+        
     </div>
 
 </div>

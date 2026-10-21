@@ -45,23 +45,29 @@ public class DtEdicion {
     public DtEdicion(String nombre, Integer cupo, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaPublicacion, DtCurso curso, List<DtUsuario> docentes, Set<String> nameDocentes){
         this(nombre, cupo, fechaInicio, fechaFin, fechaPublicacion, curso, docentes, nameDocentes, null);
     }
-    public DtEdicion(String nombre, Integer cupo, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaPublicacion, DtCurso curso, List<DtUsuario> docentes, Set<String> nameDocentes, String imagen){
-        Set<String> tmpDocentes=new HashSet<>();
-        if(nameDocentes!=null)
-            this.nameDocentes=nameDocentes;
-        else if(docentes!=null)
-            for(DtUsuario docente : docentes)
-                tmpDocentes.add(docente.getNombre()+" "+docente.getApellido());
-        this.nameDocentes=tmpDocentes;
-        this.docentes=docentes!=null?docentes:new ArrayList<>();
-        this.fechaPublicacion=fechaPublicacion;
-        this.fechaInicio=fechaInicio;
-        this.fechaFin=fechaFin;
-        this.nombre=nombre;
-        this.imagen=imagen;
-        this.curso=curso;
-        this.cupo=cupo;
+public DtEdicion(String nombre, Integer cupo, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaPublicacion, DtCurso curso, List<DtUsuario> docentes, Set<String> nameDocentes, String imagen){
+        
+        if (nameDocentes != null) {
+            this.nameDocentes = nameDocentes;
+        } else if (docentes != null) {
+            Set<String> tmpDocentes = new HashSet<>();
+            for (DtUsuario docente : docentes) {
+                tmpDocentes.add(docente.getNombre() + " " + docente.getApellido());
+            }
+            this.nameDocentes = tmpDocentes;
+        } else {
+            this.nameDocentes = new HashSet<>();
         }
+        
+        this.docentes = docentes != null ? docentes : new ArrayList<>();
+        this.fechaPublicacion = fechaPublicacion;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.nombre = nombre;
+        this.imagen = imagen;
+        this.curso = curso;
+        this.cupo = cupo;
+    }
         
     public Integer getCupo(){ return this.cupo;}
     public DtCurso getCurso(){ return this.curso; }

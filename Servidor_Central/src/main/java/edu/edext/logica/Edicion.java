@@ -39,8 +39,6 @@ public class Edicion {
     @ManyToMany
     @JoinTable(
         name="Organiza",
-//        joinColumns=@JoinColumn(name="edicion_nombre"),
-//        inverseJoinColumns=@JoinColumn(name="docente_nickname")
         joinColumns=@JoinColumn(name="edicion"),
         inverseJoinColumns=@JoinColumn(name="docente")
     )
@@ -67,7 +65,7 @@ public class Edicion {
     
     public void setCupo(Integer cupo){ this.cupo=cupo; }
     public void setCurso(Curso curso){ this.curso=curso; }
-//    public void setImagen(String imagen){ this.imagen=imagen; }
+    public void setImagen(String imagen){ this.imagen=imagen; }
     public void setNombre(String nombre){ this.nombre=nombre; }
     public void setFechaFin(LocalDate fechaFin){ this.fechaFin=fechaFin; }
     public void setDocentes(List<Docente> docentes){ this.docentes=docentes; }

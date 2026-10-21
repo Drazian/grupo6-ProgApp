@@ -35,14 +35,17 @@ public class EdicionHelper {
         return ret;
     }
 
-    public DtEdicion getEdicion(){
+public DtEdicion getEdicion(){
         Edicion tmp=seekEdicion();
         if(tmp!=null){
             List<DtUsuario> docentes=new ArrayList<>();
-            for(Usuario d : tmp.getDocentes())
+            for(Usuario d : tmp.getDocentes()){
+                // Rescatamos los datos del docente, incluyendo su foto
                 docentes.add(new DtUsuario(d.getNickname(), null, d.getEmail(), 
                         d.getNombre(), d.getApellido(), d.getImagen(), 
                         d.getfNacimiento(), null, null));
+            }
+            
             return new DtEdicion(
                     tmp.getNombre(), 
                     tmp.getCupo(), 
@@ -55,7 +58,8 @@ public class EdicionHelper {
                             new DtInstituto(tmp.getCurso().getInstituto().getNombre()),
                             tmp.getCurso().getImagen()), 
                     docentes,
-                    tmp.getImagen()); }
+                    tmp.getImagen()); // <--- IMAGEN DE LA EDICIÓN
+        }
         else return null;
     }
   

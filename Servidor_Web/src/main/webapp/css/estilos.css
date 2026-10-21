@@ -3,7 +3,7 @@
     margin: 0;
     padding: 0;
 }
- 
+
 body {
     display: flex;
     flex-direction: column;
@@ -35,6 +35,19 @@ body {
     background-color: #34495e;
     color: white;
     padding: 20px;
+    overflow-y: auto; 
+}
+
+/* Personalización de la barra de scroll para el Sector 2*/
+.sector-2::-webkit-scrollbar {
+    width: 6px;
+}
+.sector-2::-webkit-scrollbar-thumb {
+    background: #2c3e50; 
+    border-radius: 4px;
+}
+.sector-2::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .sector-2 ul {
@@ -56,3 +69,196 @@ body {
     background-color: #ecf0f1;
 }
 
+/* ==========================================================================
+   MEJORAS DE UI/UX PARA FORMULARIOS Y CONTENEDORES (Estilo Moderno)
+   ========================================================================== */
+
+/* 1. Resetear el estilo anticuado de los formularios */
+input[type="text"], 
+input[type="number"], 
+input[type="password"], 
+input[type="email"], 
+input[type="date"], 
+select, 
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px; /* Bordes suavemente redondeados */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    color: #2c3e50;
+    background-color: #fcfcfc;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Efecto al hacer clic en un input (Foco) */
+input:focus, 
+select:focus, 
+textarea:focus {
+    border-color: #3498db; /* Azul moderno */
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.4);
+    background-color: #ffffff;
+}
+
+/* 2. Estilizar las etiquetas (Labels) para que se vean ordenadas */
+label {
+    font-weight: 600;
+    color: #34495e;
+    font-size: 14px;
+    display: inline-block;
+    margin-bottom: 3px;
+}
+
+/* 3. Botones modernos (Adiós al botón gris feo) */
+button, 
+input[type="submit"], 
+input[type="button"],
+.btn-moderno {
+    background-color: #2ecc71; /* Verde esmeralda por defecto */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Efecto Hover (Al pasar el ratón) y Active (Al hacer clic) en botones */
+button:hover, 
+input[type="submit"]:hover, 
+input[type="button"]:hover {
+    background-color: #27ae60;
+}
+
+button:active, 
+input[type="submit"]:active, 
+input[type="button"]:active {
+    transform: scale(0.98); /* Pequeño efecto de pulsación */
+}
+
+/* 4. Estilos específicos para la barra de búsqueda superior */
+.buscador input[type="text"] {
+    width: 300px; /* Un poco más ancha */
+    margin: 0;
+    display: inline-block;
+    border-radius: 20px 0 0 20px; /* Bordes redondos solo a la izquierda */
+    border-right: none;
+}
+
+.buscador button {
+    border-radius: 0 20px 20px 0; /* Bordes redondos solo a la derecha */
+    background-color: #3498db;
+    margin: 0;
+    margin-left: -5px; /* Quita el espacio en blanco entre input y boton */
+}
+
+.buscador button:hover {
+    background-color: #2980b9;
+}
+
+/* 5. Cajas contenedoras de los formularios (Para que no queden pegados a los bordes) */
+form {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Sombra muy sutil */
+    border: 1px solid #eaeded;
+    max-width: 800px;
+}
+
+/* 6. Mejoras para los selectores múltiples (Listas grandes) */
+select[multiple] {
+    height: auto;
+    min-height: 100px;
+    padding: 5px;
+}
+
+select[multiple] option {
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+}
+
+select[multiple] option:checked {
+    background-color: #3498db linear-gradient(0deg, #3498db 0%, #3498db 100%);
+    color: white;
+}
+
+/* 7. Input de Archivo (Imagen) más limpio */
+input[type="file"] {
+    padding: 8px;
+    background: #f8f9fa;
+    border: 1px dashed #bdc3c7;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   SISTEMA DE MODALES MODERNOS (Reemplazo de los Alert nativos)
+   ========================================================================== */
+.modal-oculto {
+    display: none;
+}
+.modal-visible {
+    display: flex;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px); /* Difumina el fondo de la web */
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+.modal-contenido {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 450px;
+    max-width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    overflow: hidden;
+    transform: scale(0.95);
+    animation: scaleUp 0.2s forwards;
+}
+.modal-cabecera {
+    background-color: #34495e;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-cabecera h3 { margin: 0; font-size: 16px; }
+.modal-cerrar {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+.modal-cerrar:hover { color: #e74c3c; }
+.modal-cuerpo { 
+    padding: 20px; 
+    font-size: 14px; 
+    color: #2c3e50; 
+    max-height: 400px; 
+    overflow-y: auto; 
+}
+.modal-pie {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    text-align: right;
+    border-top: 1px solid #ecf0f1;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleUp { to { transform: scale(1); } }
