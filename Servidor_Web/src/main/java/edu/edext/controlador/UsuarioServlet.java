@@ -75,9 +75,13 @@ public class UsuarioServlet extends HttpServlet {
             try {
                 List<DtUsuario> todosLosUsuarios = ic.listarUsuarios();
                 List<String> misSeguidos = ic.listarSeguidos(logueado.getNickname());
+                // --- FIX: Solicitar la lista de seguidores a la base de datos ---
+                List<String> misSeguidores = ic.listarSeguidores(logueado.getNickname());
 
                 request.setAttribute("todosLosUsuarios", todosLosUsuarios);
                 request.setAttribute("misSeguidos", misSeguidos);
+                // --- FIX: Enviar la lista de seguidores al JSP ---
+                request.setAttribute("misSeguidores", misSeguidores);
 
                 request.getRequestDispatcher("/fragmentos/seguidos.jsp").forward(request, response);
             } catch (Exception e) {

@@ -21,29 +21,28 @@
 
         <!-- Selección de Curso -->
         <div style="margin-bottom: 20px;">
-            <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #444; font-size: 14px;">Seleccione el Curso:</label>
-            
-            <!-- Input oculto para que el servlet lo reciba -->
-            <input type="hidden" id="selectCurso" name="nombreCurso" required />
-
+            <label style="display: block; font-weight: bold; margin-bottom: 8px; color: #444; font-size: 14px;">Seleccione el Curso:</label>       
             <!-- Tabla de Cursos con Scroll -->
+<!-- Tabla de Cursos con Checkboxes -->
             <div style="max-height: 320px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 6px;">
                 <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
                     <thead>
                         <tr style="background-color: #f1f3f5; border-bottom: 2px solid #dee2e6; color: #333; position: sticky; top: 0; z-index: 1;">
+                            <th style="padding: 10px; width: 40px; text-align: center;">✓</th>
                             <th style="padding: 10px; width: 60px; text-align: center;">Imagen</th>
                             <th style="padding: 10px;">Nombre</th>
                             <th style="padding: 10px;">Instituto</th>
-                            <th style="padding: 10px; width: 110px; text-align: center;">Acción</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach var="cur" items="${cursos}">
-                            <tr id="fila-curso-${cur.getNombre()}" 
-                                style="border-bottom: 1px solid #eee; transition: background 0.15s;"
+                            <tr style="border-bottom: 1px solid #eee; transition: background 0.15s;"
                                 onmouseover="this.style.backgroundColor='#fcfcfc';" 
                                 onmouseout="this.style.backgroundColor='transparent';">
                                 
+                                <td style="padding: 10px; text-align: center;">
+                                    <input type="checkbox" name="cursosSeleccionados" value="${cur.getNombre()}" class="check-curso" style="transform: scale(1.2); cursor: pointer;">
+                                </td>
                                 <td style="padding: 10px; text-align: center;">
                                     <img src="ImagenServlet?nombre=${empty cur.imagen ? 'usr.png' : cur.imagen}" 
                                          alt="Curso" 
@@ -55,26 +54,18 @@
                                 <td style="padding: 10px; color: #666;">
                                     ${cur.getInstituto() != null ? cur.getInstituto().getNombre() : 'Sin instituto'}
                                 </td>
-                                <td style="padding: 10px; text-align: center;">
-                                    <button type="button" class="btn-seleccionar-curso" data-nombre="${cur.getNombre()}"
-                                            style="background-color: #f8f9fa; color: #0275d8; border: 1px solid #0275d8; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; transition: all 0.2s;"
-                                            onmouseover="this.style.backgroundColor='#0275d8'; this.style.color='#fff';" 
-                                            onmouseout="this.style.backgroundColor='#f8f9fa'; this.style.color='#0275d8';">
-                                        Seleccionar
-                                    </button>
-                                </td>
                             </tr>
                         </c:forEach>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Indicador de Curso Seleccionado -->
+            <!-- Contador de Cursos Seleccionados -->
             <div style="margin-top: 12px; padding: 10px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-size: 14px;">
-                <span style="color: #555;">Curso seleccionado:</span>
-                <span id="labelCursoSeleccionado" style="font-weight: bold; color: #0275d8;">Ninguno seleccionado</span>
+                <span style="color: #555;">Cursos seleccionados:</span>
+                <span id="contadorCursosSeleccionados" style="font-weight: bold; color: #0275d8;">0</span>
             </div>
-        </div>
+        </div>       
 
         <!-- Botón de Envío -->
         <div style="text-align: right; margin-top: 25px;">

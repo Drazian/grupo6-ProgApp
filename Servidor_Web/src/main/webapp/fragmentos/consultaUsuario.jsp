@@ -29,7 +29,7 @@
                             <td style="padding: 10px;">
                                 <a href="#" onclick="event.preventDefault(); seleccionarUsuario('${usr.nickname}')" 
                                    style="color: #2980b9; font-weight: bold; text-decoration: none;">
-                                    👤 ${usr.nickname}
+                                     ${usr.nickname}
                                 </a>
                             </td>
                             <td style="padding: 10px;">${usr.nombre} ${usr.apellido}</td>

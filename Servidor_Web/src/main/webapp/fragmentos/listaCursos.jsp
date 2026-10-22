@@ -19,7 +19,7 @@
                             onmouseout="this.style.backgroundColor='#fff';">
                             
                             <span style="font-weight: bold; color: #2c3e50; font-size: 15px;">
-                                📘 ${curso}
+                                 ${curso}
                             </span>
                             
                             <button type="button" onclick="verDetallesCurso('${curso}')"
@@ -53,7 +53,7 @@
                             onmouseout="this.style.backgroundColor='#fff';">
                             
                             <span style="font-weight: bold; color: #2c3e50; font-size: 15px;">
-                                🎓 ${programa}
+                                ${programa}
                             </span>
                             
                             <button type="button" onclick="cargarDetallePrograma('${programa}')"

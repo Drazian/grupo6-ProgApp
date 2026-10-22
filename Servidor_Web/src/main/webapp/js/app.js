@@ -1,17 +1,164 @@
-// Función para cargar fragmentos de vistas desde el menú
+// =====================================================================
+// NAVEGABILIDAD SPA: FLECHA ATRÁS Y GUARDADO DE HISTORIAL (ROBUSTO Y CIEGO A FANTASMAS)
+// =====================================================================
+// =====================================================================
+// SISTEMA GLOBAL DE NOTIFICACIONES (Intercepta y embellece los 'alert')
+// =====================================================================
+window.alert = function(mensaje) {
+    // 1. Crear el contenedor global flotante si no existe
+    let contenedor = document.getElementById('toast-container-global');
+    if (!contenedor) {
+        contenedor = document.createElement('div');
+        contenedor.id = 'toast-container-global';
+        // Lo anclamos en la esquina inferior derecha
+        contenedor.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;';
+        document.body.appendChild(contenedor);
+    }
+
+    // 2. Inteligencia simple: Detectar si es Error o Éxito leyendo el texto
+    const texto = String(mensaje).toLowerCase();
+    const esError = texto.includes('error') || texto.includes('fallo') || texto.includes('denegado') || texto.includes('atención') || texto.includes('no coinciden');
+    
+    const bgColor = esError ? '#e74c3c' : '#2ecc71'; // Rojo carmesí para error, Verde esmeralda para éxito
+    const icono = esError ? '✖' : '✔';
+
+    // 3. Construir la tarjeta emergente (Toast)
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        background-color: ${bgColor}; 
+        color: white; 
+        padding: 15px 20px; 
+        border-radius: 6px; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        font-size: 14px; 
+        font-weight: 500;
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+        opacity: 0; 
+        transform: translateY(20px); 
+        transition: all 0.3s ease;
+        max-width: 350px;
+        line-height: 1.4;
+    `;
+    toast.innerHTML = `<span style="font-size: 18px; font-weight: bold;">${icono}</span> <span>${mensaje}</span>`;
+
+    contenedor.appendChild(toast);
+
+    // 4. Animación suave de entrada
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    });
+
+    // 5. Autodestrucción a los 4 segundos
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300); // Espera a que termine la animación para borrarlo del DOM
+    }, 4000);
+};
+
+window.isNavigating = false; 
+
+function guardarEstadoActualSPA() {
+    const contenedor = document.getElementById('contenido-dinamico');
+    if (contenedor && !window.isNavigating) {
+        history.replaceState({ html: contenedor.innerHTML }, document.title);
+    }
+}
+
+function crearNuevoEstadoSPA() {
+     const contenedor = document.getElementById('contenido-dinamico');
+     if (contenedor) {
+         history.pushState({ html: contenedor.innerHTML }, document.title);
+     }
+}
+
+(function inicializarHistorialSPA() {
+    const contenedor = document.getElementById('contenido-dinamico');
+    if (!contenedor) return;
+
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a[href="#"]');
+        if (link) e.preventDefault(); 
+    });
+
+    guardarEstadoActualSPA();
+
+    window.addEventListener("popstate", (evento) => {
+        if (evento.state && evento.state.html) {
+            window.isNavigating = true; 
+            contenedor.innerHTML = evento.state.html;         
+            contenedor.querySelectorAll('button').forEach(btn => {
+                btn.disabled = false;
+            });
+            if (document.getElementById('lista-mis-seguidos-social')) {
+                let perfilNick = null;
+                const pTag = document.querySelector('#detalle-perfil-usuario p');
+                if (pTag && pTag.innerText.includes('/')) {
+                    perfilNick = pTag.innerText.split('/')[0].trim();
+                }
+                
+                fetch('UsuarioServlet?accion=cargarSocial')
+                    .then(res => res.text())
+                    .then(html => {
+                        contenedor.innerHTML = html;
+                        
+                        // Reactivamos botones también en la nueva carga por si acaso
+                        contenedor.querySelectorAll('button').forEach(btn => {
+                            btn.disabled = false;
+                        });
+
+                        if (perfilNick && perfilNick !== 'Seleccione') {
+                            fetch(`UsuarioServlet?accion=detalleConsultaUsuario&nickname=${encodeURIComponent(perfilNick)}`)
+                                .then(r => r.text())
+                                .then(profileHtml => {
+                                    const contDetalle = document.getElementById('detalle-perfil-usuario');
+                                    if (contDetalle) {
+                                        const listaUsr = document.getElementById('contenedor-lista-usuarios');
+                                        if (listaUsr) listaUsr.style.display = 'none';
+                                        contDetalle.style.display = 'block';
+                                        contDetalle.innerHTML = profileHtml;
+                                        
+                                        contDetalle.querySelectorAll('button').forEach(btn => {
+                                            btn.disabled = false;
+                                        });
+                                    }
+                                    guardarEstadoActualSPA();
+                                });
+                        } else {
+                            guardarEstadoActualSPA();
+                        }
+                    })
+                    .catch(err => {
+                        // Si el servidor llega a fallar o da error 500, al menos los botones siguen vivos
+                        console.warn("No se pudo sincronizar con el servidor al navegar:", err);
+                    });
+            }
+
+            setTimeout(() => { window.isNavigating = false; }, 200);
+        }
+    });
+})();
+
+// =====================================================================
+// FUNCIONES GENERALES
+// =====================================================================
+
+
 function cargarSeccion(opcion) {
     const contenedor = document.getElementById('contenido-dinamico');
-    
-    // Llamada al Controlador (Servlet) pidiendo una acción específica
     fetch(`MiControladorServlet?accion=${opcion}`)
         .then(response => response.text())
         .then(html => {
             contenedor.innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error('Error al cargar la sección:', error));
 }
 
-// Función para el botón de búsqueda del Sector 1
 function ejecutarBusqueda() {
     const query = document.getElementById('input-busqueda').value;
     const contenedor = document.getElementById('contenido-dinamico'); 
@@ -20,14 +167,13 @@ function ejecutarBusqueda() {
         .then(response => response.text())
         .then(html => {
             contenedor.innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error('Error en la búsqueda:', error));
 }
 
-// Función para interceptar y enviar formularios con AJAX sin recargar la página
 function guardarProducto(event) {
     event.preventDefault(); 
-    
     const formulario = document.getElementById('form-registro');
     const formData = new URLSearchParams(new FormData(formulario)); 
 
@@ -40,13 +186,13 @@ function guardarProducto(event) {
     .then(htmlRespuesta => {
         document.getElementById('resultado-registro').innerHTML = htmlRespuesta;
         formulario.reset(); 
+        guardarEstadoActualSPA(); // FIX: Actualiza estado tras guardar
     })
     .catch(error => console.error('Error al guardar:', error));
 }
 
 //---------------------------------------------------------------------------------
-
-//Filtrados y ordenamientos
+// Filtrados y ordenamientos
 function initBuscador() {
     const selectTipo = document.getElementById('filtroTipo');
     const selectOrden = document.getElementById('criterioOrden');
@@ -59,27 +205,21 @@ function initBuscador() {
     function actualizarResultados() {
         const tipoSeleccionado = selectTipo.value;
         const criterioOrden = selectOrden.value;
-
         let filas = Array.from(tbody.querySelectorAll('tr.fila-resultado'));
 
-        // 1. FILTRADO POR TIPO
         filas.forEach(fila => {
-                    const tipoFila = fila.getAttribute('data-tipo').trim().toLocaleString();
-                    
-                    //Si se selecciona TODOS, entonces se muestra todo.
-                    //Si se selecciona usuarios, se muestran los docentes y los estudiantes.
-                    const coincideTipo = (tipoSeleccionado === 'TODOS') || 
-                                         (tipoFila === tipoSeleccionado) || 
-                                         (tipoSeleccionado === 'usuario' && (tipoFila === 'docente' || tipoFila === 'estudiante'));
+            const tipoFila = fila.getAttribute('data-tipo').trim().toLocaleString();
+            const coincideTipo = (tipoSeleccionado === 'TODOS') || 
+                                 (tipoFila === tipoSeleccionado) || 
+                                 (tipoSeleccionado === 'usuario' && (tipoFila === 'docente' || tipoFila === 'estudiante'));
 
-                    if (coincideTipo) {
-                        fila.style.display = '';
-                    } else {
-                        fila.style.display = 'none';
-                    }
-                });
+            if (coincideTipo) {
+                fila.style.display = '';
+            } else {
+                fila.style.display = 'none';
+            }
+        });
 
-        // 2. ORDENAMIENTO
         filas.sort((a, b) => {
             if (criterioOrden === 'ALFABETICO') {
                 const nombreA = (a.getAttribute('data-nombre') || '').toLowerCase();
@@ -88,34 +228,28 @@ function initBuscador() {
             } else if (criterioOrden === 'FECHA') {
                 const fechaA = a.getAttribute('data-fecha') || '';
                 const fechaB = b.getAttribute('data-fecha') || '';
-                return fechaB.localeCompare(fechaA); // Descendente (más reciente primero)
+                return fechaB.localeCompare(fechaA); 
             }
             return 0;
         });
 
-        // 3. REORDENAR EN EL DOM
         filas.forEach(fila => tbody.appendChild(fila));
     }
 
     selectTipo.addEventListener('change', actualizarResultados);
     selectOrden.addEventListener('change', actualizarResultados);
-
     actualizarResultados();
 }
 
 function verDetallesBusqueda(nombre, tipo){     
     const tipoNormalizado = (tipo || '').toLowerCase();
-
-    //Si no se selecciono el usuario logueado, seguir curso normal
     switch (tipoNormalizado){     
         case "programa":
             cargarDetallePrograma(nombre);
         break;
-
         case "curso":
             verDetallesCurso(nombre);
         break;
-
         case "docente":
         case "estudiante":
             cargarConsultaUsuario(() => {
@@ -135,21 +269,19 @@ function BuscadorServlet(){
 
     fetch(`BuscadorServlet?query=${query}`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
-            }
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
             return response.text();
         })
         .then(html => {
             contenedor.innerHTML = html;
             initBuscador();
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error('Error al ejecutar la búsqueda:', error));
 }
 
 //---------------------------------------------------------------------------------
 
-//Para evitar tener que crear un Servlet extra se procede generando un evento para cargar los Institutos y Categorias del menu izquierdo.
 document.addEventListener("DOMContentLoaded", function() {
     cargarInstitutosMenu();
     cargarCategoriasMenu();
@@ -166,12 +298,10 @@ function cargarInstitutosMenu() {
             const ul = document.getElementById('lista-institutos');
             if(ul) {
                 ul.innerHTML = '';
-
                 if (!institutos || institutos.length === 0) {
                     ul.innerHTML = '<li style="font-size: 12px; opacity: 0.7;">Sin institutos</li>';
                     return;
                 }
-
                 institutos.forEach(inst => {
                     const li = document.createElement('li');
                     li.innerHTML = `<a href="#" onclick="event.preventDefault(); buscarCurso('instituto', '${inst.nombre}')">${inst.nombre}</a>`;
@@ -180,7 +310,6 @@ function cargarInstitutosMenu() {
             }
         })
         .catch(error => {
-            console.error('Error al cargar institutos:', error);
             const ul = document.getElementById('lista-institutos');
             if(ul) ul.innerHTML = '<li style="font-size: 12px; color: red;">Error al cargar</li>';
         });
@@ -196,12 +325,10 @@ function cargarCategoriasMenu() {
             const ul = document.getElementById('lista-categorias');
             if(ul) {
                 ul.innerHTML = '';
-
                 if (!categorias || categorias.length === 0) {
                     ul.innerHTML = '<li style="font-size: 12px; opacity: 0.7;">Sin categorias</li>';
                     return;
                 }
-
                 categorias.forEach(cat => {
                     const li = document.createElement('li');
                     li.innerHTML = `<a href="#" onclick="event.preventDefault(); buscarCurso('categoria', '${cat.nombre}')">${cat.nombre}</a>`;
@@ -210,16 +337,12 @@ function cargarCategoriasMenu() {
             }
         })
         .catch(error => {
-            console.error('Error al cargar categorías:', error);
             const ul = document.getElementById('lista-categorias');
             if(ul) ul.innerHTML = '<li style="font-size: 12px; color: red;">Error al cargar</li>';
         });
 }
 
-
 function buscarCurso(opcion, nombre) {
-    console.log(`Buscando cursos por ${opcion}: ${nombre}`);
-
     fetch(`CursoServlet?accion=buscarCurso&opcion=${encodeURIComponent(opcion)}&nombre=${encodeURIComponent(nombre)}`)
         .then(response => {
             if (!response.ok) throw new Error('Error en la búsqueda de cursos');
@@ -227,11 +350,10 @@ function buscarCurso(opcion, nombre) {
         })
         .then(htmlResultado => {
             document.getElementById('contenido-dinamico').innerHTML = htmlResultado;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
-            console.error('Error al buscar cursos:', error);
-            document.getElementById('contenido-dinamico').innerHTML = 
-                '<div class="alerta-error">Ocurrió un error al cargar los cursos.</div>';
+            document.getElementById('contenido-dinamico').innerHTML = '<div class="alerta-error">Ocurrió un error al cargar los cursos.</div>';
         });
 }
 
@@ -239,70 +361,56 @@ function buscarCurso(opcion, nombre) {
 
 function testServlet(){
     const contenedor = document.getElementById('contenido-dinamico');
-    
     fetch(`TestServlet`)
         .then(response => response.text())
         .then(html => {
             contenedor.innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error('Error al cargar la sección:', error));   
 }
 
 function crearInstituto(){
     const nombre = document.getElementById("nombre").value;
-    
     if (!nombre.trim()){
         alert("Ingrese un nombre valido");
         return;
     }
-    
     const params = new URLSearchParams();
     params.append('nombre', nombre);
     
-fetch('TestServlet', {
+    fetch('TestServlet', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
         body: params
     })
     .then(response => {
         return response.text().then(texto => {
-            if (!response.ok) {
-                throw new Error(texto);
-            }
+            if (!response.ok) throw new Error(texto);
             return texto;
         });
     })
     .then(mensajeExito => {
         alert(mensajeExito);
-        testServlet(); //Reinvocamos el GET
+        testServlet(); 
     })
     .catch(error => {
         alert(error.message);
     });
-    
 }
 
 //---------------------------------------------------------------------------------
 
 function ProgramaServlet(opcion) {
     const contenedor = document.getElementById('contenido-dinamico');
-    
     fetch(`ProgramaServlet?accion=${opcion}`)
         .then(response => response.text())
         .then(html => {
             contenedor.innerHTML = html;
+            if (opcion === 'formCrear') inicializarEventosCrearPrograma();
+            if (opcion === 'formAgregarCurso') inicializarEventosAgregarCursoAPrograma();
             
-            if (opcion === 'formCrear') {
-                inicializarEventosCrearPrograma();
-            }
-            
-            if (opcion === 'formAgregarCurso'){
-                inicializarEventosAgregarCursoAPrograma();
-            }
-            
-            
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error('Error al cargar la sección:', error));
 }
@@ -313,18 +421,8 @@ function crearPrograma(){
     const fechaInicio = document.getElementById("fechaInicio").value;
     const fechaFin = document.getElementById("fechaFin").value;
     
-    if (!nombre.trim()){
-        alert("Ingrese un nombre valido");
-        return;
-    }
-
-    if (!descripcion.trim()){
-        alert("Ingrese una descripcion valida");
-        return;
-    }
-    
-    if (!fechaInicio.trim() || !fechaFin.trim()){
-        alert("Ingrese un periodo valido");
+    if (!nombre.trim() || !descripcion.trim() || !fechaInicio.trim() || !fechaFin.trim()){
+        alert("Verifique que todos los campos sean válidos");
         return;
     }
     
@@ -335,19 +433,12 @@ function crearPrograma(){
     datos.append('fechaFin', fechaFin);
     
     const archivoImagen = document.getElementById("imagen").files[0];
-    if (archivoImagen) {
-        datos.append('imagen', archivoImagen);
-    }
+    if (archivoImagen) datos.append('imagen', archivoImagen);
     
-    fetch('ProgramaServlet?accion=crear', {
-            method: 'POST',
-            body: datos
-        })
+    fetch('ProgramaServlet?accion=crear', { method: 'POST', body: datos })
         .then(response => {
             return response.text().then(texto => {
-                if (!response.ok) {
-                    throw new Error(texto);
-                }
+                if (!response.ok) throw new Error(texto);
                 return texto;
             });
         })
@@ -355,15 +446,11 @@ function crearPrograma(){
             alert(mensajeExito);
             ProgramaServlet("formCrear"); 
         })
-        .catch(error => {
-            alert(error.message);
-        });
-    
+        .catch(error => { alert(error.message); });
 }
 
 function inicializarEventosCrearPrograma() {
     const inputImagen = document.getElementById("imagen");
-    
     if (inputImagen) {
         inputImagen.addEventListener("change", function(event) {
             const archivo = event.target.files[0];
@@ -379,62 +466,43 @@ function inicializarEventosCrearPrograma() {
 }
 
 function inicializarEventosAgregarCursoAPrograma() {
-document.querySelectorAll('.btn-seleccionar-curso').forEach(button => {
-        button.addEventListener('click', function() {
-            const nombreCurso = this.getAttribute('data-nombre');
-            
-            // 1. Asignar al input oculto
-            const inputCurso = document.getElementById('selectCurso');
-            if (inputCurso) inputCurso.value = nombreCurso;
+    const checkboxes = document.querySelectorAll('.check-curso');
+    const labelContador = document.getElementById('contadorCursosSeleccionados');
 
-            // 2. Actualizar el label inferior
-            const label = document.getElementById('labelCursoSeleccionado');
-            if (label) label.innerText = nombreCurso;
-
-            // 3. Resaltar la fila seleccionada
-            document.querySelectorAll('tr[id^="fila-curso-"]').forEach(fila => {
-                fila.classList.remove('table-active');
-            });
+    checkboxes.forEach(chk => {
+        chk.addEventListener('change', function() {
+            const seleccionados = document.querySelectorAll('.check-curso:checked').length;
+            if (labelContador) labelContador.innerText = seleccionados;
             
-            const filaSeleccionada = document.getElementById('fila-curso-' + nombreCurso);
-            if (filaSeleccionada) {
-                filaSeleccionada.classList.add('table-active');
-            }
+            const fila = this.closest('tr');
+            if (this.checked) fila.style.backgroundColor = '#e8f4f8';
+            else fila.style.backgroundColor = 'transparent';
         });
     });
 }
 
-
-function agregarCursoAPrograma(){
+function agregarCursoAPrograma() {
     const programa = document.getElementById('selectPrograma').value;
-    const curso = document.getElementById('selectCurso').value;
-        
-    if (!programa.trim()){
-        alert("Ingrese un programa valido");
-        return;
-    }
-
-    if (!curso.trim()){
-        alert("Ingrese un curso valido");
+    const checkboxesMarcados = document.querySelectorAll('.check-curso:checked');
+    
+    if (!programa.trim() || checkboxesMarcados.length === 0) {
+        alert("Seleccione un programa y al menos un curso para agregar.");
         return;
     } 
     
     const params = new URLSearchParams();
+    params.append('accion', 'agregarCurso');
     params.append('programaStr', programa);
-    params.append('cursoStr', curso);
+    checkboxesMarcados.forEach(chk => params.append('cursoStr', chk.value));
     
-    fetch('ProgramaServlet?accion=agregarCurso', {
+    fetch('ProgramaServlet', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
             body: params
         })
         .then(response => {
             return response.text().then(texto => {
-                if (!response.ok) {
-                    throw new Error(texto);
-                }
+                if (!response.ok) throw new Error(texto);
                 return texto;
             });
         })
@@ -442,10 +510,7 @@ function agregarCursoAPrograma(){
             alert(mensajeExito);
             ProgramaServlet("formAgregarCurso"); 
         })
-        .catch(error => {
-            alert(error.message);
-        });
-    
+        .catch(error => alert(error.message));
 }
 
 function cargarProgramas() {
@@ -456,11 +521,10 @@ function cargarProgramas() {
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('contenido-dinamico').innerHTML = 
-                '<div class="alerta-error">Ocurrió un error al cargar los programas de formación.</div>';
+            document.getElementById('contenido-dinamico').innerHTML = '<div class="alerta-error">Ocurrió un error al cargar los programas.</div>';
         });
 }
 
@@ -472,23 +536,21 @@ function cargarDetallePrograma(nombrePrograma) {
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('contenido-dinamico').innerHTML = 
-                '<div class="alerta-error">Ocurrió un error al cargar el detalle del programa.</div>';
+            document.getElementById('contenido-dinamico').innerHTML = '<div class="alerta-error">Ocurrió un error al cargar el detalle del programa.</div>';
         });
 }
 
 // =====================================================================
-// FUNCIONES DE CURSO Y EDICIÓN (LIMPIAS Y ÚNICAS)
+// FUNCIONES DE CURSO Y EDICIÓN
 // =====================================================================
 
 function altaCurso(event) {
     event.preventDefault();
     const divError = document.getElementById('mensaje-error');
     divError.style.display = 'none';
-    divError.innerHTML = '';
     const form = document.getElementById('formAltaCurso');
     
     if (!form.checkValidity()) {
@@ -496,23 +558,18 @@ function altaCurso(event) {
         return; 
     }
 
-    // Usar FormData puro para que el navegador genere el multipart/form-data
     const datos = new FormData(form);
 
-    fetch('CursoServlet?accion=altaCurso', {
-        method: 'POST',
-        body: datos
-    })
+    fetch('CursoServlet?accion=altaCurso', { method: 'POST', body: datos })
     .then(response => {
         if (response.ok) {
             return response.text().then(mensajeExito => {
                 alert(mensajeExito); 
                 form.reset(); 
+                guardarEstadoActualSPA(); // FIX: Guarda tras limpiar
             });
         } else {
-            return response.text().then(mensajeError => {
-                throw new Error(mensajeError);
-            });
+            return response.text().then(err => { throw new Error(err); });
         }
     })
     .catch(error => {
@@ -526,16 +583,10 @@ function altaEdicion(event) {
     event.preventDefault();
     const divError = document.getElementById('mensaje-error-edicion');
     divError.style.display = 'none';
-
     const form = document.getElementById('formAltaEdicion');
-    
-    // Usar FormData puro para que el navegador genere el multipart/form-data
     const datos = new FormData(form);
 
-    fetch('EdicionServlet?accion=altaEdicion', {
-        method: 'POST',
-        body: datos // NO AGREGAR HEADERS AQUÍ. El navegador lo hace solo.
-    })
+    fetch('EdicionServlet?accion=altaEdicion', { method: 'POST', body: datos })
     .then(response => {
         if (response.ok) {
             return response.text().then(msg => {
@@ -543,6 +594,7 @@ function altaEdicion(event) {
                 form.reset();
                 document.getElementById('cursoEdicion').innerHTML = '<option value="">Primero seleccione un instituto</option>';
                 document.getElementById('cursoEdicion').disabled = true;
+                guardarEstadoActualSPA(); // FIX: Guarda tras limpiar
             });
         } else {
             return response.text().then(err => { throw new Error(err); });
@@ -555,8 +607,6 @@ function altaEdicion(event) {
     });
 }
 
-// =====================================================================
-
 function cancelarOperacion() {
     const form = document.getElementById('formAltaCurso');
     if (form) {
@@ -568,17 +618,15 @@ function cancelarOperacion() {
 function cargarAltaCurso() {
     fetch('CursoServlet?accion=altaCurso')
         .then(response => {
-            if (!response.ok) {
-                throw new Error("Error de permisos o de servidor");
-            }
+            if (!response.ok) throw new Error("Error de permisos o de servidor");
             return response.text();
         })
         .then(htmlString => {
             document.getElementById('contenido-dinamico').innerHTML = htmlString;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
-            document.getElementById('contenido-dinamico').innerHTML = 
-                "<h3 style='color:red;'>No tienes permisos para ver esta sección.</h3>";
+            document.getElementById('contenido-dinamico').innerHTML = "<h3 style='color:red;'>No tienes permisos para ver esta sección.</h3>";
         });
 }
 
@@ -588,6 +636,7 @@ function cargarAltaUsuario() {
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
             inicializarEventosUsuario(); 
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error("Error al cargar la vista:", error));
 }
@@ -638,9 +687,7 @@ function inicializarEventosUsuario() {
             if (institutoSeleccionado === "") return alert("Seleccione un instituto.");
 
             for (let i = 0; i < selectSeleccionados.options.length; i++) {
-                if (selectSeleccionados.options[i].value === institutoSeleccionado) {
-                    return alert("El instituto ya fue agregado.");
-                }
+                if (selectSeleccionados.options[i].value === institutoSeleccionado) return alert("El instituto ya fue agregado.");
             }
             const opcion = document.createElement("option");
             opcion.value = institutoSeleccionado;
@@ -696,16 +743,14 @@ function inicializarEventosUsuario() {
             const archivoImagen = document.getElementById("imagen").files[0];
             if (archivoImagen) datos.append("imagen", archivoImagen);
 
-            fetch("UsuarioServlet?accion=crear", {
-                method: "POST",
-                body: datos
-            })
+            fetch("UsuarioServlet?accion=crear", { method: "POST", body: datos })
             .then(response => response.text())
             .then(resultado => {
                 alert(resultado); 
                 document.getElementById('formAltaUsuario').reset();
                 document.getElementById('vistaPrevia').src = 'imagenes/usr.png';
                 document.getElementById('institutosSeleccionados').innerHTML = ''; 
+                guardarEstadoActualSPA(); // FIX: Guarda tras limpiar
             })
             .catch(error => alert("Error: " + error));
         });
@@ -717,18 +762,14 @@ function cargarLogin() {
         .then(response => response.text())
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
             
             const formLogin = document.getElementById("formLogin");
             if(formLogin) {
                 formLogin.addEventListener("submit", function(event) {
                     event.preventDefault();
-                    
                     const datos = new URLSearchParams(new FormData(this));
-                    
-                    fetch('LoginServlet?accion=login', {
-                        method: 'POST',
-                        body: datos
-                    })
+                    fetch('LoginServlet?accion=login', { method: 'POST', body: datos })
                     .then(response => {
                         if (response.ok) {
                             window.location.reload(); 
@@ -752,19 +793,21 @@ function cerrarSesion() {
 }
 
 function cargarCursosPor(opcionBusqueda, nombreFiltro) {
-    fetch(`CursoServlet?accion=buscarCurso&opcion=${opcionBusqueda}&nombre=${nombreFiltro}`)
+    fetch(`CursoServlet?accion=buscarCurso&opcion=${encodeURIComponent(opcionBusqueda)}&nombre=${encodeURIComponent(nombreFiltro)}`)
         .then(response => response.text())
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error("Error cargando lista de cursos:", error));
 }
 
 function verDetallesCurso(nombreCurso) {
-    fetch(`CursoServlet?accion=verDetallesCurso&nombreCurso=${nombreCurso}`)
+    fetch(`CursoServlet?accion=verDetallesCurso&nombreCurso=${encodeURIComponent(nombreCurso)}`)
         .then(response => response.text())
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error("Error cargando detalles del curso:", error));
 }
@@ -784,7 +827,6 @@ function cargarMenuLateral() {
             const ulInstitutos = document.getElementById('lista-institutos');
             if(ulInstitutos) {
                 ulInstitutos.innerHTML = ''; 
-
                 institutos.forEach(inst => {
                     const li = document.createElement('li');
                     li.style.marginBottom = "5px";
@@ -792,8 +834,7 @@ function cargarMenuLateral() {
                     ulInstitutos.appendChild(li);
                 });
             }
-        })
-        .catch(error => console.error("Error al cargar institutos:", error));
+        }).catch(err => console.log(err));
 
     fetch('MiControladorServlet?accion=obtenerCategoriasJSON')
         .then(response => response.json())
@@ -801,7 +842,6 @@ function cargarMenuLateral() {
             const ulCategorias = document.getElementById('lista-categorias');
             if(ulCategorias) {
                 ulCategorias.innerHTML = ''; 
-
                 categorias.forEach(cat => {
                     const li = document.createElement('li');
                     li.style.marginBottom = "5px";
@@ -809,64 +849,53 @@ function cargarMenuLateral() {
                     ulCategorias.appendChild(li);
                 });
             }
-        })
-        .catch(error => console.error("Error al cargar categorías:", error));
+        }).catch(err => console.log(err));
 }
 
 function cargarAltaEdicion() {
     fetch('EdicionServlet?accion=altaEdicion')
         .then(response => {
-            if (!response.ok) {
-                return response.text().then(err => { throw new Error("Acceso denegado: " + response.status); });
-            }
+            if (!response.ok) return response.text().then(err => { throw new Error("Acceso denegado."); });
             return response.text();
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
-            document.getElementById('contenido-dinamico').innerHTML = `<h3 style="color:red; text-align:center;">${error.message}. ¿Iniciaste sesión como Docente?</h3>`;
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style="color:red; text-align:center;">${error.message}</h3>`;
         });
 }
 
 function cargarCursosDeInstituto(nombreInstituto) {
     const selectCurso = document.getElementById('cursoEdicion');
-    
     if (!nombreInstituto) {
         selectCurso.innerHTML = '<option value="">Primero seleccione un instituto</option>';
         selectCurso.disabled = true;
         return;
     }
-
     fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${nombreInstituto}`)
         .then(response => response.json())
         .then(cursos => {
             selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
-            cursos.forEach(curso => {
-                selectCurso.innerHTML += `<option value="${curso}">${curso}</option>`;
-            });
+            cursos.forEach(curso => selectCurso.innerHTML += `<option value="${curso}">${curso}</option>`);
             selectCurso.disabled = false;
-        })
-        .catch(error => console.error("Error cargando cursos del instituto:", error));
+        }).catch(err => console.log(err));
 }
 
 function cargarModificarUsuario() {
     const contenedor = document.getElementById('contenido-dinamico');
-
     fetch('fragmentos/ModificarUsuario.jsp')
         .then(response => {
-            if (!response.ok) {
-                throw new Error("No se pudo cargar la vista de modificación.");
-            }
+            if (!response.ok) throw new Error("No se pudo cargar la vista.");
             return response.text();
         })
         .then(html => {
             contenedor.innerHTML = html;
-            if (typeof inicializarEventosModificarUsuario === "function") {
-                inicializarEventosModificarUsuario();
-            }
+            if (typeof inicializarEventosModificarUsuario === "function") inicializarEventosModificarUsuario();
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
-        .catch(error => console.error("Error al cargar la vista de modificación:", error));
+        .catch(error => console.error(error));
 }
 
 function inicializarEventosModificarUsuario() {
@@ -880,7 +909,7 @@ function inicializarEventosModificarUsuario() {
     const selectInstituto = document.getElementById("institutoModificar");
     if (selectInstituto) {
         fetch("UsuarioServlet?accion=listarInstitutos")
-            .then(response => response.json())
+            .then(res => res.json())
             .then(institutos => {
                 institutos.forEach(inst => {
                     const opcion = document.createElement("option");
@@ -888,23 +917,17 @@ function inicializarEventosModificarUsuario() {
                     opcion.textContent = inst.nombre;
                     selectInstituto.appendChild(opcion);
                 });
-            })
-            .catch(err => console.error("Error cargando institutos:", err));
+            }).catch(err => console.log(err));
 
         const btnAgregar = document.getElementById("agregarInstitutoModificar");
         if (btnAgregar) {
             btnAgregar.addEventListener("click", function () {
                 const instSeleccionado = selectInstituto.value;
                 const selectLista = document.getElementById("institutosSeleccionadosModificar");
-
-                if (!instSeleccionado) return alert("Seleccione un instituto de la lista.");
-
+                if (!instSeleccionado) return alert("Seleccione un instituto.");
                 for (let i = 0; i < selectLista.options.length; i++) {
-                    if (selectLista.options[i].value === instSeleccionado) {
-                        return alert("El instituto ya fue agregado.");
-                    }
+                    if (selectLista.options[i].value === instSeleccionado) return alert("Ya agregado.");
                 }
-
                 const opcion = document.createElement("option");
                 opcion.value = instSeleccionado;
                 opcion.textContent = instSeleccionado;
@@ -927,9 +950,7 @@ function inicializarEventosModificarUsuario() {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function (evt) {
-                    vistaPrevia.src = evt.target.result;
-                };
+                reader.onload = function (evt) { vistaPrevia.src = evt.target.result; };
                 reader.readAsDataURL(file);
             }
         });
@@ -937,73 +958,39 @@ function inicializarEventosModificarUsuario() {
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-
-        if (divError) {
-            divError.style.display = 'none';
-            divError.innerText = '';
-        }
+        if (divError) { divError.style.display = 'none'; divError.innerText = ''; }
 
         const pass = document.getElementById('password') ? document.getElementById('password').value : '';
         const confirmPass = document.getElementById('confirmarPassword') ? document.getElementById('confirmarPassword').value : '';
 
         if (pass.length > 0 || confirmPass.length > 0) {
-            if (pass !== confirmPass) {
-                if (divError) {
-                    divError.innerText = "Las contraseñas no coinciden. Por favor verifique.";
-                    divError.style.display = 'block';
-                } else {
-                    alert("Las contraseñas no coinciden.");
-                }
-                return;
-            }
+            if (pass !== confirmPass) return alert("Las contraseñas no coinciden.");
         }
 
         const selectLista = document.getElementById("institutosSeleccionadosModificar");
-        if (selectLista && selectLista.options.length === 0) {
-            if (divError) {
-                divError.innerText = "Un docente debe tener al menos un instituto asignado.";
-                divError.style.display = 'block';
-            } else {
-                alert("Un docente debe tener al menos un instituto asignado.");
-            }
-            return;
-        }
+        if (selectLista && selectLista.options.length === 0) return alert("Un docente debe tener al menos un instituto asignado.");
 
         const formData = new FormData(form);
         formData.append('accion', 'modificarUsuario');
-
         if (selectLista) {
-            for (let i = 0; i < selectLista.options.length; i++) {
-                formData.append("institutos", selectLista.options[i].value);
-            }
+            for (let i = 0; i < selectLista.options.length; i++) formData.append("institutos", selectLista.options[i].value);
         }
 
-        fetch('UsuarioServlet', {
-            method: 'POST',
-            body: formData
-        })
+        fetch('UsuarioServlet', { method: 'POST', body: formData })
         .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => { throw new Error(text); });
-            }
+            if (!response.ok) return response.text().then(text => { throw new Error(text); });
             return response.text();
         })
         .then(mensajeExito => {
             alert("Cambios guardados correctamente.");
             window.location.reload();
         })
-        .catch(error => {
-            if (divError) {
-                divError.innerText = error.message || "Error al actualizar el perfil.";
-                divError.style.display = 'block';
-            } else {
-                alert("Error: " + error.message);
-            }
-        });
+        .catch(error => alert("Error: " + error.message));
     });
 }
 
-function cargarConsultaEdicion(nombreEdicion) {
+// FIX IMPORTANTE: Añadimos un parámetro esRefresco para diferenciar cuando navegamos vs cuando mutamos
+function cargarConsultaEdicion(nombreEdicion, esRefresco = false) {
     document.getElementById('contenido-dinamico').innerHTML = "<h3 style='text-align:center;'>Cargando edición...</h3>";
     
     fetch(`EdicionServlet?accion=consultaEdicion&nombre=${encodeURIComponent(nombreEdicion)}`)
@@ -1013,6 +1000,13 @@ function cargarConsultaEdicion(nombreEdicion) {
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            
+            // FIX: Si es un refresco (tras agregar/quitar docente), REEMPLAZAMOS el estado
+            if (esRefresco) {
+                guardarEstadoActualSPA();
+            } else {
+                crearNuevoEstadoSPA();
+            }
         })
         .catch(error => {
             document.getElementById('contenido-dinamico').innerHTML = `<h3 style="color:red; text-align:center;">${error.message}</h3>`;
@@ -1022,17 +1016,19 @@ function cargarConsultaEdicion(nombreEdicion) {
 function cargarFormInscripcion() {
     fetch('InscripcionServlet?accion=formulario')
         .then(response => {
-            if (!response.ok) throw new Error("Acceso denegado. Esta función es solo para Estudiantes.");
+            if (!response.ok) throw new Error("Acceso denegado. Función para Estudiantes.");
             return response.text();
         })
-        .then(html => document.getElementById('contenido-dinamico').innerHTML = html)
-        .catch(error => document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center; padding: 20px;'>${error.message}</h3>`);
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
+        })
+        .catch(error => document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red;'>${error.message}</h3>`);
 }
 
 function cargarCursosParaInscripcion(nombreInstituto) {
     const selectCurso = document.getElementById('cursoInscripcion');
     const selectEdicion = document.getElementById('edicionInscripcion');
-    
     selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
     selectEdicion.disabled = true;
 
@@ -1053,7 +1049,6 @@ function cargarCursosParaInscripcion(nombreInstituto) {
 
 function cargarEdicionesParaInscripcion(nombreCurso) {
     const selectEdicion = document.getElementById('edicionInscripcion');
-    
     if (!nombreCurso) {
         selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
         selectEdicion.disabled = true;
@@ -1080,50 +1075,50 @@ function inscribirEdicion(event) {
     const form = document.getElementById('formInscripcionEdicion');
     const datos = new URLSearchParams(new FormData(form));
 
-    fetch('InscripcionServlet?accion=inscribir', {
-        method: 'POST',
-        body: datos
-    })
+    fetch('InscripcionServlet?accion=inscribir', { method: 'POST', body: datos })
     .then(response => {
         if (response.ok) {
             return response.text().then(msg => {
                 msgDiv.style.display = 'block';
                 msgDiv.style.backgroundColor = '#dff0d8';
                 msgDiv.style.color = '#3c763d';
-                msgDiv.style.border = '1px solid #d6e9c6';
                 msgDiv.innerHTML = "✔ " + msg;
-                
                 form.reset();
                 document.getElementById('cursoInscripcion').disabled = true;
                 document.getElementById('edicionInscripcion').disabled = true;
+                guardarEstadoActualSPA(); // FIX: Guardar tras limpieza
             });
         } else {
             return response.text().then(err => {
                 msgDiv.style.display = 'block';
                 msgDiv.style.backgroundColor = '#f2dede';
                 msgDiv.style.color = '#a94442';
-                msgDiv.style.border = '1px solid #ebccd1';
                 msgDiv.innerHTML = "<strong>Atención:</strong> " + err;
             });
         }
-    })
-    .catch(error => console.error('Error procesando inscripción:', error));
+    }).catch(error => console.error(error));
 }
 
 // =====================================================================
 // FUNCIONALIDAD DE RED SOCIAL Y VER PERFIL
 // =====================================================================
 
-function cargarSocial() {
+// FIX IMPORTANTE: Añadimos parámetro esRefresco
+function cargarSocial(esRefresco = false) {
     fetch('UsuarioServlet?accion=cargarSocial')
         .then(response => {
-            if (!response.ok) {
-                return response.text().then(err => { throw new Error(err); });
-            }
+            if (!response.ok) return response.text().then(err => { throw new Error(err); });
             return response.text();
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            
+            // FIX: Si es refresco (por ejemplo tras seguir/dejar de seguir masivo), reemplaza. Sino, crea.
+            if (esRefresco) {
+                guardarEstadoActualSPA();
+            } else {
+                crearNuevoEstadoSPA();
+            }
         })
         .catch(error => {
             document.getElementById('contenido-dinamico').innerHTML = error.message;
@@ -1131,44 +1126,30 @@ function cargarSocial() {
 }
 
 function seguirRapido(nickname) {
-    const params = new URLSearchParams();
-    params.append('accion', 'seguir');
-    params.append('nicknameASeguir', nickname);
-
-    ejecutarAccionSocial(params);
+    const btn = document.querySelector(`button[onclick="seguirRapido('${nickname}')"]`);
+    if (btn) toggleSeguirUsuario(btn, nickname, 'seguir');
 }
 
 function dejarDeSeguirRapido(nickname) {
-    const params = new URLSearchParams();
-    params.append('accion', 'dejarSeguir');
-    params.append('nicknameSeleccionado', nickname);
-
-    ejecutarAccionSocial(params);
+    const btn = document.querySelector(`button[onclick="dejarDeSeguirRapido('${nickname}')"]`);
+    if (btn) toggleSeguirUsuario(btn, nickname, 'dejarSeguir');
 }
 
 function ejecutarAccionSocial(params) {
     fetch('UsuarioServlet', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
         body: params
     })
     .then(response => {
-        return response.text().then(texto => {
-            if (!response.ok) {
-                throw new Error(texto);
-            }
-            return texto;
-        });
+        if (!response.ok) return response.text().then(texto => { throw new Error(texto); });
+        return response.text();
     })
     .then(mensajeExito => {
         alert(mensajeExito);
-        cargarSocial(); // Recarga la lista para actualizar los botones de estado
+        cargarSocial(true); // FIX: Pasamos true para REEMPLAZAR estado en vez de push
     })
-    .catch(error => {
-        alert(error.message);
-    });
+    .catch(error => alert(error.message));
 }
 
 function verPerfilUsuario(nickname) {
@@ -1183,6 +1164,7 @@ function verPerfilUsuario(nickname) {
             })
             .then(html => {
                 contenedor.innerHTML = html;
+                crearNuevoEstadoSPA(); // FIX: Abrir el perfil es una nueva "vista" para el usuario
             })
             .catch(error => {
                 contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
@@ -1193,23 +1175,15 @@ function verPerfilUsuario(nickname) {
 function filtrarUsuariosRedSocial() {
     const input = document.getElementById('filtroNickname');
     if (!input) return;
-    
     const filtro = input.value.toLowerCase().trim();
     const filas = document.querySelectorAll('.fila-usuario-social');
 
     filas.forEach(fila => {
         const nickname = fila.getAttribute('data-nickname');
-        if (nickname.includes(filtro)) {
-            fila.style.display = '';
-        } else {
-            fila.style.display = 'none';
-        }
+        if (nickname.includes(filtro)) fila.style.display = '';
+        else fila.style.display = 'none';
     });
 }
-
-// =====================================================================
-// CASO DE USO: SELECCIONAR ESTUDIANTES A EDICIÓN (DOCENTE)
-// =====================================================================
 
 function cargarFormSeleccionEstudiantes() {
     fetch('InscripcionServlet?accion=formularioSeleccion')
@@ -1219,9 +1193,10 @@ function cargarFormSeleccionEstudiantes() {
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
-            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red;'>${error.message}</h3>`;
         });
 }
 
@@ -1233,7 +1208,7 @@ function cargarCursosParaSeleccion(nombreInstituto) {
     
     selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
     selectEdicion.disabled = true;
-    tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione Instituto, Curso y Edición para ver las inscripciones.</p>';
+    if(tablaContenedor) tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione Instituto, Curso y Edición para ver las inscripciones.</p>';
     if(btnGuardar) btnGuardar.disabled = true;
 
     if (!nombreInstituto) {
@@ -1242,13 +1217,18 @@ function cargarCursosParaSeleccion(nombreInstituto) {
         return;
     }
 
-    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${nombreInstituto}`)
+    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${encodeURIComponent(nombreInstituto)}`)
         .then(response => response.json())
         .then(cursos => {
             selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
-            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            cursos.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c;
+                option.textContent = c;
+                selectCurso.appendChild(option);
+            });
             selectCurso.disabled = false;
-        });
+        }).catch(err => console.log(err));
 }
 
 function cargarEdicionesParaSeleccion(nombreCurso) {
@@ -1297,12 +1277,10 @@ function cargarTablaInscripciones(nombreEdicion) {
         .then(response => response.text())
         .then(html => {
             tablaContenedor.innerHTML = html;
+            if (document.getElementById('cuerpoTablaInscripciones')) btnGuardar.disabled = false;
+            else btnGuardar.disabled = true;
             
-            if (document.getElementById('cuerpoTablaInscripciones')) {
-                btnGuardar.disabled = false;
-            } else {
-                btnGuardar.disabled = true;
-            }
+            guardarEstadoActualSPA(); // FIX: Guardamos el estado actual al cargar la sub-tabla
         })
         .catch(error => {
             tablaContenedor.innerHTML = `<p style="color:red; text-align:center;">Error al cargar la tabla.</p>`;
@@ -1314,7 +1292,6 @@ function ordenarInscripciones(criterio) {
     if (!tbody) return;
 
     const filas = Array.from(tbody.querySelectorAll('tr.fila-inscripcion'));
-
     filas.sort((a, b) => {
         if (criterio === 'prioridad') {
             const prioA = parseFloat(a.getAttribute('data-prioridad')) || 0;
@@ -1326,7 +1303,6 @@ function ordenarInscripciones(criterio) {
             return fechaA.localeCompare(fechaB);
         }
     });
-
     filas.forEach(fila => tbody.appendChild(fila));
 }
 
@@ -1348,21 +1324,17 @@ function guardarSeleccionEstudiantes(event) {
     const datos = new URLSearchParams(new FormData(form));
     datos.append('accion', 'guardarSeleccion');
 
-    fetch('InscripcionServlet', {
-        method: 'POST',
-        body: datos
-    })
+    fetch('InscripcionServlet', { method: 'POST', body: datos })
     .then(response => {
         if (response.ok) {
             return response.text().then(msg => {
                 msgDiv.style.display = 'block';
                 msgDiv.style.backgroundColor = '#dff0d8';
                 msgDiv.style.color = '#3c763d';
-                msgDiv.style.border = '1px solid #d6e9c6';
                 msgDiv.innerHTML = "✔ " + msg;
                 
                 const edicionActual = document.getElementById('edicionOculta').value;
-                setTimeout(() => cargarTablaInscripciones(edicionActual), 1500);
+                setTimeout(() => cargarTablaInscripciones(edicionActual), 1500); // Re-carga la tabla y allí guardará estado
             });
         } else {
             return response.text().then(err => { throw new Error(err); });
@@ -1372,34 +1344,12 @@ function guardarSeleccionEstudiantes(event) {
         msgDiv.style.display = 'block';
         msgDiv.style.backgroundColor = '#f2dede';
         msgDiv.style.color = '#a94442';
-        msgDiv.style.border = '1px solid #ebccd1';
         msgDiv.innerHTML = "<strong>Error:</strong> " + error.message;
     })
     .finally(() => {
         btnGuardar.disabled = false;
         btnGuardar.innerText = 'Guardar Selección';
     });
-}
-
-//---------------------------------------------------------
-//------- Consulta Usuario --------------------------------
-//---------------------------------------------------------
-
-function cargarConsultaUsuario() {
-    const contenedor = document.getElementById('contenido-dinamico');
-    contenedor.innerHTML = '<h3 style="text-align:center; color:#3498db;">Cargando usuarios...</h3>';
-
-    fetch('UsuarioServlet?accion=consultaUsuario')
-        .then(response => {
-            if (!response.ok) throw new Error("Error al cargar la consulta de usuario.");
-            return response.text();
-        })
-        .then(html => {
-            contenedor.innerHTML = html;
-        })
-        .catch(error => {
-            contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
-        });
 }
 
 function cargarConsultaUsuario(callback) {
@@ -1413,6 +1363,7 @@ function cargarConsultaUsuario(callback) {
         })
         .then(html => {
             contenedor.innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
             
             if (typeof callback === 'function') {
                 callback();
@@ -1423,10 +1374,7 @@ function cargarConsultaUsuario(callback) {
         });
 }
 
-
-
 function cargarDetalleConsultaUsuario(nickname) {
-    // Apuntamos al nuevo ID donde se inyectan los datos de la tarjeta
     const contenedor = document.getElementById('detalle-usuario-contenido');
     if (!contenedor) return;
 
@@ -1439,6 +1387,7 @@ function cargarDetalleConsultaUsuario(nickname) {
         })
         .then(html => {
             contenedor.innerHTML = html;
+            guardarEstadoActualSPA(); // FIX: Es una sub-vista, sobrescribimos el estado actual
         })
         .catch(error => {
             contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
@@ -1448,35 +1397,23 @@ function cargarDetalleConsultaUsuario(nickname) {
 function cambiarPestana(idPestana) {
     const contenidos = document.querySelectorAll('.contenido-tab');
     contenidos.forEach(div => div.style.display = 'none');
-
     const botones = document.querySelectorAll('.tab-btn');
-    botones.forEach(btn => {
-        btn.style.background = '#e0e0e0';
-        btn.style.color = '#333';
-    });
+    botones.forEach(btn => { btn.style.background = '#e0e0e0'; btn.style.color = '#333'; });
 
     const tabSeleccionado = document.getElementById(idPestana);
     if (tabSeleccionado) tabSeleccionado.style.display = 'block';
 
     const btnSeleccionado = document.getElementById(`btn-${idPestana}`);
-    if (btnSeleccionado) {
-        btnSeleccionado.style.background = '#3498db';
-        btnSeleccionado.style.color = 'white';
-    }
+    if (btnSeleccionado) { btnSeleccionado.style.background = '#3498db'; btnSeleccionado.style.color = 'white'; }
 }
 
 function cargarMiPerfil(nickname) {
-    if (!nickname) {
-        console.error("No hay un nickname válido para cargar el perfil.");
-        return;
-    }
-
+    if (!nickname) return;
     const contenedorPrincipal = document.getElementById('contenido-dinamico');
     if (!contenedorPrincipal) return;
 
     contenedorPrincipal.innerHTML = '<h4 style="text-align:center; color:#3498db; margin-top:20px;">Cargando Mi Perfil...</h4>';
 
-    // 1. Cargamos el fragmento base consultaUsuario.jsp
     fetch('UsuarioServlet?accion=consultaUsuario')
         .then(response => {
             if (!response.ok) throw new Error("Error al cargar la interfaz de consulta.");
@@ -1484,27 +1421,23 @@ function cargarMiPerfil(nickname) {
         })
         .then(htmlConsulta => {
             contenedorPrincipal.innerHTML = htmlConsulta;
-
-            // Usamos los NUEVOS IDs para ocultar la tabla y mostrar la tarjeta
+            
             const lista = document.getElementById('contenedor-lista-usuarios');
             if (lista) lista.style.display = 'none';
 
             const detalle = document.getElementById('contenedor-detalle-usuario');
             if (detalle) detalle.style.display = 'block';
 
-            // Ocultamos el botón "Volver" porque en Mi Perfil no tiene sentido
             const btnVolver = contenedorPrincipal.querySelector('button[onclick="volverAListaUsuarios()"]');
             if (btnVolver) btnVolver.style.display = 'none';
 
             const titulo = contenedorPrincipal.querySelector('h2');
-            if (titulo) {
-                titulo.textContent = 'Mi Perfil';
-            }
+            if (titulo) titulo.textContent = 'Mi Perfil';
 
             cargarDetalleConsultaUsuario(nickname);
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado principal
         })
         .catch(error => {
-            console.error("Error en cargarMiPerfil:", error);
             contenedorPrincipal.innerHTML = `<p style="color:red; text-align:center; padding:20px;">${error.message}</p>`;
         });
 }
@@ -1517,6 +1450,7 @@ function cargarFormListarAceptados() {
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
             document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
@@ -1544,8 +1478,7 @@ function cargarCursosParaAceptados(nombreInstituto) {
             selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
             cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
             selectCurso.disabled = false;
-        })
-        .catch(error => console.error("Error al cargar cursos:", error));
+        }).catch(err => console.log(err));
 }
 
 function cargarEdicionesParaAceptados(nombreCurso) {
@@ -1571,8 +1504,7 @@ function cargarEdicionesParaAceptados(nombreCurso) {
                 ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
                 selectEdicion.disabled = false;
             }
-        })
-        .catch(error => console.error("Error al cargar ediciones:", error));
+        });
 }
 
 function cargarTablaAceptados(nombreEdicion) {
@@ -1592,6 +1524,7 @@ function cargarTablaAceptados(nombreEdicion) {
         })
         .then(html => {
             tablaContenedor.innerHTML = html;
+            guardarEstadoActualSPA(); // FIX: Guardar el estado de la sub-tabla
         })
         .catch(error => {
             tablaContenedor.innerHTML = `<p style="color:red; text-align:center;">Error al cargar los estudiantes aceptados.</p>`;
@@ -1606,6 +1539,7 @@ function cargarResultadosInscripciones() {
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
             document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
@@ -1616,21 +1550,15 @@ function filtrarMisInscripciones(estadoSeleccionado) {
     const filas = document.querySelectorAll('#tablaMisInscripcionesBody tr.fila-mi-inscripcion');
     filas.forEach(fila => {
         const estadoFila = fila.getAttribute('data-estado');
-        if (estadoSeleccionado === 'TODOS' || estadoFila === estadoSeleccionado) {
-            fila.style.display = '';
-        } else {
-            fila.style.display = 'none';
-        }
+        if (estadoSeleccionado === 'TODOS' || estadoFila === estadoSeleccionado) fila.style.display = '';
+        else fila.style.display = 'none';
     });
 }
 
-// 1. Selector para Consulta de Curso
 function cargarSelectorConsultaCurso() {
-    // Reutilizamos el endpoint de institutos que ya tienes en tus Servlets
     fetch('EdicionServlet?accion=formularioAltaEdicion') 
         .then(response => response.text())
         .then(html => {
-            // Inyectamos un HTML temporal con los combos en cascada
             const htmlBuscador = `
                 <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px;">
                     <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Consultar Curso</h2>
@@ -1639,7 +1567,6 @@ function cargarSelectorConsultaCurso() {
                             <label style="font-weight: bold;">Instituto:</label>
                             <select id="instBuscadorCurso" onchange="cargarCursosParaBuscador(this.value)" style="width: 100%; padding: 8px;">
                                 <option value="">Seleccione Instituto...</option>
-                                <!-- Aquí deberías cargar los institutos dinámicamente o usar el JS existente -->
                             </select>
                         </div>
                         <div style="flex: 1;">
@@ -1652,13 +1579,11 @@ function cargarSelectorConsultaCurso() {
                 </div>
             `;
             document.getElementById('contenido-dinamico').innerHTML = htmlBuscador;
-            // Ejecuta una función que ya tienes para rellenar los institutos
             cargarInstitutosGenericos('instBuscadorCurso'); 
-        })
-        .catch(err => console.error("Error cargando buscador de curso:", err));
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
+        }).catch(err => console.log(err));
 }
 
-// 2. Selector para Consulta de Edición
 function cargarSelectorConsultaEdicion() {
     const htmlBuscador = `
         <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px;">
@@ -1687,15 +1612,18 @@ function cargarSelectorConsultaEdicion() {
     `;
     document.getElementById('contenido-dinamico').innerHTML = htmlBuscador;
     cargarInstitutosGenericos('instBuscadorEd');
+    crearNuevoEstadoSPA(); // FIX: Nuevo estado
 }
 
-// Helpers genéricos de AJAX
 function cargarInstitutosGenericos(selectId) {
-    fetch('UsuarioServlet?accion=listarInstitutosJSON') // Ajusta este endpoint si tienes otro que devuelva JSON de Institutos
+    fetch('CursoServlet?accion=listarInstitutosJSON')
         .then(res => res.json())
         .then(data => {
             const select = document.getElementById(selectId);
-            data.forEach(inst => select.innerHTML += `<option value="${inst}">${inst}</option>`);
+            if (select) data.forEach(inst => select.innerHTML += `<option value="${inst}">${inst}</option>`);
+        }).catch(err => {
+            const select = document.getElementById(selectId);
+            if (select) select.innerHTML = '<option value="">Error cargando</option>';
         });
 }
 
@@ -1708,7 +1636,12 @@ function cargarCursosParaBuscador(instituto) {
     fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${encodeURIComponent(instituto)}`)
         .then(res => res.json())
         .then(cursos => {
-            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            cursos.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c;
+                option.textContent = c;
+                selectCurso.appendChild(option);
+            });
             selectCurso.disabled = false;
         });
 }
@@ -1725,7 +1658,12 @@ function cargarCursosParaBuscadorEdicion(instituto) {
     fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${encodeURIComponent(instituto)}`)
         .then(res => res.json())
         .then(cursos => {
-            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            cursos.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c;
+                option.textContent = c;
+                selectCurso.appendChild(option);
+            });
             selectCurso.disabled = false;
         });
 }
@@ -1734,7 +1672,6 @@ function cargarEdicionesParaBuscadorEdicion(curso) {
     const selectEdicion = document.getElementById('edicionBuscadorFinal');
     selectEdicion.innerHTML = '<option value="">Seleccione Edición...</option>';
     selectEdicion.disabled = true;
-    
     if(!curso) return;
 
     fetch(`InscripcionServlet?accion=listarEdiciones&curso=${encodeURIComponent(curso)}`)
@@ -1745,28 +1682,6 @@ function cargarEdicionesParaBuscadorEdicion(curso) {
         });
 }
 
-function cargarInstitutosGenericos(selectId) {
-    // Apuntamos al endpoint que acabamos de crear en el CursoServlet
-    fetch('CursoServlet?accion=listarInstitutosJSON')
-        .then(res => res.json())
-        .then(data => {
-            const select = document.getElementById(selectId);
-            if (select) {
-                // Mantenemos la opción por defecto y agregamos los institutos
-                data.forEach(inst => select.innerHTML += `<option value="${inst}">${inst}</option>`);
-            }
-        })
-        .catch(err => {
-            console.error("Error cargando institutos:", err);
-            const select = document.getElementById(selectId);
-            if (select) select.innerHTML = '<option value="">Error cargando institutos</option>';
-        });
-}
-
-//#######################################
-//Inscripción a programa
-//#######################################
-
 function cargarFormInscripcionPrograma() {
     fetch('ProgramaServlet?accion=formInscripcionPrograma')
         .then(response => {
@@ -1775,9 +1690,10 @@ function cargarFormInscripcionPrograma() {
         })
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => {
-            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center; padding: 20px;'>${error.message}</h3>`;
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
         });
 }
 
@@ -1788,74 +1704,24 @@ function inscribirPrograma(event) {
     const datos = new URLSearchParams(new FormData(form));
     datos.append('accion', 'inscribirPrograma');
 
-    fetch('ProgramaServlet', {
-        method: 'POST',
-        body: datos
-    })
+    fetch('ProgramaServlet', { method: 'POST', body: datos })
     .then(response => {
         return response.text().then(msg => {
             msgDiv.style.display = 'block';
             if (response.ok) {
                 msgDiv.style.backgroundColor = '#dff0d8';
                 msgDiv.style.color = '#3c763d';
-                msgDiv.style.border = '1px solid #d6e9c6';
                 msgDiv.innerHTML = "✔ " + msg;
                 form.reset();
+                guardarEstadoActualSPA(); // FIX: Guardar tras limpieza
             } else {
                 msgDiv.style.backgroundColor = '#f2dede';
                 msgDiv.style.color = '#a94442';
-                msgDiv.style.border = '1px solid #ebccd1';
                 msgDiv.innerHTML = "<strong>Atención:</strong> " + msg;
             }
         });
-    })
-    .catch(error => console.error('Error procesando inscripción a programa:', error));
+    }).catch(error => console.log(error));
 }
-
-// =====================================================================
-// NAVEGABILIDAD SPA: FLECHA ATRÁS Y GUARDADO DE HISTORIAL (CORREGIDO)
-// =====================================================================
-(function inicializarHistorialSPA() {
-    const contenedor = document.getElementById('contenido-dinamico');
-    if (!contenedor) return;
-
-    document.addEventListener('click', function(e) {
-        const link = e.target.closest('a[href="#"]');
-        if (link) {
-            e.preventDefault(); // Evita que el navegador ensucie el historial con el símbolo #
-        }
-    });
-
-    let navegandoHaciaAtras = false;
-    let timeoutMutacion;
-
-    // 2. Guardamos la pantalla inicial (Bienvenida)
-    history.replaceState({ html: contenedor.innerHTML }, document.title);
-
-    // 3. Observador Inteligente (Espera a que el fetch termine de dibujar todo)
-    const observador = new MutationObserver(() => {
-        if (navegandoHaciaAtras) return;
-        
-        clearTimeout(timeoutMutacion);
-        timeoutMutacion = setTimeout(() => {
-            // Guardamos la foto de la pantalla 100ms después de que dejó de mutar
-            history.pushState({ html: contenedor.innerHTML }, document.title);
-        }, 100); 
-    });
-
-    observador.observe(contenedor, { childList: true, subtree: true });
-
-    // 4. Acción al presionar la flecha "Atrás" o "Adelante"
-    window.addEventListener("popstate", (evento) => {
-        if (evento.state && evento.state.html) {
-            naveandoHaciaAtras = true; // Pausamos el observador
-            contenedor.innerHTML = evento.state.html; // Restauramos la vista
-            
-            // Reactivamos el observador un instante después
-            setTimeout(() => { navegandoHaciaAtras = false; }, 150);
-        }
-    });
-})();
 
 // =====================================================================
 // CONTROLADOR DE MODALES MODERNOS
@@ -1865,11 +1731,8 @@ function mostrarModal(titulo, htmlCuerpo, botonesHtml = null) {
     document.getElementById('modal-cuerpo').innerHTML = htmlCuerpo;
     
     const pie = document.getElementById('modal-pie');
-    if (botonesHtml) {
-        pie.innerHTML = botonesHtml;
-    } else {
-        pie.innerHTML = `<button class="btn-moderno" style="background-color: #3498db;" onclick="cerrarModal()">Aceptar</button>`;
-    }
+    if (botonesHtml) pie.innerHTML = botonesHtml;
+    else pie.innerHTML = `<button class="btn-moderno" style="background-color: #3498db;" onclick="cerrarModal()">Aceptar</button>`;
     
     const modal = document.getElementById('modal-global');
     modal.classList.remove('modal-oculto');
@@ -1882,22 +1745,13 @@ function cerrarModal() {
     modal.classList.add('modal-oculto');
 }
 
-// =====================================================================
-// FUNCIONES PARA AGREGAR DOCENTE A EDICIÓN
-// =====================================================================
-
 function cargarFormularioAgregarDocente(nombreEdicion) {
-    // 1. Pedimos los docentes al Servlet
     fetch('EdicionServlet?accion=listarDocentesJSON')
         .then(res => res.json())
         .then(docentes => {
-            // 2. Armamos las opciones del <select>
             let opcionesHtml = '<option value="">Seleccione un docente...</option>';
-            docentes.forEach(doc => {
-                opcionesHtml += `<option value="${doc}">${doc}</option>`;
-            });
+            docentes.forEach(doc => opcionesHtml += `<option value="${doc}">${doc}</option>`);
 
-            // 3. Diseñamos el cuerpo del Modal
             const htmlCuerpo = `
                 <div style="margin-bottom: 15px;">
                     <p style="margin-top: 0; color: #7f8c8d;">Selecciona el docente que deseas añadir a la edición <strong>${nombreEdicion}</strong>.</p>
@@ -1907,71 +1761,46 @@ function cargarFormularioAgregarDocente(nombreEdicion) {
                     </select>
                 </div>
             `;
-
-            // 4. Diseñamos los botones del Modal
             const htmlBotones = `
                 <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
                 <button class="btn-moderno" style="background-color: #2ecc71; margin-left: 10px;" onclick="guardarDocenteEdicion('${nombreEdicion}')">Guardar Docente</button>
             `;
-
-            // 5. ¡Llamamos a nuestro sistema de Modales modernos!
             mostrarModal('Asignar Nuevo Docente', htmlCuerpo, htmlBotones);
-        })
-        .catch(err => {
-            alert("Error cargando la lista de docentes.");
-            console.error(err);
-        });
+        }).catch(err => alert("Error cargando la lista."));
 }
 
 function guardarDocenteEdicion(nombreEdicion) {
     const nicknameDocente = document.getElementById('select-nuevo-docente').value;
-    
-    if (!nicknameDocente) {
-        alert("Por favor, selecciona un docente de la lista.");
-        return;
-    }
+    if (!nicknameDocente) return alert("Selecciona un docente de la lista.");
 
-    // Enviamos el dato al backend usando POST (Formulario invisible)
     const params = new URLSearchParams();
     params.append('accion', 'agregarDocente');
     params.append('edicion', nombreEdicion);
     params.append('docente', nicknameDocente);
 
-    fetch('EdicionServlet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params
-    })
+    fetch('EdicionServlet', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params })
     .then(response => {
         if (response.ok) {
-            cerrarModal(); // Cerramos el pop-up bonito
-            cargarConsultaEdicion(nombreEdicion); // Refrescamos la vista para que el docente aparezca inmediatamente!
+            cerrarModal(); 
+            // FIX: Actualizamos la tabla de docentes y pasamos 'true' para indicar que es un reemplazo de estado
+            cargarConsultaEdicion(nombreEdicion, true); 
         } else {
             response.text().then(errorMsg => alert("Error: " + errorMsg));
         }
     });
 }
 
-// =====================================================================
-// FUNCIONES PARA QUITAR DOCENTE DE EDICIÓN (MODAL)
-// =====================================================================
-
 function confirmarQuitarDocente(nombreEdicion, nicknameDocente, nombreCompleto) {
-    // 1. Diseñamos el cuerpo del Pop-up
     const htmlCuerpo = `
         <div style="text-align: center; padding: 10px;">
             <p style="font-size: 15px; color: #2c3e50;">¿Estás seguro de que deseas quitar al docente <strong style="color: #e74c3c;">${nombreCompleto}</strong> de esta edición?</p>
             <p style="font-size: 13px; color: #7f8c8d;">Se actualizará la base de datos inmediatamente.</p>
         </div>
     `;
-
-    // 2. Diseñamos los botones
     const htmlBotones = `
         <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
         <button class="btn-moderno" style="background-color: #e74c3c; margin-left: 10px;" onclick="ejecutarQuitarDocente('${nombreEdicion}', '${nicknameDocente}')">Sí, Quitar</button>
     `;
-
-    // 3. Mostramos el Modal
     mostrarModal('Confirmar Eliminación', htmlCuerpo, htmlBotones);
 }
 
@@ -1981,233 +1810,167 @@ function ejecutarQuitarDocente(nombreEdicion, nicknameDocente) {
     params.append('edicion', nombreEdicion);
     params.append('docente', nicknameDocente);
 
-    fetch('EdicionServlet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params
-    })
+    fetch('EdicionServlet', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params })
     .then(response => {
         if (response.ok) {
-            cerrarModal(); // Cerramos el pop-up
-            cargarConsultaEdicion(nombreEdicion); // Refrescamos la vista (el docente desaparecerá instantáneamente)
+            cerrarModal();
+            // FIX: Actualizamos la tabla de docentes y pasamos 'true' para reemplazar estado
+            cargarConsultaEdicion(nombreEdicion, true); 
         } else {
             response.text().then(errorMsg => alert("Error al quitar: " + errorMsg));
         }
     });
 }
 
-// =====================================================================
-// FUNCIONES PARA CONSULTA DE USUARIO (MOSTRAR/OCULTAR Y CARGAR DATOS)
-// =====================================================================
-
 function seleccionarUsuario(nickname) {
-    // 1. Ocultamos la tabla de arriba y mostramos el contenedor de la tarjeta
     document.getElementById('contenedor-lista-usuarios').style.display = 'none';
     document.getElementById('contenedor-detalle-usuario').style.display = 'block';
-    
     const contenedorDetalle = document.getElementById('detalle-usuario-contenido');
     if (!contenedorDetalle) return;
 
-    contenedorDetalle.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 40px;">Cargando datos del usuario...</p>';
+    contenedorDetalle.innerHTML = '<p style="text-align: center; color: #7f8c8d; margin-top: 40px;">Cargando datos...</p>';
 
-    // 2. Hacemos la petición al backend para traer la información real del usuario
-    // NOTA: Asegúrate de que el endpoint 'detalleConsultaUsuario' existe en tu UsuarioServlet y devuelve la tarjeta HTML.
     fetch(`UsuarioServlet?accion=detalleConsultaUsuario&nickname=${encodeURIComponent(nickname)}`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error("Error en la respuesta del servidor");
-            }
-            return response.text(); // Esperamos el fragmento de HTML o JSP
+            if (!response.ok) throw new Error("Error del servidor");
+            return response.text(); 
         })
         .then(html => {
             contenedorDetalle.innerHTML = html;
+            crearNuevoEstadoSPA(); // FIX: Abrir la tarjeta de usuario es un nuevo estado
         })
         .catch(error => {
-            console.error("Error al cargar el usuario:", error);
-            contenedorDetalle.innerHTML = `
-                <div style="background: #fadbd8; color: #c0392b; padding: 15px; border-radius: 6px; text-align: center; margin-top: 20px;">
-                    <strong>Error:</strong> No se pudo cargar la información de @${nickname}.<br>
-                    Verifique la conexión o el código del UsuarioServlet.
-                </div>
-            `;
+            contenedorDetalle.innerHTML = `<p style="color:red; text-align:center;">Error: ${error.message}</p>`;
         });
 }
 
 function volverAListaUsuarios() {
-    // Ocultamos la tarjeta y mostramos la lista nuevamente
     document.getElementById('contenedor-detalle-usuario').style.display = 'none';
     document.getElementById('contenedor-lista-usuarios').style.display = 'block';
     
-    // Limpiamos el contenido anterior para el próximo clic
     const contenedorDetalle = document.getElementById('detalle-usuario-contenido');
-    if (contenedorDetalle) {
-        contenedorDetalle.innerHTML = `
-            <p style="color: #7f8c8d; font-style: italic; text-align: center; margin-top: 60px;">
-                Cargando información del usuario...
-            </p>
-        `;
-    }
+    if (contenedorDetalle) contenedorDetalle.innerHTML = `<p style="color: #7f8c8d; text-align: center; margin-top: 60px;">Cargando información del usuario...</p>`;
+    
+    crearNuevoEstadoSPA(); // FIX: Volver a la lista es un nuevo estado
 }
 
 // =====================================================================
-// FUNCIONALIDAD DE SEGUIR/DEJAR DE SEGUIR EN TIEMPO REAL
+// FUNCIONALIDAD DE SEGUIR/DEJAR DE SEGUIR EN TIEMPO REAL (INVENCIBLE)
 // =====================================================================
 
 function toggleSeguirUsuario(btnElementClickeado, nickname, accionActual) {
-    // PREVENIR SPAM: Si el botón está desactivado por un clic anterior, no hacer nada
     if (btnElementClickeado && btnElementClickeado.disabled) return;
 
-    // BUSCAMOS TODOS LOS BOTONES DEL USUARIO EN LA PANTALLA
-    const btnLista = document.getElementById(`btn-social-${nickname}`);
-    const btnPerfil = document.getElementById(`btn-perfil-${nickname}`);
-
-    // Bloqueamos los botones momentáneamente
-    if (btnLista) btnLista.disabled = true;
-    if (btnPerfil) btnPerfil.disabled = true;
-
-    // 1. CONEXIONES CON LA VISTA "SOCIAL" (Arriba)
-    const listaSocial = document.getElementById('lista-mis-seguidos-social');
-    const msgVacioSocial = document.getElementById('social-sin-seguidos');
-
-    // 2. CONEXIONES CON LA TARJETA DE "PERFIL" (Abajo)
-    const inputMiNickname = document.getElementById('nickname-usuario-logueado');
-    const miNickname = inputMiNickname ? inputMiNickname.value : null; // Aquí obtenemos tu usuario
+    const nickStr = String(nickname).trim();
+    const nickLower = nickStr.toLowerCase();
     
-    const contadorSeguidores = document.getElementById('contador-seguidores-perfil');
-    const listaSeguidoresPerfil = document.getElementById('lista-seguidores-perfil');
-    const msgVacioSeguidores = document.getElementById('mensaje-sin-seguidores-perfil');
+    // 1. ESCÁNER ABSOLUTO DE BOTONES
+    const botones = [];
+    document.querySelectorAll('button').forEach(btn => {
+        const attr = btn.getAttribute('onclick');
+        if (attr && attr.includes('toggleSeguirUsuario') && (attr.includes(`'${nickStr}'`) || attr.toLowerCase().includes(`'${nickLower}'`))) {
+            botones.push(btn);
+        }
+    });
 
+    botones.forEach(b => b.disabled = true);
 
-    // =========================================================
-    // ACCIÓN: SEGUIR
-    // =========================================================
+    // 2. APLICAR ESTADOS A TODOS A LA VEZ
     if (accionActual === 'seguir') {
-        
-        // Pintar botones de rojo
-        const actualizarBotonARojo = (btn) => {
-            if (!btn) return;
-            btn.innerText = 'Dejar de seguir';
-            btn.style.backgroundColor = '#d9534f';
-            btn.setAttribute('onclick', `toggleSeguirUsuario(this, '${nickname}', 'dejarSeguir')`);
-        };
-        actualizarBotonARojo(btnLista);
-        actualizarBotonARojo(btnPerfil);
-        
-        // A) Actualizar caja superior "Mis Seguidos"
-        if (listaSocial && !document.getElementById(`social-seguido-${nickname}`)) {
-            if (msgVacioSocial) msgVacioSocial.style.display = 'none'; 
-            
-            const nuevoLi = document.createElement('li');
-            nuevoLi.id = `social-seguido-${nickname}`;
-            nuevoLi.style.padding = '6px 0';
-            nuevoLi.style.borderBottom = '1px solid #eee';
-            nuevoLi.style.display = 'flex';
-            nuevoLi.style.justifyContent = 'space-between';
-            nuevoLi.innerHTML = `
-                <span>👤 <strong>${nickname}</strong></span>
-                <span onclick="toggleSeguirUsuario(this, '${nickname}', 'dejarSeguir')" style="color: #e74c3c; cursor: pointer; font-weight: bold;" title="Dejar de seguir">X</span>
-            `;
-            listaSocial.appendChild(nuevoLi);
-        }
+        botones.forEach(btn => {
+            btn.innerHTML = 'Dejar de seguir'; 
+            btn.style.backgroundColor = '#d9534f'; 
+            btn.style.color = 'white'; 
+            btn.setAttribute('onclick', `toggleSeguirUsuario(this, '${nickStr}', 'dejarSeguir')`);
+        });
+    } else {
+        botones.forEach(btn => {
+            btn.innerHTML = 'Seguir';
+            btn.style.backgroundColor = '#0275d8'; 
+            btn.style.color = 'white';
+            btn.setAttribute('onclick', `toggleSeguirUsuario(this, '${nickStr}', 'seguir')`);
+        });
+    }
 
-        // B) Actualizar Tarjeta de Perfil inferior (Contador + Lista de Seguidores)
-        if (contadorSeguidores) {
-            let numActual = parseInt(contadorSeguidores.innerText) || 0;
-            contadorSeguidores.innerText = numActual + 1; // Sumamos 1 al instante
-        }
+    // 3. ACTUALIZAR CAJA TOP-RIGHT ("Mis Seguidos")
+    const listaMisSeguidos = document.getElementById('lista-mis-seguidos-social');
+    if (listaMisSeguidos) {
+        const itemsTopRight = Array.from(listaMisSeguidos.querySelectorAll('li'));
+        const itemExistente = itemsTopRight.find(li => li.innerHTML.toLowerCase().includes(`<strong>${nickLower}</strong>`));
         
-        if (miNickname && listaSeguidoresPerfil && !document.getElementById(`li-seguidor-perfil-${miNickname}`)) {
-            if (msgVacioSeguidores) msgVacioSeguidores.style.display = 'none';
-            
-            const nuevoSeguidor = document.createElement('li');
-            nuevoSeguidor.id = `li-seguidor-perfil-${miNickname}`;
-            nuevoSeguidor.style.padding = '4px 0';
-            nuevoSeguidor.style.borderBottom = '1px dashed #eee';
-            nuevoSeguidor.style.fontSize = '13px';
-            nuevoSeguidor.innerHTML = `👤 <b>${miNickname}</b>`;
-            listaSeguidoresPerfil.appendChild(nuevoSeguidor); // Tu nombre entra a su lista
-        }
-
-    // =========================================================
-    // ACCIÓN: DEJAR DE SEGUIR
-    // =========================================================
-    } else { 
-        
-        // Pintar botones de azul
-        const actualizarBotonAAzul = (btn) => {
-            if (!btn) return;
-            btn.innerText = 'Seguir';
-            btn.style.backgroundColor = '#0275d8';
-            btn.setAttribute('onclick', `toggleSeguirUsuario(this, '${nickname}', 'seguir')`);
-        };
-        actualizarBotonAAzul(btnLista);
-        actualizarBotonAAzul(btnPerfil);
-        
-        // A) Actualizar caja superior "Mis Seguidos"
-        const itemSocial = document.getElementById(`social-seguido-${nickname}`);
-        if (itemSocial) {
-            itemSocial.remove();
-            const itemsVisibles = listaSocial.querySelectorAll('li[id^="social-seguido-"]');
-            if (itemsVisibles.length === 0 && msgVacioSocial) {
-                msgVacioSocial.style.display = 'block';
-            }
-        }
-
-        // B) Actualizar Tarjeta de Perfil inferior (Contador + Lista de Seguidores)
-        if (contadorSeguidores) {
-            let numActual = parseInt(contadorSeguidores.innerText) || 0;
-            contadorSeguidores.innerText = Math.max(0, numActual - 1); // Restamos 1, evitando que baje de 0
-        }
-        
-        if (miNickname) {
-            const miItemEnPerfil = document.getElementById(`li-seguidor-perfil-${miNickname}`);
-            if (miItemEnPerfil) {
-                miItemEnPerfil.remove(); // Tu nombre desaparece de su lista
+        if (accionActual === 'seguir') {
+            if (!itemExistente) {
+                const msgVacio = document.getElementById('social-sin-seguidos');
+                if (msgVacio) msgVacio.style.display = 'none';
                 
-                // Si la lista de sus seguidores quedó vacía, mostramos el texto "Sin seguidores"
-                if (listaSeguidoresPerfil) {
-                    const itemsRestantes = listaSeguidoresPerfil.querySelectorAll('li[id^="li-seguidor-perfil-"]');
-                    if (itemsRestantes.length === 0 && msgVacioSeguidores) {
-                        msgVacioSeguidores.style.display = 'block';
-                    }
-                }
+                const nuevoLi = document.createElement('li');
+                nuevoLi.id = `social-seguido-${nickLower}`;
+                nuevoLi.style.cssText = "padding: 6px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;";
+                nuevoLi.innerHTML = `<span>👤 <strong>${nickStr}</strong></span> <span onclick="toggleSeguirUsuario(this, '${nickStr}', 'dejarSeguir')" style="color: #e74c3c; cursor: pointer; font-weight: bold;" title="Dejar de seguir">X</span>`;
+                listaMisSeguidos.appendChild(nuevoLi);
+            }
+        } else {
+            if (itemExistente) itemExistente.remove();
+            if (listaMisSeguidos.querySelectorAll('li[id^="social-seguido-"]').length === 0) {
+                 const msgVacio = document.getElementById('social-sin-seguidos');
+                 if (msgVacio) msgVacio.style.display = 'block';
             }
         }
     }
 
-    // 3. AVISAMOS AL SERVIDOR (En segundo plano)
+    // 4. ACTUALIZAR CAJA BOTTOM-RIGHT Y CONTADOR DE PERFIL ABIERTO
+    const inputMiNickname = document.getElementById('nickname-usuario-logueado');
+    const miNickname = inputMiNickname ? inputMiNickname.value : null;
+    const listaSeguidoresPerfil = document.getElementById('lista-seguidores-perfil');
+    
+    if (miNickname && listaSeguidoresPerfil) {
+        const miNickClean = miNickname.toLowerCase();
+        const itemsPerfil = Array.from(listaSeguidoresPerfil.querySelectorAll('li'));
+        const miItem = itemsPerfil.find(li => li.innerHTML.toLowerCase().includes(`<b>${miNickClean}</b>`));
+
+        if (accionActual === 'seguir') {
+            if (!miItem) {
+                const msgVacioSeg = document.getElementById('mensaje-sin-seguidores-perfil');
+                if (msgVacioSeg) msgVacioSeg.style.display = 'none';
+                
+                const li = document.createElement('li');
+                li.id = `li-seguidor-perfil-${miNickClean}`;
+                li.style.cssText = "padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;";
+                li.innerHTML = `👤 <b>${miNickname}</b>`;
+                listaSeguidoresPerfil.appendChild(li);
+            }
+        } else {
+            if (miItem) miItem.remove();
+            if (listaSeguidoresPerfil.querySelectorAll('li[id^="li-seguidor-perfil-"]').length === 0) {
+                 const msgVacioSeg = document.getElementById('mensaje-sin-seguidores-perfil');
+                 if (msgVacioSeg) msgVacioSeg.style.display = 'block';
+            }
+        }
+    }
+
+    // Recalcular contador visual
+    const contadorSeguidores = document.getElementById('contador-seguidores-perfil');
+    if (contadorSeguidores && listaSeguidoresPerfil) {
+        contadorSeguidores.innerText = listaSeguidoresPerfil.querySelectorAll('li[id^="li-seguidor-perfil-"]').length;
+    }
+
+    // 5. AVISAMOS AL SERVIDOR Y GUARDAMOS
     const params = new URLSearchParams();
     params.append('accion', accionActual);
-    if (accionActual === 'seguir') {
-        params.append('nicknameASeguir', nickname);
-    } else {
-        params.append('nicknameSeleccionado', nickname);
-    }
+    if (accionActual === 'seguir') params.append('nicknameASeguir', nickStr);
+    else params.append('nicknameSeleccionado', nickStr);
 
-    fetch('UsuarioServlet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-        body: params
+    fetch('UsuarioServlet', { method: 'POST', body: params })
+    .then(res => {
+        if (!res.ok) throw new Error("Fallo en BD");
+        guardarEstadoActualSPA(); 
     })
-    .then(response => {
-        if (!response.ok) throw new Error("Fallo en el servidor");
-        if (btnLista) btnLista.disabled = false;
-        if (btnPerfil) btnPerfil.disabled = false;
+    .catch(err => {
+        console.error(err);
+        alert("Error de conexión. Recargando la vista...");
+        window.location.reload();
     })
-    .catch(error => {
-        console.error("Error de Red:", error);
-        alert("Error de conexión. Recargando la vista para sincronizar...");
-        cargarSocial(); 
+    .finally(() => {
+        botones.forEach(btn => btn.disabled = false);
     });
-}
-
-// Mantenemos estas por compatibilidad por si tocaste un botón viejo
-function seguirRapido(nickname) {
-    const btn = document.querySelector(`button[onclick="seguirRapido('${nickname}')"]`);
-    if (btn) toggleSeguirUsuario(btn, nickname, 'seguir');
-}
-
-function dejarDeSeguirRapido(nickname) {
-    const btn = document.querySelector(`button[onclick="dejarDeSeguirRapido('${nickname}')"]`);
-    if (btn) toggleSeguirUsuario(btn, nickname, 'dejarSeguir');
 }

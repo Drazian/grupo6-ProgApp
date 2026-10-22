@@ -63,7 +63,7 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- CUERPO: INFORMACIÓN GENERAL Y COLUMNAS DE RED SOCIAL (NUEVO DISEÑO)       -->
+    <!-- CUERPO: INFORMACIÓN GENERAL Y COLUMNAS DE RED SOCIAL      -->
     <!-- ========================================================================= -->
     <div style="display: flex; gap: 20px;">
         
@@ -98,35 +98,34 @@
             
             <!-- Caja de Seguidores -->
             <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
-                <!-- FIX: Se agregó el ID "contador-seguidores-perfil" al span del número -->
                 <h5 style="margin: 0 0 10px 0; color: #333;">
-                    Seguidores (<span id="contador-seguidores-perfil">${requestScope.cantidadSeguidores != null ? requestScope.cantidadSeguidores : '0'}</span>)
+                    Seguidores (<span id="contador-seguidores-perfil">${requestScope.listaSeguidores.size()}</span>)
                 </h5>
-                <ul id="lista-seguidores-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto; font-size: 13px;">
+                <ul id="lista-seguidores-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                     <c:forEach var="seguidor" items="${requestScope.listaSeguidores}">
-                        <!-- FIX: ID dinámico para cada seguidor -->
-                        <li id="li-seguidor-perfil-${seguidor}" style="padding: 4px 0; border-bottom: 1px solid #eee;">
-                            <a href="#" onclick="event.preventDefault(); verPerfilUsuario('${seguidor}')" style="color: #2c3e50; font-weight: bold; text-decoration: none;">👤 ${seguidor}</a>
+                        <li id="li-seguidor-perfil-${seguidor}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+                            👤 <b>${seguidor}</b>
                         </li>
                     </c:forEach>
                     <c:if test="${empty requestScope.listaSeguidores}">
-                        <!-- FIX: ID para ocultar el mensaje cuando llegue el primer seguidor -->
-                        <li id="mensaje-sin-seguidores-perfil" style="color: #999; font-style: italic;">Sin seguidores</li>
+                        <li id="mensaje-sin-seguidores-perfil" style="color: #999; font-style: italic; font-size: 12px;">Sin seguidores</li>
                     </c:if>
                 </ul>
             </div>
 
             <!-- Caja de Seguidos -->
             <div style="background: #f8f9fa; border: 1px solid #ddd; border-radius: 5px; padding: 10px;">
-                <h5 style="margin: 0 0 10px 0; color: #333;">Seguidos (${requestScope.cantidadSeguidos != null ? requestScope.cantidadSeguidos : '0'})</h5>
-                <ul id="lista-mis-seguidos-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto; font-size: 13px;">
+                <h5 style="margin: 0 0 10px 0; color: #333;">
+                    Seguidos (<span id="contador-seguidos-perfil">${requestScope.cantidadSeguidos != null ? requestScope.cantidadSeguidos : '0'}</span>)
+                </h5>
+                <ul id="lista-mis-seguidos-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                     <c:forEach var="seguido" items="${requestScope.listaSeguidos}">
-                        <li id="li-seguido-${seguido}" style="padding: 4px 0; border-bottom: 1px solid #eee;">
-                            <a href="#" onclick="event.preventDefault(); verPerfilUsuario('${seguido}')" style="color: #2c3e50; font-weight: bold; text-decoration: none;">👤 ${seguido}</a>
+                        <li id="li-seguido-${seguido}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+                            👤 <b>${seguido}</b>
                         </li>
                     </c:forEach>
                     <c:if test="${empty requestScope.listaSeguidos}">
-                        <li id="mensaje-sin-seguidos" style="color: #999; font-style: italic;">No sigue a nadie</li>
+                        <li id="mensaje-sin-seguidos" style="color: #999; font-style: italic; font-size: 12px;">No sigue a nadie</li>
                     </c:if>
                 </ul>
             </div>

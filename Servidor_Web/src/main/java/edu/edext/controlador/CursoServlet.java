@@ -43,6 +43,11 @@ public class CursoServlet extends HttpServlet {
                 String opcion = request.getParameter("opcion"); // "instituto" o "categoria"
                 String nombre = request.getParameter("nombre");
 
+                // Reparar codificación ISO a UTF-8 si Tomcat rompe las tildes
+                if (nombre != null && nombre.contains("Ã")) {
+                    nombre = new String(nombre.getBytes("ISO-8859-1"), "UTF-8");
+                }
+
                 try {
                     List<String> cursos = null;
                     if ("instituto".equalsIgnoreCase(opcion)) {
@@ -50,8 +55,6 @@ public class CursoServlet extends HttpServlet {
                     } else if ("categoria".equalsIgnoreCase(opcion)) {
                         cursos = ic.listarCursosPorCategoria(nombre);
                         
-                        //Si es una categoria, tambien deberia de traerse los programas (ya que los programas no tienen Instituto para comparar).
-                        //Para no complejizar la gestion, la realizamos aqui en vez de el ProgramaServlet o en un nuevo Servlet.
                         List<String> programas = new ArrayList<>();
                         List<DtPrograma> listaProgramas = ic.listarProgramas();
                         
@@ -64,9 +67,7 @@ public class CursoServlet extends HttpServlet {
 
                                         for (String catStr : categoriasPrograma) {
                                             if (catStr != null) {
-                                                // Dividimos por espacios o comas por si el string trae varias juntas ("CAT2 CAT1")
                                                 String[] subCategorias = catStr.split("[,\\s]+");
-
                                                 for (String subCat : subCategorias) {
                                                     if (subCat.trim().equalsIgnoreCase(nombre)) {
                                                         perteneceACategoria = true;
@@ -76,33 +77,40 @@ public class CursoServlet extends HttpServlet {
                                             }
                                             if (perteneceACategoria) break;
                                         }
-
-                                        // Si alguna de las subcategorías coincide, agregamos el programa
                                         if (perteneceACategoria) {
                                             programas.add(programa.getNombre());
                                         }
                                     }
                                 }
-                        
-                        request.setAttribute("listaProgramas", programas);
+                            List<String> programasSafe = new ArrayList<>();
+                            for(String p : programas) {
+                                programasSafe.add(p.replace("\"", "&quot;").replace("'", "&#39;"));
+                            }
+                            request.setAttribute("listaProgramas", programasSafe);
                         }
                     }
+                    if (cursos != null) {
+                        List<String> cursosSafe = new ArrayList<>();
+                        for (String c : cursos) {
+                            cursosSafe.add(c.replace("\"", "&quot;").replace("'", "&#39;"));
+                        }
+                        request.setAttribute("listaCursos", cursosSafe);
+                    } else {
+                        request.setAttribute("listaCursos", cursos);
+                    }
 
-                    request.setAttribute("listaCursos", cursos);
                     request.setAttribute("filtroAplicado", opcion + ": " + nombre);
                     request.getRequestDispatcher("fragmentos/listaCursos.jsp").forward(request, response);
                 } catch (Exception e) {
-                    request.setAttribute("error", e.getMessage());
-                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().write("<div style='padding:20px;'><h3 style='color:#e74c3c;'>Error al buscar cursos:</h3><p>" + e.getMessage() + "</p></div>");
                 }
                 break;
 
             case "listarCategoriasJson": 
                 try {
-                    // Obtenemos la lista de categorías
                     List<edu.edext.datatypes.DtCategoria> listaCat = ic.listarCategorias();
-                    
-                    // Armamos un JSON manualmente
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < listaCat.size(); i++) {
                         json.append("{\"nombre\":\"").append(listaCat.get(i).getNombre()).append("\"}");
@@ -121,10 +129,7 @@ public class CursoServlet extends HttpServlet {
 
             case "listarInstitutosJSON": 
                 try {
-                    // Obtenemos la lista de institutos desde el controlador
                     List<edu.edext.datatypes.DtInstituto> listaInst = ic.listarInstitutos();
-                    
-                    // Armamos el JSON manualmente
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < listaInst.size(); i++) {
                         json.append("\"").append(listaInst.get(i).getNombre()).append("\"");
@@ -141,45 +146,73 @@ public class CursoServlet extends HttpServlet {
                 }
                 break;
             
-            case "verDetallesCurso": 
+                case "verDetallesCurso": 
+                String nombreDelCurso = request.getParameter("nombreCurso");
                 try {
-                    String nombreDelCurso = request.getParameter("nombreCurso");
+                    if (nombreDelCurso != null && nombreDelCurso.contains("Ã")) {
+                        nombreDelCurso = new String(nombreDelCurso.getBytes("ISO-8859-1"), "UTF-8");
+                    }
                     
-                    // Llamamos a la lógica que extrae todos los datos, ediciones y programas
                     edu.edext.datatypes.DtConsultaCurso dtCurso = ic.obtenerDatosCurso(nombreDelCurso);
                     
-                    // Lo inyectamos en el request con la clave "curso"
-                    request.setAttribute("curso", dtCurso);
+                    if(dtCurso == null) {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        response.setContentType("text/html;charset=UTF-8");
+                        response.getWriter().write("<div style='padding:20px;'><h3 style='color:#e74c3c;'>El curso no existe en la base de datos.</h3><p style='color:#7f8c8d;'><b>Debug - Buscando exactamente:</b> [" + nombreDelCurso + "]</p></div>");
+                        return;
+                    }
+                    String institutoDelCurso = "Sin instituto asignado";
+                    List<edu.edext.datatypes.DtInstituto> todosLosInstitutos = ic.listarInstitutos();
+                    if (todosLosInstitutos != null) {
+                        for (edu.edext.datatypes.DtInstituto inst : todosLosInstitutos) {
+                            List<String> cursosDeEsteInst = ic.listarCursosPorInstituto(inst.getNombre());
+                            if (cursosDeEsteInst != null && cursosDeEsteInst.contains(nombreDelCurso)) {
+                                institutoDelCurso = inst.getNombre();
+                                break;
+                            }
+                        }
+                    }
+                    // Pasamos el instituto como una variable separada al JSP
+                    request.setAttribute("institutoDelCurso", institutoDelCurso);
+                    // =========================================================================
                     
-                    // Despachamos el fragmento de detalles
+                    request.setAttribute("curso", dtCurso);
                     request.getRequestDispatcher("fragmentos/consultaCurso.jsp").forward(request, response);
                 } catch (Exception e) {
-                    request.setAttribute("error", e.getMessage());
-                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().write("<div style='padding:20px;'><h3 style='color:#e74c3c;'>Error al cargar el curso:</h3><p>" + e.getMessage() + "</p><p style='color:#7f8c8d; font-size:13px;'><i>Debug - String recibido: [" + nombreDelCurso + "]</i></p></div>");
                 }
                 break;
                 
             case "altaCurso": 
-                // 1. Validar seguridad: Solo docentes pueden dar de alta un curso
                 HttpSession session = request.getSession();
                 DtUsuario usuarioLogueado = (DtUsuario) session.getAttribute("usuarioLogueado");
                 
                 if (usuarioLogueado == null || usuarioLogueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los docentes pueden realizar esta acción.");
-                    return; // Cortamos la ejecución aquí
+                    return; 
                 }
 
                 try {
-                    // 2. Cargar datos dinámicos para los <select> del formulario
                     request.setAttribute("institutos", ic.listarInstitutos());
                     request.setAttribute("categorias", ic.listarCategorias());
-                    request.setAttribute("cursosPrevios", ic.listarNombresCursos());
+                    List<String> previos = ic.listarNombresCursos();
+                    if (previos != null) {
+                        List<String> previosSafe = new ArrayList<>();
+                        for(String p : previos) {
+                            previosSafe.add(p.replace("\"", "&quot;").replace("'", "&#39;"));
+                        }
+                        request.setAttribute("cursosPrevios", previosSafe);
+                    } else {
+                        request.setAttribute("cursosPrevios", previos);
+                    }
 
-                    // 3. Despachar el fragmento HTML
                     request.getRequestDispatcher("fragmentos/altaCurso.jsp").forward(request, response);
                 } catch (Exception e) {
-                    request.setAttribute("error", e.getMessage());
-                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.setContentType("text/html;charset=UTF-8");
+                    response.getWriter().write("<div style='padding:20px;'><h3 style='color:#e74c3c;'>Error al cargar formulario:</h3><p>" + e.getMessage() + "</p></div>");
                 }
                 break;
         }
@@ -193,13 +226,12 @@ public class CursoServlet extends HttpServlet {
         String accion = request.getParameter("accion");
         
         if (accion == null){
-            accion = "error"; //Opcion por defecto si no se indica nada.
+            accion = "error"; 
         }
         
         switch (accion){
             case "altaCurso": 
                 try {
-                    // 1. Extraer los datos básicos
                     String nombreCurso = request.getParameter("nombre");
                     String descripcion = request.getParameter("descripcion");
                     String duracion = request.getParameter("duracion");
@@ -208,7 +240,6 @@ public class CursoServlet extends HttpServlet {
                     String url = request.getParameter("url");
                     String nombreInstituto = request.getParameter("instituto");
 
-                    // 2. Extraer selecciones múltiples
                     String[] catArray = request.getParameterValues("categorias");
                     Set<String> categorias = catArray != null ? new HashSet<>(Arrays.asList(catArray)) : new HashSet<>();
                     
@@ -219,33 +250,24 @@ public class CursoServlet extends HttpServlet {
                     String[] prevArray = request.getParameterValues("previas");
                     Set<String> previas = prevArray != null ? new HashSet<>(Arrays.asList(prevArray)) : new HashSet<>();
 
-                    // 3. Generar la fecha actual del sistema
                     Date fechaRegistro = new Date(); 
 
-                    // 4. Capturar y guardar la imagen del curso
                     String nombreImagen = "usr.png"; 
                     Part filePart = request.getPart("imagen"); 
                     
                     if (filePart != null && filePart.getSize() > 0) {
                         byte[] imgBytes = filePart.getInputStream().readAllBytes();
                         String nombreOriginal = filePart.getSubmittedFileName();
-                        
-                        // Limpiamos los espacios del nombre del curso para usarlo como identificador del archivo
                         String identificadorUnico = "Curso_" + nombreCurso.replaceAll("\\s+", "_"); 
-                        
-                        // Guardamos físicamente la imagen y obtenemos el nombre del archivo final
                         nombreImagen = GestorImagenes.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
                     }
 
-                    // 5. Armar el Datatype
                     DtCurso dtCurso = new DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
                             fechaRegistro, new DtInstituto(nombreInstituto), previas, categorias, nombreImagen
                     );
 
-                    // 6. Llamar a la lógica del controlador
                     ic.altaCurso(dtCurso, nombreInstituto); 
 
-                    // 7. Enviar mensaje de éxito
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.getWriter().write("Curso registrado exitosamente.");
 
