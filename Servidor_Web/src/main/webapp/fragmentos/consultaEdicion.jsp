@@ -92,10 +92,12 @@
                 <h3 style="margin: 0; color: #2c3e50;">Docentes Asignados</h3>
                 
                 <!-- Agregar Docente -->
+                <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
                 <button type="button" onclick="cargarFormularioAgregarDocente('${edicion.nombre}')" 
                     style="background-color: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: bold; margin: 0;">
                     + Agregar Docente
                 </button>
+                </c:if>    
             </div>
             
             <c:choose>
@@ -124,12 +126,14 @@
                                 </div>
                                 
                                 <!-- Botón de Quitar a la derecha -->
+                                <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
                                 <button type="button" onclick="confirmarQuitarDocente('${edicion.nombre}', '${docente.nickname}', '${docente.nombre} ${docente.apellido}')" 
                                         style="background: transparent; color: #e74c3c; border: 1px solid #e74c3c; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.2s;"
                                         onmouseover="this.style.background='#e74c3c'; this.style.color='white';"
                                         onmouseout="this.style.background='transparent'; this.style.color='#e74c3c';">
                                     Quitar
-                                </button>                               
+                                </button>     
+                                </c:if>        
                             </div>
                         </c:forEach>
                     </div>

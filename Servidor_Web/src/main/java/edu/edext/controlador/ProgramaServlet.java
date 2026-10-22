@@ -170,23 +170,41 @@ public class ProgramaServlet extends HttpServlet {
                 
             break;
             
-            case "agregarCurso":
-                String programaStr = request.getParameter("programaStr");
-                String cursoStr = request.getParameter("cursoStr");
+case "agregarCurso":
+                String programaElegido = request.getParameter("programaStr");
+                // Ahora usamos getParameterValues para recibir el array de cursos seleccionados
+                String[] cursosElegidos = request.getParameterValues("cursoStr");
                 
-                if (programaStr == null || programaStr.trim().isEmpty() || cursoStr == null || cursoStr.trim().isEmpty()) {
+                if (programaElegido == null || programaElegido.trim().isEmpty() || cursosElegidos == null || cursosElegidos.length == 0) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("Los datos no puede estar vacío.");
+                    response.getWriter().write("Debe seleccionar un programa y al menos un curso.");
                     return;
                 }
 
                 try {
-                    ic.agregarProgramaCurso(programaStr, cursoStr);
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().write("Curso " + cursoStr + " agregado con exito al programa " + programaStr + ".");
+                    int agregados = 0;
+                    // Iteramos sobre todos los cursos que el usuario tildó
+                    for (String c : cursosElegidos) {
+                        try {
+                            ic.agregarProgramaCurso(programaElegido, c);
+                            agregados++;
+                        } catch (Exception individualEx) {
+                            // Si un curso específico ya existe en el programa, lo saltamos silenciosamente 
+                            // o podrías agregar un log aquí si lo deseas.
+                        }
+                    }
+                    
+                    if(agregados > 0){
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.getWriter().write("Se agregaron " + agregados + " curso(s) con éxito al programa " + programaElegido + ".");
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.getWriter().write("No se agregó ningún curso (es posible que ya pertenecieran al programa).");
+                    }
+                    
                 } catch (Exception e){
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    response.getWriter().write("Error al agregar el curso al programa: " + e.getMessage());                    
+                    response.getWriter().write("Error crítico al procesar: " + e.getMessage());                    
                 }                
 
             break;

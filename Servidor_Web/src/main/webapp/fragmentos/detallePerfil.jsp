@@ -82,7 +82,7 @@
             <ul id="lista-mis-seguidos-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                 <c:forEach var="seguido" items="${requestScope.seguidosPerfil}">
                     <li id="li-seguido-${seguido}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
-                         <b>${seguido}</b>
+                        👤 <b>${seguido}</b>
                     </li>
                 </c:forEach>
                 <c:if test="${empty requestScope.seguidosPerfil}">

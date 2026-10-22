@@ -18,6 +18,7 @@
 
     <div style="margin-bottom: 25px; line-height: 1.6;">
         <p><strong>Descripción:</strong> ${curso.descripcion}</p>
+        <p><strong>Instituto:</strong> <span style="color: #c0392b; font-weight: bold;">${institutoDelCurso}</span></p>
         <p><strong>Duración:</strong> ${curso.duracion}</p>
         <p><strong>Cantidad de Horas:</strong> ${curso.cantidadHoras} hrs</p>
         <p><strong>Créditos:</strong> ${curso.creditos}</p>
@@ -25,9 +26,9 @@
         <p><strong>Fecha de Alta:</strong> ${curso.fechaRegistro}</p>
         <p><strong>Categorías:</strong>  
             <c:choose>
-                <c:when test="${not empty curso.categorias}">
-                    <c:forEach var="cat" items="${curso.categorias}" varStatus="loop">
-                        ${cat}${!loop.last ? ', ' : ''}
+                <c:when test="${not empty curso.categorias_toArray}">
+                    <c:forEach var="catStr" items="${curso.categorias_toArray}" varStatus="loop">
+                        <span style="background: #f1f2f6; padding: 2px 6px; border-radius: 4px; border: 1px solid #dcdde1; font-size: 13px;">${catStr}</span>${!loop.last ? ' ' : ''}
                     </c:forEach>
                 </c:when>
                 <c:otherwise><span style="color: #7f8c8d; font-style: italic;">Ninguna</span></c:otherwise>

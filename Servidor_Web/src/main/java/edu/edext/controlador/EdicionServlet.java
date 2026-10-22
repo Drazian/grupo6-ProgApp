@@ -65,7 +65,15 @@ public class EdicionServlet extends HttpServlet {
                     
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < cursos.size(); i++) {
-                        json.append("\"").append(cursos.get(i)).append("\"");
+                        // FIX: Escapar caracteres problemáticos para construir un JSON válido y seguro.
+                        // Reemplazamos comillas dobles, barras invertidas y saltos de línea.
+                        String cursoSanitizado = cursos.get(i)
+                                .replace("\\", "\\\\")
+                                .replace("\"", "\\\"")
+                                .replace("\n", "\\n")
+                                .replace("\r", "\\r");
+                                
+                        json.append("\"").append(cursoSanitizado).append("\"");
                         if (i < cursos.size() - 1) json.append(",");
                     }
                     json.append("]");
@@ -112,7 +120,13 @@ public class EdicionServlet extends HttpServlet {
                  List<String> docentesList = ic.listarDocentes(); 
                  StringBuilder jsonDoc = new StringBuilder("[");
                  for (int i = 0; i < docentesList.size(); i++) {
-                     jsonDoc.append("\"").append(docentesList.get(i)).append("\"");
+                     // FIX: También aplicamos la sanitización aquí por seguridad.
+                     String docenteSanitizado = docentesList.get(i)
+                             .replace("\\", "\\\\")
+                             .replace("\"", "\\\"")
+                             .replace("\n", "\\n")
+                             .replace("\r", "\\r");
+                     jsonDoc.append("\"").append(docenteSanitizado).append("\"");
                      if (i < docentesList.size() - 1) jsonDoc.append(",");
                  }
                  jsonDoc.append("]");
