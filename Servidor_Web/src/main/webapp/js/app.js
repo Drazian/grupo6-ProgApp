@@ -143,6 +143,31 @@ function crearNuevoEstadoSPA() {
     });
 })();
 
+window.addEventListener("popstate", () => {
+    // 1. Si estamos en la vista de Consulta de Curso y el select está vacío, lo rellenamos globalmente
+    const selectInstCurso = document.getElementById('instBuscadorCurso');
+    if (selectInstCurso && selectInstCurso.options.length <= 1) {
+        if (typeof cargarInstitutosGenericos === 'function') {
+            cargarInstitutosGenericos('instBuscadorCurso');
+        }
+    }
+
+    // 2. Si estamos en la vista de Consulta de Edición y el select está vacío
+    const selectInstEd = document.getElementById('instBuscadorEd');
+    if (selectInstEd && selectInstEd.options.length <= 1) {
+        if (typeof cargarInstitutosGenericos === 'function') {
+            cargarInstitutosGenericos('instBuscadorEd');
+        }
+    }
+
+    // 3. Si estamos en el menú lateral o general y faltan los institutos/categorías
+    const listaInstMenu = document.getElementById('lista-institutos');
+    if (listaInstMenu && listaInstMenu.children.length === 0) {
+        if (typeof cargarInstitutosMenu === 'function') cargarInstitutosMenu();
+        if (typeof cargarCategoriasMenu === 'function') cargarCategoriasMenu();
+    }
+});
+
 // =====================================================================
 // FUNCIONES GENERALES
 // =====================================================================
