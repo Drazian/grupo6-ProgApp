@@ -893,7 +893,9 @@ public class Controlador implements IControlador {
             List<DtCurso> dtCursos = new ArrayList<>();
             
             if (usuario instanceof Docente) {
-                programas = em.createQuery(
+                
+                //Programas en los que el docente dicta cursos.
+                List<ProgramaFormacion> programasPorCursos = em.createQuery(
                     "SELECT DISTINCT p " +
                     "FROM ProgramaFormacion p " +
                     "JOIN p.cursos c " +
@@ -907,6 +909,21 @@ public class Controlador implements IControlador {
                 )
                 .setParameter("nickname", nickname)
                 .getResultList();
+                
+                //Programas creados por el docente.
+                List<ProgramaFormacion> programasCreados = em.createQuery(
+                    "SELECT p " +
+                    "FROM ProgramaFormacion p " +
+                    "WHERE p.docente.nickname = :nickname",
+                    ProgramaFormacion.class
+                )
+                .setParameter("nickname", nickname)
+                .getResultList();
+                
+                //Unificacion de listas
+                Set<ProgramaFormacion> programasUnicos = new HashSet<>(programasPorCursos);
+                programasUnicos.addAll(programasCreados);
+                programas = new ArrayList<>(programasUnicos);
             } else {
                 programas = em.createQuery(
                     "SELECT ip.programa " +
