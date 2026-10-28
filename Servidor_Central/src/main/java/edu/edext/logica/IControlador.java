@@ -74,7 +74,7 @@ public interface IControlador {
     //********************** probar *******************************************
     public void crearUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;
     public void modificarUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;
-    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception;
+    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception;
     
 
     

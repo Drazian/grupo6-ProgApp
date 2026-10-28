@@ -1085,7 +1085,7 @@ public class Controlador implements IControlador {
     
 
     @Override 
-    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
+    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception {
     String nombreImagen = programa.getImagen();
 
             if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
@@ -1098,7 +1098,8 @@ public class Controlador implements IControlador {
                     programa.getFechaRegistro(),
                     programa.getFechaInicio(),
                     programa.getFechaFin(),
-                    nombreImagen
+                    nombreImagen,
+                    docente
             );
 
             boolean resultado = setCrearProgramaFormacion(programaConImagen);

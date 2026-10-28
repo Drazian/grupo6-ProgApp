@@ -19,6 +19,7 @@ public class DtPrograma {
     private final LocalDate fechaRegistro;
     private final List<DtCurso> cursos;
     private Set<String> nameCursos;
+    private String docente;
 
     public DtPrograma(String nombre, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin){
         this(nombre, null, fechaRegistro, fechaInicio, fechaFin, null, null, null);
@@ -44,6 +45,12 @@ public class DtPrograma {
     public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, String imagen){
         this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, null, null, imagen);
     }
+    public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, String imagen, String docente){
+        this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, null, null, imagen);
+        this.docente = docente;
+    }
+    
+    
     public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, Set<String> cursos){
         this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, null, cursos, null);
     }
@@ -73,6 +80,7 @@ public class DtPrograma {
         this.imagen=imagen;
     }
 
+    public String getDocente() { return this.docente;}
     public String getImagen() {return this.imagen; }
     public String getNombre(){ return this.nombre; }
     public LocalDate getFechaFin(){ return this.fechaFin; }
