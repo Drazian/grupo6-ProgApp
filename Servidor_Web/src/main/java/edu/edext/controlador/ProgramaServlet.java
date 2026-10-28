@@ -117,6 +117,9 @@ public class ProgramaServlet extends HttpServlet {
             accion = "error"; //Opcion por defecto si no se indica nada.
         }
         
+        HttpSession session = request.getSession(false);
+        DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+        
         switch (accion){
             case "crear":
                 String nombre = request.getParameter("nombre");
@@ -150,9 +153,9 @@ public class ProgramaServlet extends HttpServlet {
                 }
                 
                 DtPrograma programa = new DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
-                
+                               
                 try {
-                    boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);
+                    boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, logueado.getNickname());
                     
                     if (resultado == true){
                         response.setStatus(HttpServletResponse.SC_OK);
@@ -209,8 +212,8 @@ case "agregarCurso":
 
             break;
             case "inscribirPrograma": {
-                HttpSession session = request.getSession(false);
-                DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+                //HttpSession session = request.getSession(false);
+                //DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
 
                 if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
