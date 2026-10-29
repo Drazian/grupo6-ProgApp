@@ -948,7 +948,9 @@ public class Controlador implements IControlador {
             List<ProgramaFormacion> programas;
             
             if (usuario instanceof Docente) {
-                programas = em.createQuery(
+                
+                //Programas en los que el docente dicta cursos.
+                List<ProgramaFormacion> programasPorCursos = em.createQuery(
                     "SELECT DISTINCT p " +
                     "FROM ProgramaFormacion p " +
                     "JOIN p.cursos c " +
@@ -962,6 +964,21 @@ public class Controlador implements IControlador {
                 )
                 .setParameter("nickname", nickname)
                 .getResultList();
+                
+                //Programas creados por el docente.
+                List<ProgramaFormacion> programasCreados = em.createQuery(
+                    "SELECT p " +
+                    "FROM ProgramaFormacion p " +
+                    "WHERE p.docente.nickname = :nickname",
+                    ProgramaFormacion.class
+                )
+                .setParameter("nickname", nickname)
+                .getResultList();
+                
+                //Unificacion de listas
+                Set<ProgramaFormacion> programasUnicos = new HashSet<>(programasPorCursos);
+                programasUnicos.addAll(programasCreados);
+                programas = new ArrayList<>(programasUnicos);
             } else {
                 programas = em.createQuery(
                     "SELECT ip.programa " +
@@ -1160,6 +1177,11 @@ public class Controlador implements IControlador {
 
     @Override 
     public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
+        return setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, programa != null ? programa.getDocente() : null);
+    }
+
+    @Override 
+    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception {
     String nombreImagen = programa.getImagen();
 
             if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
@@ -1174,7 +1196,8 @@ public class Controlador implements IControlador {
                     programa.getFechaFin(),
                     programa.getCursos(),
                     programa.getNameCursos(),
-                    nombreImagen
+                    nombreImagen,
+                    docente
             );
 
             boolean resultado = setCrearProgramaFormacion(programaConImagen);

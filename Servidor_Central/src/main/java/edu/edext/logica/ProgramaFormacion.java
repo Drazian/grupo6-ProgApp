@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 
 /**
  *
@@ -30,6 +31,11 @@ public class ProgramaFormacion {
     @Column(nullable=false)
     private LocalDate fechaFin;
     private String imagen;
+    
+    @ManyToOne
+    @JoinColumn(name="docente")
+    private Docente docente;
+    
 
     @ManyToMany
     @JoinTable(
@@ -61,6 +67,20 @@ public class ProgramaFormacion {
         this.cursos=cursos;
         this.nombre=nombre;
         this.imagen=imagen;
+        this.docente=null;
+    }
+    
+    public ProgramaFormacion(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio,
+                             LocalDate fechaFin, List<Curso> cursos, List<Categoria> categorias, String imagen, Docente docente){
+        this.fechaRegistro=fechaRegistro;
+        this.fechaInicio=fechaInicio;
+        this.descripcion=descripcion;
+        this.categorias=categorias;
+        this.fechaFin=fechaFin;
+        this.cursos=cursos;
+        this.nombre=nombre;
+        this.imagen=imagen;
+        this.docente=docente;
     }
 
 //    public void setCursos (List<Curso> cursos){this.cursos=cursos;}
@@ -72,7 +92,8 @@ public class ProgramaFormacion {
 //    public void setFechaInicio(LocalDate fechaInicio){ this.fechaInicio=fechaInicio; }
 //    public void setCategorias(List<Categoria> categorias){this.categorias=categorias;   }
 //    public void setFechaRegistro(LocalDate fechaRegistro){ this.fechaRegistro=fechaRegistro; }
-        
+    
+    public Docente getDocente() { return this.docente; }
     public LocalDate getFechaRegistro (){ return this.fechaRegistro;  }
     public List<Categoria> getCategorias(){ return this.categorias; }
     public LocalDate getFechaInicio(){ return this.fechaInicio; }

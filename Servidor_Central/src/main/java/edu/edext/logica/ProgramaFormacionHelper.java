@@ -68,7 +68,10 @@ public class ProgramaFormacionHelper{
             categorias.add(findCategoria(categoria));
         for(String curso : DTO.getNameCursos())
             cursos.add(findCurso(curso));
-        return new ProgramaFormacion(DTO.getNombre(), DTO.getDescripcion(), DTO.getFechaRegistro(), DTO.getFechaInicio(), DTO.getFechaFin(), cursos, categorias, DTO.getImagen());
+        
+        Docente docente = findDocente(DTO.getDocente());
+        
+        return new ProgramaFormacion(DTO.getNombre(), DTO.getDescripcion(), DTO.getFechaRegistro(), DTO.getFechaInicio(), DTO.getFechaFin(), cursos, categorias, DTO.getImagen(), docente);
     }
     
     private boolean validateData(DtPrograma DTO){
@@ -106,6 +109,11 @@ public class ProgramaFormacionHelper{
         Curso c = db.find(Curso.class, curso);
         if (c == null) throw new IllegalArgumentException("No existe el curso '" + curso + "'.");
         return c;
+    }
+    
+    private Docente findDocente(String docente){
+        if (docente == null || docente.trim().isEmpty()) return null;
+        return db.find(Docente.class, docente);
     }
     
 }

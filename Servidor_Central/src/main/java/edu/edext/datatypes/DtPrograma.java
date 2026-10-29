@@ -19,6 +19,7 @@ public class DtPrograma {
     private final LocalDate fechaRegistro;
     private final List<DtCurso> cursos;
     private Set<String> nameCursos;
+    private String docente;
 
     public DtPrograma(String nombre, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin){
         this(nombre, null, fechaRegistro, fechaInicio, fechaFin, null, null, null);
@@ -44,6 +45,12 @@ public class DtPrograma {
     public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, String imagen){
         this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, null, null, imagen);
     }
+    public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, String imagen, String docente){
+        this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, null, null, imagen);
+        this.docente = docente;
+    }
+    
+    
     public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, Set<String> cursos){
         this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, null, cursos, null);
     }
@@ -57,6 +64,9 @@ public class DtPrograma {
         this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, cursos, null, imagen);
     }
     public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, List<DtCurso> cursos, Set<String> nameCursos, String imagen){
+        this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, cursos, nameCursos, imagen, null);
+    }
+    public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, List<DtCurso> cursos, Set<String> nameCursos, String imagen, String docente){
         Set<String> tmpCurso=new HashSet<>(), tmpCategorias=new HashSet<>();
         if(nameCursos!=null)
             tmpCurso=nameCursos;
@@ -71,8 +81,10 @@ public class DtPrograma {
         this.fechaFin=fechaFin;
         this.nombre=nombre;
         this.imagen=imagen;
+        this.docente=docente;
     }
 
+    public String getDocente() { return this.docente;}
     public String getImagen() {return this.imagen; }
     public String getNombre(){ return this.nombre; }
     public LocalDate getFechaFin(){ return this.fechaFin; }

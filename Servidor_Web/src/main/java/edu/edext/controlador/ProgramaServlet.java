@@ -131,10 +131,11 @@ public class ProgramaServlet extends HttpServlet {
             accion = "error"; //Opcion por defecto si no se indica nada.
         }
         
+        HttpSession session = request.getSession(false);
+        DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+        
         switch (accion){
             case "crear": {
-                HttpSession session = request.getSession(false);
-                DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
                 if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("Acceso denegado. Solo los docentes pueden crear programas.");
@@ -148,7 +149,7 @@ public class ProgramaServlet extends HttpServlet {
                 if (nombre == null || nombre.trim().isEmpty() || desc == null || desc.trim().isEmpty() || 
                         fechaInicioStr == null || fechaInicioStr.trim().isEmpty() || fechaFinStr == null || fechaFinStr.trim().isEmpty()) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("Los datos no pueden estar vacíos.");
+                    response.getWriter().write("Los datos no pueden estar vac?os.");
                     return;
                 }
                 
@@ -174,11 +175,11 @@ public class ProgramaServlet extends HttpServlet {
                     }
                     
                     DtPrograma programa = new DtPrograma(nombre.trim(), desc.trim(), fechaRegistro, fechaInicio, fechaFin);
-                    boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);
+                    boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, logueado.getNickname());
                     
                     if (resultado){
                         response.setStatus(HttpServletResponse.SC_OK);
-                        response.getWriter().write("Programa " + nombre.trim() + " creado con éxito.");                    
+                        response.getWriter().write("Programa " + nombre.trim() + " creado con ?xito.");                    
                     } else {
                         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         response.getWriter().write("No se pudo crear el programa (verifique que el nombre no exista y las fechas sean coherentes).");                         
@@ -191,8 +192,6 @@ public class ProgramaServlet extends HttpServlet {
             }
             
             case "agregarCurso": {
-                HttpSession session = request.getSession(false);
-                DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
                 if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("Acceso denegado. Solo los docentes pueden agregar cursos a un programa.");
@@ -236,8 +235,8 @@ public class ProgramaServlet extends HttpServlet {
                 break;
             }
             case "inscribirPrograma": {
-                HttpSession session = request.getSession(false);
-                DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+                //HttpSession session = request.getSession(false);
+                //DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
 
                 if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);

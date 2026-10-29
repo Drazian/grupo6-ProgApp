@@ -724,7 +724,7 @@ public class ControladorTest {
     public void testCrearProgramaWeb() throws Exception {
         String nombre = "CREACION-WEB";
         DtPrograma aux = new DtPrograma(nombre, "descripcion", LocalDate.now(), LocalDate.now(), LocalDate.now());
-        ic.setCrearProgramaFormacion(aux, null, "imagen.png");
+        ic.setCrearProgramaFormacion(aux, null, "imagen.png","adri");
         
         List<DtPrograma> programas = ic.listarProgramas();
         assertNotNull(programas, "La lista de programas no debe ser nula");
