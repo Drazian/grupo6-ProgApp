@@ -28,38 +28,21 @@ public class LoginServlet extends HttpServlet {
             String password = request.getParameter("password");
 
             try {
-                List<DtUsuario> usuarios = ic.listarUsuarios();
                 DtUsuario logueado = null;
-                
-                if (usuarios != null && identificador != null && password != null) {
-                    for (DtUsuario u : usuarios) {
-                        boolean coincideUsuario = (u.getNickname() != null && u.getNickname().equalsIgnoreCase(identificador)) 
-                                               || (u.getEmail() != null && u.getEmail().equalsIgnoreCase(identificador));
-                        
-                        if (coincideUsuario && u.getPassword() != null) {
-                            boolean passValida = false;
-                            
-                           try {
-                                if (u.getPassword().startsWith("$2a$") || u.getPassword().startsWith("$2b$") || u.getPassword().startsWith("$2y$")) {
-                                    // Opción A: Si usas la librería jbcrypt directamente
-                                    passValida = org.mindrot.jbcrypt.BCrypt.checkpw(password, u.getPassword());
-
-                                    // Opción B: Si tu clase Utils tiene el método checkpw
-                                    // passValida = edu.edext.tools.Utils.Crypt.checkpw(password, u.getPassword());
-                                } else {
-                                    //REVISAR
-                                    String passDescifrada = edu.edext.tools.Utils.Crypt.descifrarAES(u.getPassword());
-                                    passValida = password.equals(passDescifrada);
-                                    //passValida = u.getPassword().equals(password);
-                                }
-                            } catch (Exception ex) {
-                                passValida = u.getPassword().equals(password);
-                            }
-                            if (passValida) {
-                                logueado = u;
-                                break;
-                            }
-                        }
+                if (identificador != null && !identificador.trim().isEmpty() && password != null) {
+                    DtUsuario u = ic.obtenerUsuario(identificador.trim());
+                    if (u != null && edu.edext.tools.Utils.Crypt.verifyPassword(password, u.getPassword())) {
+                        logueado = new DtUsuario(
+                            u.getNickname(),
+                            null,
+                            u.getEmail(),
+                            u.getNombre(),
+                            u.getApellido(),
+                            u.getImagen(),
+                            u.getfNacimiento(),
+                            u.getInstitutos(),
+                            u.getTipoUsuario()
+                        );
                     }
                 }
 

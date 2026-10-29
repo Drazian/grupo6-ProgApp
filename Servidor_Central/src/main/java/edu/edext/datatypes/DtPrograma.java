@@ -64,6 +64,9 @@ public class DtPrograma {
         this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, cursos, null, imagen);
     }
     public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, List<DtCurso> cursos, Set<String> nameCursos, String imagen){
+        this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, cursos, nameCursos, imagen, null);
+    }
+    public DtPrograma(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin, List<DtCurso> cursos, Set<String> nameCursos, String imagen, String docente){
         Set<String> tmpCurso=new HashSet<>(), tmpCategorias=new HashSet<>();
         if(nameCursos!=null)
             tmpCurso=nameCursos;
@@ -78,6 +81,7 @@ public class DtPrograma {
         this.fechaFin=fechaFin;
         this.nombre=nombre;
         this.imagen=imagen;
+        this.docente=docente;
     }
 
     public String getDocente() { return this.docente;}

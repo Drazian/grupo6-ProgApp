@@ -2,6 +2,7 @@ package edu.edext.presentacion;
 
 import java.time.LocalDate;
 import edu.edext.tools.Utils;
+import edu.edext.tools.cfg;
 import javax.swing.JOptionPane;
 import edu.edext.tools.Utils.Mouse;
 import javax.swing.JFormattedTextField;
@@ -415,8 +416,11 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         else message="Confirme creación de Programa de Edición";
         int tmp=confirm(message);
         if(tmp==0){
-            String image="Programa."+nombre+Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
-            Utils.Imagen.save(imagen.getAbsolutePath(), image);
+            String image = cfg.IMAGE_USER;
+            if (imagen != null) {
+                image = "Programa." + nombre + Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
+                Utils.Imagen.save(imagen.getAbsolutePath(), image);
+            }
             try {
                 flag=Values.setData(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, image);
                 message=jTnombre.getText();
@@ -511,7 +515,6 @@ public class CrearProgramaForm extends javax.swing.JPanel {
                     flag=Utils.Fecha.isCoherente(fecha1, fecha2);
                 }else if(modo==DER_IZQ){
                     flag=Utils.Fecha.isCoherente(fecha2, fecha1);
-                    obj.setText(Utils.Fecha.assignFormato(fecha2));
                 }
             obj.setText(Utils.Fecha.assignFormato(fecha1));
             if(flag) reloj.alarm(false, "Fechas Invertidas");

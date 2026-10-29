@@ -86,16 +86,23 @@ public class InscripcionEdicionHelper {
             db.getTransaction().begin();
             Estudiante estudiante = db.find(Estudiante.class, nomEstudiante);
             Edicion edicion = db.find(Edicion.class, nomEdicion);
-            if(estudiante==null) return 1;
-            if (edicion==null) return 2;
+            if(estudiante==null){ db.getTransaction().rollback(); return 1; }
+            if (edicion==null){ db.getTransaction().rollback(); return 2; }
+            if (edicion.getFechaFin()!=null && edicion.getFechaFin().isBefore(LocalDate.now())){
+                db.getTransaction().rollback();
+                return 4; // la edicion ya finalizo
+            }
             InscripcionEdicionID idDual = new InscripcionEdicionID(nomEstudiante, nomEdicion);
             InscripcionEdicion isExist = db.find(InscripcionEdicion.class, idDual);
             if(isExist==null){
-                InscripcionEdicion newInscripcion=new InscripcionEdicion(estudiante, edicion, LocalDate.now(), 1); //Se debe de usar 1 y no 0 debido a que se quiere usar "Inscripto" en lugar de "No inscripto"
+                InscripcionEdicion newInscripcion=new InscripcionEdicion(estudiante, edicion, LocalDate.now(), INSCRIPTO);
                 db.persist(newInscripcion);
                 db.getTransaction().commit();
                 Logger.info("Se Inscribio el Estudiante {} en la edicion {}", nomEstudiante, nomEdicion);
                 ret=0;
+            } else {
+                db.getTransaction().rollback();
+                ret=3; // ya inscripto
             }
         } catch (Exception e) {
             if(db.getTransaction().isActive()) db.getTransaction().rollback();
@@ -110,7 +117,10 @@ public class InscripcionEdicionHelper {
     // 0 exito
     // 1 estudiante no existe
     // 2 edicion no existe
+    // 3 ya estaba inscripto
+    // 4 la edicion ya finalizo
     // -1 error
+    public static final int INSCRIPTO=1, ACEPTADO=2, RECHAZADO=3;
     
     public int cancelarInscripcion(String nomEstudiante, String nomEdicion){ // incompleta falta aislacion y modularizacion
         int ret=-1;
@@ -144,6 +154,10 @@ public class InscripcionEdicionHelper {
     /**
      * Calcula la prioridad de un estudiante según la fórmula ipr * 0.5
      */
+    private static class CupoExcedidoException extends RuntimeException {
+        CupoExcedidoException(String m){ super(m); }
+    }
+
     private double calcularPrioridad(String nicknameEstudiante, String nombreCurso) {
         EntityManager emAux = DB.createEntityManager();
         try {
@@ -220,6 +234,8 @@ public class InscripcionEdicionHelper {
             for (Map.Entry<String, Integer> entry : evaluaciones.entrySet()) {
                 String nicknameEstudiante = entry.getKey();
                 Integer nuevoEstado = entry.getValue(); 
+                if (nuevoEstado == null || (nuevoEstado != ACEPTADO && nuevoEstado != RECHAZADO))
+                    throw new IllegalArgumentException("Estado inválido para " + nicknameEstudiante);
 
                 InscripcionEdicionID idDual = new InscripcionEdicionID(nicknameEstudiante, this.nombre);
                 InscripcionEdicion inscripcion = db.find(InscripcionEdicion.class, idDual);
@@ -228,8 +244,20 @@ public class InscripcionEdicionHelper {
                     inscripcion.setEstado(nuevoEstado);
                 }
             }
+            db.flush();
+            Integer cupo = edicionObj.getCupo();
+            if (cupo != null && cupo > 0) {
+                Long aceptados = db.createQuery(
+                    "SELECT COUNT(i) FROM InscripcionEdicion i WHERE i.edicion.nombre = :ed AND i.estado = :est", Long.class)
+                    .setParameter("ed", this.nombre).setParameter("est", ACEPTADO).getSingleResult();
+                if (aceptados > cupo)
+                    throw new CupoExcedidoException("Se superó el cupo de la edición (" + cupo + "). Aceptados: " + aceptados + ".");
+            }
             db.getTransaction().commit();
             Logger.info("Evaluación de inscripciones completada para la edición: " + this.nombre);
+        } catch (CupoExcedidoException | IllegalArgumentException e) {
+            if (db.getTransaction().isActive()) db.getTransaction().rollback();
+            throw new Exception(e.getMessage());
         } catch (Exception e) {
             if (db.getTransaction().isActive()) db.getTransaction().rollback();
             Logger.error("Error al evaluar inscripciones: " + e.getMessage());

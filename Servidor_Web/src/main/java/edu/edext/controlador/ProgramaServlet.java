@@ -35,11 +35,24 @@ public class ProgramaServlet extends HttpServlet {
         }
         
         switch (accion){
-            case "formCrear":
+            case "formCrear": {
+                HttpSession session = request.getSession(false);
+                DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+                if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso exclusivo para Docentes.");
+                    return;
+                }
                 request.getRequestDispatcher("fragmentos/crearPrograma.jsp").forward(request, response);
-            break;
+                break;
+            }
             
-            case "formAgregarCurso":
+            case "formAgregarCurso": {
+                HttpSession session = request.getSession(false);
+                DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+                if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso exclusivo para Docentes.");
+                    return;
+                }
                 try {
                     List<DtPrograma> programas = ic.listarProgramas();
                     List<DtCurso> cursos = ic.listarCursos();
@@ -51,7 +64,8 @@ public class ProgramaServlet extends HttpServlet {
                     request.setAttribute("error", e.getMessage());
                 }
                 request.getRequestDispatcher("fragmentos/agregarCursoPrograma.jsp").forward(request, response);
-            break;
+                break;
+            }
             
             case "formVerProgramas":
             try {
@@ -121,7 +135,12 @@ public class ProgramaServlet extends HttpServlet {
         DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
         
         switch (accion){
-            case "crear":
+            case "crear": {
+                if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Acceso denegado. Solo los docentes pueden crear programas.");
+                    return;
+                }
                 String nombre = request.getParameter("nombre");
                 String desc = request.getParameter("desc");
                 String fechaInicioStr = request.getParameter("fechaInicio");
@@ -130,50 +149,54 @@ public class ProgramaServlet extends HttpServlet {
                 if (nombre == null || nombre.trim().isEmpty() || desc == null || desc.trim().isEmpty() || 
                         fechaInicioStr == null || fechaInicioStr.trim().isEmpty() || fechaFinStr == null || fechaFinStr.trim().isEmpty()) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("Los datos no puede estar vacío.");
+                    response.getWriter().write("Los datos no pueden estar vac?os.");
                     return;
                 }
                 
-                //Conversion de fechas
-                LocalDate fechaInicio = LocalDate.parse(fechaInicioStr);
-                LocalDate fechaFin = LocalDate.parse(fechaFinStr);
-                
-                LocalDate fechaRegistro = LocalDate.now();
-                
-                //Gestion de imagenes
-                Part partImagen = request.getPart("imagen");
-                byte[] bytesImagen = null;
-                String nombreOriginal = null;
-                
-                if (partImagen != null && partImagen.getSize() > 0) {
-                    nombreOriginal = partImagen.getSubmittedFileName();
-                    try (InputStream is = partImagen.getInputStream()) {
-                        bytesImagen = is.readAllBytes();
-                    }
-                }
-                
-                DtPrograma programa = new DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
-                               
                 try {
+                    LocalDate fechaInicio = LocalDate.parse(fechaInicioStr.trim());
+                    LocalDate fechaFin = LocalDate.parse(fechaFinStr.trim());
+                    if (fechaInicio.isAfter(fechaFin)) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.getWriter().write("La fecha de inicio no puede ser posterior a la fecha de fin.");
+                        return;
+                    }
+                    LocalDate fechaRegistro = LocalDate.now();
+                    
+                    Part partImagen = request.getPart("imagen");
+                    byte[] bytesImagen = null;
+                    String nombreOriginal = null;
+                    
+                    if (partImagen != null && partImagen.getSize() > 0) {
+                        nombreOriginal = partImagen.getSubmittedFileName();
+                        try (InputStream is = partImagen.getInputStream()) {
+                            bytesImagen = is.readAllBytes();
+                        }
+                    }
+                    
+                    DtPrograma programa = new DtPrograma(nombre.trim(), desc.trim(), fechaRegistro, fechaInicio, fechaFin);
                     boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, logueado.getNickname());
                     
-                    if (resultado == true){
+                    if (resultado){
                         response.setStatus(HttpServletResponse.SC_OK);
-                        response.getWriter().write("Programa " + nombre + " creado con exito.");                    
+                        response.getWriter().write("Programa " + nombre.trim() + " creado con ?xito.");                    
                     } else {
-                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        response.getWriter().write("El programa " + nombre + " ya existe.");                         
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.getWriter().write("No se pudo crear el programa (verifique que el nombre no exista y las fechas sean coherentes).");                         
                     }
-                    
-
                 } catch (Exception e){
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Error al crear el programa: " + e.getMessage());                    
                 }
-                
-            break;
+                break;
+            }
             
-case "agregarCurso":
+            case "agregarCurso": {
+                if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Acceso denegado. Solo los docentes pueden agregar cursos a un programa.");
+                    return;
+                }
                 String programaElegido = request.getParameter("programaStr");
                 // Ahora usamos getParameterValues para recibir el array de cursos seleccionados
                 String[] cursosElegidos = request.getParameterValues("cursoStr");
@@ -209,8 +232,8 @@ case "agregarCurso":
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Error crítico al procesar: " + e.getMessage());                    
                 }                
-
-            break;
+                break;
+            }
             case "inscribirPrograma": {
                 //HttpSession session = request.getSession(false);
                 //DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;

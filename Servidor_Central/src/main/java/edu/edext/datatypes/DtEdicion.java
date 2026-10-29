@@ -52,7 +52,9 @@ public DtEdicion(String nombre, Integer cupo, LocalDate fechaInicio, LocalDate f
         } else if (docentes != null) {
             Set<String> tmpDocentes = new HashSet<>();
             for (DtUsuario docente : docentes) {
-                tmpDocentes.add(docente.getNombre() + " " + docente.getApellido());
+                // Se usa el nickname (clave primaria) para poder resolver el docente en la persistencia
+                if (docente.getNickname() != null) tmpDocentes.add(docente.getNickname());
+                else tmpDocentes.add(docente.getNombre() + " " + docente.getApellido());
             }
             this.nameDocentes = tmpDocentes;
         } else {

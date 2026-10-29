@@ -96,13 +96,7 @@ public class UsuarioServlet extends HttpServlet {
                 try {
                     IControlador ic = Fabrica.getInstance().getIControlador();
 
-                    DtUsuario dtUsuario = null;
-                    for (DtUsuario u : ic.listarUsuarios()) {
-                        if (u.getNickname().equalsIgnoreCase(nickname.trim())) {
-                            dtUsuario = u;
-                            break;
-                        }
-                    }
+                    DtUsuario dtUsuario = ic.obtenerUsuario(nickname.trim());
 
                     if (dtUsuario != null) {
                         HttpSession session = request.getSession(false);
@@ -150,14 +144,7 @@ public class UsuarioServlet extends HttpServlet {
             if (nickname != null && !nickname.trim().isEmpty()) {
                 try {
                     IControlador ic = Fabrica.getInstance().getIControlador();
-                    DtUsuario dtUsuario = null;
-
-                    for (DtUsuario u : ic.listarUsuarios()) {
-                        if (u.getNickname().equalsIgnoreCase(nickname.trim())) {
-                            dtUsuario = u;
-                            break;
-                        }
-                    }
+                    DtUsuario dtUsuario = ic.obtenerUsuario(nickname.trim());
 
                     if (dtUsuario != null) {
                         HttpSession session = request.getSession(false);
@@ -333,13 +320,7 @@ public class UsuarioServlet extends HttpServlet {
 
                 ic.modificarUsuario(usuarioModificado, bytesImagen, nombreOriginal);
 
-                List<DtUsuario> listaActualizada = ic.listarUsuarios();
-                for (DtUsuario u : listaActualizada) {
-                    if (u.getNickname().equalsIgnoreCase(usuarioActual.getNickname())) {
-                        session.setAttribute("usuarioLogueado", u);
-                        break;
-                    }
-                }
+                actualizarSesionUsuario(request, ic, usuarioActual.getNickname());
 
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("Cambios guardados correctamente.");
@@ -461,12 +442,20 @@ public class UsuarioServlet extends HttpServlet {
     }
 
     private void actualizarSesionUsuario(HttpServletRequest request, IControlador ic, String nickname) throws Exception {
-        List<DtUsuario> usuarios = ic.listarUsuarios();
-        for (DtUsuario u : usuarios) {
-            if (u.getNickname().equalsIgnoreCase(nickname)) {
-                request.getSession().setAttribute("usuarioLogueado", u);
-                break;
-            }
+        DtUsuario u = ic.obtenerUsuario(nickname);
+        if (u != null) {
+            DtUsuario sinPassword = new DtUsuario(
+                u.getNickname(),
+                null,
+                u.getEmail(),
+                u.getNombre(),
+                u.getApellido(),
+                u.getImagen(),
+                u.getfNacimiento(),
+                u.getInstitutos(),
+                u.getTipoUsuario()
+            );
+            request.getSession().setAttribute("usuarioLogueado", sinPassword);
         }
     }
 }

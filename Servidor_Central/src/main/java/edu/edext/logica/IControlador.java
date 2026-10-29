@@ -30,6 +30,8 @@ public interface IControlador {
     boolean existeEmail(String email) throws Exception;
     void modificarUsuario(DtUsuario usuarioModificado)throws Exception;
     List<DtUsuario> listarUsuarios()throws Exception;
+    /** Busca un usuario por nickname (o email). Retorna null si no existe. */
+    DtUsuario obtenerUsuario(String nicknameOEmail) throws Exception;
     List<String> listarDocentes() throws Exception;
     DtSessionUsuario validarNick(String nickname, String password) throws Exception;
     DtSessionUsuario validarEmail(String email, String password) throws Exception;
@@ -74,6 +76,7 @@ public interface IControlador {
     //********************** probar *******************************************
     public void crearUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;
     public void modificarUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;
+    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception;
     public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception;
     
 

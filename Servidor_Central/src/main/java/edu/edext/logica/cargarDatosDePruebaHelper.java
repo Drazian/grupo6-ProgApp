@@ -58,7 +58,7 @@ public class cargarDatosDePruebaHelper {
              * ============================================================
              */
 
-            if (em.find(Instituto.class, "IN") != null
+            if (em.find(Instituto.class, "INCO") != null
                     || em.find(Categoria.class,"Social")!=null
                     || em.find(Usuario.class, "eleven11") != null
                     || em.find(Curso.class, "Talleres plenarios") != null
@@ -931,7 +931,7 @@ public class cargarDatosDePruebaHelper {
                     EL, e7, LocalDate.of(2024, 3, 3), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    CH, e7, LocalDate.of(2024, 3, 5), 0));
+                    CH, e7, LocalDate.of(2024, 3, 5), INSCRIPTO));
 
             em.persist(new InscripcionEdicion(
                     JW, e8, LocalDate.of(2026, 2, 18), ACEPTADO));
@@ -1059,37 +1059,37 @@ public class cargarDatosDePruebaHelper {
 
 
             em.persist(new InscripcionPrograma(
-                    EL, p1, LocalDate.of(2026, 4, 15), 0));
+                    EL, p1, LocalDate.of(2026, 4, 15), INSCRIPTO));
             
             em.persist(new InscripcionPrograma(
-                    CH, p1, LocalDate.of(2026, 4, 20), 0));
+                    CH, p1, LocalDate.of(2026, 4, 20), INSCRIPTO));
 
             em.persist(new InscripcionPrograma(
-                    CO, p2, LocalDate.of(2026, 7, 10), 0));
+                    CO, p2, LocalDate.of(2026, 7, 10), INSCRIPTO));
 
             em.persist(new InscripcionPrograma(
-                    CH, p2, LocalDate.of(2026, 7, 10), 0));
+                    CH, p2, LocalDate.of(2026, 7, 10), INSCRIPTO));
 
             em.persist(new InscripcionPrograma(
-                    EL, p2, LocalDate.of(2026, 7, 12), 0));
+                    EL, p2, LocalDate.of(2026, 7, 12), INSCRIPTO));
             
             em.persist(new InscripcionPrograma(
-                    WE, p2, LocalDate.of(2026, 7, 15), 0));
+                    WE, p2, LocalDate.of(2026, 7, 15), INSCRIPTO));
 
             em.persist(new InscripcionPrograma(
-                    RO, p2, LocalDate.of(2026, 7, 18), 0));
+                    RO, p2, LocalDate.of(2026, 7, 18), INSCRIPTO));
 
             em.persist(new InscripcionPrograma(
-                    CO, p3, LocalDate.of(2026, 8, 11), 0));
+                    CO, p3, LocalDate.of(2026, 8, 11), INSCRIPTO));
 
             em.persist(new InscripcionPrograma(
-                    CH, p3, LocalDate.of(2026, 8, 15), 0));
+                    CH, p3, LocalDate.of(2026, 8, 15), INSCRIPTO));
 
             em.persist(new InscripcionPrograma(
-                    RO, p3, LocalDate.of(2026, 8, 22), 0));
+                    RO, p3, LocalDate.of(2026, 8, 22), INSCRIPTO));
 
             em.persist(new InscripcionPrograma(
-                    JW, p3, LocalDate.of(2026, 8, 30), 0));
+                    JW, p3, LocalDate.of(2026, 8, 30), INSCRIPTO));
             
             
             /*

@@ -145,6 +145,13 @@ public class EdicionServlet extends HttpServlet {
         response.setContentType("text/plain; charset=UTF-8");
         
         String accion = request.getParameter("accion");
+        HttpSession session = request.getSession(false);
+        DtUsuario usuarioLogueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
+        if (usuarioLogueado == null || usuarioLogueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("Acceso denegado. Solo los docentes pueden realizar esta acción.");
+            return;
+        }
         
         if ("altaEdicion".equals(accion)) {
             try {
@@ -175,7 +182,10 @@ public class EdicionServlet extends HttpServlet {
                 // 4. Procesar Cupo opcional
                 Integer cupo = null;
                 if (cupoStr != null && !cupoStr.trim().isEmpty()) {
-                    cupo = Integer.parseInt(cupoStr);
+                    cupo = Integer.parseInt(cupoStr.trim());
+                    if (cupo < 0) {
+                        throw new Exception("El cupo no puede ser negativo.");
+                    }
                 }
 
                 // --- 5. Capturar y guardar la imagen de la edición ---

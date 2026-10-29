@@ -47,7 +47,7 @@ public class ProgramaFormacionHelper{
                 hiloTransaction.commit();
                 ret=true;
             } catch (Exception e) {
-                hiloTransaction.rollback();
+                if (hiloTransaction.isActive()) hiloTransaction.rollback();
                 ret=false;
             }
         }else ret=false;
@@ -79,7 +79,7 @@ public class ProgramaFormacionHelper{
         if(isExist(DTO.getNombre())) flag=false;
         if(flag) if(DTO.getFechaRegistro()==null) flag=false;
         if(flag) if(DTO.getFechaInicio()==null) flag=false;
-        if(flag2) if(DTO.getFechaFin()==null) flag=false;
+        if(flag) if(DTO.getFechaFin()==null) flag=false;
         if(flag && flag2) if(DTO.getFechaInicio().isAfter(DTO.getFechaFin())) flag=false;
         return flag && flag2;
     }
@@ -98,18 +98,21 @@ public class ProgramaFormacionHelper{
         return flag;
     }
  
+    // Usa el mismo EntityManager de la transaccion abierta en persist()
     private Categoria findCategoria(String categoria){
-        db=DB.createEntityManager();
-        return db.find(Categoria.class, categoria);
+        Categoria c = db.find(Categoria.class, categoria);
+        if (c == null) throw new IllegalArgumentException("No existe la categoria '" + categoria + "'.");
+        return c;
     }
     
     private Curso findCurso(String curso){
-        db=DB.createEntityManager();
-        return db.find(Curso.class, curso);
+        Curso c = db.find(Curso.class, curso);
+        if (c == null) throw new IllegalArgumentException("No existe el curso '" + curso + "'.");
+        return c;
     }
     
     private Docente findDocente(String docente){
-        db=DB.createEntityManager();
+        if (docente == null || docente.trim().isEmpty()) return null;
         return db.find(Docente.class, docente);
     }
     

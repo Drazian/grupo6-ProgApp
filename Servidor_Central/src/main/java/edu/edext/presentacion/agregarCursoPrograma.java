@@ -172,7 +172,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     private void tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMouseClicked
         int filaSeleccionada = tbl.getSelectedRow();
         
-        if (filaSeleccionada != -1){
+        if (filaSeleccionada != -1 && tbl.getValueAt(filaSeleccionada, 0) != null){
             String curso = tbl.getValueAt(filaSeleccionada,0).toString();
             txtCurso.setText(curso);
         }
@@ -235,8 +235,8 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try{
             
-            if (cbPrograma.getItemCount() < 0){
-                //Si no hay ningun programa creado, no hay donde agregar un curso.
+            if (cbPrograma.getItemCount() <= 0 || cbPrograma.getSelectedItem() == null){
+                JOptionPane.showMessageDialog(this, "No hay programas de formación disponibles.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             

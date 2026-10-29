@@ -113,22 +113,33 @@ public class Controlador implements IControlador {
         try{
             em.getTransaction().begin();
             Usuario usuarioModificado = em.find(Usuario.class, usuario.getNickname());
-            if(!usuarioModificado.getApellido().equals(usuario.getApellido()))
+            if (usuarioModificado == null)
+                throw new Exception("El usuario '" + usuario.getNickname() + "' no existe.");
+            if (usuario.getApellido() != null && !usuario.getApellido().isBlank())
                 usuarioModificado.setApellido(usuario.getApellido());
-            if(!usuarioModificado.getNombre().equals(usuario.getNombre()))
+            if (usuario.getNombre() != null && !usuario.getNombre().isBlank())
                 usuarioModificado.setNombre(usuario.getNombre());
-            if(!usuarioModificado.getfNacimiento().equals(usuario.getfNacimiento()))
+            if (usuario.getfNacimiento() != null)
                 usuarioModificado.setfNacimiento(usuario.getfNacimiento());
-            if(!usuarioModificado.getImagen().equals(usuario.getImagen()))
+            if (usuario.getImagen() != null && !usuario.getImagen().isBlank())
                 usuarioModificado.setImagen(usuario.getImagen());
-            if(!usuarioModificado.getEmail().equals(usuario.getEmail()))
-                if(!existeEmail(usuario.getEmail()))
-                    usuarioModificado.setEmail(usuario.getEmail());
+            if (usuario.getEmail() != null && !usuario.getEmail().equalsIgnoreCase(usuarioModificado.getEmail())) {
+                Usuario otro = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
+                        .setParameter("email", usuario.getEmail()).getResultStream().findFirst().orElse(null);
+                if (otro != null && !otro.getNickname().equals(usuarioModificado.getNickname()))
+                    throw new Exception("Ya existe un usuario con el Email '" + usuario.getEmail() + "'.");
+                usuarioModificado.setEmail(usuario.getEmail());
+            }
+            if (usuario.getPassword() != null && !usuario.getPassword().isBlank()
+                    && !usuario.getPassword().equals(usuarioModificado.getPassword()))
+                usuarioModificado.setPassword(Utils.Crypt.hashPassword(usuario.getPassword().trim()));
             
-            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
+            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE && usuarioModificado instanceof Docente
+                    && usuario.getInstitutos() != null) {
                 List<Instituto> institutos = new ArrayList<>();
                 for(String aux: usuario.getInstitutos()){
                     Instituto instituto = em.find(Instituto.class,aux);
+                    if (instituto == null) throw new Exception("No existe el instituto '" + aux + "'.");
                     institutos.add(instituto);
                 }
                 ((Docente) usuarioModificado).setInstitutos(institutos);
@@ -163,15 +174,15 @@ public class Controlador implements IControlador {
                     "Ya existe un usuario con el Email '" 
                     + usuario.getEmail() + "'.");
             }
-            //String password=Utils.Crypt.encodeBCrypt(Utils.Crypt.descifrarAES(usuario.getPassword()));    // BCrypt es una encriptador y es mucho mas seguro ya que es irreversible
-            String password=Utils.Crypt.cifrarAES(usuario.getPassword());   // AES solo sirve para transporte, no para persistencia, ya que es solo un cifrador, mientras BCrypt es unidireccional, AES es bidireccional, por lo que es facil de decifrar si se expone la clave de cifrado
+            if (usuario.getPassword() == null || usuario.getPassword().isBlank())
+                throw new Exception("La contraseña no puede estar vacía.");
+            if (usuario.getNombre() == null || usuario.getNombre().isBlank()
+                    || usuario.getApellido() == null || usuario.getApellido().isBlank())
+                throw new Exception("El nombre y el apellido son obligatorios.");
+            // BCrypt: hash irreversible, unico formato de persistencia de contrasenas
+            String password=Utils.Crypt.hashPassword(usuario.getPassword());
             Usuario nuevoUsuario;
-            char letra;
-            String tmpNombre=usuario.getNombre(), tmpApellido=usuario.getApellido();
-            letra=tmpNombre.charAt(0);
-            tmpNombre=String.valueOf(letra).toUpperCase()+tmpNombre.substring(1);
-            letra=tmpApellido.charAt(0);
-            tmpApellido=String.valueOf(letra).toUpperCase()+tmpApellido.substring(1);
+            String tmpNombre=capitalizar(usuario.getNombre().trim()), tmpApellido=capitalizar(usuario.getApellido().trim());
             if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
                 List<Instituto> institutos = new ArrayList<>();
                 for (String nombre : usuario.getInstitutos()) {
@@ -215,6 +226,28 @@ public class Controlador implements IControlador {
             throw e;
         } finally {
             em.close();
+        }
+    }
+    private static String capitalizar(String s){
+        return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+    @Override
+    public DtUsuario obtenerUsuario(String nickname) {
+        if (nickname == null) return null;
+        try (EntityManager em = emf.createEntityManager()) {
+            Usuario aux = em.find(Usuario.class, nickname);
+            if (aux == null)
+                aux = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
+                        .setParameter("email", nickname).getResultStream().findFirst().orElse(null);
+            if (aux == null) return null;
+            if (aux instanceof Docente) {
+                List<String> institutos = new ArrayList<>();
+                for (Instituto instituto : ((Docente) aux).getInstitutos()) institutos.add(instituto.getNombre());
+                return new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
+                        aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), institutos, TipoUsuario.DOCENTE);
+            }
+            return new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
+                    aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
         }
     }
     @Override
@@ -426,7 +459,6 @@ public class Controlador implements IControlador {
     public DtConsultaCurso obtenerDatosCurso(String nombreCurso) throws Exception {
         try (EntityManager em = emf.createEntityManager()) {
             Curso c = em.find(Curso.class, nombreCurso);
-            Curso c2=em.find(Curso.class, nombreCurso);
             if (c == null) throw new Exception("El curso no existe.");
 
             List<Edicion> Ediciones = em.createQuery(
@@ -440,9 +472,16 @@ public class Controlador implements IControlador {
                 for (Categoria categoria : c.getCategorias())
                     categorias.add(new DtCategoria(categoria.getNombre()));
             }
-            if(c2.getPrevias()!=null)
-                for (Curso p : c2.getPrevias())
-                    previas.add(new DtCurso(p.getNombre(), p.getDescripcion(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), p.getUrl(), p.getFechaRegistro(), new DtInstituto(p.getInstituto().getNombre()), p.getImagen()));
+            if(c.getPrevias()!=null)
+                for (Curso p : c.getPrevias()) {
+                    Set<String> catPrevia = new HashSet<>();
+                    if (p.getCategorias() != null)
+                        for (Categoria cp : p.getCategorias()) catPrevia.add(cp.getNombre());
+                    Set<String> prevPrevia = new HashSet<>();
+                    if (p.getPrevias() != null)
+                        for (Curso pp : p.getPrevias()) prevPrevia.add(pp.getNombre());
+                    previas.add(new DtCurso(p.getNombre(), p.getDescripcion(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), p.getUrl(), p.getFechaRegistro(), new DtInstituto(p.getInstituto().getNombre()), prevPrevia, catPrevia, p.getImagen()));
+                }
             List<DtEdicion> ediciones=new ArrayList<>();
             for(Edicion ed : Ediciones) {
                 List<DtUsuario> docentes=new ArrayList<>();
@@ -550,12 +589,28 @@ public class Controlador implements IControlador {
             if (dt.getImagen() != null) {
                 nuevaEdicion.setImagen(dt.getImagen());
             }
+            if (dt.getFechaInicio() == null || dt.getFechaFin() == null)
+                throw new Exception("Las fechas de inicio y fin son obligatorias.");
+            if (dt.getFechaInicio().isAfter(dt.getFechaFin()))
+                throw new Exception("La fecha de inicio no puede ser posterior a la fecha de fin.");
+            if (dt.getCupo() != null && dt.getCupo() < 0)
+                throw new Exception("El cupo no puede ser negativo.");
             List<Docente> docentesAsignados = new ArrayList<>();
-            for (String nick : dt.getNameDocentes()) {
+            Set<String> identificadores = new HashSet<>();
+            if (dt.getDocentes() != null)
+                for (DtUsuario du : dt.getDocentes())
+                    if (du != null && du.getNickname() != null) identificadores.add(du.getNickname());
+            if (identificadores.isEmpty() && dt.getNameDocentes() != null)
+                identificadores.addAll(dt.getNameDocentes());
+            for (String nick : identificadores) {
                 Docente d = em.find(Docente.class, nick);
-                if (d != null) {
-                    docentesAsignados.add(d);
+                if (d == null) {
+                    // Compatibilidad: identificador "Nombre Apellido"
+                    d = em.createQuery("SELECT d FROM Docente d WHERE CONCAT(d.nombre, ' ', d.apellido) = :n", Docente.class)
+                            .setParameter("n", nick).getResultStream().findFirst().orElse(null);
                 }
+                if (d == null) throw new Exception("No existe el docente '" + nick + "'.");
+                if (!docentesAsignados.contains(d)) docentesAsignados.add(d);
             }
             nuevaEdicion.setDocentes(docentesAsignados);
             em.persist(nuevaEdicion);
@@ -575,7 +630,7 @@ public class Controlador implements IControlador {
         EdicionHelper seek=new EdicionHelper(emf, nombre);
         try { ret=seek.getEdicion(); }
         catch (Exception e) { ret=null; }
-        finally{ seek=null; }
+        finally{ seek.kill(); }
         return ret;
     }
     @Override
@@ -584,7 +639,7 @@ public class Controlador implements IControlador {
         EdicionHelper seek=new EdicionHelper(emf, curso);
         try { ret=seek.getListEditPorCurso(); }
         catch (Exception e) { ret=new ArrayList<>(); }
-        finally{ seek=null; }
+        finally{ seek.kill(); }
         return ret;
     }
     @Override
@@ -593,7 +648,7 @@ public class Controlador implements IControlador {
         EdicionHelper seek=new EdicionHelper(emf, curso);
         try { ret=seek.listarEdicionPorCurso(); }
         catch (Exception e) { ret=new ArrayList<>(); }
-        finally{ seek=null; }
+        finally{ seek.kill(); }
         return ret;        
     }
     @Override
@@ -635,7 +690,7 @@ public class Controlador implements IControlador {
                     }
                 }
                 Set<String> nombresCategorias = new HashSet<>();
-                if (curso.getPrevias() != null) {
+                if (curso.getCategorias() != null) {
                     for (Categoria categoria : curso.getCategorias()) {
                         nombresCategorias.add(categoria.getNombre());
                     }
@@ -668,7 +723,9 @@ public class Controlador implements IControlador {
                     aux.getFechaFin(),
                     aux.getFechaPublicacion(),
                     dtCurso,
-                    nombresDocentes
+                    null,
+                    nombresDocentes,
+                    aux.getImagen()
                 ));
             }
             return resultado;
@@ -890,8 +947,6 @@ public class Controlador implements IControlador {
             }
             List<ProgramaFormacion> programas;
             
-            List<DtCurso> dtCursos = new ArrayList<>();
-            
             if (usuario instanceof Docente) {
                 
                 //Programas en los que el docente dicta cursos.
@@ -935,6 +990,17 @@ public class Controlador implements IControlador {
                 .getResultList();
             }
             for (ProgramaFormacion aux : programas) {
+                List<DtCurso> dtCursos = new ArrayList<>();
+                if (aux.getCursos() != null)
+                    for (Curso c : aux.getCursos()) {
+                        Set<String> cats = new HashSet<>();
+                        if (c.getCategorias() != null)
+                            for (Categoria cat : c.getCategorias()) cats.add(cat.getNombre());
+                        dtCursos.add(new DtCurso(c.getNombre(), c.getDescripcion(), c.getDuracion(), c.getCantidadHoras(),
+                                c.getCreditos(), c.getUrl(), c.getFechaRegistro(),
+                                c.getInstituto() != null ? new DtInstituto(c.getInstituto().getNombre()) : null,
+                                null, cats, c.getImagen()));
+                    }
                 resultado.add(new DtPrograma(
                     aux.getNombre(),
                     aux.getDescripcion(),
@@ -965,8 +1031,8 @@ public class Controlador implements IControlador {
                     if (c.getInstituto() != null) {
                         dtInst = new DtInstituto(c.getInstituto().getNombre());
                     }
-                    for(Curso previa : c.getPrevias()) previas.add(previa.getNombre());
-                    for (Categoria categoria : c.getCategorias()) categorias.add(categoria.getNombre());
+                    if (c.getPrevias() != null) for(Curso previa : c.getPrevias()) previas.add(previa.getNombre());
+                    if (c.getCategorias() != null) for (Categoria categoria : c.getCategorias()) categorias.add(categoria.getNombre());
                     DtCurso dtc = new DtCurso(
                             c.getNombre(),
                             c.getDescripcion(),
@@ -1064,9 +1130,17 @@ public class Controlador implements IControlador {
 
             if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
                 
-                //String hashPassword = Utils.Crypt.encodeBCrypt(usuario.getPassword().trim());   //  bis
-                String hashPassword = Utils.Crypt.cifrarAES(usuario.getPassword().trim());  //  bis 2
+                String hashPassword = Utils.Crypt.hashPassword(usuario.getPassword().trim());
                 usuarioModificado.setPassword(hashPassword);
+            }
+
+            if (usuario.getEmail() != null && !usuario.getEmail().isBlank()
+                    && !usuario.getEmail().equalsIgnoreCase(usuarioModificado.getEmail())) {
+                Usuario otro = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
+                        .setParameter("email", usuario.getEmail()).getResultStream().findFirst().orElse(null);
+                if (otro != null && !otro.getNickname().equals(usuarioModificado.getNickname()))
+                    throw new Exception("Ya existe un usuario con el Email '" + usuario.getEmail() + "'.");
+                usuarioModificado.setEmail(usuario.getEmail());
             }
 
             if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
@@ -1102,6 +1176,11 @@ public class Controlador implements IControlador {
     
 
     @Override 
+    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
+        return setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, programa != null ? programa.getDocente() : null);
+    }
+
+    @Override 
     public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception {
     String nombreImagen = programa.getImagen();
 
@@ -1115,6 +1194,8 @@ public class Controlador implements IControlador {
                     programa.getFechaRegistro(),
                     programa.getFechaInicio(),
                     programa.getFechaFin(),
+                    programa.getCursos(),
+                    programa.getNameCursos(),
                     nombreImagen,
                     docente
             );
@@ -1299,6 +1380,7 @@ public class Controlador implements IControlador {
                 .getResultList();
 
             if (!existentes.isEmpty()) {
+                em.getTransaction().rollback();
                 return 1;
             }
 

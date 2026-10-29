@@ -22,26 +22,30 @@ public class ImagenServlet extends HttpServlet {
 
         if (nombreImagen == null || nombreImagen.trim().isEmpty()) {
             nombreImagen = "usr.png";
+        } else {
+            nombreImagen = new File(nombreImagen.trim()).getName();
+            if (nombreImagen.isEmpty() || "..".equals(nombreImagen) || ".".equals(nombreImagen)) {
+                nombreImagen = "usr.png";
+            }
         }
-
 
         File archivo = new File(GestorImagenes.getRutaBase(), nombreImagen);
 
-        if (!archivo.exists()) {
+        if (!archivo.exists() || !archivo.isFile()) {
             String pathReal = getServletContext().getRealPath("/imagenes/" + nombreImagen);
             if (pathReal != null) {
                 archivo = new File(pathReal);
             }
         }
 
-        if (!archivo.exists()) {
+        if (!archivo.exists() || !archivo.isFile()) {
             String pathDefault = getServletContext().getRealPath("/imagenes/usr.png");
             if (pathDefault != null) {
                 archivo = new File(pathDefault);
             }
         }
 
-        if (!archivo.exists()) {
+        if (!archivo.exists() || !archivo.isFile()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }

@@ -186,7 +186,8 @@ public class Utils {
         }
         
         public static boolean isEmpty(JFormattedTextField obj){
-            return obj.getText().equals("--/--/----");
+            String txt=obj.getText();
+            return txt==null || txt.isBlank() || txt.equals("--/--/----");
         }
         
         public static void assignFormato(JFormattedTextField obj){
@@ -233,7 +234,7 @@ public class Utils {
         public static boolean isFecha(String fecha){
             boolean ret=false;
             try{
-                LocalDate.parse(fecha, DateTimeFormatter.ofPattern(FORMATO_FECHA));
+                LocalDate.parse(fecha, DateTimeFormatter.ofPattern(FORMATO_FECHA.replace("yyyy", "uuuu")).withResolverStyle(java.time.format.ResolverStyle.STRICT));
                 ret=true;
             } catch (Exception e) {}
             return ret;
@@ -286,12 +287,12 @@ public class Utils {
         }
 
         public static boolean isCoherente(Date fecha1, Date fecha2){
-            return fecha1.before(fecha2);
-        }   
+            return fecha1!=null && fecha2!=null && !fecha1.after(fecha2);
+        }
         
         public static boolean isCoherente(LocalDate fecha1, LocalDate fecha2){
-            return fecha1.isBefore(fecha2);
-        }   
+            return fecha1!=null && fecha2!=null && !fecha1.isAfter(fecha2);
+        }
 
     }
     
@@ -345,6 +346,25 @@ public class Utils {
         
         public static boolean compareBCrypt(String password, String passSaved){
             return BCrypt.checkpw(password, passSaved);
+        }
+
+        public static String hashPassword(String password){
+            return encodeBCrypt(password);
+        }
+
+        public static boolean isBCrypt(String passSaved){
+            return passSaved!=null && passSaved.matches("^\\$2[aby]?\\$\\d{2}\\$.{53}$");
+        }
+
+        public static boolean verifyPassword(String password, String passSaved){
+            if(password==null || passSaved==null) return false;
+            try {
+                if(isBCrypt(passSaved)) return BCrypt.checkpw(password, passSaved);
+            } catch (Exception e) { return false; }
+            try {
+                if(password.equals(descifrarAES(passSaved))) return true;
+            } catch (Exception e) { /* no era AES */ }
+            return password.equals(passSaved);
         }
         
         public static String cifrarAES(String password){
@@ -438,9 +458,6 @@ public class Utils {
                 if(height==0) size=getAspectRatio(imagen, with, WITH);
                 Image tmpIco2 = imagen.getImage().getScaledInstance(size[WITH], size[HEIGHT], Image.SCALE_SMOOTH);
                 retFoto = new ImageIcon(tmpIco2);
-                size=null;
-                tmpIco2=null;
-                System.gc();
             } catch(Exception e){  if(Logger.isDebugEnabled()) Logger.debug("Error al escalar foto ...: {}", e.getMessage());   }       
            return retFoto;
         }    
@@ -478,14 +495,12 @@ public class Utils {
                 HttpURLConnection conexion = (HttpURLConnection) (new URI(imagen).toURL()).openConnection();
                 conexion.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
                 retFoto=new ImageIcon(ImageIO.read(conexion.getInputStream()));
-                conexion=null;
-                System.gc();
             } catch (IOException | URISyntaxException e) {  Logger.error("Error con load WWW Foto ...: {}", e.getMessage());  }
             return retFoto;
         }
         
         public static InputStream toStream(String ruta) throws IOException {
-            return Files.newInputStream(Path.of(OS.getHomePath()+OS.getSeparador()+".edEXT"+OS.getSeparador()+"imagen"+OS.getSeparador()+ruta));
+            return Files.newInputStream(Path.of(cfg.pathImagen()+OS.getSeparador()+ruta));
         }
         
     /// @return      Devuelve el objeto que representa la imagen seleccionada
@@ -498,8 +513,6 @@ public class Utils {
                     retFile=buscar.getSelectedFile();
                 } catch(Exception e) {  Logger.error("Error al abrir foto: {}", e.getMessage());  }
             }
-            buscar=null;
-            System.gc();
             return retFile;
         }
     /// @return      Devuelve el objeto que representa la imagen seleccionada
@@ -518,8 +531,6 @@ public class Utils {
             try {
                 retFile=tmpPath.getDirectory()!=null && tmpPath.getFile()!=null?new File(tmpPath.getDirectory(), tmpPath.getFile()):null;
             } catch (Exception e) {  Logger.error("Error al abrir foto: {}", e.getMessage());  }
-            tmpPath=null;
-            System.gc();
             return retFile;
         }
         
@@ -555,11 +566,12 @@ public class Utils {
                     if(path.startsWith("#@."))
                         Origen=Origen.substring(3);
                     else
-                        Origen=cfg.PATH_INTERNAL+cfg.IMAGE_USER;                    
-                    InputStream tmp = Imagen.class.getResourceAsStream(Origen);
-                    if(tmp!=null){
-                        Files.copy(tmp, Path.of(Destino), StandardCopyOption.REPLACE_EXISTING);
-                        Logger.info("Imagen de '{}', guardada en .: {}", nombre, Destino);
+                        Origen=cfg.PATH_INTERNAL+cfg.IMAGE_USER;
+                    try (InputStream tmp = Imagen.class.getResourceAsStream(Origen)) {
+                        if(tmp!=null){
+                            Files.copy(tmp, Path.of(Destino), StandardCopyOption.REPLACE_EXISTING);
+                            Logger.info("Imagen de '{}', guardada en .: {}", nombre, Destino);
+                        }
                     }
                 }else{
                     File destino=new File(Destino);
@@ -569,13 +581,11 @@ public class Utils {
             } catch(IOException e) {
                 Logger.error(e.getMessage(), "Error al escribir la Imagen en disco: ");
             }
-            Origen=Destino=ext=null;
-            System.gc();
         }   
         
         public static boolean save(InputStream imagen, String nombre, String contenido){
             //String path=OS.getWorkPath()+OS.getSeparador()+"imagen",
-            String path=OS.getHomePath()+OS.getSeparador()+".edEXT"+OS.getSeparador()+"imagen",
+            String path=cfg.pathImagen(),
                    //file=nombre+"."+contenido.substring(contenido.lastIndexOf("/")+1),
                    nameFile=path+OS.getSeparador()+nombre;
             long ret=0;
@@ -585,9 +595,6 @@ public class Utils {
                 Logger.info("Imagen guardada en ..: {}", nameFile);
             } catch (IOException e) {
                 Logger.error(e.getMessage(), "Error al escribir el Imagen en disco: "); }
-            path=nameFile=null;
-            //file=null;
-            System.gc();
             return ret!=0;
         }
         
@@ -633,8 +640,6 @@ public class Utils {
                     retFile=buscar.getSelectedFile();
                 } catch(Exception e) {  Logger.error("Error al abrir foto: {}", e.getMessage());  }
             }
-            buscar=null;
-            System.gc();
             return retFile;
         }
 
@@ -689,8 +694,6 @@ public class Utils {
             if(tmpPath.showOpenDialog(null)==JFileChooser.APPROVE_OPTION)
                 if(tmpPath!=null)
                     retPath=(tmpPath.getSelectedFile()).getAbsolutePath();
-            tmpPath=null;
-            System.gc();
             return retPath;
         }
 
@@ -728,8 +731,6 @@ public class Utils {
         public static void createFolder(String ruta){
             File path=new File(ruta);
             if(!path.exists()) path.mkdirs();
-            path=null;
-            System.gc();
         }
         public static void save(File file){
             save(file, "", "");
@@ -746,17 +747,12 @@ public class Utils {
             if(ruta.isEmpty()) ruta=getHomePath()+getSeparador()+"."+"edEXT"+getSeparador()+"imagenes";//getPaqueteName();
             try {
                 File path=new File(ruta);
-                if(path.exists()) path.mkdirs();
+                if(!path.exists()) path.mkdirs();
                 String[] tmp=splitPath(file.getAbsolutePath());
                 if(nombre.isEmpty()) nombre=tmp[NAMEFILE];
                 File tmpFile=new File(path, nombre+tmp[EXTFILE]);
                 Files.copy(file.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 Logger.debug("Archivo guardado en ..: {}", tmpFile.getAbsolutePath());
-                path=null;
-                ruta=null;
-                tmp=null;
-                tmpFile=null;
-                System.gc();
             } catch(IOException e){  Logger.error("Error al guardar Archivo ..: " + e.getMessage());  }
         }
 

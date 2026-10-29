@@ -72,7 +72,7 @@ public class BuscadorServlet extends HttpServlet {
                     String nickname = user.getNickname() != null ? user.getNickname() : "";
                     String nom = user.getNombre() != null ? user.getNombre() : "";
                     String ape = user.getApellido() != null ? user.getApellido() : "";
-                    String tip = user.getTipoUsuario().toString();
+                    String tip = user.getTipoUsuario() != null ? user.getTipoUsuario().toString() : "estudiante";
                     String nombre = (nom + " " + ape).trim();
                     
                     if (queryLower.isEmpty() || nickname.toLowerCase().contains(queryLower) || nombre.toLowerCase().contains(queryLower)){
@@ -90,7 +90,7 @@ public class BuscadorServlet extends HttpServlet {
         
         } catch (Exception e) {
             request.setAttribute("error", e.getMessage());
-            
+            request.getRequestDispatcher("/fragmentos/error.jsp").forward(request, response);
         }
         
         

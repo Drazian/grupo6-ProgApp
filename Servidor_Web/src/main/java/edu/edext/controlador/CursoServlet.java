@@ -66,10 +66,14 @@ public class CursoServlet extends HttpServlet {
                                         boolean perteneceACategoria = false;
 
                                         for (String catStr : categoriasPrograma) {
-                                            if (catStr != null) {
-                                                String[] subCategorias = catStr.split("[,\\s]+");
+                                            if (catStr != null && nombre != null) {
+                                                if (catStr.trim().equalsIgnoreCase(nombre.trim())) {
+                                                    perteneceACategoria = true;
+                                                    break;
+                                                }
+                                                String[] subCategorias = catStr.split(",");
                                                 for (String subCat : subCategorias) {
-                                                    if (subCat.trim().equalsIgnoreCase(nombre)) {
+                                                    if (subCat.trim().equalsIgnoreCase(nombre.trim())) {
                                                         perteneceACategoria = true;
                                                         break;
                                                     }
@@ -162,15 +166,12 @@ public class CursoServlet extends HttpServlet {
                         return;
                     }
                     String institutoDelCurso = "Sin instituto asignado";
-                    List<edu.edext.datatypes.DtInstituto> todosLosInstitutos = ic.listarInstitutos();
-                    if (todosLosInstitutos != null) {
-                        for (edu.edext.datatypes.DtInstituto inst : todosLosInstitutos) {
-                            List<String> cursosDeEsteInst = ic.listarCursosPorInstituto(inst.getNombre());
-                            if (cursosDeEsteInst != null && cursosDeEsteInst.contains(nombreDelCurso)) {
-                                institutoDelCurso = inst.getNombre();
-                                break;
-                            }
+                    try {
+                        String instObtenido = ic.obtenerInstitutoPorCurso(nombreDelCurso);
+                        if (instObtenido != null && !instObtenido.trim().isEmpty()) {
+                            institutoDelCurso = instObtenido;
                         }
+                    } catch (Exception ignored) {
                     }
                     // Pasamos el instituto como una variable separada al JSP
                     request.setAttribute("institutoDelCurso", institutoDelCurso);
@@ -231,12 +232,25 @@ public class CursoServlet extends HttpServlet {
         
         switch (accion){
             case "altaCurso": 
+                HttpSession sessionPost = request.getSession(false);
+                DtUsuario docentePost = (sessionPost != null) ? (DtUsuario) sessionPost.getAttribute("usuarioLogueado") : null;
+                if (docentePost == null || docentePost.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Acceso denegado. Solo los docentes pueden registrar cursos.");
+                    return;
+                }
                 try {
                     String nombreCurso = request.getParameter("nombre");
                     String descripcion = request.getParameter("descripcion");
                     String duracion = request.getParameter("duracion");
                     int cantidadHoras = Integer.parseInt(request.getParameter("cantidadHoras"));
                     int creditos = Integer.parseInt(request.getParameter("creditos"));
+                    if (cantidadHoras <= 0) {
+                        throw new Exception("La cantidad de horas debe ser mayor a cero.");
+                    }
+                    if (creditos < 0) {
+                        throw new Exception("Los créditos no pueden ser negativos.");
+                    }
                     String url = request.getParameter("url");
                     String nombreInstituto = request.getParameter("instituto");
 

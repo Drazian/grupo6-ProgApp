@@ -12,6 +12,7 @@ import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
+import edu.edext.tools.cfg;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +44,10 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
     
     private void cargarDatosIniciales() {
         try {
+            setTitle("Alta de Edición de Curso");
+            Utils.GUI.assignFormato(textoFechaInicio);
+            Utils.GUI.assignFormato(textoFechaFin);
+            Utils.GUI.soloNumeros(textoCupos);
             // Llenar Institutos
             seleccionInstituto.removeAllItems();
             seleccionInstituto.addItem("Seleccione un Instituto...");
@@ -225,17 +230,28 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
             if (textoNombreEdicion.getText().trim().isEmpty()) throw new Exception("El nombre no puede estar vacío.");
             
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            sdf.setLenient(false);
             Date dIni = sdf.parse(textoFechaInicio.getText());
             Date dFin = sdf.parse(textoFechaFin.getText());
+            if (dIni.after(dFin)) {
+                throw new Exception("La fecha de inicio no puede ser posterior a la fecha de fin.");
+            }
             Date dAlta = new Date(); // Captura la fecha y hora actual automáticamente
             
             Integer cupo = null;
             if (!textoCupos.getText().trim().isEmpty()) {
-                cupo = Integer.valueOf(textoCupos.getText());
+                cupo = Integer.valueOf(textoCupos.getText().trim());
+                if (cupo < 0) {
+                    throw new Exception("El cupo no puede ser negativo.");
+                }
             }
 
-            String nombre=textoNombreEdicion.getText().trim(),
-                   image="Edicion."+nombre+Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
+            String nombre = textoNombreEdicion.getText().trim();
+            String image = cfg.IMAGE_USER;
+            if (imagen != null) {
+                String ext = Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
+                image = "Edicion." + nombre + ext;
+            }
             
             // Capturar la lista de docentes seleccionados (con Ctrl+Clic)
             List<String> docentesSel = listaDocentes.getSelectedValuesList();
@@ -248,12 +264,15 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
                 docentes.add(new DtUsuario(nomDocente, null, null, null, null, null, null, new ArrayList<>(), TipoUsuario.DOCENTE));
             }
             
-            Utils.Imagen.save(imagen.getAbsolutePath(), nombre);
+            String cursoSeleccionado = (String) seleccionCurso.getSelectedItem();
             // Construir el Datatype y mandarlo a la lógica
             DtEdicion dt = new DtEdicion(nombre, cupo, Utils.Cast.valueOf(dIni), Utils.Cast.valueOf(dFin), Utils.Cast.valueOf(dAlta), 
-                    new DtCurso(title, null, null, 0, 0, null, null, new DtInstituto(seleccionInstituto.getSelectedItem().toString()), null), docentes, image);
+                    new DtCurso(cursoSeleccionado, null, null, 0, 0, null, null, new DtInstituto(seleccionInstituto.getSelectedItem().toString()), null), docentes, image);
             
-            control.altaEdicionCurso((String) seleccionCurso.getSelectedItem(), dt);
+            control.altaEdicionCurso(cursoSeleccionado, dt);
+            if (imagen != null) {
+                Utils.Imagen.save(imagen.getAbsolutePath(), "Edicion." + nombre);
+            }
             
             JOptionPane.showMessageDialog(this, "Edición registrada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
@@ -293,22 +312,22 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jDfechaInicioPropertyChange
 
     private void textoFechaFinFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textoFechaFinFocusLost
-        if(!Utils.GUI.isEmpty(textoFechaInicio))
-        jDfechaInicio.setDate(Utils.Cast.valudf(textoFechaInicio.getText()));
+        if(!Utils.GUI.isEmpty(textoFechaFin))
+        jDfechaFin.setDate(Utils.Cast.valudf(textoFechaFin.getText()));
     }//GEN-LAST:event_textoFechaFinFocusLost
 
     private void textoFechaFinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textoFechaFinActionPerformed
-        if(!Utils.GUI.isEmpty(textoFechaInicio))
-        jDfechaInicio.setDate(Utils.Cast.valudf(textoFechaInicio.getText()));
+        if(!Utils.GUI.isEmpty(textoFechaFin))
+        jDfechaFin.setDate(Utils.Cast.valudf(textoFechaFin.getText()));
     }//GEN-LAST:event_textoFechaFinActionPerformed
 
     private void jBfechaFinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBfechaFinActionPerformed
-        jDfechaInicio.getCalendarButton().doClick();
+        jDfechaFin.getCalendarButton().doClick();
     }//GEN-LAST:event_jBfechaFinActionPerformed
 
     private void jDfechaFinPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDfechaFinPropertyChange
-        if(jDfechaInicio.getDate()!=null)
-        textoFechaInicio.setText(Utils.Fecha.assignFormato(jDfechaInicio.getDate()));
+        if(jDfechaFin.getDate()!=null)
+        textoFechaFin.setText(Utils.Fecha.assignFormato(jDfechaFin.getDate()));
     }//GEN-LAST:event_jDfechaFinPropertyChange
 
     private void btnAgregarImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarImagenActionPerformed
