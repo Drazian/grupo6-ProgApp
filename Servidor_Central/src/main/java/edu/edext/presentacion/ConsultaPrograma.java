@@ -5,6 +5,7 @@ import edu.edext.datatypes.DtCurso;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
+import edu.edext.tools.cfg;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JOptionPane;
@@ -258,7 +259,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
     private void cbProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProgramaActionPerformed
         try{            
             //TODO: cargar labels
-            if (cbPrograma.getItemCount() < 0){
+            if (cbPrograma.getItemCount() <= 0){
             //Si no hay ningun programa creado, no hay nada que cargar.
             return;
             }
@@ -284,6 +285,10 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                                     ? String.join(", ", categorias)
                                     : "Sin categorías";
             txtCategorias.setText(categoriasStr);
+            String imgProg = (aux.getImagen() != null && !aux.getImagen().isEmpty()) ? aux.getImagen() : cfg.IMAGE_USER;
+            int w = lblImagen.getWidth() > 0 ? lblImagen.getWidth() : 160;
+            int h = lblImagen.getHeight() > 0 ? lblImagen.getHeight() : 160;
+            lblImagen.setIcon(Utils.Imagen.resize(w, h, Utils.Imagen.loadSO(cfg.fullpathImagen() + imgProg)));
             
             
             
@@ -312,7 +317,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
     private void cargarCursos(){
         try{ 
             
-            if (cbPrograma.getItemCount() < 0){
+            if (cbPrograma.getItemCount() <= 0){
                 //Si no hay ningun programa creado, no hay curso asociado que cargar.
                 return;
             }

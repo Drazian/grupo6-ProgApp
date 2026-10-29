@@ -63,32 +63,37 @@ public class AltaUsuario extends javax.swing.JPanel {
         initComponents();
         this.modoForm=i;
         widthForm=650;
+        Utils.GUI.assignFormato(txtNacimiento);
         txtNickname.setEditable(false);
         txtNickname.setFocusable(false);
         txtPassword.setEditable(false);
         txtPassword.setFocusable(false);
+        txtEmail.setEditable(false);
+        btnAceptar.setVisible(false);
+        btnAceptar1.setVisible(false);
         chbDocente.setVisible(false);
         jPBotones1.setVisible(false);
         jPBotones.setVisible(false);
         jPInstituto.setVisible(false);
         btnQuitarInstituto.setEnabled(false);
         formResize(FORMGRANDE);
-        //btnAceptar.setVisible(false);
-        //txtEmail.setEditable(false);
         
         DefaultListModel<String> model = new DefaultListModel<>();
         lisInstitutos.setModel(model);
         
         cargarInstitutos();
         
-        if (i ==2){  
-            //Falta Obtener Cursos y cargar en las Tablas correspondientes
+        if (i == 2){  
             txtApellido.setEditable(false);
             txtNombre.setEditable(false);
+            txtNacimiento.setEditable(false);
+            jBNacimiento.setVisible(false);
             dchFechaDeNacimiento.setEnabled(false);
             btnGuardarCambios.setVisible(false);
+            btnGuardarCambios1.setVisible(false);
             btnAgregarImagen.setVisible(false);
             btnCancelar.setText("Volver");
+            btnCancelar1.setText("Volver");
             Utils.GUI.setDisable(chbDocente);
         }
     }
@@ -520,32 +525,33 @@ public class AltaUsuario extends javax.swing.JPanel {
 //        chbDocente.setEnabled(false);
         DefaultListModel<String> model =
                 (DefaultListModel<String>) lisInstitutos.getModel();
+        model.clear();
 
         if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
             formResize(FORMGRANDE);
-//            jPBotones.setVisible(false);
-//            jPBotones1.setVisible(true);
             chbDocente.setVisible(true);
             chbDocente.setSelected(true);
-//            jPInstituto.setVisible(true);
             if(this.modoForm==2){
                 cbInstitutos.setVisible(false);
                 btnQuitarInstituto.setVisible(false);
                 btnAgregarInstituto.setVisible(false);
             }
-            for (String instituto : usuario.getInstitutos()) {
-                model.addElement(instituto);
+            if (usuario.getInstitutos() != null) {
+                for (String instituto : usuario.getInstitutos()) {
+                    model.addElement(instituto);
+                }
             }
         } else {
             formResize(FORMCHICO);
             chbDocente.setVisible(false);
-//            jPInstituto.setVisible(false);
-//            jPBotones.setVisible(true);
         }
 
-        cargarImagen(pathImagen+Utils.OS.getSeparador()+usuario.getImagen());
+        String imgUsuario = (usuario.getImagen() != null && !usuario.getImagen().isEmpty())
+                ? usuario.getImagen()
+                : cfg.IMAGE_USER;
+        cargarImagen(pathImagen+Utils.OS.getSeparador()+imgUsuario);
 
-        imagenSeleccionada =new File(pathImagen, usuario.getImagen()); 
+        imagenSeleccionada = new File(pathImagen, imgUsuario); 
         //System.out.println("muestro : "+pathImagen+Utils.OS.getSeparador()+usuario.getImagen());
         //System.out.println("file : "+ imagenSeleccionada.getAbsolutePath());
         //System.out.println(RUTADEFAULT.substring(0, RUTADEFAULT.length()-1)); 
@@ -801,19 +807,20 @@ public class AltaUsuario extends javax.swing.JPanel {
         }
 
         try {
-            Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nickname); 
-            //String imagen = GestorImagenes.guardarImagen(imagenSeleccionada,nickname);
-            //System.out.println("guardo : "+imagenSeleccionada.getAbsolutePath());
-            
-            //System.out.println("ebtro con mail : "+ email);
+            String nombreImagenFinal = cfg.IMAGE_USER;
+            if (imagenSeleccionada != null) {
+                Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nickname);
+                int dot = imagenSeleccionada.getName().lastIndexOf(".");
+                String ext = dot >= 0 ? imagenSeleccionada.getName().substring(dot) : ".png";
+                nombreImagenFinal = nickname + ext;
+            }
             DtUsuario usuarioModificado = new DtUsuario(
                 nickname,
                 null,
                 email,
                 nombre,
                 apellido,
-                nickname+imagenSeleccionada.getName()
-                        .substring(imagenSeleccionada.getName().lastIndexOf(".")),
+                nombreImagenFinal,
                 nacimiento,
                 institutos,
                 tipo

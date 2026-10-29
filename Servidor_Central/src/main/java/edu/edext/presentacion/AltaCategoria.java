@@ -157,7 +157,7 @@ public class AltaCategoria extends javax.swing.JPanel {
     private void tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMouseClicked
         int filaSeleccionada = tbl.getSelectedRow();
         
-        if (filaSeleccionada != -1){
+        if (filaSeleccionada != -1 && tbl.getValueAt(filaSeleccionada, 0) != null){
             String nombre = tbl.getValueAt(filaSeleccionada, 0).toString();
             txtNombre.setText(nombre);
         }

@@ -89,6 +89,11 @@ public class InscripcionServlet extends HttpServlet {
             }
 
             case "listarInscripciones": {
+                DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo Docentes pueden ver inscripciones.");
+                    return;
+                }
                 try {
                     String edicion = request.getParameter("edicion");
                     DtEdicion dtEdicion = ic.getEdicion(edicion);
@@ -207,10 +212,13 @@ public class InscripcionServlet extends HttpServlet {
                      response.getWriter().write("Error: El estudiante no existe en la base de datos.");
                 } else if (resultado == 2) {
                      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                     response.getWriter().write("Error: La edición de curso ya no está disponible.");
+                     response.getWriter().write("Error: La edición de curso no existe.");
+                } else if (resultado == 4) {
+                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                     response.getWriter().write("Error: La edición seleccionada ya finalizó.");
                 } else {
                      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                     response.getWriter().write("No se pudo procesar. Es posible que ya estés inscripto a esta edición.");
+                     response.getWriter().write("Atención: Ya estás inscripto en esta edición.");
                 }
                 
             } catch (Exception e) {

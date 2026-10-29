@@ -539,7 +539,6 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void institutoSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_institutoSeleccionActionPerformed
-        if(institutoSeleccion.hasFocus()){
         if (institutoSeleccion.getSelectedIndex() > 0) {
             String instSeleccionado = (String) institutoSeleccion.getSelectedItem();
             try {
@@ -557,11 +556,10 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
             cursoSeleccion.removeAllItems();
             limpiarCampos();
         }
-        }
     }//GEN-LAST:event_institutoSeleccionActionPerformed
 
     private void cursoSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cursoSeleccionActionPerformed
-       if(cursoSeleccion.hasFocus()){
+       {
            if (cursoSeleccion.getSelectedItem() != null && cursoSeleccion.getSelectedIndex() > 0) {
             limpiarCampos();
             String cursoSeleccionado = (String) cursoSeleccion.getSelectedItem();
@@ -612,7 +610,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
                 if(dt.getPrevias()!=null){
                     Utils.GUI.clear(tblPrevias);
                     for(DtCurso p : dt.getPrevias())
-                        Utils.GUI.addRow(tblPrevias, new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), Utils.Fecha.assignFormato(p.getFechaRegistro()), concatena(dt.getNamePrevias()), p.getDescripcion()}); 
+                        Utils.GUI.addRow(tblPrevias, new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), Utils.Fecha.assignFormato(p.getFechaRegistro()), concatena(p.getNameCategorias()), p.getDescripcion()}); 
                     Utils.GUI.getModel(tblPrevias).setRowCount(8);
                 }
         //(new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), p.getFechaRegistro(), concatena(dt.getNamePrevias()), p.getDescripcion()});
@@ -626,7 +624,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
 //                    tablePrevias.assignData(); }
                 if(dt.getEdiciones()!=null){ 
                     for(DtEdicion p : dt.getEdiciones())
-                        tableEdiciones.addRow(new Object[]{p.getNombre(), p.getCupo()!=-1?p.getCupo():"Sin cupo" , p.getFechaInicio(), p.getFechaFin(), p.getFechaPublicacion(), concatena(p.getNameDocentes())});
+                        tableEdiciones.addRow(new Object[]{p.getNombre(), (p.getCupo()!=null && p.getCupo()>0)?p.getCupo():"Sin cupo" , p.getFechaInicio(), p.getFechaFin(), p.getFechaPublicacion(), concatena(p.getNameDocentes())});
                     tableEdiciones.assignData(); }
                 if(dt.getProgramas()!=null){
                     for(DtPrograma p : dt.getProgramas())

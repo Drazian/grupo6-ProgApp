@@ -51,7 +51,7 @@ public class UsuarioHelper {
         Usuario ret=null;
         try {
             ret=db.find(Usuario.class, nickname);
-            ret=Utils.Crypt.compareBCrypt(password, ret.getPassword())?ret:null; }
+            ret=(ret!=null && Utils.Crypt.verifyPassword(password, ret.getPassword()))?ret:null; }
         catch(Exception e) { ret=null; }
         finally { finaly(); }
         return ret;
@@ -63,7 +63,7 @@ public class UsuarioHelper {
         try {
             ret=db.createQuery("SELECT u FROM Usuario u WHERE u.email = :email",Usuario.class)
                   .setParameter("email", email).getResultStream().findFirst().orElse(null);
-            ret=Utils.Crypt.compareBCrypt(password, ret.getPassword())?ret:null; }
+            ret=(ret!=null && Utils.Crypt.verifyPassword(password, ret.getPassword()))?ret:null; }
         catch(Exception e) { ret=null; }
         finally { finaly(); }
         return ret;

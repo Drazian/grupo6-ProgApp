@@ -20,9 +20,11 @@ public class InscripcionProgramaID implements Serializable {
     }
     
     public void setEstudiante(String estudiante) { this.estudiante = estudiante; }
+    public void setPrograma(String programa) { this.programa = programa; }
     public void setProgramaFormacion(String programa) { this.programa = programa; }
 
     public String getEstudiante() { return estudiante; }
+    public String getPrograma() { return programa; }
     public String getProgramaFormacion() { return programa; }
     
       @Override

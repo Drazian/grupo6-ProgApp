@@ -52,7 +52,7 @@ public class jTable {
         if(rowData!=null){
             if(empty){
                 empty=false;
-                clear(); }
+                if(model.getRowCount()!=0) model.setRowCount(0); }
             model.addRow(rowData); }
         else clear();
     }
@@ -67,7 +67,7 @@ public class jTable {
     public void clear(){
         if(model==null) model=getModel();
         if(model.getRowCount()!=0) model.setRowCount(0);
-        if(empty) model.setRowCount(rowCount);
+        empty=true;
     }
     
 }

@@ -42,7 +42,13 @@ window.alert = function(mensaje) {
         max-width: 350px;
         line-height: 1.4;
     `;
-    toast.innerHTML = `<span style="font-size: 18px; font-weight: bold;">${icono}</span> <span>${mensaje}</span>`;
+    const spanIcono = document.createElement('span');
+    spanIcono.style.cssText = 'font-size: 18px; font-weight: bold;';
+    spanIcono.textContent = icono;
+    const spanMsg = document.createElement('span');
+    spanMsg.textContent = String(mensaje);
+    toast.appendChild(spanIcono);
+    toast.appendChild(spanMsg);
 
     contenedor.appendChild(toast);
 
@@ -310,7 +316,6 @@ function BuscadorServlet(){
 document.addEventListener("DOMContentLoaded", function() {
     cargarInstitutosMenu();
     cargarCategoriasMenu();
-    cargarMenuLateral();
 });
 
 function cargarInstitutosMenu() {
@@ -838,11 +843,11 @@ function verDetallesCurso(nombreCurso) {
 }
 
 function verDetalleEdicion(nombreEdicion) {
-    alert("Próximamente: Redirigiendo a Consulta de Edición -> " + nombreEdicion);
+    cargarConsultaEdicion(nombreEdicion);
 }
 
 function verDetallePrograma(nombrePrograma) {
-    alert("Próximamente: Redirigiendo a Consulta de Programa -> " + nombrePrograma);
+    cargarDetallePrograma(nombrePrograma);
 }
 
 function cargarMenuLateral() {
@@ -1581,32 +1586,28 @@ function filtrarMisInscripciones(estadoSeleccionado) {
 }
 
 function cargarSelectorConsultaCurso() {
-    fetch('EdicionServlet?accion=formularioAltaEdicion') 
-        .then(response => response.text())
-        .then(html => {
-            const htmlBuscador = `
-                <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px;">
-                    <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Consultar Curso</h2>
-                    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                        <div style="flex: 1;">
-                            <label style="font-weight: bold;">Instituto:</label>
-                            <select id="instBuscadorCurso" onchange="cargarCursosParaBuscador(this.value)" style="width: 100%; padding: 8px;">
-                                <option value="">Seleccione Instituto...</option>
-                            </select>
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-weight: bold;">Curso:</label>
-                            <select id="cursoBuscadorFinal" onchange="verDetallesCurso(this.value)" disabled style="width: 100%; padding: 8px;">
-                                <option value="">Primero seleccione un instituto</option>
-                            </select>
-                        </div>
-                    </div>
+    const htmlBuscador = `
+        <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px;">
+            <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Consultar Curso</h2>
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="font-weight: bold;">Instituto:</label>
+                    <select id="instBuscadorCurso" onchange="cargarCursosParaBuscador(this.value)" style="width: 100%; padding: 8px;">
+                        <option value="">Seleccione Instituto...</option>
+                    </select>
                 </div>
-            `;
-            document.getElementById('contenido-dinamico').innerHTML = htmlBuscador;
-            cargarInstitutosGenericos('instBuscadorCurso'); 
-            crearNuevoEstadoSPA(); // FIX: Nuevo estado
-        }).catch(err => console.log(err));
+                <div style="flex: 1;">
+                    <label style="font-weight: bold;">Curso:</label>
+                    <select id="cursoBuscadorFinal" onchange="verDetallesCurso(this.value)" disabled style="width: 100%; padding: 8px;">
+                        <option value="">Primero seleccione un instituto</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById('contenido-dinamico').innerHTML = htmlBuscador;
+    cargarInstitutosGenericos('instBuscadorCurso'); 
+    crearNuevoEstadoSPA();
 }
 
 function cargarSelectorConsultaEdicion() {

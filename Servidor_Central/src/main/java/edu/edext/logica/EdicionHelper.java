@@ -53,7 +53,7 @@ public DtEdicion getEdicion(){
                     tmp.getFechaFin(), 
                     tmp.getFechaPublicacion(), 
                     new DtCurso(tmp.getCurso().getNombre(), tmp.getCurso().getDescripcion(), 
-                            tmp.getCurso().getDuracion(), 0, 0, tmp.getCurso().getUrl(), 
+                            tmp.getCurso().getDuracion(), tmp.getCurso().getCantidadHoras(), tmp.getCurso().getCreditos(), tmp.getCurso().getUrl(), 
                             tmp.getCurso().getFechaRegistro(), 
                             new DtInstituto(tmp.getCurso().getInstituto().getNombre()),
                             tmp.getCurso().getImagen()), 
@@ -87,14 +87,15 @@ public DtEdicion getEdicion(){
         String ret;
         try { ret=db.find(Edicion.class, nombre).getNombre(); }
         catch (Exception e) { ret=null; }
+        finally { db.close(); db=null; }
         return ret;
     }
     private Edicion seekEdicion(){
         db=DB.createEntityManager();
         Edicion ret;
+        // El EntityManager queda abierto para permitir la carga LAZY; se cierra en kill()
         try { ret=db.find(Edicion.class, nombre); }
         catch (Exception e) { ret=null; }
-        db=null;
         return ret;
     }
     
