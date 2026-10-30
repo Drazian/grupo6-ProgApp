@@ -55,6 +55,8 @@
         </dependency>
     </dependencies>
     <build>
+        <!-- Genera target/web.war para desplegar en Tomcat -->
+        <finalName>web</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

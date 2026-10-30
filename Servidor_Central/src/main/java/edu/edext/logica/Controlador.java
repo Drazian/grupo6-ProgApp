@@ -13,13 +13,15 @@ import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.tools.Utils;
+import edu.edext.tools.cfg;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class Controlador implements IControlador {
-    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("edext");
+    // La conexion a la base se toma de ~/.edEXT/servidor.properties
+    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("edext", cfg.propiedadesJPA());
 
 //******************************** Institutos ********************************//
     @Override
