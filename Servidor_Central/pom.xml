@@ -13,7 +13,19 @@
     <properties>
         <exec.mainClass>edu.edext.presentacion.index</exec.mainClass>
         <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>     <!--  ignora la molestia advertencia por sentencias obsoletas -->
+        <edext.test.config>${project.build.testOutputDirectory}/servidor-test.properties</edext.test.config>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Hibernate 6.4 trae byte-buddy 1.14.11, que no reconoce Java 25 y no deja arrancar a Mockito.
+                 Se fija la version que usa Mockito 5.24 (tambien la usa Hibernate). -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.17.7</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
@@ -89,9 +101,46 @@
             <version>1.3.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- Base en memoria para los tests: no dependen ni modifican la base real -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Mocks en tests: dialogos JOptionPane/JFileChooser sin abrir ventanas y errores simulados del controlador -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.24.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.24.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+                <configuration>
+                    <!-- Cada clase de test en su propia JVM: arranca con su propia base H2 vacia -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                    <systemPropertyVariables>
+                        <!-- Por defecto H2 en memoria. Para correr contra la base real:
+                             mvn test -Dedext.test.config=<ruta a servidor.properties> -->
+                        <edext.config>${edext.test.config}</edext.config>
+                        <!-- ~ apunta a target/home-test: los tests nunca leen ni escriben el ~/.edEXT real -->
+                        <user.home>${project.build.directory}/home-test</user.home>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -122,7 +171,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.15</version>
                 <executions>
                     <execution>
                         <goals>

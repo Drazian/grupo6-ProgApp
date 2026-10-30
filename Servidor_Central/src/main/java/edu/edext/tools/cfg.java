@@ -22,7 +22,8 @@ import org.tinylog.Logger;
 public class cfg {
 
     public static final String PATH=getHomePath()+getSeparador()+".edEXT";
-    public static final String PATH_PROPERTIES=PATH+getSeparador()+"servidor.properties";
+    // Se puede usar otro archivo con -Dedext.config=<ruta> (lo usan los tests para correr contra H2)
+    public static final String PATH_PROPERTIES=System.getProperty("edext.config", PATH+getSeparador()+"servidor.properties");
     // Archivo de configuracion de la iteracion anterior, solo se lee para migrar la ruta de imagenes
     public static final String PATH_FILE=PATH+getSeparador()+"edEXT.cfg";
     public static final String PATH_INTERNAL="/Images/";
