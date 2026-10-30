@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <div style="max-width: 800px; margin: 0 auto; padding: 25px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
@@ -19,7 +20,7 @@
                             📚 ${prog.getNombre()}
                         </span>
                         
-                        <button type="button" onclick="cargarDetallePrograma('${prog.getNombre()}')"
+                        <button type="button" data-programa="${fn:escapeXml(prog.getNombre())}" onclick="cargarDetallePrograma(this.dataset.programa)"
                                 style="background-color: #0275d8; color: white; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s;"
                                 onmouseover="this.style.backgroundColor='#025aa5';" 
                                 onmouseout="this.style.backgroundColor='#0275d8';">

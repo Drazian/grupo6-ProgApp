@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <div style="max-width: 900px; margin: 0 auto; padding: 25px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
@@ -14,7 +15,7 @@
             <select id="selectPrograma" name="nombrePrograma" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: #fff; font-size: 14px;">
                 <option value="" disabled selected>-- Seleccione un Programa --</option>
                 <c:forEach var="prog" items="${programas}">
-                    <option value="${prog.getNombre()}">${prog.getNombre()}</option>
+                    <option value="${fn:escapeXml(prog.getNombre())}">${prog.getNombre()}</option>
                 </c:forEach>
             </select>
         </div>
@@ -41,7 +42,7 @@
                                 onmouseout="this.style.backgroundColor='transparent';">
                                 
                                 <td style="padding: 10px; text-align: center;">
-                                    <input type="checkbox" name="cursosSeleccionados" value="${cur.getNombre()}" class="check-curso" style="transform: scale(1.2); cursor: pointer;">
+                                    <input type="checkbox" name="cursosSeleccionados" value="${fn:escapeXml(cur.getNombre())}" class="check-curso" style="transform: scale(1.2); cursor: pointer;">
                                 </td>
                                 <td style="padding: 10px; text-align: center;">
                                     <img src="ImagenServlet?nombre=${empty cur.imagen ? 'usr.png' : cur.imagen}" 

@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <div style="max-width: 1100px; margin: 0 auto; padding: 25px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
@@ -47,9 +48,9 @@
             <tbody>
                 <c:forEach var="item" items="${resultadosBusqueda}">
                     <tr class="fila-resultado" 
-                        data-tipo="${item.tipo}" 
-                        data-nombre="${item.nombre}" 
-                        data-fecha="${item.fechaPublicacion}"
+                        data-tipo="${fn:escapeXml(item.tipo)}"
+                        data-nombre="${fn:escapeXml(item.nombre)}"
+                        data-fecha="${fn:escapeXml(item.fechaPublicacion)}"
                         style="border-bottom: 1px solid #eee; transition: background 0.15s;"
                         onmouseover="this.style.backgroundColor='#fcfcfc';" 
                         onmouseout="this.style.backgroundColor='transparent';">
@@ -64,7 +65,7 @@
                             ${item.nombre}
                         </td>
 
-                        <td style="padding: 12px 10px; color: #555; max-width: 450px; vertical-align: top; word-break: break-word;" title="${item.descripcion}">
+                        <td style="padding: 12px 10px; color: #555; max-width: 450px; vertical-align: top; word-break: break-word;" title="${fn:escapeXml(item.descripcion)}">
                             ${item.descripcion}
                         </td>
 
@@ -79,7 +80,8 @@
                         </td>
 
                         <td style="padding: 12px 10px; text-align: center; vertical-align: top;">
-                            <button type="button" onclick="verDetallesBusqueda('${item.nombre}', '${item.tipo}')"
+                            <%-- El nombre se lee del data-nombre de la fila para soportar comillas y otros caracteres especiales --%>
+                            <button type="button" onclick="const fila = this.closest('tr'); verDetallesBusqueda(fila.dataset.nombre, fila.dataset.tipo);"
                                     style="background-color: #0275d8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s; white-space: nowrap;"
                                     onmouseover="this.style.backgroundColor='#025aa5';" 
                                     onmouseout="this.style.backgroundColor='#0275d8';">

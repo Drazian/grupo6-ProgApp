@@ -38,7 +38,8 @@ public class UsuarioServlet extends HttpServlet {
             StringBuilder json = new StringBuilder("[");
             for (int i = 0; i < lista.size(); i++) {
                 if (i > 0) json.append(",");
-                json.append("{\"nombre\":\"").append(lista.get(i).getNombre()).append("\"}");
+                // Escapar \ y " para que nombres con comillas no rompan el JSON
+                json.append("{\"nombre\":\"").append(lista.get(i).getNombre().replace("\\", "\\\\").replace("\"", "\\\"")).append("\"}");
             }
             json.append("]");
             response.getWriter().write(json.toString());

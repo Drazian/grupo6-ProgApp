@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <c:choose>
     <c:when test="${not empty inscripciones}">
@@ -31,7 +32,7 @@
             <tbody id="cuerpoTablaInscripciones">
                 <c:forEach var="ins" items="${inscripciones}">
                     <!-- Guardamos data-fecha y data-prioridad ocultos en la fila para que JS pueda ordenarlos -->
-                    <tr class="fila-inscripcion" data-fecha="${ins.fechaInscripcion}" data-prioridad="${ins.prioridad}">
+                    <tr class="fila-inscripcion" data-fecha="${fn:escapeXml(ins.fechaInscripcion)}" data-prioridad="${fn:escapeXml(ins.prioridad)}">
                         
                         <td style="padding: 10px; border: 1px solid #ddd; background: #fff;">
                             <strong>${ins.estudiante.nombre} ${ins.estudiante.apellido}</strong><br>

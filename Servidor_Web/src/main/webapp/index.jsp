@@ -1,11 +1,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%-- Version de los recursos estaticos: cambia en cada despliegue. Maven arma el war con fecha fija (1980)
+     y sin esto el navegador sigue usando el app.js / estilos.css viejos despues de redesplegar. --%>
+<%! private static final long VERSION_RECURSOS = System.currentTimeMillis(); %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>EDEXT</title> 
-    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/estilos.css?v=<%= VERSION_RECURSOS %>">
 </head>
 <body>
 
@@ -28,7 +32,7 @@
                         <!-- Foto de perfil servida dinámicamente desde ImagenServlet -->
                         <img src="ImagenServlet?nombre=${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
                              alt="Foto de perfil" 
-                             onclick="event.preventDefault(); cargarMiPerfil('${sessionScope.usuarioLogueado.nickname}');"
+                             data-nickname="${fn:escapeXml(sessionScope.usuarioLogueado.nickname)}" onclick="event.preventDefault(); cargarMiPerfil(this.dataset.nickname);"
                              style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;cursor: pointer;">
 
                         <span style="font-weight: bold;">
@@ -164,7 +168,7 @@
         </main>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=<%= VERSION_RECURSOS %>"></script>
     
     <!-- CONTENEDOR MAESTRO DE MODALES (Pop-ups modernos) -->
     <div id="modal-global" class="modal-oculto">

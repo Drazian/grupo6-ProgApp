@@ -55,7 +55,8 @@ public class InscripcionServlet extends HttpServlet {
                     
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < ediciones.size(); i++) {
-                        json.append("\"").append(ediciones.get(i)).append("\"");
+                        // Escapar \ y " para que nombres con comillas no rompan el JSON
+                        json.append("\"").append(ediciones.get(i).replace("\\", "\\\\").replace("\"", "\\\"")).append("\"");
                         if (i < ediciones.size() - 1) json.append(",");
                     }
                     json.append("]");

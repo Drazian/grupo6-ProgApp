@@ -1,11 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px;">
     
     <!-- CAMPO OCULTO: Guarda el nickname del usuario logueado para que JS lo pueda usar -->
     <c:if test="${not empty sessionScope.usuarioLogueado}">
-        <input type="hidden" id="nickname-usuario-logueado" value="${sessionScope.usuarioLogueado.nickname}">
+        <input type="hidden" id="nickname-usuario-logueado" value="${fn:escapeXml(sessionScope.usuarioLogueado.nickname)}">
     </c:if>
 
     <!-- ========================================================================= -->
@@ -43,14 +44,14 @@
                         <c:choose>
                             <c:when test="${requestScope.loSigo}">
                                 <button type="button" class="btn-moderno" id="btn-perfil-${requestScope.usuarioPerfil.nickname}"
-                                        onclick="toggleSeguirUsuario(this, '${requestScope.usuarioPerfil.nickname}', 'dejarSeguir')" 
+                                        data-nickname="${fn:escapeXml(requestScope.usuarioPerfil.nickname)}" onclick="toggleSeguirUsuario(this, this.dataset.nickname, 'dejarSeguir')" 
                                         style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                                     Dejar de seguir
                                 </button>
                             </c:when>
                             <c:otherwise>
                                 <button type="button" class="btn-moderno" id="btn-perfil-${requestScope.usuarioPerfil.nickname}"
-                                        onclick="toggleSeguirUsuario(this, '${requestScope.usuarioPerfil.nickname}', 'seguir')" 
+                                        data-nickname="${fn:escapeXml(requestScope.usuarioPerfil.nickname)}" onclick="toggleSeguirUsuario(this, this.dataset.nickname, 'seguir')" 
                                         style="background-color: #0275d8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                                     Seguir
                                 </button>
@@ -103,7 +104,7 @@
                 </h5>
                 <ul id="lista-seguidores-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                     <c:forEach var="seguidor" items="${requestScope.listaSeguidores}">
-                        <li id="li-seguidor-perfil-${seguidor}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+                        <li id="li-seguidor-perfil-${seguidor}" data-nickname="${fn:escapeXml(seguidor)}" onclick="abrirPerfilDesdeRedSocial(this.dataset.nickname)" title="Ver perfil" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px; cursor: pointer; color: #2980b9;">
                             👤 <b>${seguidor}</b>
                         </li>
                     </c:forEach>
@@ -120,7 +121,7 @@
                 </h5>
                 <ul id="lista-mis-seguidos-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                     <c:forEach var="seguido" items="${requestScope.listaSeguidos}">
-                        <li id="li-seguido-${seguido}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+                        <li id="li-seguido-${seguido}" data-nickname="${fn:escapeXml(seguido)}" onclick="abrirPerfilDesdeRedSocial(this.dataset.nickname)" title="Ver perfil" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px; cursor: pointer; color: #2980b9;">
                             👤 <b>${seguido}</b>
                         </li>
                     </c:forEach>
@@ -187,7 +188,7 @@
                                 <tr style="border-bottom: 1px solid #eee;">
                                     <td style="padding: 10px;">
                                         <!-- Enlace a Consulta de Edicion -->
-                                        <a href="#" onclick="event.preventDefault(); cargarConsultaEdicion('${ins.edicion.nombre}')" 
+                                        <a href="#" data-edicion="${fn:escapeXml(ins.edicion.nombre)}" onclick="event.preventDefault(); cargarConsultaEdicion(this.dataset.edicion)" 
                                            style="color: #2980b9; font-weight: bold; text-decoration: none;">
                                             ${ins.edicion.nombre}
                                         </a>
@@ -195,7 +196,7 @@
                                             <span style="font-size: 12px; color: #7f8c8d; display: block; margin-top: 3px;">
                                                 Curso: 
                                                 <!-- Enlace a Consulta de Curso -->
-                                                <a href="#" onclick="event.preventDefault(); verDetallesCurso('${ins.edicion.curso.nombre}')" style="color: #34495e; font-weight: bold;">
+                                                <a href="#" data-curso="${fn:escapeXml(ins.edicion.curso.nombre)}" onclick="event.preventDefault(); verDetallesCurso(this.dataset.curso)" style="color: #34495e; font-weight: bold;">
                                                     ${ins.edicion.curso.nombre}
                                                 </a>
                                             </span>
@@ -226,7 +227,7 @@
                                     </td>
 
                                     <td style="padding: 10px; text-align: center;">
-                                        <button type="button" onclick="cargarConsultaEdicion('${ins.edicion.nombre}')" 
+                                        <button type="button" data-edicion="${fn:escapeXml(ins.edicion.nombre)}" onclick="cargarConsultaEdicion(this.dataset.edicion)" 
                                                 style="background: #17a2b8; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">
                                             Ver Edicion
                                         </button>
@@ -263,7 +264,7 @@
                             <tr style="border-bottom: 1px solid #eee;">
                                 <td style="padding: 10px;">
                                     <!-- Enlace a la Consulta de Edicion -->
-                                    <a href="#" onclick="event.preventDefault(); cargarConsultaEdicion('${ed.nombre}')" 
+                                    <a href="#" data-edicion="${fn:escapeXml(ed.nombre)}" onclick="event.preventDefault(); cargarConsultaEdicion(this.dataset.edicion)" 
                                        style="color: #2980b9; font-weight: bold; text-decoration: none;">
                                         🎓 ${ed.nombre}
                                     </a>
@@ -272,7 +273,7 @@
                                     <c:if test="${not empty ed.curso}">
                                         <span style="font-size: 12px; color: #7f8c8d; display: block; margin-top: 3px;">
                                             Curso: 
-                                            <a href="#" onclick="event.preventDefault(); verDetallesCurso('${ed.curso.nombre}')" 
+                                            <a href="#" data-curso="${fn:escapeXml(ed.curso.nombre)}" onclick="event.preventDefault(); verDetallesCurso(this.dataset.curso)" 
                                                style="color: #34495e; font-weight: bold; text-decoration: underline;">
                                                 ${ed.curso.nombre}
                                             </a>
@@ -285,14 +286,14 @@
 
                                 <td style="padding: 10px; text-align: center; white-space: nowrap;">
                                     <!-- Boton para ver Edicion -->
-                                    <button type="button" onclick="cargarConsultaEdicion('${ed.nombre}')" 
+                                    <button type="button" data-edicion="${fn:escapeXml(ed.nombre)}" onclick="cargarConsultaEdicion(this.dataset.edicion)" 
                                             style="background: #17a2b8; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; margin-right: 4px;">
                                         Ver Edicion
                                     </button>
 
                                     <!-- Boton para ver Curso completo -->
                                     <c:if test="${not empty ed.curso}">
-                                        <button type="button" onclick="verDetallesCurso('${ed.curso.nombre}')" 
+                                        <button type="button" data-curso="${fn:escapeXml(ed.curso.nombre)}" onclick="verDetallesCurso(this.dataset.curso)" 
                                                 style="background: #34495e; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">
                                             Ver Curso
                                         </button>
@@ -326,14 +327,14 @@
                     <c:forEach var="prog" items="${requestScope.listaProgramas}">
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 10px;">
-                                <a href="#" onclick="event.preventDefault(); cargarDetallePrograma('${prog.nombre}')" 
+                                <a href="#" data-programa="${fn:escapeXml(prog.nombre)}" onclick="event.preventDefault(); cargarDetallePrograma(this.dataset.programa)" 
                                    style="color: #8e44ad; font-weight: bold; text-decoration: none;">
                                     ${prog.nombre}
                                 </a>
                             </td>
                             <td style="padding: 10px;">${prog.descripcion}</td>
                             <td style="padding: 10px; text-align: center;">
-                                <button type="button" onclick="cargarDetallePrograma('${prog.nombre}')" 
+                                <button type="button" data-programa="${fn:escapeXml(prog.nombre)}" onclick="cargarDetallePrograma(this.dataset.programa)" 
                                         style="background: #8e44ad; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">
                                     Ver Programa
                                 </button>

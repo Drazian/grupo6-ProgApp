@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- Datos básicos de la Edición de Curso -->
 <c:if test="${not empty edicion}">
@@ -10,12 +11,12 @@
         
         <div style="flex: 1; min-width: 250px; line-height: 1.6;">
             <h3 style="margin: 0 0 5px 0; color: #2c3e50;">
-                <a href="#" onclick="cargarConsultaEdicion('${edicion.nombre}'); return false;" style="color: #2c3e50; text-decoration: none;">
+                <a href="#" data-edicion="${fn:escapeXml(edicion.nombre)}" onclick="cargarConsultaEdicion(this.dataset.edicion); return false;" style="color: #2c3e50; text-decoration: none;">
                     ${edicion.nombre}
                 </a>
             </h3> 
             <div>
-                <a href="#" onclick="verDetallesCurso('${edicion.curso.nombre}'); return false;" style="color: #2980b9; font-weight: bold; text-decoration: underline; font-size: 14px;">
+                <a href="#" data-curso="${fn:escapeXml(edicion.curso.nombre)}" onclick="verDetallesCurso(this.dataset.curso); return false;" style="color: #2980b9; font-weight: bold; text-decoration: underline; font-size: 14px;">
                     Ver información del Curso (${edicion.curso.nombre})
                 </a>
             </div>

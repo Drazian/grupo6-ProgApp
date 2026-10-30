@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div class="contenedor-formulario" style="max-width: 550px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff;">
     <h2>Modificar Perfil</h2>
@@ -11,27 +12,27 @@
         
         <div style="margin-bottom: 15px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nickname:</label>
-            <input type="text" value="${sessionScope.usuarioLogueado.nickname}" readonly disabled style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ccc; border-radius: 4px;" />
+            <input type="text" value="${fn:escapeXml(sessionScope.usuarioLogueado.nickname)}" readonly disabled style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
         <div style="margin-bottom: 15px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Correo Electrónico:</label>
-            <input type="email" value="${sessionScope.usuarioLogueado.email}" readonly disabled style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ccc; border-radius: 4px;" />
+            <input type="email" value="${fn:escapeXml(sessionScope.usuarioLogueado.email)}" readonly disabled style="width: 100%; padding: 8px; background-color: #e9ecef; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
         <div style="margin-bottom: 15px;">
             <label for="nombre" style="display: block; font-weight: bold; margin-bottom: 5px;">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" value="${sessionScope.usuarioLogueado.nombre}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+            <input type="text" id="nombre" name="nombre" value="${fn:escapeXml(sessionScope.usuarioLogueado.nombre)}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
         <div style="margin-bottom: 15px;">
             <label for="apellido" style="display: block; font-weight: bold; margin-bottom: 5px;">Apellido:</label>
-            <input type="text" id="apellido" name="apellido" value="${sessionScope.usuarioLogueado.apellido}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+            <input type="text" id="apellido" name="apellido" value="${fn:escapeXml(sessionScope.usuarioLogueado.apellido)}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
         <div style="margin-bottom: 15px;">
             <label for="fechaNacimiento" style="display: block; font-weight: bold; margin-bottom: 5px;">Fecha de Nacimiento:</label>
-            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${sessionScope.usuarioLogueado.fNacimiento}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${fn:escapeXml(sessionScope.usuarioLogueado.fNacimiento)}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
         <!-- SECCIÓN EXCLUSIVA PARA DOCENTES: Gestión de Institutos -->
@@ -49,7 +50,7 @@
                 <div style="margin-top: 10px;">
                     <select id="institutosSeleccionadosModificar" multiple style="width: 100%; height: 100px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
                         <c:forEach var="inst" items="${sessionScope.usuarioLogueado.institutos}">
-                            <option value="${inst}">${inst}</option>
+                            <option value="${fn:escapeXml(inst)}">${inst}</option>
                         </c:forEach>
                     </select>
                     <button type="button" id="quitarInstitutoModificar" style="margin-top: 5px; padding: 6px 12px; background-color: #d9534f; color: white; border: none; border-radius: 4px; cursor: pointer;">Quitar Selección</button>

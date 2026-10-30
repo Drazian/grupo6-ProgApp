@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <div style="max-width: 950px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
@@ -27,7 +28,7 @@
                     <c:forEach var="usr" items="${requestScope.todosLosUsuarios}">
                         <tr style="border-bottom: 1px solid #eee;">
                             <td style="padding: 10px;">
-                                <a href="#" onclick="event.preventDefault(); seleccionarUsuario('${usr.nickname}')" 
+                                <a href="#" data-nickname="${fn:escapeXml(usr.nickname)}" onclick="event.preventDefault(); seleccionarUsuario(this.dataset.nickname)" 
                                    style="color: #2980b9; font-weight: bold; text-decoration: none;">
                                      ${usr.nickname}
                                 </a>

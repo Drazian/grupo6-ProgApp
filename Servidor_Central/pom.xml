@@ -97,6 +97,9 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
+                    <!-- Genera target/servidor.jar ejecutable (Servidor Central + Estacion de Trabajo) -->
+                    <finalName>servidor</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifest>
                            <mainClass>edu.edext.presentacion.index</mainClass>

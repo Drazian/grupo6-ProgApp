@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div class="contenedor-formulario" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
     <h2 style="color: #2c3e50;">Inscripción a Edición de Curso</h2>
@@ -16,7 +17,7 @@
             <select id="instInscripcion" onchange="cargarCursosParaInscripcion(this.value)" required style="width: 100%; padding: 8px;">
                 <option value="">Seleccione un Instituto...</option>
                 <c:forEach var="inst" items="${institutos}">
-                    <option value="${inst.nombre}">${inst.nombre}</option>
+                    <option value="${fn:escapeXml(inst.nombre)}">${inst.nombre}</option>
                 </c:forEach>
             </select>
         </div>
