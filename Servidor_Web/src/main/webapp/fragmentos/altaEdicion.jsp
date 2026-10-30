@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div class="contenedor-formulario" style="max-width: 600px; margin: 0 auto;">
     <h2>Alta de Edición de Curso</h2>
@@ -15,7 +16,7 @@
             <select id="institutoEdicion" name="instituto" onchange="cargarCursosDeInstituto(this.value)" required>
                 <option value="">Seleccione un Instituto...</option>
                 <c:forEach var="inst" items="${institutos}">
-                    <option value="${inst.nombre}">${inst.nombre}</option>
+                    <option value="${fn:escapeXml(inst.nombre)}">${inst.nombre}</option>
                 </c:forEach>
             </select>
         </div>
@@ -55,7 +56,7 @@
             <small style="display: block; margin-bottom: 5px; color: #666;">Mantén presionado Ctrl (Windows) o Cmd (Mac) para seleccionar varios.</small>
             <select id="docentes" name="docentes" multiple required style="height: 120px;">
                 <c:forEach var="doc" items="${docentes}">
-                    <option value="${doc}">${doc}</option>
+                    <option value="${fn:escapeXml(doc)}">${doc}</option>
                 </c:forEach>
             </select>
         </div>

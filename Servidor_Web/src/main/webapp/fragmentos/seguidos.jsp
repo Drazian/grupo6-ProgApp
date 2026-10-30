@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <h2>Ingrese nickname para buscar</h2>
@@ -28,7 +29,7 @@
                 <tbody>
                     <c:forEach var="usr" items="${requestScope.todosLosUsuarios}">
                         <c:if test="${usr.nickname != sessionScope.usuarioLogueado.nickname}">
-                            <tr class="fila-usuario-social" data-nickname="${usr.nickname.toLowerCase()}" style="border-bottom: 1px solid #eee;">
+                            <tr class="fila-usuario-social" data-nickname="${fn:escapeXml(usr.nickname.toLowerCase())}" style="border-bottom: 1px solid #eee;">
                                 <td style="padding: 8px;">
                                     <strong>${usr.nickname}</strong>
                                     <br>
@@ -40,14 +41,14 @@
                                     <c:choose>
                                         <c:when test="${requestScope.misSeguidos.contains(usr.nickname)}">
                                             <button type="button" id="btn-social-${usr.nickname}"
-                                                    onclick="toggleSeguirUsuario(this, '${usr.nickname}', 'dejarSeguir')"
+                                                    data-nickname="${fn:escapeXml(usr.nickname)}" onclick="toggleSeguirUsuario(this, this.dataset.nickname, 'dejarSeguir')"
                                                     style="background-color: #d9534f; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; transition: 0.2s;">
                                                 Dejar de seguir
                                             </button>
                                         </c:when>
                                         <c:otherwise>
                                             <button type="button" id="btn-social-${usr.nickname}"
-                                                    onclick="toggleSeguirUsuario(this, '${usr.nickname}', 'seguir')"
+                                                    data-nickname="${fn:escapeXml(usr.nickname)}" onclick="toggleSeguirUsuario(this, this.dataset.nickname, 'seguir')"
                                                     style="background-color: #0275d8; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; transition: 0.2s;">
                                                 Seguir
                                             </button>
@@ -57,7 +58,7 @@
 
                                 <td style="padding: 8px; text-align: center;">
                                     <button type="button" 
-                                            onclick="verPerfilUsuario('${usr.nickname}')"
+                                            data-nickname="${fn:escapeXml(usr.nickname)}" onclick="verPerfilUsuario(this.dataset.nickname)"
                                             style="background-color: #5bc0de; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">
                                         Ver perfil
                                     </button>
@@ -80,7 +81,7 @@
                 <h4 style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px;">Mis Seguidores</h4>
                 <ul id="lista-mis-seguidores-social" style="list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; font-size: 13px;">
                     <c:forEach var="seguidor" items="${requestScope.misSeguidores}">
-                         <li style="padding: 6px 0; border-bottom: 1px solid #eee;">👤 <strong>${seguidor}</strong></li>
+                         <li data-nickname="${fn:escapeXml(seguidor)}" onclick="abrirPerfilDesdeRedSocial(this.dataset.nickname)" title="Ver perfil" style="padding: 6px 0; border-bottom: 1px solid #eee; cursor: pointer; color: #2980b9;">👤 <strong>${seguidor}</strong></li>
                     </c:forEach>
                     <c:if test="${empty requestScope.misSeguidores}">
                          <li style="color: #999; font-style: italic;">Aún no tienes seguidores.</li>
@@ -96,9 +97,9 @@
                 <ul id="lista-mis-seguidos-social" style="list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; font-size: 13px;">
                     <c:forEach var="seguido" items="${requestScope.misSeguidos}">
                          <li id="social-seguido-${seguido}" style="padding: 6px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
-                             <span>👤 <strong>${seguido}</strong></span>
+                             <span data-nickname="${fn:escapeXml(seguido)}" onclick="abrirPerfilDesdeRedSocial(this.dataset.nickname)" title="Ver perfil" style="cursor: pointer; color: #2980b9;">👤 <strong>${seguido}</strong></span>
                              <!-- Botoncito "X" para dejar de seguir desde la lista -->
-                             <span onclick="toggleSeguirUsuario(document.getElementById('btn-social-${seguido}'), '${seguido}', 'dejarSeguir')" style="color: #e74c3c; cursor: pointer; font-weight: bold;" title="Dejar de seguir">X</span>
+                             <span data-nickname="${fn:escapeXml(seguido)}" onclick="toggleSeguirUsuario(document.getElementById('btn-social-' + this.dataset.nickname), this.dataset.nickname, 'dejarSeguir')" style="color: #e74c3c; cursor: pointer; font-weight: bold;" title="Dejar de seguir">X</span>
                          </li>
                     </c:forEach>
                     <c:if test="${empty requestScope.misSeguidos}">

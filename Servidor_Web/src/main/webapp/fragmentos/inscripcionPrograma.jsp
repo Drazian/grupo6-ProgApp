@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div style="max-width: 600px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
     <h2 style="color: #2c3e50; border-bottom: 2px solid #8e44ad; padding-bottom: 10px; margin-top: 0;">
@@ -16,7 +17,7 @@
             <select name="programa" id="selectProgramaInsc" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;">
                 <option value="">-- Seleccionar Programa --</option>
                 <c:forEach var="prog" items="${requestScope.listaProgramas}">
-                    <option value="${prog.nombre}">${prog.nombre}</option>
+                    <option value="${fn:escapeXml(prog.nombre)}">${prog.nombre}</option>
                 </c:forEach>
             </select>
         </div>

@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div class="contenedor-formulario">
     <h2>Alta de Curso</h2>
@@ -16,7 +17,7 @@
                 <option value="" disabled selected>Seleccione un Instituto...</option>
                 <!-- Itera sobre la lista de DtInstituto -->
                 <c:forEach var="inst" items="${institutos}">
-                    <option value="${inst.nombre}">${inst.nombre}</option>
+                    <option value="${fn:escapeXml(inst.nombre)}">${inst.nombre}</option>
                 </c:forEach>
             </select>
         </div>
@@ -58,7 +59,7 @@
             <select id="categorias" name="categorias" multiple required size="5">
                 <!-- Itera sobre la lista de DtCategoria -->
                 <c:forEach var="cat" items="${categorias}">
-                    <option value="${cat.nombre}">${cat.nombre}</option>
+                    <option value="${fn:escapeXml(cat.nombre)}">${cat.nombre}</option>
                 </c:forEach>
             </select>
         </div>
@@ -70,7 +71,7 @@
             <select id="previas" name="previas" multiple size="5">
                 <!-- Itera sobre la lista de Strings de nombres de cursos -->
                 <c:forEach var="curso" items="${cursosPrevios}">
-                    <option value="${curso}">${curso}</option>
+                    <option value="${fn:escapeXml(curso)}">${curso}</option>
                 </c:forEach>
             </select>
         </div>

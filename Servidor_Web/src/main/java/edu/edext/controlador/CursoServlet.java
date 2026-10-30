@@ -86,22 +86,11 @@ public class CursoServlet extends HttpServlet {
                                         }
                                     }
                                 }
-                            List<String> programasSafe = new ArrayList<>();
-                            for(String p : programas) {
-                                programasSafe.add(p.replace("\"", "&quot;").replace("'", "&#39;"));
-                            }
-                            request.setAttribute("listaProgramas", programasSafe);
+                            // Los nombres se escapan en el JSP (fn:escapeXml), no aca
+                            request.setAttribute("listaProgramas", programas);
                         }
                     }
-                    if (cursos != null) {
-                        List<String> cursosSafe = new ArrayList<>();
-                        for (String c : cursos) {
-                            cursosSafe.add(c.replace("\"", "&quot;").replace("'", "&#39;"));
-                        }
-                        request.setAttribute("listaCursos", cursosSafe);
-                    } else {
-                        request.setAttribute("listaCursos", cursos);
-                    }
+                    request.setAttribute("listaCursos", cursos);
 
                     request.setAttribute("filtroAplicado", opcion + ": " + nombre);
                     request.getRequestDispatcher("fragmentos/listaCursos.jsp").forward(request, response);
@@ -117,7 +106,8 @@ public class CursoServlet extends HttpServlet {
                     List<edu.edext.datatypes.DtCategoria> listaCat = ic.listarCategorias();
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < listaCat.size(); i++) {
-                        json.append("{\"nombre\":\"").append(listaCat.get(i).getNombre()).append("\"}");
+                        // Escapar \ y " para que nombres con comillas no rompan el JSON
+                        json.append("{\"nombre\":\"").append(listaCat.get(i).getNombre().replace("\\", "\\\\").replace("\"", "\\\"")).append("\"}");
                         if (i < listaCat.size() - 1) {
                             json.append(",");
                         }
@@ -136,7 +126,8 @@ public class CursoServlet extends HttpServlet {
                     List<edu.edext.datatypes.DtInstituto> listaInst = ic.listarInstitutos();
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < listaInst.size(); i++) {
-                        json.append("\"").append(listaInst.get(i).getNombre()).append("\"");
+                        // Escapar \ y " para que nombres con comillas no rompan el JSON
+                        json.append("\"").append(listaInst.get(i).getNombre().replace("\\", "\\\\").replace("\"", "\\\"")).append("\"");
                         if (i < listaInst.size() - 1) {
                             json.append(",");
                         }
@@ -198,16 +189,8 @@ public class CursoServlet extends HttpServlet {
                 try {
                     request.setAttribute("institutos", ic.listarInstitutos());
                     request.setAttribute("categorias", ic.listarCategorias());
-                    List<String> previos = ic.listarNombresCursos();
-                    if (previos != null) {
-                        List<String> previosSafe = new ArrayList<>();
-                        for(String p : previos) {
-                            previosSafe.add(p.replace("\"", "&quot;").replace("'", "&#39;"));
-                        }
-                        request.setAttribute("cursosPrevios", previosSafe);
-                    } else {
-                        request.setAttribute("cursosPrevios", previos);
-                    }
+                    // Los nombres se escapan en el JSP (fn:escapeXml), no aca
+                    request.setAttribute("cursosPrevios", ic.listarNombresCursos());
 
                     request.getRequestDispatcher("fragmentos/altaCurso.jsp").forward(request, response);
                 } catch (Exception e) {

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div style="max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
@@ -34,7 +35,7 @@
                 </thead>
                 <tbody id="tablaMisInscripcionesBody">
                     <c:forEach var="ins" items="${misInscripciones}">
-                        <tr class="fila-mi-inscripcion" data-estado="${ins.valorEstado}">
+                        <tr class="fila-mi-inscripcion" data-estado="${fn:escapeXml(ins.valorEstado)}">
                             <!-- Imagen de la Edición (Req. 7.2) -->
                             <td style="padding: 10px; border: 1px solid #ddd; background: #fff; text-align: center;">
                                 <img src="ImagenServlet?nombre=${empty ins.edicion.imagen ? 'usr.png' : ins.edicion.imagen}" 
@@ -44,14 +45,14 @@
 
                             <!-- Link navegable a Consulta de Edición (Req. 7.1) -->
                             <td style="padding: 10px; border: 1px solid #ddd; background: #fff;">
-                                <a href="#" onclick="cargarConsultaEdicion('${ins.edicion.nombre}'); return false;" style="color: #2980b9; font-weight: bold; text-decoration: none;">
+                                <a href="#" data-edicion="${fn:escapeXml(ins.edicion.nombre)}" onclick="cargarConsultaEdicion(this.dataset.edicion); return false;" style="color: #2980b9; font-weight: bold; text-decoration: none;">
                                     📘 ${ins.edicion.nombre}
                                 </a>
                             </td>
 
                             <!-- Link navegable a Consulta de Curso (Req. 7.1) -->
                             <td style="padding: 10px; border: 1px solid #ddd; background: #fff;">
-                                <a href="#" onclick="verDetallesCurso('${ins.edicion.curso.nombre}'); return false;" style="color: #34495e; text-decoration: underline;">
+                                <a href="#" data-curso="${fn:escapeXml(ins.edicion.curso.nombre)}" onclick="verDetallesCurso(this.dataset.curso); return false;" style="color: #34495e; text-decoration: underline;">
                                     ${ins.edicion.curso.nombre}
                                 </a>
                             </td>

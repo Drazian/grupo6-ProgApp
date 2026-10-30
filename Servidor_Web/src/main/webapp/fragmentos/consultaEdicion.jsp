@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- Ampliamos un poco el max-width para que la foto y la tabla respiren bien lado a lado -->
 <div style="max-width: 980px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
@@ -93,7 +94,7 @@
                 
                 <!-- Agregar Docente -->
                 <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
-                <button type="button" onclick="cargarFormularioAgregarDocente('${edicion.nombre}')" 
+                <button type="button" data-edicion="${fn:escapeXml(edicion.nombre)}" onclick="cargarFormularioAgregarDocente(this.dataset.edicion)" 
                     style="background-color: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; transition: 0.2s; font-weight: bold; margin: 0;">
                     + Agregar Docente
                 </button>
@@ -127,7 +128,7 @@
                                 
                                 <!-- Botón de Quitar a la derecha -->
                                 <c:if test="${not empty sessionScope.usuarioLogueado and sessionScope.usuarioLogueado.tipoUsuario == 'DOCENTE'}">
-                                <button type="button" onclick="confirmarQuitarDocente('${edicion.nombre}', '${docente.nickname}', '${docente.nombre} ${docente.apellido}')" 
+                                <button type="button" data-edicion="${fn:escapeXml(edicion.nombre)}" data-nickname="${fn:escapeXml(docente.nickname)}" data-docente-nombre="${fn:escapeXml(docente.nombre)} ${fn:escapeXml(docente.apellido)}" onclick="confirmarQuitarDocente(this.dataset.edicion, this.dataset.nickname, this.dataset.docenteNombre)" 
                                         style="background: transparent; color: #e74c3c; border: 1px solid #e74c3c; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.2s;"
                                         onmouseover="this.style.background='#e74c3c'; this.style.color='white';"
                                         onmouseout="this.style.background='transparent'; this.style.color='#e74c3c';">

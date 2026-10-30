@@ -1,9 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <!-- CAMPO OCULTO: Guarda el nickname del usuario logueado para que JS lo pueda usar -->
 <c:if test="${not empty sessionScope.usuarioLogueado}">
-    <input type="hidden" id="nickname-usuario-logueado" value="${sessionScope.usuarioLogueado.nickname}">
+    <input type="hidden" id="nickname-usuario-logueado" value="${fn:escapeXml(sessionScope.usuarioLogueado.nickname)}">
 </c:if>
 
 <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px;">
@@ -25,14 +26,14 @@
         <c:choose>
             <c:when test="${requestScope.loSigo}">
                 <button type="button" id="btn-perfil-${requestScope.usuarioPerfil.nickname}"
-                        onclick="toggleSeguirUsuario(this, '${requestScope.usuarioPerfil.nickname}', 'dejarSeguir')" 
+                        data-nickname="${fn:escapeXml(requestScope.usuarioPerfil.nickname)}" onclick="toggleSeguirUsuario(this, this.dataset.nickname, 'dejarSeguir')" 
                         style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                     Dejar de seguir
                 </button>
             </c:when>
             <c:otherwise>
                 <button type="button" id="btn-perfil-${requestScope.usuarioPerfil.nickname}"
-                        onclick="toggleSeguirUsuario(this, '${requestScope.usuarioPerfil.nickname}', 'seguir')" 
+                        data-nickname="${fn:escapeXml(requestScope.usuarioPerfil.nickname)}" onclick="toggleSeguirUsuario(this, this.dataset.nickname, 'seguir')" 
                         style="background-color: #0275d8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                     Seguir
                 </button>
@@ -64,7 +65,7 @@
             </h4>
             <ul id="lista-seguidores-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                 <c:forEach var="seguidor" items="${requestScope.seguidoresPerfil}">
-                    <li id="li-seguidor-perfil-${seguidor}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+                    <li id="li-seguidor-perfil-${seguidor}" data-nickname="${fn:escapeXml(seguidor)}" onclick="abrirPerfilDesdeRedSocial(this.dataset.nickname)" title="Ver perfil" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px; cursor: pointer; color: #2980b9;">
                         👤 <b>${seguidor}</b>
                     </li>
                 </c:forEach>
@@ -81,7 +82,7 @@
             </h4>
             <ul id="lista-mis-seguidos-perfil" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto;">
                 <c:forEach var="seguido" items="${requestScope.seguidosPerfil}">
-                    <li id="li-seguido-${seguido}" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;">
+                    <li id="li-seguido-${seguido}" data-nickname="${fn:escapeXml(seguido)}" onclick="abrirPerfilDesdeRedSocial(this.dataset.nickname)" title="Ver perfil" style="padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px; cursor: pointer; color: #2980b9;">
                         👤 <b>${seguido}</b>
                     </li>
                 </c:forEach>

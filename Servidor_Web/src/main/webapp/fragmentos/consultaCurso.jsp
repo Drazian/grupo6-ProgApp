@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <div style="max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
     <h2 style="color: #2c3e50; margin-bottom: 15px;">Detalles del Curso: ${curso.nombre}</h2>
@@ -45,7 +46,7 @@
                     <ul style="list-style: none; padding: 0;">
                         <c:forEach var="edicionName" items="${curso.ediciones}">
                             <li style="margin-bottom: 8px;">
-                                <a href="#" onclick="cargarConsultaEdicion('${edicionName.getNombre()}')" style="text-decoration: none; color: #2980b9; font-weight: bold;">
+                                <a href="#" data-edicion="${fn:escapeXml(edicionName.getNombre())}" onclick="cargarConsultaEdicion(this.dataset.edicion)" style="text-decoration: none; color: #2980b9; font-weight: bold;">
                                     <span style="margin-right: 5px;">📘</span> ${edicionName.getNombre()}
                                 </a>
                             </li>
@@ -66,7 +67,7 @@
                     <ul style="list-style: none; padding: 0;">
                         <c:forEach var="progName" items="${curso.programas}">
                             <li style="margin-bottom: 8px;">
-                                <a href="#" onclick="cargarDetallePrograma('${progName.getNombre()}')" style="text-decoration: none; color: #8e44ad; font-weight: bold;">
+                                <a href="#" data-programa="${fn:escapeXml(progName.getNombre())}" onclick="cargarDetallePrograma(this.dataset.programa)" style="text-decoration: none; color: #8e44ad; font-weight: bold;">
                                     <span style="margin-right: 5px;">🎓</span> ${progName.getNombre()}
                                 </a>
                             </li>

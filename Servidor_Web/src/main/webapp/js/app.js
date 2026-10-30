@@ -1,4 +1,18 @@
 // =====================================================================
+// ESCAPE DE TEXTO PARA HTML GENERADO (soporta nombres con comillas, <, &)
+// Usar en todo texto o atributo armado con template strings; en los onclick
+// pasar el valor por un data-* y leerlo con this.dataset.
+// =====================================================================
+function escHtml(texto) {
+    return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// =====================================================================
 // NAVEGABILIDAD SPA: FLECHA ATRÁS Y GUARDADO DE HISTORIAL (ROBUSTO Y CIEGO A FANTASMAS)
 // =====================================================================
 // =====================================================================
@@ -334,7 +348,7 @@ function cargarInstitutosMenu() {
                 }
                 institutos.forEach(inst => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<a href="#" onclick="event.preventDefault(); buscarCurso('instituto', '${inst.nombre}')">${inst.nombre}</a>`;
+                    li.innerHTML = `<a href="#" data-nombre="${escHtml(inst.nombre)}" onclick="event.preventDefault(); buscarCurso('instituto', this.dataset.nombre)">${escHtml(inst.nombre)}</a>`;
                     ul.appendChild(li);
                 });
             }
@@ -361,7 +375,7 @@ function cargarCategoriasMenu() {
                 }
                 categorias.forEach(cat => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<a href="#" onclick="event.preventDefault(); buscarCurso('categoria', '${cat.nombre}')">${cat.nombre}</a>`;
+                    li.innerHTML = `<a href="#" data-nombre="${escHtml(cat.nombre)}" onclick="event.preventDefault(); buscarCurso('categoria', this.dataset.nombre)">${escHtml(cat.nombre)}</a>`;
                     ul.appendChild(li);
                 });
             }
@@ -860,7 +874,7 @@ function cargarMenuLateral() {
                 institutos.forEach(inst => {
                     const li = document.createElement('li');
                     li.style.marginBottom = "5px";
-                    li.innerHTML = `<a href="#" onclick="cargarCursosPor('instituto', '${inst.nombre}')">${inst.nombre}</a>`;
+                    li.innerHTML = `<a href="#" data-nombre="${escHtml(inst.nombre)}" onclick="cargarCursosPor('instituto', this.dataset.nombre)">${escHtml(inst.nombre)}</a>`;
                     ulInstitutos.appendChild(li);
                 });
             }
@@ -875,7 +889,7 @@ function cargarMenuLateral() {
                 categorias.forEach(cat => {
                     const li = document.createElement('li');
                     li.style.marginBottom = "5px";
-                    li.innerHTML = `<a href="#" onclick="cargarCursosPor('categoria', '${cat.nombre}')">${cat.nombre}</a>`;
+                    li.innerHTML = `<a href="#" data-nombre="${escHtml(cat.nombre)}" onclick="cargarCursosPor('categoria', this.dataset.nombre)">${escHtml(cat.nombre)}</a>`;
                     ulCategorias.appendChild(li);
                 });
             }
@@ -908,7 +922,7 @@ function cargarCursosDeInstituto(nombreInstituto) {
         .then(response => response.json())
         .then(cursos => {
             selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
-            cursos.forEach(curso => selectCurso.innerHTML += `<option value="${curso}">${curso}</option>`);
+            cursos.forEach(curso => selectCurso.innerHTML += `<option value="${escHtml(curso)}">${escHtml(curso)}</option>`);
             selectCurso.disabled = false;
         }).catch(err => console.log(err));
 }
@@ -1072,7 +1086,7 @@ function cargarCursosParaInscripcion(nombreInstituto) {
         .then(response => response.json())
         .then(cursos => {
             selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
-            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            cursos.forEach(c => selectCurso.innerHTML += `<option value="${escHtml(c)}">${escHtml(c)}</option>`);
             selectCurso.disabled = false;
         });
 }
@@ -1093,7 +1107,7 @@ function cargarEdicionesParaInscripcion(nombreCurso) {
                 selectEdicion.disabled = true;
             } else {
                 selectEdicion.innerHTML = '<option value="">Seleccione la Edición...</option>';
-                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
+                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${escHtml(e)}">${escHtml(e)}</option>`);
                 selectEdicion.disabled = false;
             }
         });
@@ -1155,16 +1169,6 @@ function cargarSocial(esRefresco = false) {
         });
 }
 
-function seguirRapido(nickname) {
-    const btn = document.querySelector(`button[onclick="seguirRapido('${nickname}')"]`);
-    if (btn) toggleSeguirUsuario(btn, nickname, 'seguir');
-}
-
-function dejarDeSeguirRapido(nickname) {
-    const btn = document.querySelector(`button[onclick="dejarDeSeguirRapido('${nickname}')"]`);
-    if (btn) toggleSeguirUsuario(btn, nickname, 'dejarSeguir');
-}
-
 function ejecutarAccionSocial(params) {
     fetch('UsuarioServlet', {
         method: 'POST',
@@ -1199,6 +1203,24 @@ function verPerfilUsuario(nickname) {
             .catch(error => {
                 contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
             });
+    }
+}
+
+// Abre el perfil de un usuario al hacer clic en las listas de Seguidores / Seguidos,
+// quedandose en la pantalla actual cuando es posible
+function abrirPerfilDesdeRedSocial(nickname) {
+    const inputMiNickname = document.getElementById('nickname-usuario-logueado');
+    const esMiPerfil = inputMiNickname && inputMiNickname.value.toLowerCase() === String(nickname).toLowerCase();
+    const btnVolver = document.querySelector('button[onclick="volverAListaUsuarios()"]');
+
+    if (esMiPerfil) {
+        cargarMiPerfil(nickname);
+    } else if (document.getElementById('detalle-perfil-usuario')) {
+        verPerfilUsuario(nickname); // Pantalla Social: se abre en el panel derecho
+    } else if (btnVolver && btnVolver.style.display !== 'none') {
+        seleccionarUsuario(nickname); // Consulta de usuario: se abre en la misma tarjeta
+    } else {
+        cargarConsultaUsuario(() => seleccionarUsuario(nickname)); // Mi Perfil: se pasa a Consulta de usuario
     }
 }
 
@@ -1283,7 +1305,7 @@ function cargarEdicionesParaSeleccion(nombreCurso) {
                 selectEdicion.disabled = true;
             } else {
                 selectEdicion.innerHTML = '<option value="">Seleccione la Edición...</option>';
-                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
+                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${escHtml(e)}">${escHtml(e)}</option>`);
                 selectEdicion.disabled = false;
             }
         });
@@ -1506,7 +1528,7 @@ function cargarCursosParaAceptados(nombreInstituto) {
         .then(response => response.json())
         .then(cursos => {
             selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
-            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
+            cursos.forEach(c => selectCurso.innerHTML += `<option value="${escHtml(c)}">${escHtml(c)}</option>`);
             selectCurso.disabled = false;
         }).catch(err => console.log(err));
 }
@@ -1531,7 +1553,7 @@ function cargarEdicionesParaAceptados(nombreCurso) {
                 selectEdicion.disabled = true;
             } else {
                 selectEdicion.innerHTML = '<option value="">Seleccione la Edición...</option>';
-                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
+                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${escHtml(e)}">${escHtml(e)}</option>`);
                 selectEdicion.disabled = false;
             }
         });
@@ -1646,7 +1668,7 @@ function cargarInstitutosGenericos(selectId) {
         .then(res => res.json())
         .then(data => {
             const select = document.getElementById(selectId);
-            if (select) data.forEach(inst => select.innerHTML += `<option value="${inst}">${inst}</option>`);
+            if (select) data.forEach(inst => select.innerHTML += `<option value="${escHtml(inst)}">${escHtml(inst)}</option>`);
         }).catch(err => {
             const select = document.getElementById(selectId);
             if (select) select.innerHTML = '<option value="">Error cargando</option>';
@@ -1703,7 +1725,7 @@ function cargarEdicionesParaBuscadorEdicion(curso) {
     fetch(`InscripcionServlet?accion=listarEdiciones&curso=${encodeURIComponent(curso)}`)
         .then(res => res.json())
         .then(ediciones => {
-            ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
+            ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${escHtml(e)}">${escHtml(e)}</option>`);
             selectEdicion.disabled = false;
         });
 }
@@ -1776,7 +1798,7 @@ function cargarFormularioAgregarDocente(nombreEdicion) {
         .then(res => res.json())
         .then(docentes => {
             let opcionesHtml = '<option value="">Seleccione un docente...</option>';
-            docentes.forEach(doc => opcionesHtml += `<option value="${doc}">${doc}</option>`);
+            docentes.forEach(doc => opcionesHtml += `<option value="${escHtml(doc)}">${escHtml(doc)}</option>`);
 
             const htmlCuerpo = `
                 <div style="margin-bottom: 15px;">
@@ -1789,7 +1811,7 @@ function cargarFormularioAgregarDocente(nombreEdicion) {
             `;
             const htmlBotones = `
                 <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
-                <button class="btn-moderno" style="background-color: #2ecc71; margin-left: 10px;" onclick="guardarDocenteEdicion('${nombreEdicion}')">Guardar Docente</button>
+                <button class="btn-moderno" style="background-color: #2ecc71; margin-left: 10px;" data-edicion="${escHtml(nombreEdicion)}" onclick="guardarDocenteEdicion(this.dataset.edicion)">Guardar Docente</button>
             `;
             mostrarModal('Asignar Nuevo Docente', htmlCuerpo, htmlBotones);
         }).catch(err => alert("Error cargando la lista."));
@@ -1825,7 +1847,7 @@ function confirmarQuitarDocente(nombreEdicion, nicknameDocente, nombreCompleto) 
     `;
     const htmlBotones = `
         <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
-        <button class="btn-moderno" style="background-color: #e74c3c; margin-left: 10px;" onclick="ejecutarQuitarDocente('${nombreEdicion}', '${nicknameDocente}')">Sí, Quitar</button>
+        <button class="btn-moderno" style="background-color: #e74c3c; margin-left: 10px;" data-edicion="${escHtml(nombreEdicion)}" data-nickname="${escHtml(nicknameDocente)}" onclick="ejecutarQuitarDocente(this.dataset.edicion, this.dataset.nickname)">Sí, Quitar</button>
     `;
     mostrarModal('Confirmar Eliminación', htmlCuerpo, htmlBotones);
 }
@@ -1891,10 +1913,11 @@ function toggleSeguirUsuario(btnElementClickeado, nickname, accionActual) {
     const nickLower = nickStr.toLowerCase();
     
     // 1. ESCÁNER ABSOLUTO DE BOTONES
+    // El nickname esta en data-nickname (no en el texto del onclick) para soportar comillas
     const botones = [];
-    document.querySelectorAll('button').forEach(btn => {
+    document.querySelectorAll('button[data-nickname]').forEach(btn => {
         const attr = btn.getAttribute('onclick');
-        if (attr && attr.includes('toggleSeguirUsuario') && (attr.includes(`'${nickStr}'`) || attr.toLowerCase().includes(`'${nickLower}'`))) {
+        if (attr && attr.includes('toggleSeguirUsuario') && btn.dataset.nickname.trim().toLowerCase() === nickLower) {
             botones.push(btn);
         }
     });
@@ -1904,17 +1927,17 @@ function toggleSeguirUsuario(btnElementClickeado, nickname, accionActual) {
     // 2. APLICAR ESTADOS A TODOS A LA VEZ
     if (accionActual === 'seguir') {
         botones.forEach(btn => {
-            btn.innerHTML = 'Dejar de seguir'; 
-            btn.style.backgroundColor = '#d9534f'; 
-            btn.style.color = 'white'; 
-            btn.setAttribute('onclick', `toggleSeguirUsuario(this, '${nickStr}', 'dejarSeguir')`);
+            btn.innerHTML = 'Dejar de seguir';
+            btn.style.backgroundColor = '#d9534f';
+            btn.style.color = 'white';
+            btn.setAttribute('onclick', `toggleSeguirUsuario(this, this.dataset.nickname, 'dejarSeguir')`);
         });
     } else {
         botones.forEach(btn => {
             btn.innerHTML = 'Seguir';
-            btn.style.backgroundColor = '#0275d8'; 
+            btn.style.backgroundColor = '#0275d8';
             btn.style.color = 'white';
-            btn.setAttribute('onclick', `toggleSeguirUsuario(this, '${nickStr}', 'seguir')`);
+            btn.setAttribute('onclick', `toggleSeguirUsuario(this, this.dataset.nickname, 'seguir')`);
         });
     }
 
@@ -1932,7 +1955,7 @@ function toggleSeguirUsuario(btnElementClickeado, nickname, accionActual) {
                 const nuevoLi = document.createElement('li');
                 nuevoLi.id = `social-seguido-${nickLower}`;
                 nuevoLi.style.cssText = "padding: 6px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;";
-                nuevoLi.innerHTML = `<span>👤 <strong>${nickStr}</strong></span> <span onclick="toggleSeguirUsuario(this, '${nickStr}', 'dejarSeguir')" style="color: #e74c3c; cursor: pointer; font-weight: bold;" title="Dejar de seguir">X</span>`;
+                nuevoLi.innerHTML = `<span data-nickname="${escHtml(nickStr)}" onclick="abrirPerfilDesdeRedSocial(this.dataset.nickname)" style="cursor: pointer; color: #2980b9;" title="Ver perfil">👤 <strong>${escHtml(nickStr)}</strong></span> <span data-nickname="${escHtml(nickStr)}" onclick="toggleSeguirUsuario(this, this.dataset.nickname, 'dejarSeguir')" style="color: #e74c3c; cursor: pointer; font-weight: bold;" title="Dejar de seguir">X</span>`;
                 listaMisSeguidos.appendChild(nuevoLi);
             }
         } else {
@@ -1961,8 +1984,11 @@ function toggleSeguirUsuario(btnElementClickeado, nickname, accionActual) {
                 
                 const li = document.createElement('li');
                 li.id = `li-seguidor-perfil-${miNickClean}`;
-                li.style.cssText = "padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px;";
-                li.innerHTML = `👤 <b>${miNickname}</b>`;
+                li.style.cssText = "padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 13px; cursor: pointer; color: #2980b9;";
+                li.title = 'Ver perfil';
+                li.dataset.nickname = miNickname;
+                li.setAttribute('onclick', 'abrirPerfilDesdeRedSocial(this.dataset.nickname)');
+                li.innerHTML = `👤 <b>${escHtml(miNickname)}</b>`;
                 listaSeguidoresPerfil.appendChild(li);
             }
         } else {
