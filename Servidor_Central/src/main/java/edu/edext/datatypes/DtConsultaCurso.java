@@ -25,6 +25,9 @@ public class DtConsultaCurso {
     private Set<String> nameCategorias;
     private Set<String> namePrevias;
 
+    // Requerido por JAXB para recibir este datatype por los Web Services
+    private DtConsultaCurso(){ this(null, null, null, 0, 0, null, null, null, null, null, null, null, null, null, null, null); }
+
     public DtConsultaCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, 
             List<DtEdicion> ediciones, List<DtPrograma> programas, List<DtCategoria> categorias, List<DtCurso> previas, String imagen) {
         this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, ediciones, programas, categorias, previas, null, null, null, null, imagen);

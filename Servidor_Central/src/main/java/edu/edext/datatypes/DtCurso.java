@@ -21,6 +21,9 @@ public class DtCurso {
     private List<DtCurso> previas;
     private List<DtCategoria> categorias;
     
+    // Requerido por JAXB para recibir este datatype por los Web Services
+    private DtCurso(){ this(null, null, null, 0, 0, null, null, null, null, null, null, null, null); }
+
     public DtCurso(String nombre, String imagen){
         this(nombre, null, null, 0, 0, null, null, null, null, null, null, null, imagen);
     }

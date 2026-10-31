@@ -1,5 +1,7 @@
 package edu.edext.datatypes;
 
+import jakarta.xml.bind.annotation.XmlTransient;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Objects;
 public class DtUsuario {
     
     private final String nickname;
+    @XmlTransient // la contraseña nunca viaja por los Web Services
     private final String password;
     private final String email;
     private final String nombre;
@@ -22,6 +25,9 @@ public class DtUsuario {
     private final TipoUsuario tipoUsuario;
     private final List<String> seguidos;
     private final List<String> seguidores;
+
+    // Requerido por JAXB para recibir este datatype por los Web Services
+    private DtUsuario(){ this(null, null, null, null, null, null, null, null, null); }
 
     public DtUsuario(String nickname, String password, String email, String nombre, String apellido, String imagen, Date fNacimiento, List<String> institutos, TipoUsuario tipoUsuario) {
         this(nickname, password, email, nombre, apellido, imagen, fNacimiento, institutos, tipoUsuario, new ArrayList<>(), new ArrayList<>());

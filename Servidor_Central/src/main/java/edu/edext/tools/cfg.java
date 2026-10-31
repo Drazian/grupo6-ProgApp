@@ -38,6 +38,7 @@ public class cfg {
     public static final String DB_PASSWORD="db.password";
     public static final String DB_ESQUEMA="db.esquema";
     public static final String IMAGEN_RUTA="imagen.ruta";
+    public static final String WS_URL="ws.url";
 
     private static Properties propiedades;
 
@@ -57,8 +58,27 @@ public class cfg {
                 propiedades.load(r);
                 Logger.info("Configuracion cargada de ..: {}", PATH_PROPERTIES);
             } catch (IOException e){  Logger.error("Error leyendo configuracion {} : {}", PATH_PROPERTIES, e.getMessage());  }
+            completarProperties(defecto);
         }
         return propiedades;
+    }
+
+    // Un servidor.properties creado por una version anterior no tiene las claves nuevas (p.ej. ws.url):
+    // se agregan al final del archivo con su valor por defecto para que quede a la vista y se pueda editar
+    private static void completarProperties(Properties defecto){
+        StringBuilder faltantes=new StringBuilder();
+        for (String clave : defecto.stringPropertyNames())
+            if(!propiedades.containsKey(clave))
+                faltantes.append(clave).append("=").append(defecto.getProperty(clave)).append("\n");
+        if(faltantes.isEmpty())
+            return;
+        try (Writer w = new FileWriter(PATH_PROPERTIES, StandardCharsets.UTF_8, true)){
+            w.write("\n# Agregado automaticamente (claves nuevas con su valor por defecto)\n");
+            w.write(faltantes.toString());
+            Logger.info("Se agregaron claves nuevas a {} :\n{}", PATH_PROPERTIES, faltantes);
+        } catch (IOException e) {
+            Logger.error("Error al completar configuracion {} : {}", PATH_PROPERTIES, e.getMessage());
+        }
     }
 
     public static String get(String clave){
@@ -92,6 +112,7 @@ public class cfg {
         p.setProperty(DB_PASSWORD, "pipo");
         p.setProperty(DB_ESQUEMA, "update");
         p.setProperty(IMAGEN_RUTA, rutaImagenAnterior());
+        p.setProperty(WS_URL, "http://localhost:9128/edext/publicador");
         return p;
     }
 
@@ -120,6 +141,9 @@ public class cfg {
             escribir(w, p, DB_ESQUEMA);
             w.write("\n# Carpeta de imagenes\n");
             escribir(w, p, IMAGEN_RUTA);
+            w.write("\n# URL donde el Servidor Central publica los Web Services.\n");
+            w.write("# Para que el Servidor Web los consuma desde otra maquina usar la IP de este equipo (o 0.0.0.0).\n");
+            escribir(w, p, WS_URL);
             Logger.info("Archivo de configuracion creado en ..: {}", PATH_PROPERTIES);
         } catch (IOException e) {
             Logger.error("Error al crear configuracion {} : {}", PATH_PROPERTIES, e.getMessage());
