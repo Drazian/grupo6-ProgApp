@@ -42,8 +42,8 @@
             <div style="margin-top: 12px;">
                 <strong style="font-size: 14px; color: #333; margin-right: 8px;">Categorías:</strong>
                 <c:choose>
-                    <c:when test="${not empty programa.getCategorias()}">
-                        <c:forEach var="categoria" items="${programa.getCategorias()}">
+                    <c:when test="${not empty categoriasPrograma}">
+                        <c:forEach var="categoria" items="${categoriasPrograma}">
                             <span style="font-size: 11px; background: #e9ecef; padding: 4px 8px; border-radius: 12px; border: 1px solid #ced4da; font-weight: bold; color: #495057; display: inline-block; margin-right: 5px; margin-bottom: 4px; text-transform: uppercase;">
                                 <c:out value="${categoria}"/>
                             </span>

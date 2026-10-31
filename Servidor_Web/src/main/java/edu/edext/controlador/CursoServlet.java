@@ -1,13 +1,13 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtCurso;
-import edu.edext.datatypes.DtInstituto;
-import edu.edext.datatypes.DtPrograma;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
-import edu.edext.logica.GestorImagenes;
+import edu.edext.cliente.DtCurso;
+import edu.edext.cliente.DtInstituto;
+import edu.edext.cliente.DtPrograma;
+import edu.edext.cliente.DtUsuario;
+import edu.edext.cliente.TipoUsuario;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
+import edu.edext.web.Datos;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -28,7 +28,7 @@ import java.util.Set;
 @WebServlet("/CursoServlet")
 @MultipartConfig 
 public class CursoServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private Publicador ic = ClienteCentral.get();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -60,7 +60,7 @@ public class CursoServlet extends HttpServlet {
                         
                         if (listaProgramas != null) {
                                 for (DtPrograma programa : listaProgramas) {
-                                    Set<String> categoriasPrograma = programa.getCategorias();
+                                    Set<String> categoriasPrograma = Datos.categoriasDePrograma(programa);
 
                                     if (categoriasPrograma != null) {
                                         boolean perteneceACategoria = false;
@@ -103,7 +103,7 @@ public class CursoServlet extends HttpServlet {
 
             case "listarCategoriasJson": 
                 try {
-                    List<edu.edext.datatypes.DtCategoria> listaCat = ic.listarCategorias();
+                    List<edu.edext.cliente.DtCategoria> listaCat = ic.listarCategorias();
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < listaCat.size(); i++) {
                         // Escapar \ y " para que nombres con comillas no rompan el JSON
@@ -123,7 +123,7 @@ public class CursoServlet extends HttpServlet {
 
             case "listarInstitutosJSON": 
                 try {
-                    List<edu.edext.datatypes.DtInstituto> listaInst = ic.listarInstitutos();
+                    List<edu.edext.cliente.DtInstituto> listaInst = ic.listarInstitutos();
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < listaInst.size(); i++) {
                         // Escapar \ y " para que nombres con comillas no rompan el JSON
@@ -148,7 +148,7 @@ public class CursoServlet extends HttpServlet {
                         nombreDelCurso = new String(nombreDelCurso.getBytes("ISO-8859-1"), "UTF-8");
                     }
                     
-                    edu.edext.datatypes.DtConsultaCurso dtCurso = ic.obtenerDatosCurso(nombreDelCurso);
+                    edu.edext.cliente.DtConsultaCurso dtCurso = ic.obtenerDatosCurso(nombreDelCurso);
                     
                     if(dtCurso == null) {
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -256,12 +256,11 @@ public class CursoServlet extends HttpServlet {
                         byte[] imgBytes = filePart.getInputStream().readAllBytes();
                         String nombreOriginal = filePart.getSubmittedFileName();
                         String identificadorUnico = "Curso_" + nombreCurso.replaceAll("\\s+", "_"); 
-                        nombreImagen = GestorImagenes.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
+                        nombreImagen = ic.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
                     }
 
-                    DtCurso dtCurso = new DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
-                            fechaRegistro, new DtInstituto(nombreInstituto), previas, categorias, nombreImagen
-                    );
+                    DtCurso dtCurso = Datos.curso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url,
+                            fechaRegistro, nombreInstituto, previas, categorias, nombreImagen);
 
                     ic.altaCurso(dtCurso, nombreInstituto); 
 

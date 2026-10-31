@@ -1,11 +1,12 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtEdicion;
-import edu.edext.datatypes.DtInscripcionEdicion;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
+import edu.edext.cliente.DtEdicion;
+import edu.edext.cliente.DtInscripcionEdicion;
+import edu.edext.cliente.DtUsuario;
+import edu.edext.cliente.TipoUsuario;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
+import edu.edext.web.Datos;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,7 +22,7 @@ import java.util.Enumeration;
 
 @WebServlet("/InscripcionServlet")
 public class InscripcionServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private Publicador ic = ClienteCentral.get();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -144,7 +145,7 @@ public class InscripcionServlet extends HttpServlet {
                     List<DtInscripcionEdicion> aceptadas = new ArrayList<>();
                     if (todas != null) {
                         for (DtInscripcionEdicion ins : todas) {
-                            if (ins.getValorEstado() == 2) {
+                            if (ins.getEstado() == 2) {
                                 aceptadas.add(ins);
                             }
                         }
@@ -250,7 +251,7 @@ public class InscripcionServlet extends HttpServlet {
                     }
                 }
                 
-                ic.evaluarInscripciones(nombreEdicion, evaluaciones);
+                ic.evaluarInscripciones(nombreEdicion, Datos.evaluaciones(evaluaciones));
                 
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("Selección de estudiantes guardada con éxito.");

@@ -1,11 +1,12 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtCurso;
-import edu.edext.datatypes.DtPrograma;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
+import edu.edext.cliente.DtCurso;
+import edu.edext.cliente.DtPrograma;
+import edu.edext.cliente.DtUsuario;
+import edu.edext.cliente.TipoUsuario;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
+import edu.edext.web.Datos;
 import edu.edext.modelo.DtResultadoBusqueda;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,7 +23,7 @@ import java.util.List;
 
 @WebServlet("/BuscadorServlet")
 public class BuscadorServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private Publicador ic = ClienteCentral.get();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -44,7 +45,7 @@ public class BuscadorServlet extends HttpServlet {
                     String desc = prog.getDescripcion() != null ? prog.getDescripcion() : "";
                     
                     if (queryLower.isEmpty() || nombre.toLowerCase().contains(queryLower) || desc.toLowerCase().contains(queryLower)){
-                        LocalDate fechaReg = prog.getFechaRegistro() != null ? prog.getFechaRegistro() : LocalDate.now();
+                        LocalDate fechaReg = prog.getFechaRegistro() != null ? Datos.fecha(prog.getFechaRegistro()) : LocalDate.now();
                         DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,prog.getImagen(),"programa");
                         resultados.add(res);
                     }
@@ -76,7 +77,7 @@ public class BuscadorServlet extends HttpServlet {
                     String nombre = (nom + " " + ape).trim();
                     
                     if (queryLower.isEmpty() || nickname.toLowerCase().contains(queryLower) || nombre.toLowerCase().contains(queryLower)){
-                        LocalDate fechaN = user.getfNacimiento() != null ? DateToLocalDate(user.getfNacimiento()) : LocalDate.now();
+                        LocalDate fechaN = user.getFechaNacimiento() != null ? DateToLocalDate(user.getFechaNacimiento()) : LocalDate.now();
                         DtResultadoBusqueda res = new DtResultadoBusqueda(nickname, nombre, fechaN, user.getImagen(),tip.toLowerCase());
                         resultados.add(res);
                     }

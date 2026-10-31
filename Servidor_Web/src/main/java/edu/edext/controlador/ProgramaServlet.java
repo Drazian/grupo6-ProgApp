@@ -1,11 +1,12 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtCurso;
-import edu.edext.datatypes.DtPrograma;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
+import edu.edext.cliente.DtCurso;
+import edu.edext.cliente.DtPrograma;
+import edu.edext.cliente.DtUsuario;
+import edu.edext.cliente.TipoUsuario;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
+import edu.edext.web.Datos;
 import java.io.IOException;
 import java.io.PrintWriter; 
 import jakarta.servlet.ServletException;
@@ -23,7 +24,7 @@ import java.util.List;
 @WebServlet("/ProgramaServlet")
 @MultipartConfig
 public class ProgramaServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private Publicador ic = ClienteCentral.get();
     
     //Responsable de mostrar formularios
     @Override
@@ -86,6 +87,7 @@ public class ProgramaServlet extends HttpServlet {
                     DtPrograma programa = ic.buscarPrograma(nombrePrograma); 
 
                     request.setAttribute("programa", programa);
+                    request.setAttribute("categoriasPrograma", programa != null ? Datos.categoriasDePrograma(programa) : null);
                     request.getRequestDispatcher("fragmentos/programaDetalles.jsp").forward(request, response);
                 } catch (Exception e) {
                     request.setAttribute("error", e.getMessage());
@@ -174,8 +176,8 @@ public class ProgramaServlet extends HttpServlet {
                         }
                     }
                     
-                    DtPrograma programa = new DtPrograma(nombre.trim(), desc.trim(), fechaRegistro, fechaInicio, fechaFin);
-                    boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, logueado.getNickname());
+                    DtPrograma programa = Datos.programa(nombre.trim(), desc.trim(), fechaRegistro, fechaInicio, fechaFin);
+                    boolean resultado = ic.setCrearProgramaFormacionConDocente(programa, bytesImagen, nombreOriginal, logueado.getNickname());
                     
                     if (resultado){
                         response.setStatus(HttpServletResponse.SC_OK);
