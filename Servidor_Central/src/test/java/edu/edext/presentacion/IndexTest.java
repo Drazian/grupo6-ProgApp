@@ -180,4 +180,28 @@ public class IndexTest {
             verify(ventanas.constructed().get(0)).setVisible(true);
         }
     }
+
+    @Test
+    public void testMainAvisaSiNoSePuedenPublicarLosWebServices() {
+        List<Runnable> tareas = new ArrayList<>();
+        try (MockedStatic<UIManager> ui = mockStatic(UIManager.class, inv -> "getInstalledLookAndFeels".equals(inv.getMethod().getName())
+                    ? new LookAndFeelInfo[0] : inv.callRealMethod());
+             MockedStatic<EventQueue> eventos = mockStatic(EventQueue.class, inv -> {
+                    if ("invokeLater".equals(inv.getMethod().getName())) {
+                        tareas.add(inv.getArgument(0));
+                        return null;
+                    }
+                    return inv.callRealMethod();
+                });
+             MockedStatic<edu.edext.webservices.ServidorWebServices> ws = mockStatic(edu.edext.webservices.ServidorWebServices.class)) {
+            ws.when(edu.edext.webservices.ServidorWebServices::publicar)
+                    .thenThrow(new jakarta.xml.ws.WebServiceException("Address already in use: bind"));
+            index.main(new String[0]);
+        }
+        dialogos.verify(() -> JOptionPane.showMessageDialog(isNull(), contains("No se pudieron publicar los Web Services"),
+                eq("Web Services"), eq(JOptionPane.WARNING_MESSAGE)));
+        dialogos.verify(() -> JOptionPane.showMessageDialog(isNull(), contains("Address already in use"),
+                anyString(), anyInt()));
+        assertEquals(1, tareas.size(), "La Estacion de Trabajo arranca igual");
+    }
 }

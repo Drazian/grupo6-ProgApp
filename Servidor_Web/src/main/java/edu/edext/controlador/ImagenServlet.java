@@ -1,6 +1,7 @@
 package edu.edext.controlador;
 
-import edu.edext.logica.GestorImagenes;
+import edu.edext.web.ClienteCentral;
+import org.tinylog.Logger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -29,7 +30,25 @@ public class ImagenServlet extends HttpServlet {
             }
         }
 
-        File archivo = new File(GestorImagenes.getRutaBase(), nombreImagen);
+        // Las imagenes estan en el Servidor Central: se piden por Web Service
+        byte[] desdeCentral = null;
+        try {
+            desdeCentral = ClienteCentral.get().obtenerImagen(nombreImagen);
+        } catch (Exception e) {
+            Logger.error("No se pudo obtener la imagen '{}' del Servidor Central: {}", nombreImagen, e.getMessage());
+        }
+        if (desdeCentral != null) {
+            String tipo = getServletContext().getMimeType(nombreImagen);
+            response.setContentType(tipo != null ? tipo : "image/png");
+            response.setContentLength(desdeCentral.length);
+            try (OutputStream out = response.getOutputStream()) {
+                out.write(desdeCentral);
+            }
+            return;
+        }
+
+        // Si el Central no la tiene, se usa la del war (o la imagen por defecto)
+        File archivo = new File("");
 
         if (!archivo.exists() || !archivo.isFile()) {
             String pathReal = getServletContext().getRealPath("/imagenes/" + nombreImagen);

@@ -1,8 +1,8 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
+import edu.edext.cliente.DtUsuario;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -21,29 +21,17 @@ public class LoginServlet extends HttpServlet {
         response.setContentType("text/plain; charset=UTF-8");
         
         String accion = request.getParameter("accion");
-        IControlador ic = Fabrica.getInstance().getIControlador();
+        Publicador ic = ClienteCentral.get();
 
         if ("login".equals(accion)) {
             String identificador = request.getParameter("identificador");
             String password = request.getParameter("password");
 
             try {
+                // La contraseña la verifica el Servidor Central (por el Web Service nunca viaja el hash)
                 DtUsuario logueado = null;
                 if (identificador != null && !identificador.trim().isEmpty() && password != null) {
-                    DtUsuario u = ic.obtenerUsuario(identificador.trim());
-                    if (u != null && edu.edext.tools.Utils.Crypt.verifyPassword(password, u.getPassword())) {
-                        logueado = new DtUsuario(
-                            u.getNickname(),
-                            null,
-                            u.getEmail(),
-                            u.getNombre(),
-                            u.getApellido(),
-                            u.getImagen(),
-                            u.getfNacimiento(),
-                            u.getInstitutos(),
-                            u.getTipoUsuario()
-                        );
-                    }
+                    logueado = ic.iniciarSesion(identificador.trim(), password);
                 }
 
                 if (logueado != null) {

@@ -12,11 +12,12 @@
     <packaging>war</packaging>
     
     <dependencies>
+        <!-- Cliente de los Web Services del Servidor Central (la web ya no incluye al Central: se comunican por SOAP) -->
         <dependency>
-            <groupId>edu</groupId>
-            <artifactId>Servidor_Central</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency> 
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
+            <version>4.0.5</version>
+        </dependency>
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-web-api</artifactId>
@@ -58,6 +59,32 @@
         <!-- Genera target/web.war para desplegar en Tomcat -->
         <finalName>web</finalName>
         <plugins>
+            <!-- Genera el cliente (edu.edext.cliente) a partir del contrato del Servidor Central guardado en
+                 src/main/resources/wsdl. Si cambia el Publicador, volver a descargar publicador.wsdl y publicador.xsd -->
+            <plugin>
+                <groupId>com.sun.xml.ws</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>4.0.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlDirectory>${project.basedir}/src/main/resources/wsdl</wsdlDirectory>
+                            <wsdlFiles>
+                                <wsdlFile>publicador.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <wsdlLocation>/wsdl/publicador.wsdl</wsdlLocation>
+                            <bindingDirectory>${project.basedir}/src/main/resources/wsdl</bindingDirectory>
+                            <bindingFiles>
+                                <bindingFile>publicador-bindings.xml</bindingFile>
+                            </bindingFiles>
+                            <packageName>edu.edext.cliente</packageName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>

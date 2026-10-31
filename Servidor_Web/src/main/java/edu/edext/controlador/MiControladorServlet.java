@@ -1,9 +1,9 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtCategoria;
-import edu.edext.datatypes.DtInstituto;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
+import edu.edext.cliente.DtCategoria;
+import edu.edext.cliente.DtInstituto;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
 import edu.edext.modelo.Producto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,7 +19,7 @@ import org.tinylog.Logger;
 // Nota: Si usas una versión muy antigua de Java EE, cambia "jakarta" por "javax"
 @WebServlet("/MiControladorServlet")
 public class MiControladorServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private Publicador ic = ClienteCentral.get();
 
     // Método principal que recibe peticiones GET (clics del menú y búsquedas)
     @Override

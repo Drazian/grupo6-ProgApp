@@ -1,6 +1,6 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtInstituto;
+import edu.edext.cliente.DtInstituto;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -9,8 +9,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import edu.edext.logica.IControlador;
-import edu.edext.logica.Fabrica;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
 import java.util.List;
 
 /**
@@ -20,7 +20,7 @@ import java.util.List;
 
 @WebServlet("/TestServlet")
 public class TestServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private Publicador ic = ClienteCentral.get();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

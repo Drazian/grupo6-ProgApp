@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <div class="contenedor-formulario" style="max-width: 550px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff;">
     <h2>Modificar Perfil</h2>
@@ -32,7 +33,7 @@
 
         <div style="margin-bottom: 15px;">
             <label for="fechaNacimiento" style="display: block; font-weight: bold; margin-bottom: 5px;">Fecha de Nacimiento:</label>
-            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="${fn:escapeXml(sessionScope.usuarioLogueado.fNacimiento)}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" value="<fmt:formatDate value="${sessionScope.usuarioLogueado.fechaNacimiento}" pattern="yyyy-MM-dd"/>" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
         <!-- SECCIÓN EXCLUSIVA PARA DOCENTES: Gestión de Institutos -->

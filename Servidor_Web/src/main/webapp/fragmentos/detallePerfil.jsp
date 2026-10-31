@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <!-- CAMPO OCULTO: Guarda el nickname del usuario logueado para que JS lo pueda usar -->
@@ -52,7 +53,7 @@
         <p><b>Nombre:</b> ${requestScope.usuarioPerfil.nombre}</p>
         <p><b>Apellido:</b> ${requestScope.usuarioPerfil.apellido}</p>
         <p><b>Correo electrónico:</b> ${requestScope.usuarioPerfil.email}</p>
-        <p><b>Fecha de Nacimiento:</b> ${requestScope.usuarioPerfil.fNacimiento}</p>
+        <p><b>Fecha de Nacimiento:</b> <fmt:formatDate value="${requestScope.usuarioPerfil.fechaNacimiento}" pattern="yyyy-MM-dd"/></p>
     </div>
 
     <!-- Paneles de Red Social al costado (Seguidores y Seguidos) -->

@@ -47,20 +47,20 @@
                         <td style="padding: 10px; border: 1px solid #ddd; background: #fff;">
                             <!-- Mostramos el estado actual con colores -->
                             <c:choose>
-                                <c:when test="${ins.valorEstado == 1}"><span style="color: #f39c12; font-weight: bold;">${ins.estado}</span></c:when>
-                                <c:when test="${ins.valorEstado == 2}"><span style="color: #27ae60; font-weight: bold;">${ins.estado}</span></c:when>
-                                <c:when test="${ins.valorEstado == 3}"><span style="color: #c0392b; font-weight: bold;">${ins.estado}</span></c:when>
-                                <c:otherwise>${ins.estado}</c:otherwise>
+                                <c:when test="${ins.estado == 1}"><span style="color: #f39c12; font-weight: bold;">${nombresEstado[ins.estado]}</span></c:when>
+                                <c:when test="${ins.estado == 2}"><span style="color: #27ae60; font-weight: bold;">${nombresEstado[ins.estado]}</span></c:when>
+                                <c:when test="${ins.estado == 3}"><span style="color: #c0392b; font-weight: bold;">${nombresEstado[ins.estado]}</span></c:when>
+                                <c:otherwise>${nombresEstado[ins.estado]}</c:otherwise>
                             </c:choose>
                         </td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: center; background: #fdfefe;">
                             <!-- Inputs que viajarán al Servlet como "estado_nickname" -->
                             <label style="margin-right: 15px; cursor: pointer;">
-                                <input type="radio" name="estado_${ins.estudiante.nickname}" value="2" ${ins.valorEstado == 2 ? 'checked' : ''} required> 
+                                <input type="radio" name="estado_${ins.estudiante.nickname}" value="2" ${ins.estado == 2 ? 'checked' : ''} required> 
                                 <span style="color: #27ae60; font-weight: bold;">Aceptar</span>
                             </label>
                             <label style="cursor: pointer;">
-                                <input type="radio" name="estado_${ins.estudiante.nickname}" value="3" ${ins.valorEstado == 3 ? 'checked' : ''} required> 
+                                <input type="radio" name="estado_${ins.estudiante.nickname}" value="3" ${ins.estado == 3 ? 'checked' : ''} required> 
                                 <span style="color: #c0392b; font-weight: bold;">Rechazar</span>
                             </label>
                         </td>

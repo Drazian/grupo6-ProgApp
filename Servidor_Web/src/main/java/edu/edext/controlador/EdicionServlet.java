@@ -1,11 +1,11 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtEdicion;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
-import edu.edext.logica.GestorImagenes; 
+import edu.edext.cliente.DtEdicion;
+import edu.edext.cliente.DtUsuario;
+import edu.edext.cliente.TipoUsuario;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
+import edu.edext.web.Datos;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig; 
@@ -18,7 +18,7 @@ import jakarta.servlet.http.Part;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import edu.edext.datatypes.DtInscripcionEdicion;
+import edu.edext.cliente.DtInscripcionEdicion;
 import java.util.ArrayList;
 import java.util.HashSet; 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.time.format.DateTimeParseException;
 @WebServlet("/EdicionServlet")
 @MultipartConfig // IMPORTANTE: Sin esto, el Servlet no puede leer el FormData con imágenes
 public class EdicionServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private Publicador ic = ClienteCentral.get();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -100,7 +100,7 @@ public class EdicionServlet extends HttpServlet {
 
                  if (todasLasInscripciones != null) {
                      for (DtInscripcionEdicion ins : todasLasInscripciones) {
-                         if (ins.getValorEstado() == 2) {
+                         if (ins.getEstado() == 2) {
                              aceptadas.add(ins);
                          }
                      }
@@ -200,13 +200,11 @@ public class EdicionServlet extends HttpServlet {
                     String identificadorUnico = "Edicion_" + nombreEdicion.replaceAll("\\s+", "_");
                     
                     // Guardamos físicamente la imagen y obtenemos el nombre del archivo final
-                    nombreImagen = GestorImagenes.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
+                    nombreImagen = ic.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
                 }
 
                 // 6. Instanciar el DtEdicion
-                DtEdicion dt = new DtEdicion(
-                    nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen
-                );
+                DtEdicion dt = Datos.edicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, docentes, nombreImagen);
 
                 // 7. Impactar en base de datos
                 ic.altaEdicionCurso(nombreCurso, dt);

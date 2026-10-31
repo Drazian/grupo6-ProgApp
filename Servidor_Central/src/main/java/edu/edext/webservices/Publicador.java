@@ -11,11 +11,14 @@ import edu.edext.datatypes.DtInstituto;
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.logica.Fabrica;
+import edu.edext.logica.GestorImagenes;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebService;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +60,28 @@ public class Publicador {
         if (u == null || !Utils.Crypt.verifyPassword(password, u.getPassword()))
             return null;
         return u;
+    }
+
+//******************************** Imagenes ********************************//
+
+    /** Guarda una imagen en la carpeta de imagenes del Servidor Central y devuelve el nombre con el que quedo. */
+    @WebMethod
+    public String guardarImagen(@WebParam(name = "imagen") byte[] imagen,
+                                @WebParam(name = "nombreOriginal") String nombreOriginal,
+                                @WebParam(name = "identificador") String identificador) throws Exception {
+        return GestorImagenes.guardarImagen(imagen, nombreOriginal, identificador);
+    }
+
+    /** Contenido de una imagen de la carpeta de imagenes, o null si no existe. Solo se acepta el nombre del archivo. */
+    @WebMethod
+    public byte[] obtenerImagen(@WebParam(name = "nombre") String nombre) throws Exception {
+        if (nombre == null || nombre.isBlank())
+            return null;
+        String soloNombre = new File(nombre.trim()).getName();
+        if (soloNombre.isEmpty() || ".".equals(soloNombre) || "..".equals(soloNombre))
+            return null;
+        File archivo = new File(GestorImagenes.getRutaBase(), soloNombre);
+        return archivo.isFile() ? Files.readAllBytes(archivo.toPath()) : null;
     }
 
 //******************************** Institutos y categorias ********************************//

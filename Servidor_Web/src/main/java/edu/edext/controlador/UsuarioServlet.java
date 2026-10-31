@@ -1,13 +1,14 @@
 package edu.edext.controlador;
  
-import edu.edext.datatypes.DtEdicion;
-import edu.edext.datatypes.DtInscripcionEdicion;
-import edu.edext.datatypes.DtInstituto;
-import edu.edext.datatypes.DtPrograma;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
+import edu.edext.cliente.DtEdicion;
+import edu.edext.cliente.DtInscripcionEdicion;
+import edu.edext.cliente.DtInstituto;
+import edu.edext.cliente.DtPrograma;
+import edu.edext.cliente.DtUsuario;
+import edu.edext.cliente.TipoUsuario;
+import edu.edext.cliente.Publicador;
+import edu.edext.web.ClienteCentral;
+import edu.edext.web.Datos;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,7 +33,7 @@ public class UsuarioServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         try {
-            IControlador ic = Fabrica.getInstance().getIControlador();
+            Publicador ic = ClienteCentral.get();
             List<DtInstituto> lista = ic.listarInstitutos();
 
             StringBuilder json = new StringBuilder("[");
@@ -70,7 +71,7 @@ public class UsuarioServlet extends HttpServlet {
                 return;
             }
 
-            IControlador ic = Fabrica.getInstance().getIControlador();
+            Publicador ic = ClienteCentral.get();
             DtUsuario logueado = (DtUsuario) session.getAttribute("usuarioLogueado");
 
             try {
@@ -95,7 +96,7 @@ public class UsuarioServlet extends HttpServlet {
 
             if (nickname != null && !nickname.trim().isEmpty()) {
                 try {
-                    IControlador ic = Fabrica.getInstance().getIControlador();
+                    Publicador ic = ClienteCentral.get();
 
                     DtUsuario dtUsuario = ic.obtenerUsuario(nickname.trim());
 
@@ -130,7 +131,7 @@ public class UsuarioServlet extends HttpServlet {
 
         } else if ("consultaUsuario".equals(accion)) {
             try {
-                IControlador ic = Fabrica.getInstance().getIControlador();
+                Publicador ic = ClienteCentral.get();
                 List<DtUsuario> todosLosUsuarios = ic.listarUsuarios();
 
                 request.setAttribute("todosLosUsuarios", todosLosUsuarios);
@@ -144,7 +145,7 @@ public class UsuarioServlet extends HttpServlet {
             String nickname = request.getParameter("nickname");
             if (nickname != null && !nickname.trim().isEmpty()) {
                 try {
-                    IControlador ic = Fabrica.getInstance().getIControlador();
+                    Publicador ic = ClienteCentral.get();
                     DtUsuario dtUsuario = ic.obtenerUsuario(nickname.trim());
 
                     if (dtUsuario != null) {
@@ -214,7 +215,7 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String accion = request.getParameter("accion");
-        IControlador ic = Fabrica.getInstance().getIControlador();
+        Publicador ic = ClienteCentral.get();
 
         if ("crear".equals(accion)) {
             String nickname = request.getParameter("nickname");
@@ -243,12 +244,9 @@ public class UsuarioServlet extends HttpServlet {
                 Date fecha = Date.valueOf(fechaNacimiento);
                 TipoUsuario tipo = TipoUsuario.valueOf(tipoUsuario);
 
-                DtUsuario usuario = new DtUsuario(
-                    nickname, password, email, nombre, apellido,
-                    null, fecha, institutos, tipo
-                );
+                DtUsuario usuario = Datos.usuario(nickname, email, nombre, apellido, null, fecha, institutos, tipo);
 
-                ic.crearUsuario(usuario, bytesImagen, nombreOriginal);
+                ic.crearUsuarioConImagen(usuario, password, bytesImagen, nombreOriginal);
 
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("Usuario creado correctamente.");
@@ -307,19 +305,10 @@ public class UsuarioServlet extends HttpServlet {
                     nombreImagenFinal = usuarioActual.getNickname() + extension;
                 }
 
-                DtUsuario usuarioModificado = new DtUsuario(
-                    usuarioActual.getNickname(),
-                    passwordParaControlador,
-                    usuarioActual.getEmail(),
-                    nombre,
-                    apellido,
-                    nombreImagenFinal, 
-                    fecha,
-                    institutos,
-                    usuarioActual.getTipoUsuario()
-                );
+                DtUsuario usuarioModificado = Datos.usuario(usuarioActual.getNickname(), usuarioActual.getEmail(),
+                        nombre, apellido, nombreImagenFinal, fecha, institutos, usuarioActual.getTipoUsuario());
 
-                ic.modificarUsuario(usuarioModificado, bytesImagen, nombreOriginal);
+                ic.modificarUsuarioConImagen(usuarioModificado, passwordParaControlador, bytesImagen, nombreOriginal);
 
                 actualizarSesionUsuario(request, ic, usuarioActual.getNickname());
 
@@ -429,7 +418,7 @@ public class UsuarioServlet extends HttpServlet {
         }
     }
     
-    private void actualizarListasSociales(HttpServletRequest request, IControlador ic) {
+    private void actualizarListasSociales(HttpServletRequest request, Publicador ic) {
         DtUsuario logueado = (DtUsuario) request.getSession().getAttribute("usuarioLogueado");
         if (logueado != null) {
             try {
@@ -442,21 +431,11 @@ public class UsuarioServlet extends HttpServlet {
         }
     }
 
-    private void actualizarSesionUsuario(HttpServletRequest request, IControlador ic, String nickname) throws Exception {
+    private void actualizarSesionUsuario(HttpServletRequest request, Publicador ic, String nickname) throws Exception {
+        // Por el Web Service el usuario nunca trae la contraseña
         DtUsuario u = ic.obtenerUsuario(nickname);
         if (u != null) {
-            DtUsuario sinPassword = new DtUsuario(
-                u.getNickname(),
-                null,
-                u.getEmail(),
-                u.getNombre(),
-                u.getApellido(),
-                u.getImagen(),
-                u.getfNacimiento(),
-                u.getInstitutos(),
-                u.getTipoUsuario()
-            );
-            request.getSession().setAttribute("usuarioLogueado", sinPassword);
+            request.getSession().setAttribute("usuarioLogueado", u);
         }
     }
 }

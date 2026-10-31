@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ajustes de wsimport para que las clases generadas sean comodas de usar en servlets y JSP -->
+<jaxb:bindings version="3.0"
+               xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               schemaLocation="publicador.xsd" node="/xs:schema">
+
+    <!-- xs:dateTime como java.util.Date (por defecto seria XMLGregorianCalendar) -->
+    <jaxb:globalBindings>
+        <jaxb:javaType name="java.util.Date" xmlType="xs:dateTime"
+                       parseMethod="edu.edext.web.FechasXml.leer"
+                       printMethod="edu.edext.web.FechasXml.escribir"/>
+    </jaxb:globalBindings>
+
+    <!-- fNacimiento generaria getFNacimiento() (propiedad "FNacimiento" en EL): se renombra -->
+    <jaxb:bindings node="//xs:complexType[@name='dtUsuario']//xs:element[@name='fNacimiento']">
+        <jaxb:property name="fechaNacimiento"/>
+    </jaxb:bindings>
+</jaxb:bindings>
