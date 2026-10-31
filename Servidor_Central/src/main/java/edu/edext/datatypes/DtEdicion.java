@@ -21,6 +21,9 @@ public class DtEdicion {
     private List<DtUsuario> docentes;
     private Set<String> nameDocentes;
     
+    // Requerido por JAXB para recibir este datatype por los Web Services
+    private DtEdicion(){ this(null, null, null, null, null, null, null, null, null); }
+
     public DtEdicion(String nombre, Integer cupo, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaPublicacion){
         this(nombre, cupo, fechaInicio, fechaFin, fechaPublicacion, null, null, null, null);
     }

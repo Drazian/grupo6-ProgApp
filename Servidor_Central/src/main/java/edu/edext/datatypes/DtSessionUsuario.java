@@ -11,6 +11,9 @@ public class DtSessionUsuario {
     private final String imagen;
     private final TipoUsuario tipoUsuario;
     
+    // Requerido por JAXB para recibir este datatype por los Web Services
+    private DtSessionUsuario(){ this(null, null, null, null); }
+
     public DtSessionUsuario(String nickname, String email, String imagen, TipoUsuario tipoUsuario){
         this.nickname=nickname;
         this.email=email;

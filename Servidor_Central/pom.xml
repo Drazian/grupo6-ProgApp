@@ -36,6 +36,20 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>6.4.4.Final</version>
+            <exclusions>
+                <!-- JAX-WS ya trae JAXB 4.0.9 (com.sun.xml.bind:jaxb-impl) con las mismas clases org.glassfish.jaxb.*:
+                     con las dos versiones, servidor.jar mezcla clases de 4.0.2 y 4.0.9 y los fault SOAP fallan -->
+                <exclusion>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- JAX-WS (Metro): publica los Web Services con el servidor HTTP de la JDK (Endpoint.publish) -->
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
+            <version>4.0.5</version>
         </dependency>
         <dependency>
             <groupId>com.toedter</groupId>
@@ -172,6 +186,13 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.15</version>
+                <configuration>
+                    <excludes>
+                        <!-- Clases que JAX-WS genera en tiempo de ejecucion (wrappers y fault beans): no son codigo
+                             del proyecto, y si JaCoCo las instrumenta JAX-WS intenta serializar su campo $jacocoData -->
+                        <exclude>edu/edext/webservices/jaxws/*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

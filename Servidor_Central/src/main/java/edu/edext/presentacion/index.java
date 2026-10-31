@@ -3,6 +3,7 @@ package edu.edext.presentacion;
 import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
 import edu.edext.tools.indexHelper;
+import edu.edext.webservices.ServidorWebServices;
 import javax.swing.JOptionPane;
 import org.tinylog.Logger;
 
@@ -309,6 +310,17 @@ public class index extends javax.swing.JFrame {
             }
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
             Logger.error(ex);
+        }
+
+        // Servidor Central: publica los Web Services (req. 7.7) para el Servidor Web y el Dispositivo Movil
+        try {
+            ServidorWebServices.publicar();
+        } catch (RuntimeException ex) {
+            Logger.error(ex, "No se pudieron publicar los Web Services");
+            JOptionPane.showMessageDialog(null,
+                    "No se pudieron publicar los Web Services en " + cfg.get(cfg.WS_URL) + ":\n" + ex.getMessage()
+                    + "\n\nLa Estación de Trabajo funciona igual. Revise ws.url en " + cfg.PATH_PROPERTIES,
+                    "Web Services", JOptionPane.WARNING_MESSAGE);
         }
         //</editor-fold>
 

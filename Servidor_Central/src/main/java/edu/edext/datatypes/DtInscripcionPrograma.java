@@ -1,5 +1,7 @@
 package edu.edext.datatypes;
 
+import jakarta.xml.bind.annotation.XmlTransient;
+
 import java.time.LocalDate;
 
 /**
@@ -12,14 +14,22 @@ import java.time.LocalDate;
  */
 public class DtInscripcionPrograma {
     private final int estado;
+    @XmlTransient
     public final int ACEPTADO=2;
+    @XmlTransient
     public final int INSCRIPTO=1;
+    @XmlTransient
     public final int RECHAZADO=3;
+    @XmlTransient
     public final int NOINSCRIPTO=0;
     private final DtPrograma programa;
     private final DtUsuario estudiante;
     private final LocalDate fechaInscripcion;
+    @XmlTransient
     private final String[] nomEstado={"No Inscripto", "Inscripto", "Aceptado", "Rechazado"};
+
+    // Requerido por JAXB para recibir este datatype por los Web Services
+    private DtInscripcionPrograma(){ this(null, null, null, 0); }
 
     public DtInscripcionPrograma(DtUsuario estudiante, DtPrograma programa, LocalDate fechaInscripcion, int estado){
         this.fechaInscripcion=fechaInscripcion;

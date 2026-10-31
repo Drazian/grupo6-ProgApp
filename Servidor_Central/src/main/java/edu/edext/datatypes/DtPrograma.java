@@ -21,6 +21,9 @@ public class DtPrograma {
     private Set<String> nameCursos;
     private String docente;
 
+    // Requerido por JAXB para recibir este datatype por los Web Services
+    private DtPrograma(){ this(null, null, null, null, null, null, null, null, null); }
+
     public DtPrograma(String nombre, LocalDate fechaRegistro, LocalDate fechaInicio, LocalDate fechaFin){
         this(nombre, null, fechaRegistro, fechaInicio, fechaFin, null, null, null);
     }    
