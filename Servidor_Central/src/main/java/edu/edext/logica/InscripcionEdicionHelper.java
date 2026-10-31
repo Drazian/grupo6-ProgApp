@@ -198,12 +198,8 @@ public class InscripcionEdicionHelper {
                 DtUsuario dtEst = new DtUsuario(e.getNickname(), e.getPassword(), e.getEmail(), e.getNombre(), e.getApellido(), e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
 
                 Edicion ed = i.getEdicion();
-                
-                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), "usr.png");
-//                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), null, null, 0, 0, null, null, null, null, null, "usr.png");
-                
-                
-                DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, "usr.png");
+                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), imagenOPorDefecto(ed.getCurso().getImagen()));
+                DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, imagenOPorDefecto(ed.getImagen()));
 
                 // Cálculo en caliente del requerimiento 7.5
                 double prioridad = calcularPrioridad(e.getNickname(), ed.getCurso().getNombre());
@@ -283,13 +279,8 @@ public class InscripcionEdicionHelper {
                 DtUsuario dtEst = new DtUsuario(e.getNickname(), e.getPassword(), e.getEmail(), e.getNombre(), e.getApellido(), e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
 
                 Edicion ed = i.getEdicion();
-                String imgCurso = (ed.getCurso() != null && ed.getCurso().getImagen() != null && !ed.getCurso().getImagen().isEmpty()) 
-                        ? ed.getCurso().getImagen() : "usr.png";
-                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), imgCurso);
-
-                String imgEdicion = (ed.getImagen() != null && !ed.getImagen().isEmpty()) 
-                        ? ed.getImagen() : "usr.png";
-                DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, imgEdicion);
+                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), imagenOPorDefecto(ed.getCurso().getImagen()));
+                DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, imagenOPorDefecto(ed.getImagen()));
 
                 ret.add(new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0));
             }
@@ -302,7 +293,9 @@ public class InscripcionEdicionHelper {
         return ret;
     }  
     
-    
-    
+    // Imagen guardada del curso/edicion o, si no tiene, la generica
+    private static String imagenOPorDefecto(String imagen) {
+        return (imagen != null && !imagen.isEmpty()) ? imagen : "usr.png";
+    }
     
 }

@@ -82,14 +82,6 @@ public DtEdicion getEdicion(){
         return ret;
     }
 
-    private String seekNameEdicion(){
-        db=DB.createEntityManager();
-        String ret;
-        try { ret=db.find(Edicion.class, nombre).getNombre(); }
-        catch (Exception e) { ret=null; }
-        finally { db.close(); db=null; }
-        return ret;
-    }
     private Edicion seekEdicion(){
         db=DB.createEntityManager();
         Edicion ret;

@@ -166,6 +166,30 @@ public class Utils {
                     }else
                         if (!Character.isDigit(c))
                             evt.consume(); } });
+            filtrarTexto(obj, c -> Character.isDigit(c) || (espacios && c == ' '));
+        }
+
+        // El KeyListener no ve el texto pegado ni el que llega por setText: el filtro del documento
+        // descarta tambien esos caracteres
+        private static void filtrarTexto(Component obj, java.util.function.IntPredicate permitido){
+            if(obj instanceof javax.swing.text.JTextComponent txt && txt.getDocument() instanceof javax.swing.text.AbstractDocument doc)
+                doc.setDocumentFilter(new javax.swing.text.DocumentFilter(){
+                    @Override
+                    public void insertString(FilterBypass fb, int offset, String texto, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
+                        super.insertString(fb, offset, limpiar(texto, permitido), attr);
+                    }
+                    @Override
+                    public void replace(FilterBypass fb, int offset, int largo, String texto, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
+                        super.replace(fb, offset, largo, limpiar(texto, permitido), attr);
+                    }
+                });
+        }
+
+        private static String limpiar(String texto, java.util.function.IntPredicate permitido){
+            if(texto==null) return null;
+            StringBuilder ret=new StringBuilder();
+            texto.codePoints().filter(permitido).forEach(ret::appendCodePoint);
+            return ret.toString();
         }
         
         public static void soloLetras(Component obj){
@@ -183,6 +207,7 @@ public class Utils {
                     }else
                         if (!Character.isLetter(c))
                             evt.consume(); } });
+            filtrarTexto(obj, c -> Character.isLetter(c) || (espacios && c == ' '));
         }
         
         public static boolean isEmpty(JFormattedTextField obj){
@@ -492,10 +517,15 @@ public class Utils {
         public static ImageIcon loadWeb(String imagen){
             ImageIcon retFoto=null;
             try {
-                HttpURLConnection conexion = (HttpURLConnection) (new URI(imagen).toURL()).openConnection();
-                conexion.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-                retFoto=new ImageIcon(ImageIO.read(conexion.getInputStream()));
-            } catch (IOException | URISyntaxException e) {  Logger.error("Error con load WWW Foto ...: {}", e.getMessage());  }
+                // Solo direcciones http/https: otros protocolos (file:, jar:) no abren una HttpURLConnection
+                if((new URI(imagen).toURL()).openConnection() instanceof HttpURLConnection conexion){
+                    conexion.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+                    Image tmpImagen=ImageIO.read(conexion.getInputStream());
+                    // ImageIO devuelve null si el contenido no es una imagen
+                    if(tmpImagen!=null) retFoto=new ImageIcon(tmpImagen);
+                    else Logger.error("Error con load WWW Foto ...: el contenido de {} no es una imagen", imagen);
+                }else Logger.error("Error con load WWW Foto ...: {} no es una direccion http/https", imagen);
+            } catch (IOException | URISyntaxException | IllegalArgumentException e) {  Logger.error("Error con load WWW Foto ...: {}", e.getMessage());  }
             return retFoto;
         }
         
@@ -555,11 +585,18 @@ public class Utils {
         
         
 
+        /// @return La extension del archivo (tomada solo de su nombre), o ".png" si no tiene
+        public static String extension(String path){
+            String ext=Disk.splitPath(path)[EXTFILE];
+            return ext.isEmpty()?".png":ext;
+        }
+
         public static void save(String path, String nombre){
+            // nombre es el nombre final del archivo (el que se guarda en la base); si no trae la extension
+            // del archivo de origen se le agrega
+            String ext=path.endsWith(Utils.OS.getSeparador())?"":extension(path);
             String Origen=path.endsWith(Utils.OS.getSeparador())?path.substring(0, path.length()-1):path,
-                   ext=!path.endsWith(Utils.OS.getSeparador())?path.substring(path.lastIndexOf(".")):"",
-                   Destino=cfg.pathImagen()+Utils.OS.getSeparador()+nombre+ext;
-                   if(Destino.contains(ext+ext)) Destino=Destino.substring(0, Destino.length()-ext.length());
+                   Destino=cfg.pathImagen()+Utils.OS.getSeparador()+(nombre.endsWith(ext)?nombre:nombre+ext);
             Disk.createFolder(cfg.pathImagen());
             try {
                 if(path.endsWith(cfg.IMAGE_USER) || path.startsWith("#@.")){
@@ -618,9 +655,9 @@ public class Utils {
      *                  [EXTFILE] o [2] contiene la extension
      */    
         public static String[] splitPath(String path){
-            int posS=path.lastIndexOf(File.separator), posE=path.lastIndexOf(".");
-            if(posS==-1) posS=path.length()-1;
-            if(posE==-1) posE=path.length();
+            int posS=Math.max(path.lastIndexOf('/'), path.lastIndexOf(File.separatorChar)), posE=path.lastIndexOf(".");
+            // Sin punto, o con el punto en una carpeta (p.ej. C:\Users\juan.perez\foto): no hay extension
+            if(posE<=posS) posE=path.length();
             String[] ret={path.substring(0, posS+1), path.substring(posS+1, posE), path.substring(posE)};
             return ret;
         }
@@ -669,7 +706,7 @@ public class Utils {
             Logger.debug(filtro);
             FileDialog tmpPath = new FileDialog((Frame) null, titulo, FileDialog.LOAD);
             if(isWin())
-                if(!filtro.contains("."))
+                if(!filtro.contains(".") || "*.*".equals(filtro))
                     tmpPath.setFile("*.*");
                 else
                     tmpPath.setFile("*"+filtro);
@@ -692,8 +729,7 @@ public class Utils {
             tmpPath.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             tmpPath.setAcceptAllFileFilterUsed(false);
             if(tmpPath.showOpenDialog(null)==JFileChooser.APPROVE_OPTION)
-                if(tmpPath!=null)
-                    retPath=(tmpPath.getSelectedFile()).getAbsolutePath();
+                retPath=(tmpPath.getSelectedFile()).getAbsolutePath();
             return retPath;
         }
 
@@ -802,8 +838,8 @@ public class Utils {
                 tmpLog.write("\n"+valor);
             else if("#".equals(clave))
                 tmpLog.write(clave+valor);
-            else
-                tmpLog.write(clave+" : "+valor);
+            else    // al agregar, la clave va en una linea nueva (igual que con "\n")
+                tmpLog.write((modo?"\n":"")+clave+" : "+valor);
             Logger.debug("Archivo CFG guardado en ..: {}",cfg.PATH_FILE);
         } catch (IOException e) {
             Logger.error(e.getMessage(),"Error al guardar CFG... ");

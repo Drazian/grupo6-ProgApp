@@ -9,6 +9,7 @@ import edu.edext.datatypes.DtInstituto;
 import jakarta.persistence.Persistence;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.datatypes.DtPrograma;
+import edu.edext.datatypes.DtInscripcionPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtCurso;
@@ -186,6 +187,8 @@ public class Controlador implements IControlador {
             Usuario nuevoUsuario;
             String tmpNombre=capitalizar(usuario.getNombre().trim()), tmpApellido=capitalizar(usuario.getApellido().trim());
             if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
+                if (usuario.getInstitutos() == null)
+                    throw new Exception("Debe indicar los institutos del docente.");
                 List<Instituto> institutos = new ArrayList<>();
                 for (String nombre : usuario.getInstitutos()) {
                     Instituto instituto = em.find(Instituto.class, nombre);
@@ -230,27 +233,30 @@ public class Controlador implements IControlador {
             em.close();
         }
     }
+    // Solo recibe nombre/apellido ya validados (no en blanco) y recortados: nunca vacios
     private static String capitalizar(String s){
-        return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
     @Override
     public DtUsuario obtenerUsuario(String nickname) {
         if (nickname == null) return null;
+        DtUsuario ret = null;
+        // Un solo return fuera del try: cada return dentro del try-with-resources agrega un cierre (y ramas) extra
         try (EntityManager em = emf.createEntityManager()) {
             Usuario aux = em.find(Usuario.class, nickname);
             if (aux == null)
                 aux = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
                         .setParameter("email", nickname).getResultStream().findFirst().orElse(null);
-            if (aux == null) return null;
             if (aux instanceof Docente) {
                 List<String> institutos = new ArrayList<>();
                 for (Instituto instituto : ((Docente) aux).getInstitutos()) institutos.add(instituto.getNombre());
-                return new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
+                ret = new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
                         aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), institutos, TipoUsuario.DOCENTE);
-            }
-            return new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
-                    aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
+            } else if (aux != null)
+                ret = new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
+                        aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
         }
+        return ret;
     }
     @Override
     public List<DtUsuario> listarUsuarios(){
@@ -940,6 +946,30 @@ public class Controlador implements IControlador {
     }
     
     @Override
+    public List<DtInscripcionPrograma> listarInscriptosPorPrograma(String nombrePrograma) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombrePrograma);
+            if (programa == null)
+                throw new Exception("No existe el programa '" + nombrePrograma + "'.");
+            List<DtInscripcionPrograma> resultado = new ArrayList<>();
+            List<InscripcionPrograma> inscripciones = em.createQuery(
+                    "SELECT ip FROM InscripcionPrograma ip WHERE ip.programa.nombre = :prog ORDER BY ip.fechaInscripcion, ip.estudiante.nickname",
+                    InscripcionPrograma.class)
+                    .setParameter("prog", nombrePrograma)
+                    .getResultList();
+            DtPrograma dtPrograma = new DtPrograma(programa.getNombre(), programa.getFechaRegistro(), programa.getFechaInicio(), programa.getFechaFin());
+            for (InscripcionPrograma ip : inscripciones) {
+                Estudiante e = ip.getEstudiante();
+                // Sin contraseña: el Dt es solo para mostrar el inscripto
+                DtUsuario estudiante = new DtUsuario(e.getNickname(), null, e.getEmail(), e.getNombre(), e.getApellido(),
+                        e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
+                resultado.add(new DtInscripcionPrograma(estudiante, dtPrograma, ip.getFechaInscripcion(), ip.getEstado()));
+            }
+            return resultado;
+        }
+    }
+
+    @Override
     public List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception {
         try (EntityManager em = emf.createEntityManager()) {
             List<DtPrograma> resultado = new ArrayList<>();
@@ -1126,9 +1156,13 @@ public class Controlador implements IControlador {
                 throw new Exception("El usuario '" + usuario.getNickname() + "' no existe.");
             }
 
-            usuarioModificado.setApellido(usuario.getApellido());
-            usuarioModificado.setNombre(usuario.getNombre());
-            usuarioModificado.setfNacimiento(usuario.getfNacimiento());
+            // Igual que modificarUsuario(DtUsuario): los datos nulos o en blanco no se modifican
+            if (usuario.getApellido() != null && !usuario.getApellido().isBlank())
+                usuarioModificado.setApellido(usuario.getApellido());
+            if (usuario.getNombre() != null && !usuario.getNombre().isBlank())
+                usuarioModificado.setNombre(usuario.getNombre());
+            if (usuario.getfNacimiento() != null)
+                usuarioModificado.setfNacimiento(usuario.getfNacimiento());
 
             if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
                 
@@ -1152,7 +1186,9 @@ public class Controlador implements IControlador {
                 usuarioModificado.setImagen(usuario.getImagen());
             }
 
-            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE && usuario.getInstitutos() != null) {
+            // Si el usuario no es Docente (aunque el Dt diga DOCENTE) los institutos se ignoran
+            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE && usuarioModificado instanceof Docente
+                    && usuario.getInstitutos() != null) {
                 List<Instituto> institutos = new ArrayList<>();
                 for (String aux : usuario.getInstitutos()) {
                     Instituto instituto = em.find(Instituto.class, aux);
@@ -1184,6 +1220,8 @@ public class Controlador implements IControlador {
 
     @Override 
     public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception {
+    // Datos invalidos: no se crea (false), igual que setCrearProgramaFormacion(DtPrograma)
+    if (programa == null) return false;
     String nombreImagen = programa.getImagen();
 
             if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {

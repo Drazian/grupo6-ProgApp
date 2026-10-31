@@ -1,6 +1,7 @@
 package edu.edext.logica;
 
 import edu.edext.datatypes.DtInscripcionEdicion;
+import edu.edext.datatypes.DtInscripcionPrograma;
 import edu.edext.datatypes.DtSessionUsuario;
 import edu.edext.datatypes.DtConsultaCurso;
 import edu.edext.datatypes.DtInstituto;
@@ -66,6 +67,7 @@ public interface IControlador {
     List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception;
     List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception;
     List<DtPrograma> listarProgramas() throws Exception;
+    List<DtInscripcionPrograma> listarInscriptosPorPrograma(String nombrePrograma) throws Exception;
 
 //***************************** Datos de Prueba ******************************//
     int cargarDatosDePrueba() throws Exception;
