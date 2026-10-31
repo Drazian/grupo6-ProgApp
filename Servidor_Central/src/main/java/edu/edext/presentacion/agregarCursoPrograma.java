@@ -219,7 +219,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                         aux.getDuracion(),
                         aux.getCantidadHoras(),
                         aux.getCreditos(),
-                        aux.getFechaRegistro(),
+                        Utils.Fecha.assignFormato(aux.getFechaRegistro()),  //  columna String: dd/MM/yyyy
                         aux.getUrl(),
                         strPrevias,
                         strCategorias
@@ -260,7 +260,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void lblProgramaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblProgramaMouseClicked
-        System.out.println("Dimensiones : "+this.getWidth()+", "+this.getHeight());
+        // Sin accion: el evento lo registra el .form (initComponents)
     }//GEN-LAST:event_lblProgramaMouseClicked
 
 

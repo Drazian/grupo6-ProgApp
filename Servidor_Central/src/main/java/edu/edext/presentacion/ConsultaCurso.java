@@ -12,7 +12,6 @@ import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
 import edu.edext.tools.jTable;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JOptionPane;
@@ -48,10 +47,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
     }
     
     private String concatena(Set<String> coleccion){
-        String tmp="";
-        for(String cat : coleccion) tmp+=cat+", ";
-        if(tmp.length()>3) tmp=tmp.substring(0, tmp.length()-2);
-        return tmp;
+        return String.join(", ", coleccion);
     }
     
     private void cargarInstitutos() {
@@ -574,8 +570,8 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
                 textoURL.setText(dt.getUrl());
                 lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(cfg.fullpathImagen()+dt.getImagen())));
                 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                textoFechaAlta.setText(sdf.format(dt.getFechaRegistro()));
+                // Sin fecha de registro el campo queda vacio (assignFormato devuelve null)
+                textoFechaAlta.setText(Utils.Fecha.assignFormato(dt.getFechaRegistro()));
 
                 //DefaultTableModel modelPrevias=(DefaultTableModel) tblCursos.getModel();
                 //DefaultTableCellRenderer CENTRO= new DefaultTableCellRenderer();

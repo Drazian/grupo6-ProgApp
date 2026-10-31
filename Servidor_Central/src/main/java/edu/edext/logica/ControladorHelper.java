@@ -1,8 +1,6 @@
 package edu.edext.logica;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
 
 /**
  *
@@ -10,8 +8,6 @@ import jakarta.persistence.EntityTransaction;
  */
 public class ControladorHelper {
     private final EntityManagerFactory DB;
-    private EntityManager db;
-    private EntityTransaction hiloTransaction;
     
     public ControladorHelper(EntityManagerFactory obj){ DB=obj; }
     
@@ -19,12 +15,7 @@ public class ControladorHelper {
 
 
     public void kill(){
-        finaly();
-    }
-    
-    private void finaly(){
-        if(db!=null && db.isOpen()) db.close();
-        db=null;
+        // Todavia no abre EntityManager propio: no hay nada que liberar
     }
     
 

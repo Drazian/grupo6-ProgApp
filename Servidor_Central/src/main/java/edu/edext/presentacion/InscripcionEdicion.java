@@ -8,6 +8,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import org.tinylog.Logger;
 
 /**
@@ -200,13 +201,14 @@ public class InscripcionEdicion extends javax.swing.JPanel {
     }//GEN-LAST:event_jLCursosValueChanged
 
     private void jLEdicionesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLEdicionesValueChanged
-        if(!evt.getValueIsAdjusting())
+        if(!evt.getValueIsAdjusting()){
             jPECandidatos.setVisible(false);
             jBEst_Cand.setVisible(false);
             if(jLEdiciones.getSelectedValue()!=null){
                 loadEstudiantes(jLEdiciones.getSelectedValue());
                 jBshowCandidatos.setVisible(true);
             }else jBshowCandidatos.setVisible(false);
+        }
     }//GEN-LAST:event_jLEdicionesValueChanged
 
     private void jLInscriptosValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jLInscriptosValueChanged
@@ -263,50 +265,82 @@ public class InscripcionEdicion extends javax.swing.JPanel {
     private void operacion(){
         ArrayList<String> lista, listaCan;
         DefaultListModel<String> modeloIns, modeloCan;
-        String nomEstudiante;
+        String nomEstudiante, nomEdicion=jLEdiciones.getSelectedValue();
+        int ret;
         if ("<<".equals(jBEst_Cand.getText())){
             nomEstudiante=jLCandidatos.getSelectedValue();
+            if(nomEstudiante==null){
+                JOptionPane.showMessageDialog(this, "Debe seleccionar el candidato a inscribir.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             try {
-                new InscripcionEdicionHelper().setInscripcion(nomEstudiante, jLEdiciones.getSelectedValue());
-                lista=new ArrayList<>();
-                modeloIns=new DefaultListModel<>();
-                for(int i = 0; i < jLInscriptos.getModel().getSize(); i++) lista.add(jLInscriptos.getModel().getElementAt(i));
-                lista.add(nomEstudiante); 
-                for(String elemento : lista) modeloIns.addElement(elemento);
-                jLInscriptos.setModel(modeloIns);
-                modeloCan=new DefaultListModel<>();
-                lista.clear();
-                for(int i = 0; i < jLCandidatos.getModel().getSize(); i++) lista.add(jLCandidatos.getModel().getElementAt(i));
-                lista.remove(nomEstudiante);
-                modeloCan=new DefaultListModel<>();
-                for(String elemento : lista) modeloCan.addElement(elemento);
-                jLCandidatos.setModel(modeloCan);
+                ret=new InscripcionEdicionHelper().setInscripcion(nomEstudiante, nomEdicion);
             } catch (Exception ex) {
                 Logger.error(ex);
+                ret=-1;
             }
+            // Las listas solo se actualizan si la inscripcion quedo registrada en la base
+            if(ret!=0){
+                JOptionPane.showMessageDialog(this, mensajeInscripcion(ret, nomEstudiante, nomEdicion), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            lista=new ArrayList<>();
+            modeloIns=new DefaultListModel<>();
+            for(int i = 0; i < jLInscriptos.getModel().getSize(); i++) lista.add(jLInscriptos.getModel().getElementAt(i));
+            lista.add(nomEstudiante);
+            for(String elemento : lista) modeloIns.addElement(elemento);
+            jLInscriptos.setModel(modeloIns);
+            modeloCan=new DefaultListModel<>();
+            lista.clear();
+            for(int i = 0; i < jLCandidatos.getModel().getSize(); i++) lista.add(jLCandidatos.getModel().getElementAt(i));
+            lista.remove(nomEstudiante);
+            modeloCan=new DefaultListModel<>();
+            for(String elemento : lista) modeloCan.addElement(elemento);
+            jLCandidatos.setModel(modeloCan);
         }else if (">>".equals(jBEst_Cand.getText())){
-          nomEstudiante=jLInscriptos.getSelectedValue();
+            nomEstudiante=jLInscriptos.getSelectedValue();
+            if(nomEstudiante==null){
+                JOptionPane.showMessageDialog(this, "Debe seleccionar el inscripto a dar de baja.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             try {
-                new InscripcionEdicionHelper().detInscripcion(nomEstudiante, jLEdiciones.getSelectedValue());
-                lista=new ArrayList<>();
-                modeloIns=new DefaultListModel<>();
-                for(int i = 0; i < jLCandidatos.getModel().getSize(); i++) lista.add(jLCandidatos.getModel().getElementAt(i));
-                lista.add(nomEstudiante); 
-                for(String elemento : lista) modeloIns.addElement(elemento);
-                jLCandidatos.setModel(modeloIns);
-                modeloCan=new DefaultListModel<>();
-                lista.clear();
-                for(int i = 0; i < jLInscriptos.getModel().getSize(); i++) lista.add(jLInscriptos.getModel().getElementAt(i));
-                lista.remove(nomEstudiante);
-                modeloCan=new DefaultListModel<>();
-                for(String elemento : lista) modeloCan.addElement(elemento);
-                jLInscriptos.setModel(modeloCan);
+                ret=new InscripcionEdicionHelper().detInscripcion(nomEstudiante, nomEdicion);
             } catch (Exception ex) {
                 Logger.error(ex);
+                ret=-1;
             }
+            // Las listas solo se actualizan si la baja quedo registrada en la base
+            if(ret!=0){
+                JOptionPane.showMessageDialog(this, "No se pudo cancelar la inscripción de " + nomEstudiante + " a la edición " + nomEdicion + ".", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            lista=new ArrayList<>();
+            modeloIns=new DefaultListModel<>();
+            for(int i = 0; i < jLCandidatos.getModel().getSize(); i++) lista.add(jLCandidatos.getModel().getElementAt(i));
+            lista.add(nomEstudiante);
+            for(String elemento : lista) modeloIns.addElement(elemento);
+            jLCandidatos.setModel(modeloIns);
+            modeloCan=new DefaultListModel<>();
+            lista.clear();
+            for(int i = 0; i < jLInscriptos.getModel().getSize(); i++) lista.add(jLInscriptos.getModel().getElementAt(i));
+            lista.remove(nomEstudiante);
+            modeloCan=new DefaultListModel<>();
+            for(String elemento : lista) modeloCan.addElement(elemento);
+            jLInscriptos.setModel(modeloCan);
         }
     }
-    
+
+    // Mensaje para los codigos de error de setInscripcion (ver logica.InscripcionEdicionHelper)
+    private String mensajeInscripcion(int codigo, String estudiante, String edicion){
+        switch(codigo){
+            case 1: return "No se encontró el estudiante " + estudiante + ".";
+            case 2: return "No se encontró la edición " + edicion + ".";
+            case 3: return "El estudiante " + estudiante + " ya está inscripto en la edición " + edicion + ".";
+            case 4: return "La edición " + edicion + " ya finalizó, no admite inscripciones.";
+            default: return "No se pudo inscribir al estudiante " + estudiante + " en la edición " + edicion + ".";
+        }
+    }
+
     private void conmutarBoton(JList Principal, JList Secundario, int memoria, JButton Boton){
         Object  tmpObj1 = Principal.getSelectedValue();
         String  principal = tmpObj1!=null?tmpObj1.toString():"",
@@ -370,8 +404,7 @@ public class InscripcionEdicion extends javax.swing.JPanel {
         jLInscriptos.setListData(ins.getEstudiantesInscriptos(nombre));
         jPEInscriptos.setVisible(true);
         jPEstudiantes.setVisible(true);
-        if(jPECandidatos.isVisible()) jBEst_Cand.setVisible(true);
-        else jBEst_Cand.setVisible(false);
+        // los candidatos y el boton de conmutar ya los oculto jLEdicionesValueChanged (unico llamador)
         //jPECandidatos.setVisible(true);
         ins=null;
     }

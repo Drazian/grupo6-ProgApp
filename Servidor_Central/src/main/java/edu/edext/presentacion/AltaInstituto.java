@@ -14,9 +14,18 @@ public class AltaInstituto extends javax.swing.JPanel {
     private final Mouse mouse=new Mouse();
     public AltaInstituto() {
         initComponents();
+        // Actualizar y Eliminar solo se habilitan con un instituto seleccionado en la tabla
+        tbl.getSelectionModel().addListSelectionListener(e -> habilitarBotones());
         cargarTabla();
     }
-    
+
+    private void habilitarBotones(){
+        int fila = tbl.getSelectedRow();
+        boolean seleccionado = fila != -1 && tbl.getValueAt(fila, 0) != null;
+        btnActualizar.setEnabled(seleccionado);
+        btnEliminar.setEnabled(seleccionado);
+    }
+
     
     /**
      * This method is called from within the constructor to initialize the form.

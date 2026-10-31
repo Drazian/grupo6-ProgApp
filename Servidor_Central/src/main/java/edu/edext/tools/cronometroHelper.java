@@ -54,11 +54,11 @@ public class cronometroHelper {
                 cronoTimer.start();
             }else{
                 if(!cronoError.isEmpty() && cronoError.contains(alert)) cronoError.remove(cronoError.indexOf(alert));
-                if(!cronoError.isEmpty()) message.setText(cronoError.getLast());
+                if(!cronoError.isEmpty() && message!=null) message.setText(cronoError.getLast());
                 if(cronoError.isEmpty()){
                     cronoTimer.stop();
                     if(message!=null) message.setText("");
-                    if(obj!=null) obj.setVisible(false);
+                    obj.setVisible(false);
                 }
             }
         }else kill();

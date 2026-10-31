@@ -22,6 +22,11 @@ public class AltaCurso extends javax.swing.JInternalFrame {
 
     public AltaCurso() {
         initComponents();
+        // Los listeners y el formato se registran una sola vez (newCurso no debe repetirlos)
+        Utils.GUI.soloNumeros(textoCantidadHoras);
+        Utils.GUI.assignFormato(textoFechaAlta);
+        Utils.GUI.soloNumeros(textoCreditos);
+        Utils.GUI.soloNumeros(textoDuracion);
         cargarDatosIniciales();
     }
     
@@ -294,10 +299,6 @@ public class AltaCurso extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnAgregarImagenActionPerformed
 
     private void cargarDatosIniciales() {
-        Utils.GUI.soloNumeros(textoCantidadHoras);
-        Utils.GUI.assignFormato(textoFechaAlta);
-        Utils.GUI.soloNumeros(textoCreditos);
-        Utils.GUI.soloNumeros(textoDuracion);
         refreshInstitutos();
         buttonGuardar.setEnabled(institutoSeleccion.getSelectedIndex() >= 0);
         refreshCategorias();
@@ -365,7 +366,7 @@ public class AltaCurso extends javax.swing.JInternalFrame {
         textoCantidadHoras.setText("");
         textoCreditos.setText("");
         textoDuracion.setText("");
-        textoFechaAlta.setText("");
+        textoFechaAlta.setValue(null);  //  vacia tambien el valor confirmado (si no, al perder el foco vuelve la fecha anterior)
         textoURL.setText("");
         lblImagen.setIcon(null);
         imagen=null;
@@ -419,9 +420,9 @@ public class AltaCurso extends javax.swing.JInternalFrame {
                 return;
         String nombreImagen = cfg.IMAGE_USER;
         if (imagen != null) {
-            int dot = imagen.getName().lastIndexOf(".");
-            String ext = dot >= 0 ? imagen.getName().substring(dot) : ".png";
-            nombreImagen = "Curso." + nombre + ext;
+            // Misma extension que usa Utils.Imagen.save: la del nombre del archivo, o .png si no tiene
+            String ext = Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
+            nombreImagen = "Curso." + nombre + (ext.isEmpty() ? ".png" : ext);
         }
         DtCurso dt = new DtCurso(nombre, descripcion, duracion+" "+(String)jCUnitDuracion.getSelectedItem(), 
                     Utils.Cast.valueof(horas), Utils.Cast.valueof(creditos), url, Utils.Cast.valudf(fecha), 
@@ -429,16 +430,23 @@ public class AltaCurso extends javax.swing.JInternalFrame {
                     nombreImagen);
         try {
             control.altaCurso(dt, instSeleccionado);
-            if (imagen != null) {
-                Utils.Imagen.save(imagen.getAbsolutePath(), "Curso." + nombre);
-            }
-            Logger.info("El curso '" + nombre + "' fue creado exitosamente.");
-            JOptionPane.showMessageDialog(this, "El curso '" + nombre + "' fue creado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            newCurso();
         } catch (Exception ex) {
             Logger.error(ex.getMessage(), "Error al crear curso : {}", nombre);
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error en el Sistema", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+        // El curso ya esta creado: un fallo al copiar la imagen se avisa, pero no es un error del alta
+        if (imagen != null)
+            try {
+                // Con el nombre completo (con extension) el archivo queda igual al nombre guardado en la base
+                Utils.Imagen.save(imagen.getAbsolutePath(), nombreImagen);
+            } catch (Exception ex) {
+                Logger.error(ex.getMessage(), "Error al guardar la imagen del curso : {}", nombre);
+                alert("El curso '" + nombre + "' fue creado, pero no se pudo guardar la imagen : " + ex.getMessage());
+            }
+        Logger.info("El curso '" + nombre + "' fue creado exitosamente.");
+        JOptionPane.showMessageDialog(this, "El curso '" + nombre + "' fue creado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        newCurso();
     }
     
    private int confirm(String mensaje){

@@ -8,18 +8,14 @@ import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
-import java.awt.Image;
 import java.io.File;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;//para que no de error al cargar el formulario la imagen generica por el ancho
-import javax.swing.filechooser.FileNameExtensionFilter;
 import org.tinylog.Logger;
 
 
@@ -324,7 +320,6 @@ public class AltaUsuario extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     //Mostrar Institutos solo si el nuevo usuario es docente
     private void chbDocenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chbDocenteActionPerformed
-        //mostrarInstitutos(chbDocente.isSelected());
         if(chbDocente.isSelected())
             formResize(FORMGRANDE);
         else
@@ -354,7 +349,6 @@ public class AltaUsuario extends javax.swing.JPanel {
                             Utils.Imagen.loadSO(
                                     imagenSeleccionada.getAbsolutePath())));
         }
-        //loadImagen();
     }//GEN-LAST:event_btnAgregarImagenActionPerformed
 
     private void btnAgregarInstitutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarInstitutoActionPerformed
@@ -442,50 +436,8 @@ public class AltaUsuario extends javax.swing.JPanel {
             jPBotones.setVisible(true);
         }
         if(this.modoForm==0) Utils.GUI.reSizePadre(this, widthForm, heightForm[modo]);
-    }  
-    
-    private void loadImagen(){
-        JFileChooser selector = new JFileChooser();
-        
-    
-        FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imágenes (PNG, JPG)","png", "jpg");
-        selector.setFileFilter(filtro);
-        int ancho = 124;
-        int alto = 116;
-        int resultado = selector.showOpenDialog(this);
+    }
 
-        if (resultado == JFileChooser.APPROVE_OPTION) {
-
-            imagenSeleccionada = selector.getSelectedFile();
-
-            ImageIcon icono = new ImageIcon(imagenSeleccionada.getAbsolutePath());
-
-            Image imagen = icono.getImage();
-
-            Image imagenEscalada = imagen.getScaledInstance(
-                lblImagen.getWidth(),
-                lblImagen.getHeight(),
-                Image.SCALE_SMOOTH
-            );
-
-            lblImagen.setIcon(new ImageIcon(imagenEscalada));
-            
-                // Mantener el tamaño del JLabel
-            lblImagen.setPreferredSize(
-                    new java.awt.Dimension(ancho, alto)
-            );
-            lblImagen.setMinimumSize(
-                    new java.awt.Dimension(ancho, alto)
-            );
-            lblImagen.setMaximumSize(
-                    new java.awt.Dimension(ancho, alto)
-            );
-
-            revalidate();
-            repaint();
-        }
-    }        
-    
     public void limpiarCampos() {
         txtNickname.setText("");
         txtPassword.setText("");
@@ -503,15 +455,8 @@ public class AltaUsuario extends javax.swing.JPanel {
         
         ((DefaultListModel<String>) lisInstitutos.getModel()).clear();
         imagenSeleccionada = new File (cfg.pathImagen()+Utils.OS.getSeparador()+cfg.IMAGE_USER);
-        mostrarInstitutos(false);
+        formResize(FORMCHICO);
         cargarImagen(cfg.IMAGE_USER);
-    }
-    
-    private void mostrarInstitutos(boolean mostrar) {
-        if(mostrar)
-            formResize(FORMGRANDE);
-        else
-            formResize(FORMCHICO);
     }
 
     public void cargarFormulario (DtUsuario usuario){
@@ -614,9 +559,9 @@ public class AltaUsuario extends javax.swing.JPanel {
     }
         
     private void cancelar(){
-        javax.swing.JInternalFrame frame = 
+        javax.swing.JInternalFrame frame =
         (javax.swing.JInternalFrame) javax.swing.SwingUtilities.getAncestorOfClass(javax.swing.JInternalFrame.class, this);
-        frame.dispose();       
+        if(frame!=null) frame.dispose();
     }
     
     private void alertMessage(String mensaje, String titulo){
@@ -643,7 +588,7 @@ public class AltaUsuario extends javax.swing.JPanel {
         if(Utils.Validate.isEmpty(nombre) || Utils.Validate.isEmpty(apellido)){
             alertMessage("Debe ingresar "+(nombre.isBlank()?"nombre":"apellido")+" ", "Error");
             if(Utils.Validate.isEmpty(nombre)) txtNombre.requestFocus();
-            else if(Utils.Validate.isEmpty(apellido)) txtApellido.requestFocus();
+            else txtApellido.requestFocus();
             return; }
         if(!Utils.Validate.isEmail(email)){
                 alertMessage("El email ingresado no es válido.", "Error");
@@ -683,20 +628,20 @@ public class AltaUsuario extends javax.swing.JPanel {
         }
 
         try {
-            Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nickname);
             DtUsuario dtUsuario = new DtUsuario(
                 nickname,
                 getContraseña(password),
-                email==null||email.isBlank()?"":email,
+                email,
                 nombre,
                 apellido,
-                imagenSeleccionada==null?cfg.IMAGE_USER:nickname+imagenSeleccionada.getName()
-                        .substring(imagenSeleccionada.getName().lastIndexOf(".")),
+                nombreImagen(nickname),
                 nacimiento,
                 institutos,
                 tipo
             );
             ic.crearUsuario(dtUsuario);
+            // La imagen se copia solo si el usuario se creo: si falla no queda una imagen huerfana
+            Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nombreImagen(nickname));
             Logger.info("Usuario {} con mombre {} {} creado correctamente.", nickname, nombre, apellido);
             JOptionPane.showMessageDialog(this,"Usuario creado correctamente.","Alta de usuario",JOptionPane.INFORMATION_MESSAGE);
             limpiarCampos();
@@ -712,7 +657,12 @@ public class AltaUsuario extends javax.swing.JPanel {
         //return Utils.Crypt.cifrarAES(password);
     }
     //************************************************************************//
-    
+
+    // Nombre de la imagen del usuario: nickname + extension del archivo elegido, .png si no tiene (igual que Utils.Imagen.save)
+    private String nombreImagen(String nickname){
+        return nickname+Utils.Imagen.extension(imagenSeleccionada.getName());
+    }
+
     private void guardarCambios(){
         IControlador ic = Fabrica.getInstance().getIControlador();
         String nickname = txtNickname.getText().trim();
@@ -762,7 +712,7 @@ public class AltaUsuario extends javax.swing.JPanel {
         if(Utils.Validate.isEmpty(nombre) || Utils.Validate.isEmpty(apellido)){
             alertMessage("Debe ingresar "+(nombre.isBlank()?"nombre":"apellido")+" ", "Error");
             if(Utils.Validate.isEmpty(nombre)) txtNombre.requestFocus();
-            else if(Utils.Validate.isEmpty(apellido)) txtApellido.requestFocus();
+            else txtApellido.requestFocus();
             return; }
         if(!Utils.Validate.isEmail(email)){
                 alertMessage("El email ingresado no es válido.", "Error");
@@ -807,13 +757,7 @@ public class AltaUsuario extends javax.swing.JPanel {
         }
 
         try {
-            String nombreImagenFinal = cfg.IMAGE_USER;
-            if (imagenSeleccionada != null) {
-                Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nickname);
-                int dot = imagenSeleccionada.getName().lastIndexOf(".");
-                String ext = dot >= 0 ? imagenSeleccionada.getName().substring(dot) : ".png";
-                nombreImagenFinal = nickname + ext;
-            }
+            String nombreImagenFinal = imagenSeleccionada != null ? nombreImagen(nickname) : cfg.IMAGE_USER;
             DtUsuario usuarioModificado = new DtUsuario(
                 nickname,
                 null,
@@ -829,6 +773,9 @@ public class AltaUsuario extends javax.swing.JPanel {
             //IControlador ic = Fabrica.getInstance().getIControlador();
 
             ic.modificarUsuario(usuarioModificado);
+            // La imagen se copia solo si se modifico el usuario: si falla no queda una imagen huerfana
+            if (imagenSeleccionada != null)
+                Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nombreImagen(nickname));
 
             JOptionPane.showMessageDialog(
                 this,

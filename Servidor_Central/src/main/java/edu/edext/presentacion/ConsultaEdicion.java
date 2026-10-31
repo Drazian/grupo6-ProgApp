@@ -4,7 +4,6 @@ import edu.edext.tools.ConsultaEdicionHelper;
 import javax.swing.DefaultComboBoxModel;
 import edu.edext.tools.Utils;
 import edu.edext.tools.cfg;
-import java.awt.HeadlessException;
 import javax.swing.JOptionPane;
 import org.tinylog.Logger;
 
@@ -299,11 +298,10 @@ public class ConsultaEdicion extends javax.swing.JPanel {
 
     private void loadData(){
         ConsultaEdicionHelper ceh=new ConsultaEdicionHelper();
-        String cupo, edicion=jLEdiciones.getSelectedValue();
+        String edicion=jLEdiciones.getSelectedValue();
         if(ceh.getData(edicion)){
             jTnombre.setText(ceh.getNombre());
-            cupo=Utils.Cast.valueOf(ceh.getCupo());
-            jTcupo.setText(!"-1".equals(cupo)?cupo:"Sin cupo");
+            jTcupo.setText(textoCupo(ceh.getCupo()));
             jTFechaInicio.setText(Utils.Fecha.assignFormato(ceh.getFechaInicio()));
             jTFechaFin.setText(Utils.Fecha.assignFormato(ceh.getFechaFin()));
             jTffechaPublicacion.setText(Utils.Fecha.assignFormato(ceh.getFechaPublicacion()));
@@ -311,13 +309,15 @@ public class ConsultaEdicion extends javax.swing.JPanel {
             jLdocentes.setListData(ceh.getDocentes().toArray(String[]::new));
             //jTdocentej.setText(ceh.));
             if(!Utils.Validate.isEmpty(ceh.getImagen())){
-                System.out.println("Entre con"+cfg.fullpathImagen()+ceh.getImagen());
-                
                 lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(cfg.fullpathImagen()+ceh.getImagen())));
             }
             jLInscriptos.setListData(ceh.getListaInscriptos(edicion));
             jPData.setVisible(true);
         }
+    }
+    // Igual que en ConsultaCurso y en la logica: cupo nulo o no positivo = sin limite
+    private String textoCupo(Integer cupo){
+        return cupo!=null && cupo>0?Utils.Cast.valueOf(cupo):"Sin cupo";
     }
     private void refreschCombo(){
         ConsultaEdicionHelper tmpSet=new ConsultaEdicionHelper();
@@ -343,44 +343,35 @@ public class ConsultaEdicion extends javax.swing.JPanel {
     
     //**/******************** Revisar contribucion de Diego*********************
      public void cargarEdicion(String nombreEdicion) {
-        try {
-            ConsultaEdicionHelper ceh = new ConsultaEdicionHelper();
+        // Como en loadData, ConsultaEdicionHelper ya atrapa los errores de la logica (getData devuelve false)
+        ConsultaEdicionHelper ceh = new ConsultaEdicionHelper();
 
-            if (ceh.getData(nombreEdicion)) {
+        if (ceh.getData(nombreEdicion)) {
 
-                jTnombre.setText(ceh.getNombre());
-                jTcupo.setText(Utils.Cast.valueOf(ceh.getCupo()));
-                jTFechaInicio.setText(Utils.Fecha.assignFormato(ceh.getFechaInicio()));
-                jTFechaFin.setText(Utils.Fecha.assignFormato(ceh.getFechaFin()));
-                jTffechaPublicacion.setText(
-                        Utils.Fecha.assignFormato(ceh.getFechaPublicacion())
-                );
-                jTcurso.setText(ceh.getCurso());
+            jTnombre.setText(ceh.getNombre());
+            jTcupo.setText(textoCupo(ceh.getCupo()));
+            jTFechaInicio.setText(Utils.Fecha.assignFormato(ceh.getFechaInicio()));
+            jTFechaFin.setText(Utils.Fecha.assignFormato(ceh.getFechaFin()));
+            jTffechaPublicacion.setText(
+                    Utils.Fecha.assignFormato(ceh.getFechaPublicacion())
+            );
+            jTcurso.setText(ceh.getCurso());
 
-                jLdocentes.setListData(
-                        ceh.getDocentes().toArray(String[]::new)
-                );
+            jLdocentes.setListData(
+                    ceh.getDocentes().toArray(String[]::new)
+            );
 
-                // Mostrar los datos de la edición
-                jPData.setVisible(true);
+            // Mostrar los datos de la edición
+            jPData.setVisible(true);
 
-                // Ocultar las listas de navegación
-                jPCursos.setVisible(false);
-                jPEdiciones.setVisible(false);
+            // Ocultar las listas de navegación
+            jPCursos.setVisible(false);
+            jPEdiciones.setVisible(false);
 
-            } else {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "No se encontró la edición: " + nombreEdicion,
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            }
-
-        } catch (HeadlessException e) {
+        } else {
             JOptionPane.showMessageDialog(
                     this,
-                    "Error al cargar la edición: " + e.getMessage(),
+                    "No se encontró la edición: " + nombreEdicion,
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );

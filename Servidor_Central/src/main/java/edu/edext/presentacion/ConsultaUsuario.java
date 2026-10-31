@@ -10,6 +10,7 @@ import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -28,8 +29,8 @@ public class ConsultaUsuario extends javax.swing.JPanel {
      */
     private AltaUsuario formularioUsuario;
     private List<DtUsuario> usuarios;
-    private String selected=null;
-    
+    private String selected=null;   // nickname del usuario seleccionado
+
     public ConsultaUsuario() {
         initComponents();
         crearFormulario();
@@ -65,18 +66,25 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         try{
             IControlador ic = Fabrica.getInstance().getIControlador();
 
-            usuarios = ic.listarUsuarios();
+            List<DtUsuario> lista = ic.listarUsuarios();
+
+            // Si la lista no cambio no se reconstruye: se mantiene la seleccion sin recargar el usuario
+            if (usuarios != null && claves(usuarios).equals(claves(lista))) return;
+
+            usuarios = lista;
 
             DefaultListModel<String> model = new DefaultListModel<>();
+            int indice = -1;
 
             for (DtUsuario aux: usuarios){
-                //model.addElement(aux.getNickname());
+                // La seleccion se recupera por nickname (puede haber usuarios con el mismo nombre y apellido)
+                if (aux.getNickname().equals(selected)) indice = model.getSize();
                 model.addElement(aux.getNombre()+" "+aux.getApellido());
             }
 
             lisUsuario.setModel(model);
-            lisUsuario.setSelectedValue(selected, true);
-            
+            if (indice != -1) lisUsuario.setSelectedIndex(indice);
+
 
         } catch (Exception e){
             JOptionPane.showMessageDialog(
@@ -86,6 +94,13 @@ public class ConsultaUsuario extends javax.swing.JPanel {
                 JOptionPane.ERROR_MESSAGE
             );
         }
+    }
+
+    // Lo que muestra la lista de cada usuario (nickname y nombre completo) para detectar cambios
+    private static List<String> claves(List<DtUsuario> lista){
+        List<String> ret = new ArrayList<>();
+        for (DtUsuario aux: lista) ret.add(aux.getNickname()+" "+aux.getNombre()+" "+aux.getApellido());
+        return ret;
     }
 
     /**
@@ -278,10 +293,9 @@ public class ConsultaUsuario extends javax.swing.JPanel {
                 int indice = lisUsuario.getSelectedIndex();
                 crearFormulario();
                 if (indice != -1) {
-                    selected=lisUsuario.getSelectedValue();
-                    
                     DtUsuario usuario = usuarios.get(indice);
-                     
+                    selected=usuario.getNickname();
+
                     formularioUsuario.cargarFormulario(usuario);
                     
                     configurarPestanas(usuario);
@@ -296,7 +310,8 @@ public class ConsultaUsuario extends javax.swing.JPanel {
 
         int fila = tblCursos.getSelectedRow();
 
-        if (fila != -1) {
+        // Las filas vacias (tabla sin cargar) no abren nada
+        if (fila != -1 && tblCursos.getValueAt(fila, 0) != null) {
 
             String nombreCurso = tblCursos.getValueAt(fila, 0).toString();
 
@@ -325,7 +340,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
     private void tblEdicionDeCursosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEdicionDeCursosMouseClicked
         int fila = tblEdicionDeCursos.getSelectedRow();
 
-        if (fila != -1) {
+        if (fila != -1 && tblEdicionDeCursos.getValueAt(fila, 0) != null) {
 
             String nombreEdicion =
                     tblEdicionDeCursos.getValueAt(fila, 0).toString();
@@ -367,7 +382,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
     private void tblProgramasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProgramasMouseClicked
             int fila = tblProgramas.getSelectedRow();
 
-        if (fila != -1) {
+        if (fila != -1 && tblProgramas.getValueAt(fila, 0) != null) {
             String nombrePrograma = tblProgramas.getValueAt(fila, 0).toString();
 
             ConsultaPrograma ventana = new ConsultaPrograma();
@@ -407,7 +422,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
     }//GEN-LAST:event_lisUsuarioFocusGained
 
     private void lisUsuarioFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_lisUsuarioFocusLost
-        listarUsuarios();
+        // Perder el foco no cambia los usuarios: no se recarga la lista
     }//GEN-LAST:event_lisUsuarioFocusLost
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
@@ -420,7 +435,6 @@ public class ConsultaUsuario extends javax.swing.JPanel {
 
     private void resizeTab(){
         tbCursosYProgramas.setSize(this.getWidth(), this.getHeight()-tbCursosYProgramas.getY());
-        System.out.println("X : "+tbCursosYProgramas.getSize());
         Dimension size=tbCursosYProgramas.getSize();//new Dimension(623, 185);
         tblCursos.setSize(size);
         tblCursos.setPreferredSize(size);
@@ -446,13 +460,9 @@ public class ConsultaUsuario extends javax.swing.JPanel {
             tbCursosYProgramas.addTab("Programas", panProgramas);
         }
 
-        // Si es estudiante, quito la pestaña de Cursos
+        // Si es estudiante, quito la pestaña de Cursos (siempre esta: se agrega arriba)
         if (usuario.getTipoUsuario() == TipoUsuario.ESTUDIANTE) {
-            int indiceCursos = tbCursosYProgramas.indexOfComponent(panCursos);
-
-            if (indiceCursos != -1) {
-                tbCursosYProgramas.removeTabAt(indiceCursos);
-            }
+            tbCursosYProgramas.removeTabAt(tbCursosYProgramas.indexOfComponent(panCursos));
         }
     }
     
@@ -526,6 +536,9 @@ public class ConsultaUsuario extends javax.swing.JPanel {
                 List<DtCurso> cursos = ic.listarCursosPorUsuario(nickname);
 
                 cargarCursos(cursos);
+            } else {
+                // Un estudiante no tiene cursos: no se conservan los del docente anterior
+                cargarCursos(List.of());
             }
 
             // Cargar ediciones

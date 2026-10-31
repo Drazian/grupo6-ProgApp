@@ -240,7 +240,11 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
             
             Integer cupo = null;
             if (!textoCupos.getText().trim().isEmpty()) {
-                cupo = Integer.valueOf(textoCupos.getText().trim());
+                // soloNumeros ya filtra lo que se escribe o pega; se valida igual por numeros fuera de rango
+                cupo = Utils.Cast.valuOf(textoCupos.getText().trim());
+                if (cupo == null) {
+                    throw new Exception("El cupo debe ser un número entero válido.");
+                }
                 if (cupo < 0) {
                     throw new Exception("El cupo no puede ser negativo.");
                 }
@@ -249,8 +253,7 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
             String nombre = textoNombreEdicion.getText().trim();
             String image = cfg.IMAGE_USER;
             if (imagen != null) {
-                String ext = Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
-                image = "Edicion." + nombre + ext;
+                image = "Edicion." + nombre + Utils.Imagen.extension(imagen.getAbsolutePath());
             }
             
             // Capturar la lista de docentes seleccionados (con Ctrl+Clic)
@@ -271,7 +274,7 @@ public class AltaEdicion extends javax.swing.JInternalFrame {
             
             control.altaEdicionCurso(cursoSeleccionado, dt);
             if (imagen != null) {
-                Utils.Imagen.save(imagen.getAbsolutePath(), "Edicion." + nombre);
+                Utils.Imagen.save(imagen.getAbsolutePath(), image);
             }
             
             JOptionPane.showMessageDialog(this, "Edición registrada exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);

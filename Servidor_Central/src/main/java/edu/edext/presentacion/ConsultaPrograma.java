@@ -2,6 +2,8 @@ package edu.edext.presentacion;
 
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtCurso;
+import edu.edext.datatypes.DtInscripcionPrograma;
+import edu.edext.datatypes.DtUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
@@ -22,6 +24,14 @@ public class ConsultaPrograma extends javax.swing.JPanel {
      */
     public ConsultaPrograma() {
         initComponents();
+        txtCategorias.setEditable(false);
+        // Inscriptos del programa (se cargan en cargarInscriptos)
+        tblInscriptos.setModel(new DefaultTableModel(new Object[][]{}, new String[]{"Estudiante", "Fecha de Inscripcion", "Estado"}) {
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return false;
+            }
+        });
         cargarProgramas();
         cargarCursos();
     }
@@ -278,7 +288,8 @@ public class ConsultaPrograma extends javax.swing.JPanel {
             txtInicio.setText(Utils.Fecha.assignFormato(aux.getFechaInicio()));
             txtFin.setText(Utils.Fecha.assignFormato(aux.getFechaFin()));
             cargarCursos();
-            
+            cargarInscriptos(ic, programa);
+
             //Para cargar categorias
             Set<String> categorias = aux.getCategorias();
             String categoriasStr = (categorias != null && !categorias.isEmpty())
@@ -298,6 +309,16 @@ public class ConsultaPrograma extends javax.swing.JPanel {
         }
         
     }//GEN-LAST:event_cbProgramaActionPerformed
+
+    private void cargarInscriptos(IControlador ic, String programa) throws Exception {
+        DefaultTableModel model = (DefaultTableModel) tblInscriptos.getModel();
+        model.setRowCount(0);
+        for (DtInscripcionPrograma ins : ic.listarInscriptosPorPrograma(programa)) {
+            DtUsuario est = ins.getEstudiante();
+            model.addRow(new Object[]{est.getNickname() + " (" + est.getNombre() + " " + est.getApellido() + ")",
+                    Utils.Fecha.assignFormato(ins.getFechaInscripcion()), ins.getEstado()});
+        }
+    }
   
         private void cargarProgramas(){
         //TODO: cargar lista de nombres de programas.
@@ -335,24 +356,14 @@ public class ConsultaPrograma extends javax.swing.JPanel {
             DefaultTableModel model = (DefaultTableModel) tblCursos.getModel();
             model.setRowCount(0);
             for (DtCurso aux: lista){
-                String strPrevias = (aux.getPrevias_toArray() != null && !aux.getPrevias_toArray().isEmpty()) 
-                                        ? String.join(", ", aux.getPrevias_toArray()) 
-                                        : "---";
-                
-                String strCategorias = (aux.getCategorias_toArray() != null && !aux.getCategorias_toArray().isEmpty()) 
-                                        ? String.join(", ", aux.getCategorias_toArray()) 
-                                        : "---";
-                
+                // Una fila por curso con las 6 columnas de la tabla
                 model.addRow(new Object[]{
                         aux.getNombre(),
                         aux.getDescripcion(),
                         aux.getDuracion(),
                         aux.getCantidadHoras(),
                         aux.getCreditos(),
-                        aux.getFechaRegistro(),
-                        aux.getUrl(),
-                        strPrevias,
-                        strCategorias
+                        Utils.Fecha.assignFormato(aux.getFechaRegistro())
                     });   
             }
 
@@ -380,20 +391,10 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                 return;
             }
 
-            // Cargar el nombre en el combo
+            // Cargar el nombre en el combo: al quedar seleccionado (unico item), cbProgramaActionPerformed
+            // muestra los datos, cursos, categorias e imagen (fechas en dd/MM/yyyy; una fecha null queda vacia)
             cbPrograma.removeAllItems();
             cbPrograma.addItem(nombrePrograma);
-            cbPrograma.setSelectedIndex(0);
-
-            // Cargar los datos
-            txtNombre.setText(programa.getNombre());
-            txaDescripcion.setText(programa.getDescripcion());
-            txtRegistro.setText(programa.getFechaRegistro().toString());
-            txtInicio.setText(programa.getFechaInicio().toString());
-            txtFin.setText(programa.getFechaFin().toString());
-
-            // Cargar los cursos del programa
-            cargarCursos();
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(

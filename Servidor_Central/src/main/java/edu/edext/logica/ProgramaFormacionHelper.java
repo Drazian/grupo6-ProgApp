@@ -75,13 +75,13 @@ public class ProgramaFormacionHelper{
     }
     
     private boolean validateData(DtPrograma DTO){
-        boolean flag=true, flag2=true;
+        boolean flag=true;
         if(isExist(DTO.getNombre())) flag=false;
         if(flag) if(DTO.getFechaRegistro()==null) flag=false;
         if(flag) if(DTO.getFechaInicio()==null) flag=false;
         if(flag) if(DTO.getFechaFin()==null) flag=false;
-        if(flag && flag2) if(DTO.getFechaInicio().isAfter(DTO.getFechaFin())) flag=false;
-        return flag && flag2;
+        if(flag) if(DTO.getFechaInicio().isAfter(DTO.getFechaFin())) flag=false;
+        return flag;
     }
     
     private boolean isExist(String tmpNombre){

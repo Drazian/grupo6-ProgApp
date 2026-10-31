@@ -42,6 +42,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         jLista.setListData(Values.getList());
         Utils.GUI.setDisable(jLista);
         reloj.kill();
+        refresh();  //  "Crear" arranca deshabilitado hasta que los datos sean validos
     }
 
     /**
@@ -296,6 +297,12 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         jFfechaFin.setText("");
         jFfechaPublic.setText("");
         jTAdescripcion.setText("");
+        // Los calendarios se usan al validar el orden de las fechas: no deben quedar las del programa anterior
+        jDfechaInicio.setDate(null);
+        jDfechaFin.setDate(null);
+        jDfechaPublic.setDate(null);
+        imagen=null;
+        lblImagen.setIcon(null);
         fechaRegistro=fechaInicio=fechaFin=null;
         descripcion=nombre=null;
         jBCreate.setEnabled(false);
@@ -418,19 +425,25 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         if(tmp==0){
             String image = cfg.IMAGE_USER;
             if (imagen != null) {
-                image = "Programa." + nombre + Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
-                Utils.Imagen.save(imagen.getAbsolutePath(), image);
+                // Misma extension que usa Utils.Imagen.save: la del nombre del archivo, o .png si no tiene
+                String ext = Utils.Disk.splitPath(imagen.getAbsolutePath())[Utils.EXTFILE];
+                image = "Programa." + nombre + (ext.isEmpty() ? ".png" : ext);
             }
             try {
                 flag=Values.setData(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, image);
-                message=jTnombre.getText();
-                resize(FORMCHICO);
+                if(!flag)
+                    showMessageDialog(this, "No se pudo crear el Programa de Formacion '" + nombre
+                            + "'. Verifique que el nombre no exista y que las fechas sean correctas.", "Error", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                showMessageDialog(this, "Nombre Existente");
+                showMessageDialog(this, "Error al crear el Programa de Formacion : " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
             if(flag){
+                // La imagen se copia solo si el programa se creo (si no, quedaria un archivo huerfano)
+                if (imagen != null) guardarImagen(image);
+                message=jTnombre.getText();
                 Values.getLista().add(message); //  debug
                 jLista.setListData(Values.getList()); //   debug
+                resize(FORMCHICO);
             }
             
         }
@@ -485,7 +498,18 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         if(fechaInicio!=null) flag=true;
         if(fechaFin!=null) flag=true;
         if(fechaRegistro!=null) flag=true;
+        if(imagen!=null) flag=true;
         return flag;
+    }
+
+    // El programa ya esta creado: un fallo al copiar la imagen se avisa, pero no es un error de la creacion
+    private void guardarImagen(String nombreImagen){
+        try {
+            // Con el nombre completo (con extension) el archivo queda igual al nombre guardado en la base
+            Utils.Imagen.save(imagen.getAbsolutePath(), nombreImagen);
+        } catch (Exception ex) {
+            showMessageDialog(this, "El programa se creo, pero no se pudo guardar la imagen : " + ex.getMessage(), "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }
     }
     
     private void jTnombre(){
@@ -511,11 +535,8 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         boolean flag=true;
         if(fecha1!=null){
             if(fecha2!=null)
-                if(modo==IZQ_DER){
-                    flag=Utils.Fecha.isCoherente(fecha1, fecha2);
-                }else if(modo==DER_IZQ){
-                    flag=Utils.Fecha.isCoherente(fecha2, fecha1);
-                }
+                if(modo==IZQ_DER) flag=Utils.Fecha.isCoherente(fecha1, fecha2);
+                else flag=Utils.Fecha.isCoherente(fecha2, fecha1);   //  DER_IZQ
             obj.setText(Utils.Fecha.assignFormato(fecha1));
             if(flag) reloj.alarm(false, "Fechas Invertidas");
             else reloj.alarm(true, "Fechas Invertidas");
@@ -531,6 +552,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
             jBNew.setEnabled(false);
             jPNuevo.setVisible(true);
             reloj.enabled(true);
+            refresh();
         }
         Utils.GUI.reSizePadre(this, formWidht[modo], formHeight);
     }

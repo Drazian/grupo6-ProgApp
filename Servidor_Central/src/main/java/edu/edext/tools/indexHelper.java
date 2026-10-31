@@ -62,17 +62,19 @@ public class indexHelper {
         boolean flag=true;
         if (unique){
             for(JInternalFrame panels : this.dpIndex.getAllFrames()) {
-                if(panels.getContentPane().getComponentCount()>0){
-                    Component internalPanel=panels.getContentPane().getComponent(0);
-                    if(internalPanel.getClass().equals(panel.getClass())){
-                        flag=false;
+                // Un JInternalFrame se agrega tal cual al escritorio; un JPanel queda dentro del frame que se crea
+                Component internalPanel=null;
+                if(panel instanceof JInternalFrame) internalPanel=panels;
+                else if(panels.getContentPane().getComponentCount()>0) internalPanel=panels.getContentPane().getComponent(0);
+                if(internalPanel!=null && internalPanel.getClass().equals(panel.getClass())){
+                    flag=false;
                     try{
                         if(panels.isIcon()) panels.setIcon(false);
                         panels.toFront();
                         panels.setSelected(true);
                     }catch(PropertyVetoException e){}
-                    break;                    
-                    } } } }
+                    break;
+                } } }
         if(flag){
             try{
                 if(panel instanceof JPanel) {
