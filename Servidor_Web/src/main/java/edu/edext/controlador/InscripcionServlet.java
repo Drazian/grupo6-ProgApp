@@ -243,9 +243,13 @@ public class InscripcionServlet extends HttpServlet {
                 while (paramNames.hasMoreElements()) {
                     String paramName = paramNames.nextElement();
                     if (paramName.startsWith("estado_")) {
-                        String nickname = paramName.substring(7);
-                        int estado = Integer.parseInt(request.getParameter(paramName));
-                        evaluaciones.put(nickname, estado);
+                        String valorParam = request.getParameter(paramName);
+                        //Verificamos que se haya seleccionado un estado
+                        if (valorParam != null && !valorParam.trim().isEmpty()) {
+                            String nickname = paramName.substring(7);
+                            int estado = Integer.parseInt(request.getParameter(paramName));
+                            evaluaciones.put(nickname, estado);
+                        }
                     }
                 }
                 
