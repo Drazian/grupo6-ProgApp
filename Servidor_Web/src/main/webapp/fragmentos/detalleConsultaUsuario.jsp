@@ -174,6 +174,7 @@
                 <table style="width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e0e0e0;">
                     <thead>
                         <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd; text-align: left;">
+                            <th style="width: 28px; padding: 4px;"></th>
                             <th style="padding: 10px;">Edicion / Curso</th>
                             <th style="padding: 10px;">Fecha Inscripcion</th>
                             <th style="padding: 10px; text-align: center;">Estado</th>
@@ -185,6 +186,19 @@
                             <%-- REGLA DE NEGOCIO: Si es Rechazada (valorEstado == 3), solo se muestra si es el propio perfil del usuario --%>
                             <c:if test="${ins.valorEstado != 3 or requestScope.esPropioPerfil}">
                                 <tr style="border-bottom: 1px solid #eee;">
+                                    <%-- Columna estrecha para desistir de inscripciones propias pendientes --%>
+                                    <td style="width: 28px; min-width: 28px; padding: 4px; text-align: center; vertical-align: middle;">
+                                        <c:if test="${requestScope.esPropioPerfil and ins.valorEstado != 2 and ins.valorEstado != 3}">
+                                            <button type="button"
+                                                    onclick="desistirInscripcionAccion('${ins.edicion.nombre}')"
+                                                    title="Desistir de esta inscripción"
+                                                    aria-label="Desistir de esta inscripción"
+                                                    style="appearance: none !important; display: inline-block !important; width: 18px !important; height: 18px !important; margin: 0 !important; padding: 0 !important; background: transparent !important; border: 0 !important; color: #e53935 !important; font-size: 17px !important; font-weight: bold !important; cursor: pointer !important;">
+                                                ×
+                                            </button>
+                                        </c:if>
+                                    </td>
+
                                     <td style="padding: 10px;">
                                         <!-- Enlace a Consulta de Edicion -->
                                         <a href="#" onclick="event.preventDefault(); cargarConsultaEdicion('${ins.edicion.nombre}')" 
@@ -236,7 +250,7 @@
                         </c:forEach>
                         <c:if test="${empty requestScope.listaInscripcionesCompletas}">
                             <tr>
-                                <td colspan="4" style="text-align: center; color: #7f8c8d; padding: 15px;">
+                                <td colspan="5" style="text-align: center; color: #7f8c8d; padding: 15px;">
                                     No hay inscripciones registradas para este estudiante.
                                 </td>
                             </tr>

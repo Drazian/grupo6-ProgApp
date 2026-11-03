@@ -122,28 +122,44 @@ public class InscripcionEdicionHelper {
     // -1 error
     public static final int INSCRIPTO=1, ACEPTADO=2, RECHAZADO=3;
     
-    public int cancelarInscripcion(String nomEstudiante, String nomEdicion){ // incompleta falta aislacion y modularizacion
-        int ret=-1;
-        db=DB.createEntityManager();
+
+    public int cancelarInscripcion(String nomEstudiante, String nomEdicion) {
+        int ret = -1;
+        db = DB.createEntityManager();
+
         try {
             db.getTransaction().begin();
+
             InscripcionEdicionID idDual = new InscripcionEdicionID(nomEstudiante, nomEdicion);
-            InscripcionEdicion isExist = db.find(InscripcionEdicion.class, idDual);
-            if(isExist!=null){
-                db.remove(isExist);
-                db.getTransaction().commit();
-                Logger.info("Se Cancelo la Incripcion del Estudiante {} a la Edicion {}", nomEstudiante, nomEdicion);
-                ret=0;
+            InscripcionEdicion inscripcion = db.find(InscripcionEdicion.class, idDual);
+
+            // Verificar que exista la inscripción
+            if (inscripcion == null) {
+                db.getTransaction().rollback();
+                return 1;
             }
+
+            // Eliminar la inscripción sin importar el estado en que se encuentre
+            db.remove(inscripcion);
+            db.getTransaction().commit();
+
+            Logger.info("Se canceló la inscripción del estudiante {} a la edición {}", nomEstudiante, nomEdicion);
+            ret = 0;
+
         } catch (Exception e) {
-            if(db.getTransaction().isActive()) db.getTransaction().rollback();
-            Logger.error("Error al Cancelar la Inscripcion del estudiante {} a la edicion {}", nomEstudiante, nomEdicion);
-            ret=-1;
+            if (db.getTransaction().isActive()) {
+                db.getTransaction().rollback();
+            }
+            Logger.error("Error al cancelar la inscripción: {}", e.getMessage());
+            ret = -1;
+
+        } finally {
+            if (db != null && db.isOpen()) {
+                db.close();
+            }
+            db = null;
         }
-        finally{
-            db.close();
-        }
-        
+
         return ret;
     }
     

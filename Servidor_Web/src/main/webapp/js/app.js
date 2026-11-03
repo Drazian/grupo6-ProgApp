@@ -1999,4 +1999,57 @@ function toggleSeguirUsuario(btnElementClickeado, nickname, accionActual) {
     .finally(() => {
         botones.forEach(btn => btn.disabled = false);
     });
+    
+    
+}
+    // =====================================================================
+// DESISTIR DE INSCRIPCIÓN A EDICIÓN (CON MODAL MODERNO)
+// =====================================================================
+function desistirInscripcionAccion(nombreEdicion) {
+    const nickname = document.getElementById('nickname-usuario-logueado')?.value;
+    if (!nickname) {
+        alert('No se pudo identificar al usuario logueado.');
+        return;
+    }
+
+    const htmlCuerpo = `
+        <div style="text-align: center; padding: 10px;">
+            <p style="font-size: 15px; color: #2c3e50;">¿Estás seguro de que deseas desistir?</p>
+        </div>
+    `;
+
+    const htmlBotones = `
+        <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn-moderno" style="background-color: #e74c3c; margin-left: 10px;" onclick="ejecutarDesistirInscripcion('${nombreEdicion}', '${nickname}')">Sí, Desistir</button>
+    `;
+
+    mostrarModal('Confirmar Desistimiento', htmlCuerpo, htmlBotones);
+}
+
+function ejecutarDesistirInscripcion(nombreEdicion, nickname) {
+    cerrarModal();
+
+    const params = new URLSearchParams();
+    params.append('accion', 'desistirInscripcion');
+    params.append('edicion', nombreEdicion);
+
+    fetch('UsuarioServlet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: params
+    })
+    .then(async response => {
+        const mensaje = await response.text();
+        if (!response.ok) {
+            throw new Error(mensaje);
+        }
+        // Dispara la notificación estilizada (Toast) que ya tienes configurada
+        alert(mensaje);
+
+        // Recargar el detalle del usuario dentro de la SPA
+        cargarDetalleConsultaUsuario(nickname);
+    })
+    .catch(error => {
+        alert(error.message || 'Error al procesar el desistimiento.');
+    });
 }
