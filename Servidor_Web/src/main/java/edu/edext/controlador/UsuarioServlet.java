@@ -425,6 +425,54 @@ public class UsuarioServlet extends HttpServlet {
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write(e.getMessage());
             }
+        } else if ("desistirInscripcion".equals(accion)) {
+            HttpSession session = request.getSession(false);
+
+            if (session == null || session.getAttribute("usuarioLogueado") == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("Debe iniciar sesión para desistir de una inscripción.");
+                return;
+            }
+
+            DtUsuario usuarioActual = (DtUsuario) session.getAttribute("usuarioLogueado");
+
+            if (usuarioActual.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("Solo los estudiantes pueden desistir de sus inscripciones.");
+                return;
+            }
+
+            String nombreEdicion = request.getParameter("edicion");
+
+            if (nombreEdicion == null || nombreEdicion.trim().isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("No se recibió una edición válida.");
+                return;
+            }
+
+            try {
+                int resultado = ic.delInscripcion(usuarioActual.getNickname(), nombreEdicion.trim());
+
+                response.setContentType("text/plain;charset=UTF-8");
+
+                if (resultado == 0) {
+                    response.getWriter().write("Inscripción cancelada correctamente.");
+                } else if (resultado == 1) {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.getWriter().write("No existe esa inscripción.");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("No se pudo cancelar la inscripción.");
+                }
+
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("Error al desistir de la inscripción: " + e.getMessage());
+            }
         }
     }
     

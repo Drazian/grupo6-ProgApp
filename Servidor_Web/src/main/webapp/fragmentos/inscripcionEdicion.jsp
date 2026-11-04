@@ -37,6 +37,12 @@
             </select>
         </div>
 
+        <!-- 4. Video de Motivación (Opcional) -->
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="videoURL" style="font-weight: bold;">4. URL del Video de Motivación (opcional):</label>
+            <input type="url" id="videoURL" name="videoURL" placeholder="https://www.youtube.com/watch?v=..." style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #bdc3c7;">
+        </div>
+
         <div class="form-actions" style="margin-top: 25px; text-align: right;">
             <button type="submit" style="background-color: #3498db; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Confirmar Inscripción</button>
         </div>

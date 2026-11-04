@@ -1999,4 +1999,98 @@ function toggleSeguirUsuario(btnElementClickeado, nickname, accionActual) {
     .finally(() => {
         botones.forEach(btn => btn.disabled = false);
     });
+    
+    
+}
+    // =====================================================================
+// DESISTIR DE INSCRIPCIÓN A EDICIÓN (CON MODAL MODERNO)
+// =====================================================================
+function desistirInscripcionAccion(nombreEdicion) {
+    const nickname = document.getElementById('nickname-usuario-logueado')?.value;
+    if (!nickname) {
+        alert('No se pudo identificar al usuario logueado.');
+        return;
+    }
+
+    const htmlCuerpo = `
+        <div style="text-align: center; padding: 10px;">
+            <p style="font-size: 15px; color: #2c3e50;">¿Estás seguro de que deseas desistir?</p>
+        </div>
+    `;
+
+    const htmlBotones = `
+        <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn-moderno" style="background-color: #e74c3c; margin-left: 10px;" onclick="ejecutarDesistirInscripcion('${nombreEdicion}', '${nickname}')">Sí, Desistir</button>
+    `;
+
+    mostrarModal('Confirmar Desistimiento', htmlCuerpo, htmlBotones);
+}
+
+function ejecutarDesistirInscripcion(nombreEdicion, nickname) {
+    cerrarModal();
+
+    const params = new URLSearchParams();
+    params.append('accion', 'desistirInscripcion');
+    params.append('edicion', nombreEdicion);
+
+    fetch('UsuarioServlet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+        body: params
+    })
+    .then(async response => {
+        const mensaje = await response.text();
+        if (!response.ok) {
+            throw new Error(mensaje);
+        }
+        // Dispara la notificación estilizada (Toast) que ya tienes configurada
+        alert(mensaje);
+
+        // Recargar el detalle del usuario dentro de la SPA
+        cargarDetalleConsultaUsuario(nickname);
+    })
+    .catch(error => {
+        alert(error.message || 'Error al procesar el desistimiento.');
+    });
+}
+
+// =======================
+// REPRODUCCIÓN DE VIDEO 
+// =======================
+function reproducirVideoMotivacion(urlRaw, nombreEstudiante) {
+    if (!urlRaw || urlRaw.trim() === '') {
+        alert("Esta inscripción no contiene una URL de video válida.");
+        return;
+    }
+
+    // Convertir enlace normal de YouTube al formato embed para iframe
+    let embedUrl = urlRaw.trim();
+    if (embedUrl.includes("youtube.com/watch?v=")) {
+        const videoId = embedUrl.split("v=")[1].split("&")[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    } else if (embedUrl.includes("youtu.be/")) {
+        const videoId = embedUrl.split("youtu.be/")[1].split("?")[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    const htmlCuerpo = `
+        <div style="text-align: center;">
+            <p style="margin-bottom: 12px; color: #7f8c8d; font-size: 13px;">
+                Video motivacional de: <strong style="color: #2c3e50;">${nombreEstudiante}</strong>
+            </p>
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 6px; background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                <iframe src="${embedUrl}" 
+                        style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border: 0;" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    `;
+
+    const htmlBotones = `
+        <button class="btn-moderno" style="background-color: #34495e;" onclick="cerrarModal()">Cerrar Reproductor</button>
+    `;
+
+    mostrarModal('Reproducción de Video', htmlCuerpo, htmlBotones);
 }

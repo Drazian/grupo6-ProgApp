@@ -2,14 +2,6 @@ package edu.edext.datatypes;
 
 import java.time.LocalDate;
 
-/**
- *
- * @author vdraco
- * 0 sin accion
- * 1 inscripto
- * 2 aceptado 
- * 3 recharado
- */
 public class DtInscripcionEdicion {
     private final int estado;
     public final int ACEPTADO=2;
@@ -21,17 +13,25 @@ public class DtInscripcionEdicion {
     private final LocalDate fechaInscripcion;
     private final String[] nomEstado={"No Inscripto", "Inscripto", "Aceptado", "Rechazado"};
     private final double prioridad;
+    private final String videoURL; 
 
-    public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado, double prioridad){
-        this.fechaInscripcion=fechaInscripcion;
-        this.estudiante=estudiante;
-        this.edicion=edicion;
-        this.estado=estado;
+    // Constructor principal
+    public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado, double prioridad, String videoURL){
+        this.fechaInscripcion = fechaInscripcion;
+        this.estudiante = estudiante;
+        this.edicion = edicion;
+        this.estado = estado;
         this.prioridad = prioridad;
+        this.videoURL = videoURL;
+    }
+    
+    // Sobrecarga previa para mantener compatibilidad
+    public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado, double prioridad){
+        this(estudiante, edicion, fechaInscripcion, estado, prioridad, null);
     }
     
     public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado){
-        this(estudiante, edicion, fechaInscripcion, estado, 0.0);
+        this(estudiante, edicion, fechaInscripcion, estado, 0.0, null);
     }
    
     public int getValorEstado(){ return this.estado; }
@@ -40,4 +40,5 @@ public class DtInscripcionEdicion {
     public DtUsuario getEstudiante(){  return this.estudiante;  }
     public LocalDate getFechaInscripcion(){ return this.fechaInscripcion; }
     public double getPrioridad(){ return this.prioridad; }
+    public String getVideoURL(){ return this.videoURL; } // <-- NUEVO GETTER
 }

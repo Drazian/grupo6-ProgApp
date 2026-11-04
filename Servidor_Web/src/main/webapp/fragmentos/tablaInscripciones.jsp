@@ -4,7 +4,7 @@
 <c:choose>
     <c:when test="${not empty inscripciones}">
         
-        <!-- Cabecera de la tabla con el Ordenador (Req. 7.5) -->
+        <!-- Cabecera de la tabla con el Ordenador -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f8f9fa; padding: 10px; border-radius: 4px;">
             <strong style="color: #2c3e50;">Inscripciones encontradas: ${inscripciones.size()}</strong>
             
@@ -24,6 +24,7 @@
                     <th style="padding: 10px; border: 1px solid #ddd;">Estudiante</th>
                     <th style="padding: 10px; border: 1px solid #ddd;">Fecha Inscr.</th>
                     <th style="padding: 10px; border: 1px solid #ddd;">Prioridad</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Video</th>
                     <th style="padding: 10px; border: 1px solid #ddd;">Estado Actual</th>
                     <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Evaluación</th>
                 </tr>
@@ -43,6 +44,23 @@
                                 ${ins.prioridad}
                             </span>
                         </td>
+
+                        <!-- NUEVA COLUMNA: Video de Motivación -->
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #fff; text-align: center;">
+                            <c:choose>
+                                <c:when test="${not empty ins.videoURL}">
+                                    <button type="button" 
+                                            onclick="reproducirVideoMotivacion('${ins.videoURL}', '${ins.estudiante.nombre} ${ins.estudiante.apellido}')" 
+                                            style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                                        ▶ Ver Video
+                                    </button>
+                                </c:when>
+                                <c:otherwise>
+                                    <span style="font-size: 12px; color: #95a5a6; font-style: italic;">Sin video</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+
                         <td style="padding: 10px; border: 1px solid #ddd; background: #fff;">
                             <!-- Mostramos el estado actual con colores -->
                             <c:choose>
