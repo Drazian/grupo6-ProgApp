@@ -1,5 +1,10 @@
 package edu.edext.datatypes;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet; 
@@ -10,17 +15,26 @@ import java.util.Set;
  *
  * @author vdraco
  */
+@XmlRootElement(name = "DtEdicion")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DtEdicion {
-    private final Integer cupo;
-    private final String nombre;
-    private final DtCurso curso;
-    private final String imagen;
-    private final LocalDate fechaFin;
-    private final LocalDate fechaInicio;
-    private final LocalDate fechaPublicacion;
+    private Integer cupo;
+    private String nombre;
+    private DtCurso curso;
+    private String imagen;
+    @XmlElement(name = "fechaFin")
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate fechaFin;
+    @XmlElement(name = "fechaInicio")
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate fechaInicio;
+    @XmlElement(name = "fechaPublicacion")
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate fechaPublicacion;
     private List<DtUsuario> docentes;
     private Set<String> nameDocentes;
     
+    public DtEdicion(){};
     public DtEdicion(String nombre, Integer cupo, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaPublicacion){
         this(nombre, cupo, fechaInicio, fechaFin, fechaPublicacion, null, null, null, null);
     }

@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.tools.Utils.Mouse;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.List;
@@ -26,6 +27,7 @@ public class ConsultaUsuario extends javax.swing.JPanel {
     /**
      * Creates new form ConsultaUsuario
      */
+    private final Mouse mouse=new Mouse();
     private AltaUsuario formularioUsuario;
     private List<DtUsuario> usuarios;
     private String selected=null;
@@ -121,12 +123,22 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lisUsuario.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        lisUsuario.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                lisUsuarioMouseDragged(evt);
+            }
+        });
         lisUsuario.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 lisUsuarioFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 lisUsuarioFocusLost(evt);
+            }
+        });
+        lisUsuario.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                lisUsuarioMousePressed(evt);
             }
         });
         lisUsuario.addListSelectionListener(this::lisUsuarioValueChanged);
@@ -418,9 +430,17 @@ public class ConsultaUsuario extends javax.swing.JPanel {
         SwingUtilities.invokeLater(() -> {resizeTab();}); 
     }//GEN-LAST:event_bCursosYProgramasMouseClicked
 
+    private void lisUsuarioMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lisUsuarioMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_lisUsuarioMousePressed
+
+    private void lisUsuarioMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lisUsuarioMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_lisUsuarioMouseDragged
+
     private void resizeTab(){
         tbCursosYProgramas.setSize(this.getWidth(), this.getHeight()-tbCursosYProgramas.getY());
-        System.out.println("X : "+tbCursosYProgramas.getSize());
+//        System.out.println("X : "+tbCursosYProgramas.getSize());
         Dimension size=tbCursosYProgramas.getSize();//new Dimension(623, 185);
         tblCursos.setSize(size);
         tblCursos.setPreferredSize(size);

@@ -1,13 +1,28 @@
 package edu.edext.controlador;
 
+import edu.edext.datatypes.DtCategoria;
+import edu.edext.datatypes.DtConsultaCurso;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtInstituto;
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
 import edu.edext.logica.GestorImagenes;
+import edu.edext.logica.IBridgeSOAP;
+import edu.edext.logica.IControlador;
+
+//import edu.edext.controlador.ws.DtCategoria;
+//import edu.edext.controlador.ws.DtConsultaCurso;
+//import edu.edext.controlador.ws.DtCurso;
+//import edu.edext.controlador.ws.DtInstituto;
+//import edu.edext.controlador.ws.DtPrograma;
+//import edu.edext.controlador.ws.DtUsuario;
+//import edu.edext.controlador.ws.IBridgeSOAP;
+//import edu.edext.controlador.ws.TipoUsuario;
+//import edu.edext.resources.GestorImagenes;
+
+import edu.edext.modelo.Remux;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -18,6 +33,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -28,7 +44,8 @@ import java.util.Set;
 @WebServlet("/CursoServlet")
 @MultipartConfig 
 public class CursoServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IControlador ic = Fabrica.getInstance().getIControlador();
+//    private final IBridgeSOAP ic = Fabrica.getConexion();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -60,7 +77,8 @@ public class CursoServlet extends HttpServlet {
                         
                         if (listaProgramas != null) {
                                 for (DtPrograma programa : listaProgramas) {
-                                    Set<String> categoriasPrograma = programa.getCategorias();
+                                    Set<String> categoriasPrograma = new HashSet<>(programa.getCategorias());
+//                                    Set<String> categoriasPrograma = new HashSet<>();
 
                                     if (categoriasPrograma != null) {
                                         boolean perteneceACategoria = false;
@@ -72,6 +90,7 @@ public class CursoServlet extends HttpServlet {
                                                     break;
                                                 }
                                                 String[] subCategorias = catStr.split(",");
+//                                                String[] subCategorias = catStr.split("[,\\s]+");
                                                 for (String subCat : subCategorias) {
                                                     if (subCat.trim().equalsIgnoreCase(nombre.trim())) {
                                                         perteneceACategoria = true;
@@ -104,7 +123,7 @@ public class CursoServlet extends HttpServlet {
                     }
 
                     request.setAttribute("filtroAplicado", opcion + ": " + nombre);
-                    request.getRequestDispatcher("fragmentos/listaCursos.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/listaCursos.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.setContentType("text/html;charset=UTF-8");
@@ -114,7 +133,7 @@ public class CursoServlet extends HttpServlet {
 
             case "listarCategoriasJson": 
                 try {
-                    List<edu.edext.datatypes.DtCategoria> listaCat = ic.listarCategorias();
+                    List<DtCategoria> listaCat = ic.listarCategorias();
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < listaCat.size(); i++) {
                         json.append("{\"nombre\":\"").append(listaCat.get(i).getNombre()).append("\"}");
@@ -133,7 +152,7 @@ public class CursoServlet extends HttpServlet {
 
             case "listarInstitutosJSON": 
                 try {
-                    List<edu.edext.datatypes.DtInstituto> listaInst = ic.listarInstitutos();
+                    List<DtInstituto> listaInst = ic.listarInstitutos();
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < listaInst.size(); i++) {
                         json.append("\"").append(listaInst.get(i).getNombre()).append("\"");
@@ -157,7 +176,7 @@ public class CursoServlet extends HttpServlet {
                         nombreDelCurso = new String(nombreDelCurso.getBytes("ISO-8859-1"), "UTF-8");
                     }
                     
-                    edu.edext.datatypes.DtConsultaCurso dtCurso = ic.obtenerDatosCurso(nombreDelCurso);
+                    DtConsultaCurso dtCurso = ic.obtenerDatosCurso(nombreDelCurso);
                     
                     if(dtCurso == null) {
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -170,6 +189,15 @@ public class CursoServlet extends HttpServlet {
                         String instObtenido = ic.obtenerInstitutoPorCurso(nombreDelCurso);
                         if (instObtenido != null && !instObtenido.trim().isEmpty()) {
                             institutoDelCurso = instObtenido;
+
+//                    List<DtInstituto> todosLosInstitutos = ic.listarInstitutos();
+//                    if (todosLosInstitutos != null) {
+//                        for (DtInstituto inst : todosLosInstitutos) {
+//                            List<String> cursosDeEsteInst = ic.listarCursosPorInstituto(inst.getNombre());
+//                            if (cursosDeEsteInst != null && cursosDeEsteInst.contains(nombreDelCurso)) {
+//                                institutoDelCurso = inst.getNombre();
+//                                break;
+//                            }
                         }
                     } catch (Exception ignored) {
                     }
@@ -178,7 +206,7 @@ public class CursoServlet extends HttpServlet {
                     // =========================================================================
                     
                     request.setAttribute("curso", dtCurso);
-                    request.getRequestDispatcher("fragmentos/consultaCurso.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/consultaCurso.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.setContentType("text/html;charset=UTF-8");
@@ -209,7 +237,7 @@ public class CursoServlet extends HttpServlet {
                         request.setAttribute("cursosPrevios", previos);
                     }
 
-                    request.getRequestDispatcher("fragmentos/altaCurso.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/altaCurso.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.setContentType("text/html;charset=UTF-8");
@@ -264,7 +292,7 @@ public class CursoServlet extends HttpServlet {
                     String[] prevArray = request.getParameterValues("previas");
                     Set<String> previas = prevArray != null ? new HashSet<>(Arrays.asList(prevArray)) : new HashSet<>();
 
-                    Date fechaRegistro = new Date(); 
+                    LocalDate fechaRegistro=LocalDate.now(); 
 
                     String nombreImagen = "usr.png"; 
                     Part filePart = request.getPart("imagen"); 
@@ -276,9 +304,13 @@ public class CursoServlet extends HttpServlet {
                         nombreImagen = GestorImagenes.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
                     }
 
+                    // ************************* Descomentar para ejecutar ************************
                     DtCurso dtCurso = new DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
-                            fechaRegistro, new DtInstituto(nombreInstituto), previas, categorias, nombreImagen
-                    );
+                            fechaRegistro, new DtInstituto(nombreInstituto), previas, categorias, nombreImagen);
+                    // ************************** Comentar para compilar **************************
+//                    DtCurso dtCurso = Remux.DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
+//                            fechaRegistro, Remux.DtInstituto(nombreInstituto), previas, categorias, nombreImagen);
+                    // ****************************************************************************
 
                     ic.altaCurso(dtCurso, nombreInstituto); 
 

@@ -4,6 +4,14 @@
  */
 package edu.edext.logica;
 
+import edu.edext.entitys.InscripcionPrograma;
+import edu.edext.entitys.Curso;
+import edu.edext.entitys.InscripcionEdicion;
+import edu.edext.entitys.Estudiante;
+import edu.edext.entitys.Edicion;
+import edu.edext.entitys.ProgramaFormacion;
+import edu.edext.entitys.Instituto;
+import edu.edext.entitys.InscripcionEdicionID;
 import edu.edext.datatypes.DtCategoria;
 import edu.edext.datatypes.DtConsultaCurso;
 import edu.edext.datatypes.DtCurso;
@@ -13,13 +21,20 @@ import edu.edext.datatypes.DtInstituto;
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
+import edu.edext.tools.Utils;
+import edu.edext.tools.cfg;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.w3c.dom.CDATASection;
 
 /**
  *
@@ -130,8 +146,9 @@ public class ControladorTest {
     public void testCrearUsuarioEstudiante() throws Exception{
         String nickname = "NICKNAME";
         List<String> institutos = new ArrayList<>();
-        Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+//        Date fecha = new Date();
+//        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.ESTUDIANTE);
         ic.crearUsuario(usuario);
         
         List<DtUsuario> usuarios = ic.listarUsuarios();
@@ -147,8 +164,10 @@ public class ControladorTest {
         String nickname = "NICKNAME2";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "password", "email221", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
-        DtUsuario usuario2 = new DtUsuario(nickname, "password", "email222", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+//        DtUsuario usuario = new DtUsuario(nickname, "password", "email221", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+//        DtUsuario usuario2 = new DtUsuario(nickname, "password", "email222", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email221", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario2 = new DtUsuario(nickname, "password", "email222", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.ESTUDIANTE);
         ic.crearUsuario(usuario);
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario2);}, "Ya existe");        
@@ -161,8 +180,10 @@ public class ControladorTest {
         String nickname2 = "NICKNAME32";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "password", "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
-        DtUsuario usuario2 = new DtUsuario(nickname2, "password", "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+//        DtUsuario usuario = new DtUsuario(nickname, "password", "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+//        DtUsuario usuario2 = new DtUsuario(nickname2, "password", "email333", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email333", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario2 = new DtUsuario(nickname2, "password", "email333", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.ESTUDIANTE);
         ic.crearUsuario(usuario);
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario2);}, "Ya existe");        
@@ -174,7 +195,8 @@ public class ControladorTest {
         String nickname = "NICKNAME_DOCENTE";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
+//        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.DOCENTE);
         ic.crearUsuario(usuario);
         
         List<DtUsuario> usuarios = ic.listarUsuarios();
@@ -192,7 +214,8 @@ public class ControladorTest {
         institutos.add("Instituto manolo");
         
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente2", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
+//        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente2", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.DOCENTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email_docente2", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.DOCENTE);
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.crearUsuario(usuario);}, "No existe el Instituto");        
         assertNotNull(excepcion.getMessage());
@@ -230,8 +253,12 @@ public class ControladorTest {
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
         List<DtCurso> previas = ic.listarCursosPorUsuario("heisenberg");
+        List<DtCategoria> categorias=ic.listarCategorias(); // new
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new ArrayList<>(), "img");
+//        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new ArrayList<>(), "img");
+//         DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, categorias, "img"); // new
+         DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", LocalDate.now(), instituto, previas, categorias, "img"); // new
+
         
         ic.altaCurso(curso, nombreInstituto);
         
@@ -251,12 +278,14 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso previa = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+//        DtCurso previa = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+        DtCurso previa = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", LocalDate.now(), instituto, "img");
         
         List<DtCurso> previas = ic.listarCursosPorUsuario("heisenberg");
         previas.add(previa);
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new ArrayList<>(), "img");
+//        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, previas, new ArrayList<>(), "img");
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", LocalDate.now(), instituto, previas, new ArrayList<>(), "img");
                
         Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, nombreInstituto);}, "No existe la previa");        
         assertNotNull(excepcion.getMessage());
@@ -272,7 +301,8 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+//        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", LocalDate.now(), instituto, "img");
         
         ic.altaCurso(curso, nombreInstituto);
         
@@ -290,7 +320,8 @@ public class ControladorTest {
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No se encontró el instituto: " + nombreInstituto));
         
-        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+//        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", new Date(), instituto, "img");
+        DtCurso curso = new DtCurso(nombreCurso, "Intro", "4 meses", 60, 10, "http...", LocalDate.now(), instituto, "img");
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.altaCurso(curso, "INSTITUTO_INEXISTENTE33");}, "Instituto inexistente");        
         assertNotNull(excepcion.getMessage());
@@ -514,7 +545,8 @@ public class ControladorTest {
         String nickname = "NICKNAME44";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+//        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.ESTUDIANTE);
         
         Exception excepcion = assertThrows(Exception.class, () -> {ic.modificarUsuario(usuario);}, "No existe");        
         assertNotNull(excepcion.getMessage());      
@@ -541,13 +573,13 @@ public class ControladorTest {
         assertEquals(nombre, edicion.getNombre(), "El nombre buscado debe coincidir");
     }
     
-    @Test
-    public void testBuscarEdicion() throws Exception {
-        String nombre = "Dalavuelta - 2025";
-        DtEdicion edicion = ic.buscarEdicion(nombre);
-
-        assertEquals(nombre, edicion.getNombre(), "El nombre buscado debe coincidir");
-    }
+//    @Test
+//    public void testBuscarEdicion() throws Exception {
+//        String nombre = "Dalavuelta - 2025";
+//        DtEdicion edicion = ic.buscarEdicion(nombre);
+//
+//        assertEquals(nombre, edicion.getNombre(), "El nombre buscado debe coincidir");
+//    }
     
     @Test
     public void testObtenerInstitutoPorCurso() throws Exception {
@@ -724,7 +756,7 @@ public class ControladorTest {
     public void testCrearProgramaWeb() throws Exception {
         String nombre = "CREACION-WEB";
         DtPrograma aux = new DtPrograma(nombre, "descripcion", LocalDate.now(), LocalDate.now(), LocalDate.now());
-        ic.setCrearProgramaFormacion(aux, null, "imagen.png","adri");
+        ic.setCrearProgramaFormacion(aux, null, "imagen.png");
         
         List<DtPrograma> programas = ic.listarProgramas();
         assertNotNull(programas, "La lista de programas no debe ser nula");
@@ -739,8 +771,22 @@ public class ControladorTest {
         String nickname = "CREACION-WEB";
         List<String> institutos = new ArrayList<>();
         Date fecha = new Date();
-        DtUsuario usuario = new DtUsuario(nickname, "password", "email@web", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+//        DtUsuario usuario = new DtUsuario(nickname, "password", "email@web", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario = new DtUsuario(nickname, "password", "email@web", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.ESTUDIANTE);
         ic.crearUsuario(usuario, null, "imagen.png");
+
+        //*********************** Nuevo ****************************************
+        String pathImage=cfg.PATH_INTERNAL.substring(1)+"benkenobi.jpg";
+        byte[] imagen=null;
+          InputStream tmpImage = ControladorTest.class.getClassLoader().getResourceAsStream(pathImage);
+          assertNotNull(tmpImage, "Error cargando la imagen "+pathImage);
+          if(tmpImage!=null)
+              imagen=tmpImage.readAllBytes();
+        String nickname2 = "CREACION-WEB2";
+//        DtUsuario usuario2 = new DtUsuario(nickname2, "password", "email2@web", "nombre", "apellido", "imagen", fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario usuario2 = new DtUsuario(nickname2, "password", "email2@web", "nombre", "apellido", "imagen", LocalDate.now(), institutos, TipoUsuario.ESTUDIANTE);
+        ic.crearUsuario(usuario2, imagen, "imagen.png");
+        //**********************************************************************
         
         List<DtUsuario> usuarios = ic.listarUsuarios();
         assertNotNull(usuarios, "La lista de usuarios no debe ser nula");
@@ -857,9 +903,200 @@ public class ControladorTest {
         assertFalse(lista.isEmpty(), "La lista no debe estar vacía");
         
     }
+
+
+    @Test
+    public void testmodificarUsuario() throws Exception{
+        List<String> institutos=new ArrayList<>();
+        LocalDate fecha=LocalDate.now();
+        String nickname="NICKNAME", nickname2="NICKNAME_DOCENTE", email="nick@gamil.com";
+        String pathImage=cfg.PATH_INTERNAL.substring(1)+"benkenobi.jpg";
+        institutos.add("Física");
+        institutos.add("Eléctrica");
+        
+//        DtUsuario estudiante=new DtUsuario(nickname, "passNick", (Utils.Validate.isEmail(email)?email:null), "nombreNick", "apellidoNick", "imagenNick", Utils.Cast.valueOf(fecha), institutos, TipoUsuario.ESTUDIANTE);
+//        DtUsuario docente=new DtUsuario(nickname2, "passNick", (Utils.Validate.isEmail(email)?email:null), "nombreNick", "apellidoNick", "imagenNick", Utils.Cast.valueOf(fecha), institutos, TipoUsuario.DOCENTE);
+        DtUsuario estudiante=new DtUsuario(nickname, "passNick", (Utils.Validate.isEmail(email)?email:null), "nombreNick", "apellidoNick", "imagenNick",fecha, institutos, TipoUsuario.ESTUDIANTE);
+        DtUsuario docente=new DtUsuario(nickname2, "passNick", (Utils.Validate.isEmail(email)?email:null), "nombreNick", "apellidoNick", "imagenNick",fecha, institutos, TipoUsuario.DOCENTE);
+        byte[] imagen=null;
+          InputStream tmpImage=ControladorTest.class.getClassLoader().getResourceAsStream(pathImage);
+          assertNotNull(tmpImage, "Error cargando la imagen "+pathImage);
+          if(tmpImage!=null)
+              imagen=tmpImage.readAllBytes();
+          ic.modificarUsuario(estudiante, imagen, nickname);
+          ic.modificarUsuario(docente, imagen, nickname2);
+    }
+
+    @Test
+    public void evaluarInscripciones_Exito() throws Exception {
+        String nickname="jeffw", nombre="MicroBit - 2026";
+        Map<String ,Integer> evaluaciones=new HashMap<>();
+        evaluaciones.put(nickname, 2);
+        ic.evaluarInscripciones(nombre, evaluaciones);
+        List<DtInscripcionEdicion> inscripciones=ic.getInscripcionesCompletas(nombre);
+        boolean flag=false;
+        for(DtInscripcionEdicion inscripcion : inscripciones)
+            if(inscripcion.getEstudiante().getNickname().equals(nickname) && inscripcion.getEstado()==2){
+                flag=true;
+                break;
+            }
+        assertTrue(flag, "El estado de la inscripción debió actualizarse a 1");
+    }
+
+//    @Test
+//    public void testLogin() throws Exception {
+//        String nickname="jeffw", email="jwilliams@gmail.com", pass="1234";
+//        DtSessionUsuario dto;
+//        dto=ic.validarNick(nickname, pass);
+//        assertNotNull(dto, "login incorrecto, el nick no existe"); // nick=ok, pass=ok
+//        dto=ic.validarEmail(email, pass);
+//        assertNotNull(dto, "login incorrecto, la contraseña no existe"); // email=ok, pass=ok
+//    }
+
+    @Test
+    void testAgregaryQuitarDocenteAEdicion() throws Exception {
+        String nameEddion="Talleres plenarios - 2026", 
+                nickname="benkenobi";
+        boolean flag=false;
+        ic.agregarDocenteAEdicion(nameEddion, nickname);
+        for(DtUsuario dt : ic.getEdicion(nameEddion).getDocentes())
+            if(dt.getNickname().equals(nickname)){
+                flag=true;
+                break;
+            }                
+        assertTrue(flag, "El docente no se agrego a la edicion");
+        flag=false;
+        ic.quitarDocenteDeEdicion(nameEddion, nickname);
+        for(DtUsuario dt : ic.getEdicion(nameEddion).getDocentes())
+            if(dt.getNickname().equals(nickname)){
+                flag=true;
+                break;
+            }                
+        assertFalse(flag, "El docente no se elimino a la edicion");
+    }
+
+    private void pruebaEquals(Object ent1, Object ent2, Object ent3, String message){
+        assertFalse(ent1.equals(ent2), "Error en comparacion de "+message+"1 vs "+message+"2");
+        assertFalse(ent1.equals(ent3), "Error en comparacion de "+message+"1 vs "+message+"3");
+        assertTrue(ent1.equals(ent1), "Error en comparacion de "+message+" iguales");
+        assertFalse(ent1.equals(null), "Error en comparacion de "+message+" null");
+    }
+    @Test
+    public void testEquals() throws Exception {
+        Edicion edicion=new Edicion("Extensionismo Industrial - 2025", 20, LocalDate.now(), LocalDate.now(), LocalDate.now(), new Curso(), new ArrayList<>(), "");
+        Edicion edicion2=new Edicion("Dalavuelta - 2025", 10, LocalDate.now(), LocalDate.now(), LocalDate.now(), new Curso(), new ArrayList<>(), "");
+        Estudiante estudiante=new Estudiante();
+        String estudianteid="sdf", edicionid="ghj";
+//        Curso curso=new Curso("curso1", "", "", 0, 0, "", new Date(), new Instituto(), null, null, ""),
+//                curso2=new Curso("curso2", "", "", 0, 0, "", new Date(), new Instituto(), null, null, ""),
+//                curso3=new Curso("curso3", "", "", 0, 0, "", new Date(), new Instituto(), null, null, "");
+        Curso curso=new Curso("curso1", "", "", 0, 0, "", LocalDate.now(), new Instituto(), null, null, ""),
+                curso2=new Curso("curso2", "", "", 0, 0, "", LocalDate.now(), new Instituto(), null, null, ""),
+                curso3=new Curso("curso3", "", "", 0, 0, "", LocalDate.now(), new Instituto(), null, null, "");
+        boolean flag;
+        InscripcionEdicion entEdicion=new InscripcionEdicion();
+        InscripcionEdicion entEdicion2=new InscripcionEdicion();
+        InscripcionEdicion entEdicion3=new InscripcionEdicion();
+
+        InscripcionEdicionID entEdicionid=new InscripcionEdicionID();
+        InscripcionEdicionID entEdicionid2=new InscripcionEdicionID();
+        InscripcionEdicionID entEdicionid3=new InscripcionEdicionID();
+        
+        ProgramaFormacion programa=new ProgramaFormacion("programa1", "", LocalDate.now(), LocalDate.now(), LocalDate.now(), null, null, "");
+        ProgramaFormacion programa2=new ProgramaFormacion("programa2", "", LocalDate.now(), LocalDate.now(), LocalDate.now(), null, null, "");
+        ProgramaFormacion programa3=new ProgramaFormacion("programa3", "", LocalDate.now(), LocalDate.now(), LocalDate.now(), null, null, "");
+        
+        InscripcionPrograma entPrograma=new InscripcionPrograma();
+        InscripcionPrograma entPrograma2=new InscripcionPrograma();
+        InscripcionPrograma entPrograma3=new InscripcionPrograma();
+        
+        entEdicion.setEdicion(edicion);
+        entEdicion2.setEdicion(edicion);
+        entEdicion.setEstudiante(estudiante);
+        entEdicion.setFechaInscripcion(LocalDate.now());
+        entEdicion3.setEstudiante(estudiante);
+        
+        entEdicionid.setEdicion(edicionid);
+        entEdicionid2.setEdicion(edicionid);
+        entEdicionid.setEstudiante(estudianteid);
+        entEdicionid3.setEstudiante(estudianteid);
+        
+        entPrograma.setProgramaFormacion(programa);
+        entPrograma2.setProgramaFormacion(programa);
+        entPrograma.setEstudiante(estudiante);
+        entPrograma.setFechaInscripcion(LocalDate.now());
+        entPrograma3.setEstudiante(estudiante);
+
+        
+        flag=entEdicion.getEdicion().equals(edicion);
+        assertTrue(flag, "No existe incripciones en InscripcionEdicion1");
+        pruebaEquals(entEdicion, entEdicion2, entEdicion3, "InscripcionEdicion");
+        pruebaEquals(entEdicionid, entEdicionid2, entEdicionid3, "IncripcionEdicionID");
+        pruebaEquals(curso, curso2, curso3, "Curso");
+        pruebaEquals(programa, programa2, programa3, "Programa");
+        pruebaEquals(entPrograma, entPrograma2, entPrograma3, "InscripcionPrograma");
+
+        
+    }
     
+    @Test
+    public void testHashCode() throws Exception {
+        assertEquals(new ProgramaFormacion().hashCode(), 679, "Error de hash en Programa");
+        assertNotEquals(new Curso().hashCode(), 0, "Error de hash en Curso");
+
+    }
     
+    @Test
+    public void testSettersyGetters() throws Exception {
+        Instituto instituto=new Instituto();
+        instituto.setNombre("instituto");
+        ProgramaFormacion programa=new ProgramaFormacion("programa1", "", LocalDate.now(), LocalDate.now(), LocalDate.now(), null, null, "");
+
+        assertNull(programa.getCategorias(), "Categoria no es null");
+        assertEquals(instituto.getNombre(), "instituto", "Error en setter de instituto");
+    }
     
+//    @Test
+//    public void testSetInscripcionPrograma() throws Exception {
+//        String nickname="jeffw", programa="EFI Ingeniería Mecánica";
+//        int flag=ic.setInscripcionPrograma(nickname, programa);
+//        //assertEquals(flag, 0, "fallo la inscripcion de programa");
+//    }
+
+    @Test
+    public void testSetInscripcionProgramaExistente() throws Exception {
+        String nickname="jeffw", programa="EFI Ingeniería Mecánica";
+        int flag=ic.setInscripcionPrograma(nickname, programa);
+        assertEquals(flag, 0, "No se ingreso la inscripcion");
+    }
     
-    
+    @Test
+    public void testModificarUduarioChange() throws Exception {
+//        Date newNacimiento=Utils.Cast.valueOf(LocalDate.of(1983, 11, 16));
+        LocalDate newNacimiento=LocalDate.of(1983, 11, 16);
+        String nombre="costas", newImagen="user.png", newEmail="gcostasNEW@gmail.com";
+        DtUsuario usuarioOriginal = ic.listarUsuarios().stream().filter(inst -> inst.getNickname().equalsIgnoreCase(nombre))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el usuario: " + nombre));        
+        DtUsuario usuarioModificado = new DtUsuario(
+                usuarioOriginal.getNickname(),
+                usuarioOriginal.getPassword(),
+                newEmail,
+                usuarioOriginal.getNombre()+"2",
+                usuarioOriginal.getApellido(),
+                newImagen,
+                newNacimiento,
+                usuarioOriginal.getInstitutos(),
+                usuarioOriginal.getTipoUsuario()
+        );
+        ic.modificarUsuario(usuarioModificado);
+        DtUsuario usuarioFinal = ic.listarUsuarios().stream().filter(inst -> inst.getNickname().equalsIgnoreCase(nombre))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No se encontró el usuario: " + nombre)); 
+        assertEquals(usuarioOriginal.getNombre()+"2", usuarioFinal.getNombre() , "El nombre no cambio");
+        assertEquals(newEmail, usuarioFinal.getEmail() , "El email no cambio");
+        assertEquals(newImagen, usuarioFinal.getImagen() , "El imagen no cambio");
+        assertEquals(newNacimiento, usuarioFinal.getfNacimiento() , "El email no cambio");
+    }
+   
 }

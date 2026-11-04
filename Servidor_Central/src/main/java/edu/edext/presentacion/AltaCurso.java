@@ -6,7 +6,7 @@ import edu.edext.datatypes.DtInstituto;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
-import edu.edext.tools.cfg;
+import edu.edext.tools.Utils.Mouse;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.tinylog.Logger;
 
 public class AltaCurso extends javax.swing.JInternalFrame {
 
-    private final Utils.Mouse mouse=new Utils.Mouse(); 
+    private final Mouse mouse=new Mouse(); 
     private IControlador control;
     private File imagen;
 
@@ -254,7 +254,7 @@ public class AltaCurso extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_listaCategoriasFocusLost
 
     private void listaPreviasFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_listaPreviasFocusLost
-        if(listaPrevias.getSelectedValuesList().isEmpty()) refreshPrevias();
+        if(listaCategorias.getSelectedValuesList().isEmpty()) refreshPrevias();
     }//GEN-LAST:event_listaPreviasFocusLost
 
     private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
@@ -290,7 +290,7 @@ public class AltaCurso extends javax.swing.JInternalFrame {
                     lblImagen.getHeight(),
                     Utils.Imagen.loadSO(
                         imagen.getAbsolutePath())));
-        }
+            lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(imagen.getAbsolutePath()))); }
     }//GEN-LAST:event_btnAgregarImagenActionPerformed
 
     private void cargarDatosIniciales() {
@@ -298,8 +298,8 @@ public class AltaCurso extends javax.swing.JInternalFrame {
         Utils.GUI.assignFormato(textoFechaAlta);
         Utils.GUI.soloNumeros(textoCreditos);
         Utils.GUI.soloNumeros(textoDuracion);
-        refreshInstitutos();
-        buttonGuardar.setEnabled(institutoSeleccion.getSelectedIndex() >= 0);
+        institutoSeleccion.removeAllItems();
+        buttonGuardar.setEnabled(false);
         refreshCategorias();
         refreshPrevias();
     }
@@ -307,14 +307,10 @@ public class AltaCurso extends javax.swing.JInternalFrame {
     private void refreshInstitutos(){
         control = Fabrica.getInstance().getIControlador();
         try {
-            Object previo = institutoSeleccion.getSelectedItem();
             institutoSeleccion.removeAllItems();
             List<DtInstituto> institutos = control.listarInstitutos();
             for (DtInstituto i : institutos)
                 institutoSeleccion.addItem(i.getNombre());
-            if (previo != null) {
-                institutoSeleccion.setSelectedItem(previo);
-            }
         } catch (Exception e) {
             Logger.error(e.getMessage(), "Error al cargar institutos ");
             error("Error al cargar Institutos : " + e.getMessage(), "Error");
@@ -356,7 +352,7 @@ public class AltaCurso extends javax.swing.JInternalFrame {
     }
     
     private void error(String message, String titulo){
-        JOptionPane.showMessageDialog(this, message, titulo, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, message, titulo, JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void newCurso(){
@@ -417,21 +413,13 @@ public class AltaCurso extends javax.swing.JInternalFrame {
         if(Utils.Validate.isEmpty(previas))
             if(confirm("Desea continuar sin asignar previas")!=0)
                 return;
-        String nombreImagen = cfg.IMAGE_USER;
-        if (imagen != null) {
-            int dot = imagen.getName().lastIndexOf(".");
-            String ext = dot >= 0 ? imagen.getName().substring(dot) : ".png";
-            nombreImagen = "Curso." + nombre + ext;
-        }
+        Utils.Imagen.save(imagen.getAbsolutePath(), "Curso."+nombre);
         DtCurso dt = new DtCurso(nombre, descripcion, duracion+" "+(String)jCUnitDuracion.getSelectedItem(), 
-                    Utils.Cast.valueof(horas), Utils.Cast.valueof(creditos), url, Utils.Cast.valudf(fecha), 
+                    Utils.Cast.valueof(horas), Utils.Cast.valueof(creditos), url, Utils.Cast.valueOf(Utils.Cast.valudf(fecha)), 
                     new DtInstituto(instSeleccionado), new HashSet<>(previas), new HashSet<>(categorias), 
-                    nombreImagen);
+                    "Curso."+nombre+imagen.getName().substring(imagen.getName().lastIndexOf(".")));
         try {
             control.altaCurso(dt, instSeleccionado);
-            if (imagen != null) {
-                Utils.Imagen.save(imagen.getAbsolutePath(), "Curso." + nombre);
-            }
             Logger.info("El curso '" + nombre + "' fue creado exitosamente.");
             JOptionPane.showMessageDialog(this, "El curso '" + nombre + "' fue creado exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             newCurso();

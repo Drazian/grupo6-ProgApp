@@ -1,10 +1,11 @@
-package edu.edext.logica;
+package edu.edext.entitys;
 
 import java.util.Date;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity 
@@ -19,7 +20,7 @@ public class Docente extends Usuario {
     }
 
     public Docente(String nickname, String password, String email, String nombre,
-                   String apellido, Date fNacimiento, String imagen,
+                   String apellido, LocalDate fNacimiento, String imagen,
                    List<Instituto> instituto) {
 
         super(nickname, password, email, nombre, apellido, fNacimiento, imagen);
@@ -33,5 +34,6 @@ public class Docente extends Usuario {
     public void setInstitutos(List <Instituto> instituto) {
         this.institutos = instituto;
     }
+    
     
 }

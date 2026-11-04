@@ -8,6 +8,17 @@ import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+
+//import edu.edext.controlador.ws.DtEdicion;
+//import edu.edext.controlador.ws.DtInscripcionEdicion;
+//import edu.edext.controlador.ws.DtInstituto;
+//import edu.edext.controlador.ws.DtPrograma;
+//import edu.edext.controlador.ws.DtUsuario;
+//import edu.edext.controlador.ws.IBridgeSOAP;
+//import edu.edext.controlador.ws.TipoUsuario;
+
+import edu.edext.modelo.Remux;
+import edu.edext.modelo.Utils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,6 +30,7 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,12 +39,15 @@ import java.util.List;
 @WebServlet(name = "UsuarioServlet", urlPatterns = {"/UsuarioServlet"})
 @MultipartConfig
 public class UsuarioServlet extends HttpServlet {
-
+    private final IControlador ic = Fabrica.getInstance().getIControlador();
+//    private final IBridgeSOAP ic = Fabrica.getConexion();
+    
     private void cargarInstitutos(HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
 
         try {
-            IControlador ic = Fabrica.getInstance().getIControlador();
+//            IControlador ic = Fabrica.getInstance().getIControlador();
+            //IBridgeSOAP ic = Fabrica.getConexion();
             List<DtInstituto> lista = ic.listarInstitutos();
 
             StringBuilder json = new StringBuilder("[");
@@ -59,7 +74,7 @@ public class UsuarioServlet extends HttpServlet {
             cargarInstitutos(response);
 
         } else if ("formAlta".equals(accion)) {
-            request.getRequestDispatcher("/fragmentos/altaUsuario.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/fragmentos/altaUsuario.jsp").forward(request, response);
 
         } else if ("cargarSocial".equals(accion)) {
             HttpSession session = request.getSession(false);
@@ -69,7 +84,7 @@ public class UsuarioServlet extends HttpServlet {
                 return;
             }
 
-            IControlador ic = Fabrica.getInstance().getIControlador();
+            //IBridgeSOAP ic = Fabrica.getConexion();
             DtUsuario logueado = (DtUsuario) session.getAttribute("usuarioLogueado");
 
             try {
@@ -83,7 +98,7 @@ public class UsuarioServlet extends HttpServlet {
                 // --- FIX: Enviar la lista de seguidores al JSP ---
                 request.setAttribute("misSeguidores", misSeguidores);
 
-                request.getRequestDispatcher("/fragmentos/seguidos.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/fragmentos/seguidos.jsp").forward(request, response);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al cargar la red social: " + e.getMessage() + "</h3>");
@@ -94,9 +109,16 @@ public class UsuarioServlet extends HttpServlet {
 
             if (nickname != null && !nickname.trim().isEmpty()) {
                 try {
-                    IControlador ic = Fabrica.getInstance().getIControlador();
+                    //IBridgeSOAP ic = Fabrica.getConexion();
 
                     DtUsuario dtUsuario = ic.obtenerUsuario(nickname.trim());
+//                    DtUsuario dtUsuario = null;
+//                    for (DtUsuario u : ic.listarUsuarios()) {
+//                        if (u.getNickname().equalsIgnoreCase(nickname.trim())) {
+//                            dtUsuario = u;
+//                            break;
+//                        }
+//                    }
 
                     if (dtUsuario != null) {
                         HttpSession session = request.getSession(false);
@@ -116,7 +138,7 @@ public class UsuarioServlet extends HttpServlet {
                         request.setAttribute("seguidosPerfil", seguidosPerfil);
                         request.setAttribute("loSigo", loSigo);
 
-                        request.getRequestDispatcher("/fragmentos/detallePerfil.jsp").forward(request, response);
+                        request.getRequestDispatcher("/WEB-INF/fragmentos/detallePerfil.jsp").forward(request, response);
                     } else {
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         response.getWriter().write("<p style='color:red;'>Usuario no encontrado.</p>");
@@ -129,11 +151,11 @@ public class UsuarioServlet extends HttpServlet {
 
         } else if ("consultaUsuario".equals(accion)) {
             try {
-                IControlador ic = Fabrica.getInstance().getIControlador();
+                //IBridgeSOAP ic = Fabrica.getConexion();
                 List<DtUsuario> todosLosUsuarios = ic.listarUsuarios();
 
                 request.setAttribute("todosLosUsuarios", todosLosUsuarios);
-                request.getRequestDispatcher("/fragmentos/consultaUsuario.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/fragmentos/consultaUsuario.jsp").forward(request, response);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.getWriter().write("<h3 style='color:red;'>Error: " + e.getMessage() + "</h3>");
@@ -143,8 +165,16 @@ public class UsuarioServlet extends HttpServlet {
             String nickname = request.getParameter("nickname");
             if (nickname != null && !nickname.trim().isEmpty()) {
                 try {
-                    IControlador ic = Fabrica.getInstance().getIControlador();
+                    //IBridgeSOAP ic = Fabrica.getConexion();
                     DtUsuario dtUsuario = ic.obtenerUsuario(nickname.trim());
+//                    DtUsuario dtUsuario = null;
+//
+//                    for (DtUsuario u : ic.listarUsuarios()) {
+//                        if (u.getNickname().equalsIgnoreCase(nickname.trim())) {
+//                            dtUsuario = u;
+//                            break;
+//                        }
+//                    }
 
                     if (dtUsuario != null) {
                         HttpSession session = request.getSession(false);
@@ -184,7 +214,7 @@ public class UsuarioServlet extends HttpServlet {
                         request.setAttribute("esPropioPerfil", esPropioPerfil);
                         request.setAttribute("loSigo", loSigo);
 
-                        request.getRequestDispatcher("/fragmentos/detalleConsultaUsuario.jsp").forward(request, response);
+                        request.getRequestDispatcher("/WEB-INF/fragmentos/detalleConsultaUsuario.jsp").forward(request, response);
                     }
                 } catch (Exception e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -213,7 +243,7 @@ public class UsuarioServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String accion = request.getParameter("accion");
-        IControlador ic = Fabrica.getInstance().getIControlador();
+        //IBridgeSOAP ic = Fabrica.getConexion();
 
         if ("crear".equals(accion)) {
             String nickname = request.getParameter("nickname");
@@ -239,13 +269,19 @@ public class UsuarioServlet extends HttpServlet {
             }
 
             try {
-                Date fecha = Date.valueOf(fechaNacimiento);
+//                Date fecha = Date.valueOf(fechaNacimiento);
+                LocalDate fecha = Utils.Cast.valueOf(fechaNacimiento);
                 TipoUsuario tipo = TipoUsuario.valueOf(tipoUsuario);
 
+// ************************ Descomentar para ejecutar **************************
                 DtUsuario usuario = new DtUsuario(
                     nickname, password, email, nombre, apellido,
-                    null, fecha, institutos, tipo
-                );
+                    null, fecha, institutos, tipo );
+// ************************* Comentar para compilar ****************************
+//                DtUsuario usuario = Remux.DtUsuario(
+//                    nickname, password, email, nombre, apellido,
+//                    null, fecha, institutos, tipo );
+// *****************************************************************************
 
                 ic.crearUsuario(usuario, bytesImagen, nombreOriginal);
 
@@ -290,7 +326,8 @@ public class UsuarioServlet extends HttpServlet {
             }
 
             try {
-                Date fecha = Date.valueOf(fechaNacimiento);
+//                Date fecha = Date.valueOf(fechaNacimiento);
+                LocalDate fecha = Utils.Cast.valueOf(fechaNacimiento);
 
                 String passwordParaControlador = (nuevaPassword != null && !nuevaPassword.trim().isEmpty()) 
                     ? nuevaPassword.trim() 
@@ -306,6 +343,7 @@ public class UsuarioServlet extends HttpServlet {
                     nombreImagenFinal = usuarioActual.getNickname() + extension;
                 }
 
+// ************************* Comentar para ejecutar ****************************
                 DtUsuario usuarioModificado = new DtUsuario(
                     usuarioActual.getNickname(),
                     passwordParaControlador,
@@ -315,12 +353,30 @@ public class UsuarioServlet extends HttpServlet {
                     nombreImagenFinal, 
                     fecha,
                     institutos,
-                    usuarioActual.getTipoUsuario()
-                );
+                    usuarioActual.getTipoUsuario());
+// ************************* Comentar para compilar ****************************
+//                DtUsuario usuarioModificado = Remux.DtUsuario(
+//                    usuarioActual.getNickname(),
+//                    passwordParaControlador,
+//                    usuarioActual.getEmail(),
+//                    nombre,
+//                    apellido,
+//                    nombreImagenFinal, 
+//                    fecha,
+//                    institutos,
+//                    usuarioActual.getTipoUsuario());
+// *****************************************************************************
 
                 ic.modificarUsuario(usuarioModificado, bytesImagen, nombreOriginal);
 
-                actualizarSesionUsuario(request, ic, usuarioActual.getNickname());
+                actualizarSesionUsuario(request, usuarioActual.getNickname());
+//                List<DtUsuario> listaActualizada = ic.listarUsuarios();
+//                for (DtUsuario u : listaActualizada) {
+//                    if (u.getNickname().equalsIgnoreCase(usuarioActual.getNickname())) {
+//                        session.setAttribute("usuarioLogueado", u);
+//                        break;
+//                    }
+//                }
 
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("Cambios guardados correctamente.");
@@ -359,7 +415,7 @@ public class UsuarioServlet extends HttpServlet {
                 }
 
                 ic.seguirUsuario(logueado.getNickname(), nicknameASeguir.trim());
-                actualizarSesionUsuario(request, ic, logueado.getNickname());
+                actualizarSesionUsuario(request, logueado.getNickname());
 
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("Ahora sigues a '" + nicknameASeguir.trim() + "'.");
@@ -387,7 +443,7 @@ public class UsuarioServlet extends HttpServlet {
                 }
 
                 ic.dejarDeSeguirUsuario(logueado.getNickname(), nicknameADejar.trim());
-                actualizarSesionUsuario(request, ic, logueado.getNickname());
+                actualizarSesionUsuario(request, logueado.getNickname());
 
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("Has dejado de seguir a '" + nicknameADejar.trim() + "'.");
@@ -415,7 +471,7 @@ public class UsuarioServlet extends HttpServlet {
                 }
 
                 ic.dejarDeSeguirUsuario(seguidorAEliminar.trim(), logueado.getNickname());
-                actualizarSesionUsuario(request, ic, logueado.getNickname());
+                actualizarSesionUsuario(request, logueado.getNickname());
 
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("Se ha eliminado a '" + seguidorAEliminar.trim() + "' de tus seguidores.");
@@ -476,7 +532,9 @@ public class UsuarioServlet extends HttpServlet {
         }
     }
     
-    private void actualizarListasSociales(HttpServletRequest request, IControlador ic) {
+//    private void actualizarListasSociales(HttpServletRequest request, IControlador ic) {
+//    private void actualizarListasSociales(HttpServletRequest request, IBridgeSOAP ic) {
+    private void actualizarListasSociales(HttpServletRequest request) {
         DtUsuario logueado = (DtUsuario) request.getSession().getAttribute("usuarioLogueado");
         if (logueado != null) {
             try {
@@ -489,9 +547,20 @@ public class UsuarioServlet extends HttpServlet {
         }
     }
 
-    private void actualizarSesionUsuario(HttpServletRequest request, IControlador ic, String nickname) throws Exception {
+//    private void actualizarSesionUsuario(HttpServletRequest request, IControlador ic, String nickname) throws Exception {
+//    private void actualizarSesionUsuario(HttpServletRequest request, IBridgeSOAP ic, String nickname) throws Exception {
+//        List<DtUsuario> usuarios = ic.listarUsuarios();
+//        for (DtUsuario u : usuarios) {
+//            if (u.getNickname().equalsIgnoreCase(nickname)) {
+//                request.getSession().setAttribute("usuarioLogueado", u);
+//                break;
+//            }
+//        }
+//    }
+    private void actualizarSesionUsuario(HttpServletRequest request, String nickname) throws Exception {
         DtUsuario u = ic.obtenerUsuario(nickname);
         if (u != null) {
+                    // ************************** Comentar para ejecutar **************************
             DtUsuario sinPassword = new DtUsuario(
                 u.getNickname(),
                 null,
@@ -503,6 +572,19 @@ public class UsuarioServlet extends HttpServlet {
                 u.getInstitutos(),
                 u.getTipoUsuario()
             );
+                    // ************************** Comentar para compilar **************************
+//            DtUsuario sinPassword = Remux.DtUsuario(
+//                u.getNickname(),
+//                null,
+//                u.getEmail(),
+//                u.getNombre(),
+//                u.getApellido(),
+//                u.getImagen(),
+//                Utils.Cast.valueOf(u.getFNacimiento()),
+//                u.getInstitutos(),
+//                u.getTipoUsuario()
+//            );
+                    // ****************************************************************************
             request.getSession().setAttribute("usuarioLogueado", sinPassword);
         }
     }

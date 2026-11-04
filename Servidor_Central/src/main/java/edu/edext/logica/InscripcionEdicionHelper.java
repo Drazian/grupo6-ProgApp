@@ -1,5 +1,10 @@
 package edu.edext.logica;
 //**************************** Capa Logica *************************************
+import edu.edext.entitys.Usuario;
+import edu.edext.entitys.InscripcionEdicion;
+import edu.edext.entitys.Estudiante;
+import edu.edext.entitys.InscripcionEdicionID;
+import edu.edext.entitys.Edicion;
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtInscripcionEdicion;
@@ -30,20 +35,42 @@ public class InscripcionEdicionHelper {
         this.nombre=nombre;
     }
     
-    public List<String> getEstudiantesInscriptos(){
+    
+//    public List<String> getEstudiantesInscriptos(){
+//        return getInscriptos();
+//    }
+    public List<DtUsuario> getEstudiantesInscriptos(){
+        return toArrayDTO(toArrayEntity(getInscriptos()));
+    }
+
+    public List<DtUsuario> getEstudiantesCandidatos(){
+        return toArrayDTO(toArrayEntity(getCandidatos()));
+    }
+
+    public List<String> getListEstudiantesInscriptos(){
         return getInscriptos();
     }
 
-    public List<String> getEstudiantesCandidatos(){
+    public List<String> getListEstudiantesCandidatos(){
         return getCandidatos();
     }
 
+    private List<DtUsuario> toArrayDTO(List<Usuario> entity){
+        List<DtUsuario> ret=new ArrayList<>();
+        for (Usuario en : entity)
+            if(en instanceof Estudiante)
+                ret.add(new DtUsuario(en.getNickname(), null, en.getEmail(), en.getNombre(),
+                        en.getApellido(), en.getImagen(), en.getfNacimiento(), new ArrayList<>(), TipoUsuario.ESTUDIANTE));
+        return ret;
+    }
+    
     public void kill(){
         if(db!=null && db.isOpen()) db.close();
         hiloTransaction=null;
         DTO=null;
         db=null;
     }
+    
     
     //***************************** pipeline ***********************************
     
@@ -74,34 +101,44 @@ public class InscripcionEdicionHelper {
         return ret;
     }
     
-    public int inscribirEstudiante(String nomEstudiante, String nomEdicion, String videoURL) {
-        int ret = -1;
-        db = DB.createEntityManager();
+    private List<Usuario> toArrayEntity(List<String> dto){
+        db=DB.createEntityManager();
+        List<Usuario> ret=new ArrayList<>();
+        for(String usuario : dto)
+            ret.add(db.find(Usuario.class, usuario));
+        return ret;
+    }
+
+
+
+
+    public int inscribirEstudiante(String nomEstudiante, String nomEdicion, String videoURL){ // incompleta falta aislacion y modularizacion
+        int ret=-1;
+        db=DB.createEntityManager();
         try {
             db.getTransaction().begin();
             Estudiante estudiante = db.find(Estudiante.class, nomEstudiante);
             Edicion edicion = db.find(Edicion.class, nomEdicion);
-            if (estudiante == null) { db.getTransaction().rollback(); return 1; }
-            if (edicion == null) { db.getTransaction().rollback(); return 2; }
-            if (edicion.getFechaFin() != null && edicion.getFechaFin().isBefore(LocalDate.now())) {
+            if(estudiante==null){ db.getTransaction().rollback(); return 1; }
+            if (edicion==null){ db.getTransaction().rollback(); return 2; }
+            if (edicion.getFechaFin()!=null && edicion.getFechaFin().isBefore(LocalDate.now())){
                 db.getTransaction().rollback();
-                return 4; // la edicion ya finalizó
+                return 4; // la edicion ya finalizo
             }
             InscripcionEdicionID idDual = new InscripcionEdicionID(nomEstudiante, nomEdicion);
             InscripcionEdicion isExist = db.find(InscripcionEdicion.class, idDual);
-            if (isExist == null) {
-                // Pasar la variable videoURL al crear el objeto de persistencia
-                InscripcionEdicion newInscripcion = new InscripcionEdicion(estudiante, edicion, LocalDate.now(), INSCRIPTO, videoURL);
+            if(isExist==null){
+                InscripcionEdicion newInscripcion=new InscripcionEdicion(estudiante, edicion, LocalDate.now(), INSCRIPTO, videoURL);
                 db.persist(newInscripcion);
                 db.getTransaction().commit();
                 Logger.info("Se Inscribio el Estudiante {} en la edicion {}", nomEstudiante, nomEdicion);
-                ret = 0;
+                ret=0;
             } else {
                 db.getTransaction().rollback();
-                ret = 3; // ya inscripto
+                ret=3; // ya inscripto
             }
         } catch (Exception e) {
-            if (db.getTransaction().isActive()) db.getTransaction().rollback();
+            if(db.getTransaction().isActive()) db.getTransaction().rollback();
             Logger.error("Error al Inscribir al estudiante {} en la edicion {}", nomEstudiante, nomEdicion);
         } finally {
             db.close();
@@ -117,23 +154,24 @@ public class InscripcionEdicionHelper {
     // -1 error
     public static final int INSCRIPTO=1, ACEPTADO=2, RECHAZADO=3;
     
-
-    public int cancelarInscripcion(String nomEstudiante, String nomEdicion) {
-        int ret = -1;
-        db = DB.createEntityManager();
-
+    public int cancelarInscripcion(String nomEstudiante, String nomEdicion){ // incompleta falta aislacion y modularizacion
+        int ret=-1;
+        db=DB.createEntityManager();
         try {
             db.getTransaction().begin();
-
             InscripcionEdicionID idDual = new InscripcionEdicionID(nomEstudiante, nomEdicion);
+//            InscripcionEdicion isExist = db.find(InscripcionEdicion.class, idDual);
             InscripcionEdicion inscripcion = db.find(InscripcionEdicion.class, idDual);
-
-            // Verificar que exista la inscripción
+//            if(isExist!=null){
+//                db.remove(isExist);
+//                db.getTransaction().commit();
+//                Logger.info("Se Cancelo la Incripcion del Estudiante {} a la Edicion {}", nomEstudiante, nomEdicion);
+//                ret=0;
+//            }
             if (inscripcion == null) {
                 db.getTransaction().rollback();
                 return 1;
             }
-
             // Eliminar la inscripción sin importar el estado en que se encuentre
             db.remove(inscripcion);
             db.getTransaction().commit();
@@ -142,26 +180,26 @@ public class InscripcionEdicionHelper {
             ret = 0;
 
         } catch (Exception e) {
-            if (db.getTransaction().isActive()) {
-                db.getTransaction().rollback();
-            }
-            Logger.error("Error al cancelar la inscripción: {}", e.getMessage());
-            ret = -1;
-
-        } finally {
-            if (db != null && db.isOpen()) {
-                db.close();
-            }
-            db = null;
+            if(db.getTransaction().isActive()) db.getTransaction().rollback();
+            Logger.error("Error al Cancelar la Inscripcion del estudiante {} a la edicion {}", nomEstudiante, nomEdicion);
+            ret=-1;
+        } finally{
+	  if (db != null && db.isOpen()) {
+            db.close();
+          }
+          db = null;
         }
-
+        
         return ret;
     }
     
-    // =========================================================================
+  // =========================================================================
     // NUEVOS MÉTODOS PARA EL CASO DE USO "SELECCIONAR ESTUDIANTES"
     // =========================================================================
 
+    /**
+     * Calcula la prioridad de un estudiante según la fórmula ipr * 0.5
+     */
     private static class CupoExcedidoException extends RuntimeException {
         CupoExcedidoException(String m){ super(m); }
     }
@@ -169,6 +207,7 @@ public class InscripcionEdicionHelper {
     private double calcularPrioridad(String nicknameEstudiante, String nombreCurso) {
         EntityManager emAux = DB.createEntityManager();
         try {
+            // Cuenta inscripciones previas rechazadas (estado=3) a ediciones finalizadas del MISMO curso
             Long ipr = emAux.createQuery(
                 "SELECT COUNT(i) FROM InscripcionEdicion i " +
                 "WHERE i.estudiante.nickname = :estudiante " +
@@ -207,6 +246,8 @@ public class InscripcionEdicionHelper {
                 Edicion ed = i.getEdicion();
                 
                 DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), "usr.png");
+//                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), null, null, 0, 0, null, null, null, null, null, "usr.png");
+                
                 
                 DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, "usr.png");
 
@@ -225,6 +266,10 @@ public class InscripcionEdicionHelper {
         return ret;
     }
 
+    /**
+     * Aplica el dictamen del docente (Aceptado/Rechazado) masivamente a la lista de estudiantes.
+     * @param evaluaciones Map donde Key = Nickname del Estudiante, Value = Nuevo Estado (2 o 3)
+     */
     public void evaluarInscripciones(Map<String, Integer> evaluaciones) throws Exception {
         db = DB.createEntityManager();
         try {
@@ -262,7 +307,7 @@ public class InscripcionEdicionHelper {
             throw new Exception(e.getMessage());
         } catch (Exception e) {
             if (db.getTransaction().isActive()) db.getTransaction().rollback();
-            Logger.error("Error al evaluar inscripciones: " + e.getMessage());
+            Logger.error(e,"Error al evaluar inscripciones: ");
             throw new Exception("Ocurrió un error al guardar las evaluaciones de los estudiantes.");
         } finally {
             db.close();
@@ -303,4 +348,8 @@ public class InscripcionEdicionHelper {
         }
         return ret;
     }  
+    
+    
+    
+    
 }

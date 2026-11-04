@@ -3,6 +3,9 @@ package edu.edext.presentacion;
 import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
 import edu.edext.tools.indexHelper;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
 import javax.swing.JOptionPane;
 import org.tinylog.Logger;
 
@@ -18,7 +21,7 @@ public class index extends javax.swing.JFrame {
         initComponents();
         form=new indexHelper(dpIndex);
         form.assignScroll();
-        cfg.init();
+//        cfg.init();
         form.setScroll(true);  // Activa o desactiva el Scroll de la ventana padre
         form.setLimiteMin(true);  // true = Impide que el formulario salga fuera de la ventana del lado izquierdo
     }
@@ -58,12 +61,15 @@ public class index extends javax.swing.JFrame {
         jmverArbol = new javax.swing.JMenuItem();
         mDataPrueba = new javax.swing.JMenu();
         jmcargarDatosPrueba = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(773, 435));
+        setMinimumSize(new java.awt.Dimension(700, 420));
+        setPreferredSize(new java.awt.Dimension(810, 540));
 
-        jScrollPane1.setMinimumSize(new java.awt.Dimension(773, 435));
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(1138, 640));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(810, 540));
 
         dpIndex.setDoubleBuffered(true);
         dpIndex.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -186,6 +192,18 @@ public class index extends javax.swing.JFrame {
 
         mbIndex.add(mDataPrueba);
 
+        jMenu1.setText("Config");
+
+        jMenuItem2.setText("Configuracion");
+        jMenuItem2.addActionListener(this::jMenuItem2ActionPerformed);
+        jMenu1.add(jMenuItem2);
+
+        jMenuItem1.setText("About SOAP");
+        jMenuItem1.addActionListener(this::jMenuItem1ActionPerformed);
+        jMenu1.add(jMenuItem1);
+
+        mbIndex.add(jMenu1);
+
         setJMenuBar(mbIndex);
 
         pack();
@@ -290,10 +308,23 @@ public class index extends javax.swing.JFrame {
         mouse.MouseDragged(evt);
     }//GEN-LAST:event_dpIndexMouseDragged
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        try {
+            Desktop.getDesktop().browse(URI.create(cfg.wsdl()));
+        } catch (IOException ex) {
+            System.getLogger(index.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        form.cargarPanel("Configuracion",new Config(), true);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
     /**
      * @param args the command line arguments
+     * @param latch
      */
-    public static void main(String args[]) {
+    public static void main(String args[], java.util.concurrent.CountDownLatch latch) {
         java.util.logging.LogManager.getLogManager().reset(); // <- lo agregue para eliminar toda interferencia del JUL
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -310,17 +341,34 @@ public class index extends javax.swing.JFrame {
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
             Logger.error(ex);
         }
-        //</editor-fold>
+          //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new index().setVisible(true));
-    }
+    //    java.awt.EventQueue.invokeLater(() -> new index().setVisible(true));
+    //}
+    java.awt.EventQueue.invokeLater(() -> {
+        index ventana = new index();
+        ventana.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        ventana.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                latch.countDown();
+            }
+        });
+        ventana.setVisible(true);
+    });
+}
+
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem altaCurso;
     private javax.swing.JMenuItem consultaCurso;
     private javax.swing.JMenuItem crearEdicion;
     private javax.swing.JDesktopPane dpIndex;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JMenuItem jmConsultaEdicion;

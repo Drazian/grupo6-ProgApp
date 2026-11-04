@@ -1,40 +1,52 @@
 package edu.edext.datatypes;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet; 
 import java.util.List;
 import java.util.Set;
 
+@XmlRootElement(name = "DtConsultaCurso")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DtConsultaCurso {
     
-    private final String nombre;
-    private final String descripcion;
-    private final String duracion;
-    private final int cantidadHoras;
-    private final String imagen;
-    private final String url;
-    private final int creditos;
-    private final Date fechaRegistro;
-    private final List<DtEdicion> ediciones;
-    private final List<DtPrograma> programas;
-    private final List<DtCategoria> categorias;
-    private final List<DtCurso> previas;
+    private String nombre;
+    private String descripcion;
+    private String duracion;
+    private int cantidadHoras;
+    private String imagen;
+    private String url;
+    private int creditos;
+//    @jakarta.xml.bind.annotation.XmlSchemaType(name = "fechaRegistro")
+    @XmlElement(name = "fechaRegistro")
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate fechaRegistro;
+    private List<DtEdicion> ediciones;
+    private List<DtPrograma> programas;
+    private List<DtCategoria> categorias;
+    private List<DtCurso> previas;
     private Set<String> nameEdiciones;
     private Set<String> nameProgramas;
     private Set<String> nameCategorias;
     private Set<String> namePrevias;
 
-    public DtConsultaCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, 
+    public DtConsultaCurso(){};
+    public DtConsultaCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, LocalDate fechaRegistro, 
             List<DtEdicion> ediciones, List<DtPrograma> programas, List<DtCategoria> categorias, List<DtCurso> previas, String imagen) {
         this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, ediciones, programas, categorias, previas, null, null, null, null, imagen);
         
     }
     public DtConsultaCurso(String nombre, String descripcion, String duracion, int cantidadHoras, 
-                           int creditos, String url, Date fechaRegistro, Set<String> ediciones, Set<String> programas, Set<String> categorias, Set<String> previas, String imagen) {
+                           int creditos, String url, LocalDate fechaRegistro, Set<String> ediciones, Set<String> programas, Set<String> categorias, Set<String> previas, String imagen) {
         this(nombre, descripcion, duracion, cantidadHoras, creditos, url, fechaRegistro, null, null, null, null, ediciones, programas, categorias, previas, imagen);
     }
-    public DtConsultaCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, Date fechaRegistro, 
+    public DtConsultaCurso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, LocalDate fechaRegistro, 
             List<DtEdicion> ediciones, List<DtPrograma> programas, List<DtCategoria> categorias, List<DtCurso> previas,
             Set<String> nameEdiciones, Set<String> nameProgramas, Set<String> nameCategorias, Set<String> namePrevias, String imagen) {
         Set<String> tmpEdiciones=new HashSet<>(), tmpProgramas=new HashSet<>(), tmpCategorias=new HashSet<>(), tmpPrevias=new HashSet<>(); 
@@ -75,7 +87,7 @@ public class DtConsultaCurso {
     public int getCreditos() { return creditos; }
     public String getImagen(){ return this.imagen; }
     public String getUrl() { return url; }
-    public Date getFechaRegistro() { return fechaRegistro; }
+    public LocalDate getFechaRegistro() { return fechaRegistro; }
 
     public List<DtEdicion> getEdiciones() { return ediciones; }
     public List<DtPrograma> getProgramas() { return programas; }

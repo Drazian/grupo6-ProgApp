@@ -4,7 +4,7 @@
 <c:choose>
     <c:when test="${not empty inscripciones}">
         
-        <!-- Cabecera de la tabla con el Ordenador -->
+        <!-- Cabecera de la tabla con el Ordenador (Req. 7.5) -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f8f9fa; padding: 10px; border-radius: 4px;">
             <strong style="color: #2c3e50;">Inscripciones encontradas: ${inscripciones.size()}</strong>
             
@@ -73,10 +73,12 @@
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: center; background: #fdfefe;">
                             <!-- Inputs que viajarán al Servlet como "estado_nickname" -->
                             <label style="margin-right: 15px; cursor: pointer;">
+//                                <input type="radio" name="estado_${ins.estudiante.nickname}" value="2" ${ins.valorEstado == 2 ? 'checked' : ''} required> 
                                 <input type="radio" name="estado_${ins.estudiante.nickname}" value="2" ${ins.valorEstado == 2 ? 'checked' : ''}> 
                                 <span style="color: #27ae60; font-weight: bold;">Aceptar</span>
                             </label>
                             <label style="cursor: pointer;">
+//                                <input type="radio" name="estado_${ins.estudiante.nickname}" value="3" ${ins.valorEstado == 3 ? 'checked' : ''} required> 
                                 <input type="radio" name="estado_${ins.estudiante.nickname}" value="3" ${ins.valorEstado == 3 ? 'checked' : ''}> 
                                 <span style="color: #c0392b; font-weight: bold;">Rechazar</span>
                             </label>

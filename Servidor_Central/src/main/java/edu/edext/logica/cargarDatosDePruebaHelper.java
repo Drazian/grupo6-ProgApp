@@ -1,5 +1,15 @@
 package edu.edext.logica;
 //**************************** Capa Logica *************************************
+import edu.edext.entitys.Usuario;
+import edu.edext.entitys.InscripcionPrograma;
+import edu.edext.entitys.InscripcionEdicion;
+import edu.edext.entitys.Docente;
+import edu.edext.entitys.Estudiante;
+import edu.edext.entitys.Curso;
+import edu.edext.entitys.Categoria;
+import edu.edext.entitys.Instituto;
+import edu.edext.entitys.ProgramaFormacion;
+import edu.edext.entitys.Edicion;
 import edu.edext.tools.Utils;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityManager;
@@ -124,7 +134,7 @@ public class cargarDatosDePruebaHelper {
                     "eleven11@gmail.com",
                     "Eleven",
                     "Twelve",
-                    java.sql.Date.valueOf(LocalDate.of(1971, 12, 31)),
+                    LocalDate.of(1971, 12, 31),
                     imagen
             );
 
@@ -134,7 +144,7 @@ public class cargarDatosDePruebaHelper {
                     "gcostas@gmail.com",
                     "Gerardo",
                     "Costas",
-                    java.sql.Date.valueOf(LocalDate.of(1983, 11, 15)),
+                    LocalDate.of(1983, 11, 15),
                     imagen
             );
 
@@ -144,7 +154,7 @@ public class cargarDatosDePruebaHelper {
                     "rcotelo@yahoo.com",
                     "Rodrigo",
                     "Cotelo",
-                    java.sql.Date.valueOf(LocalDate.of(1975, 8, 2)),
+                    LocalDate.of(1975, 8, 2),
                     "roro.jpeg"
             );
             
@@ -155,7 +165,7 @@ public class cargarDatosDePruebaHelper {
                     "cgarrido@hotmail.com",
                     "Cecilia",
                     "Garrido",
-                    java.sql.Date.valueOf(LocalDate.of(1987, 9, 12)),
+                    LocalDate.of(1987, 9, 12),
                     "chechi.jpeg"
             );
 
@@ -165,7 +175,7 @@ public class cargarDatosDePruebaHelper {
                     "jwilliams@gmail.com",
                     "Jeff",
                     "Williams",
-                    java.sql.Date.valueOf(LocalDate.of(1964, 11, 27)),
+                    LocalDate.of(1964, 11, 27),
                     "jeffw.jpeg"
             );
 
@@ -175,7 +185,7 @@ public class cargarDatosDePruebaHelper {
                     "aweiss@hotmail.com",
                     "Adrian",
                     "Weiss",
-                    java.sql.Date.valueOf(LocalDate.of(1978, 12, 23)),
+                    LocalDate.of(1978, 12, 23),
                     imagen
             );
 
@@ -191,7 +201,7 @@ public class cargarDatosDePruebaHelper {
                     "heisenberg@gmail.com",
                     "Walter",
                     "White",
-                    java.sql.Date.valueOf(LocalDate.of(1956, 3, 7)),
+                    LocalDate.of(1956, 3, 7),
                     "heisenberg.png",
                     institutosWalter
             );
@@ -206,7 +216,7 @@ public class cargarDatosDePruebaHelper {
                     "benKenobi@gmail.com",
                     "Obi-Wan",
                     "Kenobi",
-                    java.sql.Date.valueOf(LocalDate.of(1914, 4, 2)),
+                    LocalDate.of(1914, 4, 2),
                     "benkenobi.jpg",
                     institutosObi
             );
@@ -221,7 +231,7 @@ public class cargarDatosDePruebaHelper {
                     "e.watson@gmail.com",
                     "Emma",
                     "Watson",
-                    java.sql.Date.valueOf(LocalDate.of(1990, 4, 15)),
+                    LocalDate.of(1990, 4, 15),
                     "waston.jpg",
                     institutosEmma
             );
@@ -236,7 +246,7 @@ public class cargarDatosDePruebaHelper {
                     "greghouse@gmail.com",
                     "Gregory",
                     "House",
-                    java.sql.Date.valueOf(LocalDate.of(1959, 5, 15)),
+                    LocalDate.of(1959, 5, 15),
                     "house.jpeg",
                     institutosHouse
             );
@@ -251,7 +261,7 @@ public class cargarDatosDePruebaHelper {
                     "tim.cook@apple.com",
                     "Tim",
                     "Cook",
-                    java.sql.Date.valueOf(LocalDate.of(1960, 11, 1)),
+                    LocalDate.of(1960, 11, 1),
                     "timmy.jpeg",
                     institutosTim
             );
@@ -266,7 +276,7 @@ public class cargarDatosDePruebaHelper {
                     "dan.riccio@gmail.com",
                     "Daniel",
                     "Riccio",
-                    java.sql.Date.valueOf(LocalDate.of(1963, 7, 5)),
+                    LocalDate.of(1963, 7, 5),
                     imagen,
                     institutosDaniel
             );
@@ -281,7 +291,7 @@ public class cargarDatosDePruebaHelper {
                     "schiller@gmail.com",
                     "Philip",
                     "Schiller",
-                    java.sql.Date.valueOf(LocalDate.of(1961, 10, 7)),
+                    LocalDate.of(1961, 10, 7),
                     imagen,
                     institutosPhilip
             );
@@ -296,7 +306,7 @@ public class cargarDatosDePruebaHelper {
                     "sewell@gmail.com",
                     "Bruce",
                     "Sewell",
-                    java.sql.Date.valueOf(LocalDate.of(1959, 12, 3)),
+                    LocalDate.of(1959, 12, 3),
                     imagen,
                     institutosBruce
             );
@@ -311,7 +321,7 @@ public class cargarDatosDePruebaHelper {
                     "agarcia@gmail.com",
                     "Adriana",
                     "García",
-                    java.sql.Date.valueOf(LocalDate.of(1978, 7, 28)),
+                    LocalDate.of(1978, 7, 28),
                     imagen,
                     institutosAdriana
             );
@@ -407,7 +417,7 @@ public class cargarDatosDePruebaHelper {
                     15,
                     1,
                     "www.tmu.edu.uy",
-                    java.sql.Date.valueOf(LocalDate.of(2026, 2, 1)),
+                    LocalDate.of(2026, 2, 1),
                     il,
                     new ArrayList<>(),
                     new ArrayList<>(),
@@ -423,7 +433,7 @@ public class cargarDatosDePruebaHelper {
                     30,
                     2,
                     "www.tmu.edu.uy",
-                    java.sql.Date.valueOf(LocalDate.of(2026, 7, 12)),
+                    LocalDate.of(2026, 7, 12),
                     il,
                     new ArrayList<>(),
                     new ArrayList<>(),
@@ -443,7 +453,7 @@ public class cargarDatosDePruebaHelper {
                     60,
                     4,
                     "https://eva.fing.edu.uy/course/view.php?id=783#section-2",
-                    java.sql.Date.valueOf(LocalDate.of(2024, 6, 25)),
+                    LocalDate.of(2024, 6, 25),
                     im,
                     catc3,
                     new ArrayList<>(),
@@ -463,7 +473,7 @@ public class cargarDatosDePruebaHelper {
                     75,
                     5,
                     "https://eva.fing.edu.uy/course/view.php?id=783#section-2",
-                    java.sql.Date.valueOf(LocalDate.of(2025, 6, 16)),
+                    LocalDate.of(2025, 6, 16),
                     im,
                     catc4,
                     new ArrayList<>(),
@@ -486,7 +496,7 @@ public class cargarDatosDePruebaHelper {
                     45,
                     3,
                     "https://eva.fing.edu.uy/course/view.php?id=783#section-2",
-                    java.sql.Date.valueOf(LocalDate.of(2026, 2, 1)),
+                    LocalDate.of(2026, 2, 1),
                     im,
                     catc5,
                     new ArrayList<>(),
@@ -504,7 +514,7 @@ public class cargarDatosDePruebaHelper {
                     150,
                     10,
                     "http://www.flordeceibo.edu.uy/",
-                    java.sql.Date.valueOf(LocalDate.of(2008, 7, 27)),
+                    LocalDate.of(2008, 7, 27),
                     di,
                     catc6,
                     new ArrayList<>(),
@@ -524,7 +534,7 @@ public class cargarDatosDePruebaHelper {
                     90,
                     6,
                     "https://eva.fing.edu.uy/course/view.php?id=1187",
-                    java.sql.Date.valueOf(LocalDate.of(2024, 2, 2)),
+                    LocalDate.of(2024, 2, 2),
                     in,
                     catc7,
                     new ArrayList<>(),
@@ -542,7 +552,7 @@ public class cargarDatosDePruebaHelper {
                     45,
                     3,
                     "https://eva.fing.edu.uy/mod/folder/view.php?id=89398",
-                    java.sql.Date.valueOf(LocalDate.of(2026, 6, 15)),
+                    LocalDate.of(2026, 6, 15),
                     in,
                     catc8,
                     new ArrayList<>(),
@@ -561,7 +571,7 @@ public class cargarDatosDePruebaHelper {
                     60,
                     4,
                     "https://eva.fing.edu.uy/mod/folder/view.php?id=89398",
-                    java.sql.Date.valueOf(LocalDate.of(2026, 5, 24)),
+                    LocalDate.of(2026, 5, 24),
                     in,
                     catc9,
                     new ArrayList<>(),
@@ -584,7 +594,7 @@ public class cargarDatosDePruebaHelper {
                     105,
                     7,
                     "https://www.fing.edu.uy/noticias/extension/modulo-de-tallerextension-microbit",
-                    java.sql.Date.valueOf(LocalDate.of(2026, 3, 13)),
+                    LocalDate.of(2026, 3, 13),
                     ie,
                     catc10,
                     new ArrayList<>(),
@@ -931,7 +941,7 @@ public class cargarDatosDePruebaHelper {
                     EL, e7, LocalDate.of(2024, 3, 3), ACEPTADO));
 
             em.persist(new InscripcionEdicion(
-                    CH, e7, LocalDate.of(2024, 3, 5), INSCRIPTO));
+                    CH, e7, LocalDate.of(2024, 3, 5), 0));
 
             em.persist(new InscripcionEdicion(
                     JW, e8, LocalDate.of(2026, 2, 18), ACEPTADO));
@@ -1059,37 +1069,37 @@ public class cargarDatosDePruebaHelper {
 
 
             em.persist(new InscripcionPrograma(
-                    EL, p1, LocalDate.of(2026, 4, 15), INSCRIPTO));
+                    EL, p1, LocalDate.of(2026, 4, 15), 0));
             
             em.persist(new InscripcionPrograma(
-                    CH, p1, LocalDate.of(2026, 4, 20), INSCRIPTO));
+                    CH, p1, LocalDate.of(2026, 4, 20), 0));
 
             em.persist(new InscripcionPrograma(
-                    CO, p2, LocalDate.of(2026, 7, 10), INSCRIPTO));
+                    CO, p2, LocalDate.of(2026, 7, 10), 0));
 
             em.persist(new InscripcionPrograma(
-                    CH, p2, LocalDate.of(2026, 7, 10), INSCRIPTO));
+                    CH, p2, LocalDate.of(2026, 7, 10), 0));
 
             em.persist(new InscripcionPrograma(
-                    EL, p2, LocalDate.of(2026, 7, 12), INSCRIPTO));
+                    EL, p2, LocalDate.of(2026, 7, 12), 0));
             
             em.persist(new InscripcionPrograma(
-                    WE, p2, LocalDate.of(2026, 7, 15), INSCRIPTO));
+                    WE, p2, LocalDate.of(2026, 7, 15), 0));
 
             em.persist(new InscripcionPrograma(
-                    RO, p2, LocalDate.of(2026, 7, 18), INSCRIPTO));
+                    RO, p2, LocalDate.of(2026, 7, 18), 0));
 
             em.persist(new InscripcionPrograma(
-                    CO, p3, LocalDate.of(2026, 8, 11), INSCRIPTO));
+                    CO, p3, LocalDate.of(2026, 8, 11), 0));
 
             em.persist(new InscripcionPrograma(
-                    CH, p3, LocalDate.of(2026, 8, 15), INSCRIPTO));
+                    CH, p3, LocalDate.of(2026, 8, 15), 0));
 
             em.persist(new InscripcionPrograma(
-                    RO, p3, LocalDate.of(2026, 8, 22), INSCRIPTO));
+                    RO, p3, LocalDate.of(2026, 8, 22), 0));
 
             em.persist(new InscripcionPrograma(
-                    JW, p3, LocalDate.of(2026, 8, 30), INSCRIPTO));
+                    JW, p3, LocalDate.of(2026, 8, 30), 0));
             
             
             /*

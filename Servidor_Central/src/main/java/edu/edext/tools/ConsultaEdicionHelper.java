@@ -2,6 +2,7 @@ package edu.edext.tools;
 //************************ Capa presentacion ***********************************
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtInstituto;
+import edu.edext.datatypes.DtUsuario;
 import edu.edext.logica.Fabrica;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -88,7 +89,19 @@ public class ConsultaEdicionHelper {
     }
     
     public String[] getListaInscriptos(String edicion){
-        return getInscriptos(edicion).toArray(String[]::new);
+        //return getInscriptos(edicion).toArray(String[]::new)
+        return getfullnames(edicion).toArray(String[]::new);
+    }
+    
+    private List<String> getfullnames(String edicion){
+        Pipe tmp=new Pipe();
+        List<String> ret=new ArrayList<>();
+        try { 
+            for(DtUsuario dt : tmp.getPipeinscriptos(edicion))
+                ret.add(dt.getNombre()+" "+dt.getApellido()); }
+        catch (Exception e) { ret=new ArrayList<>(); }
+        tmp=null;
+        return ret;
     }
     
     private boolean getEdicion(String nombre){
@@ -202,6 +215,10 @@ public class ConsultaEdicionHelper {
         
         private List<String> getPipeInscriptos(String nombre) throws Exception{
             return Fabrica.getInstance().getIControlador().getEstudiantesInscriptosEdicion(nombre);
+        }
+        
+        private List<DtUsuario> getPipeinscriptos(String nombre) throws Exception{
+            return Fabrica.getInstance().getIControlador().getEstudiantesIncriptosEdicion(nombre);
         }
       
     }//*************************************************************************

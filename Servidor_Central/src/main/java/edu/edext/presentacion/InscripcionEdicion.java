@@ -3,6 +3,7 @@ package edu.edext.presentacion;
 
 import edu.edext.tools.ConsultaEdicionHelper;
 import edu.edext.tools.InscripcionEdicionHelper;
+import edu.edext.tools.Utils;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -17,6 +18,7 @@ import org.tinylog.Logger;
 public class InscripcionEdicion extends javax.swing.JPanel {
     private String oldInscriptoSelect="", oldCandidatoSelect="", estadoCruce;
     private final int INSCRIPTOS=1, CANDIDATOS=2;
+    private final Utils.Mouse mouse=new Utils.Mouse();
 
     /**
      * Creates new form InscEditCursoForm
@@ -73,6 +75,16 @@ public class InscripcionEdicion extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(735, 415));
         setPreferredSize(new java.awt.Dimension(735, 415));
         setRequestFocusEnabled(false);
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+        });
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLInstituto.setText("Instituto ...:");
@@ -258,6 +270,14 @@ public class InscripcionEdicion extends javax.swing.JPanel {
     private void jBEst_CandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBEst_CandActionPerformed
         operacion();
     }//GEN-LAST:event_jBEst_CandActionPerformed
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_formMouseDragged
 
 
     private void operacion(){

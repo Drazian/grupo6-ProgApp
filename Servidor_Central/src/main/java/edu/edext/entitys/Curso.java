@@ -1,4 +1,4 @@
-package edu.edext.logica;
+package edu.edext.entitys;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +8,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.ManyToMany;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +32,7 @@ public class Curso {
 //    private List<Categoria> categorias;
    
     @Column(nullable=false) // Aporte de Draco conservado
-    private Date fechaRegistro;
+    private LocalDate fechaRegistro;
 
     @ManyToOne
     //@Column(name = "instituto") //
@@ -54,7 +55,7 @@ public class Curso {
     public Curso() {}
 
     public Curso(String nombre, String descripcion, String duracion, int cantidadHoras, int creditos, String url, 
-                 Date fechaRegistro, Instituto instituto, List<Categoria> categorias, List<Curso> previas, String imagen) {
+                 LocalDate fechaRegistro, Instituto instituto, List<Categoria> categorias, List<Curso> previas, String imagen) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.duracion = duracion;
@@ -86,7 +87,7 @@ public class Curso {
     public int getCantidadHoras() { return cantidadHoras; }
     public int getCreditos() { return creditos; }
     public String getUrl() { return url; }
-    public Date getFechaRegistro() { return fechaRegistro; }
+    public LocalDate getFechaRegistro() { return fechaRegistro; }
     public Instituto getInstituto() { return instituto; }
     public List<Categoria> getCategorias() { return categorias; }
     public List<Curso> getPrevias() { return previas; }

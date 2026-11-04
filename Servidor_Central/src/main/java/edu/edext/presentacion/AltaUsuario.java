@@ -11,6 +11,7 @@ import edu.edext.tools.cfg;
 import java.awt.Image;
 import java.io.File;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,37 +64,32 @@ public class AltaUsuario extends javax.swing.JPanel {
         initComponents();
         this.modoForm=i;
         widthForm=650;
-        Utils.GUI.assignFormato(txtNacimiento);
         txtNickname.setEditable(false);
         txtNickname.setFocusable(false);
         txtPassword.setEditable(false);
         txtPassword.setFocusable(false);
-        txtEmail.setEditable(false);
-        btnAceptar.setVisible(false);
-        btnAceptar1.setVisible(false);
         chbDocente.setVisible(false);
         jPBotones1.setVisible(false);
         jPBotones.setVisible(false);
         jPInstituto.setVisible(false);
         btnQuitarInstituto.setEnabled(false);
         formResize(FORMGRANDE);
+        //btnAceptar.setVisible(false);
+        //txtEmail.setEditable(false);
         
         DefaultListModel<String> model = new DefaultListModel<>();
         lisInstitutos.setModel(model);
         
         cargarInstitutos();
         
-        if (i == 2){  
+        if (i ==2){  
+            //Falta Obtener Cursos y cargar en las Tablas correspondientes
             txtApellido.setEditable(false);
             txtNombre.setEditable(false);
-            txtNacimiento.setEditable(false);
-            jBNacimiento.setVisible(false);
             dchFechaDeNacimiento.setEnabled(false);
             btnGuardarCambios.setVisible(false);
-            btnGuardarCambios1.setVisible(false);
             btnAgregarImagen.setVisible(false);
             btnCancelar.setText("Volver");
-            btnCancelar1.setText("Volver");
             Utils.GUI.setDisable(chbDocente);
         }
     }
@@ -521,37 +517,36 @@ public class AltaUsuario extends javax.swing.JPanel {
          txtEmail.setText(usuario.getEmail());
         txtNombre.setText(usuario.getNombre());
         txtApellido.setText(usuario.getApellido());
-        dchFechaDeNacimiento.setDate(usuario.getfNacimiento());
+        dchFechaDeNacimiento.setDate(Utils.Cast.valueOf(usuario.getfNacimiento()));
 //        chbDocente.setEnabled(false);
         DefaultListModel<String> model =
                 (DefaultListModel<String>) lisInstitutos.getModel();
-        model.clear();
 
         if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
             formResize(FORMGRANDE);
+//            jPBotones.setVisible(false);
+//            jPBotones1.setVisible(true);
             chbDocente.setVisible(true);
             chbDocente.setSelected(true);
+//            jPInstituto.setVisible(true);
             if(this.modoForm==2){
                 cbInstitutos.setVisible(false);
                 btnQuitarInstituto.setVisible(false);
                 btnAgregarInstituto.setVisible(false);
             }
-            if (usuario.getInstitutos() != null) {
-                for (String instituto : usuario.getInstitutos()) {
-                    model.addElement(instituto);
-                }
+            for (String instituto : usuario.getInstitutos()) {
+                model.addElement(instituto);
             }
         } else {
             formResize(FORMCHICO);
             chbDocente.setVisible(false);
+//            jPInstituto.setVisible(false);
+//            jPBotones.setVisible(true);
         }
 
-        String imgUsuario = (usuario.getImagen() != null && !usuario.getImagen().isEmpty())
-                ? usuario.getImagen()
-                : cfg.IMAGE_USER;
-        cargarImagen(pathImagen+Utils.OS.getSeparador()+imgUsuario);
+        cargarImagen(pathImagen+Utils.OS.getSeparador()+usuario.getImagen());
 
-        imagenSeleccionada = new File(pathImagen, imgUsuario); 
+        imagenSeleccionada =new File(pathImagen, usuario.getImagen()); 
         //System.out.println("muestro : "+pathImagen+Utils.OS.getSeparador()+usuario.getImagen());
         //System.out.println("file : "+ imagenSeleccionada.getAbsolutePath());
         //System.out.println(RUTADEFAULT.substring(0, RUTADEFAULT.length()-1)); 
@@ -630,7 +625,8 @@ public class AltaUsuario extends javax.swing.JPanel {
         String email = txtEmail.getText().trim();
         String nombre = txtNombre.getText().trim();
         String apellido = txtApellido.getText().trim();
-        Date nacimiento=Utils.Cast.valudf(txtNacimiento.getText());   //  campo formateado no necesita trim()
+//        Date nacimiento=Utils.Cast.valudf(txtNacimiento.getText());   //  campo formateado no necesita trim()
+        LocalDate nacimiento=Utils.Cast.valueOf(txtNacimiento.getText());   //  campo formateado no necesita trim()
         
         if(Utils.Validate.isEmpty(nickname)){
             alertMessage("Nickname vacio", "Error");
@@ -654,7 +650,8 @@ public class AltaUsuario extends javax.swing.JPanel {
             alertMessage("Debe seleccionar una fecha de nacimiento.", "Error");
             dchFechaDeNacimiento.requestFocus();
             return; }
-        else if(!Utils.Fecha.isCoherente(nacimiento, Date.from(Instant.now()))){
+//        else if(!Utils.Fecha.isCoherente(nacimiento, Date.from(Instant.now()))){
+        else if(!Utils.Fecha.isCoherente(nacimiento, LocalDate.now())){
             alertMessage("La fecha tiene que ser anterior a la fecha actual", "Error");
             dchFechaDeNacimiento.requestFocus();
             return; }
@@ -720,7 +717,8 @@ public class AltaUsuario extends javax.swing.JPanel {
         String email = txtEmail.getText().trim();
         String nombre = txtNombre.getText().trim();
         String apellido = txtApellido.getText().trim();
-        Date nacimiento=Utils.Cast.valudf(txtNacimiento.getText());   //  campo formateado no necesita trim()
+//        Date nacimiento=Utils.Cast.valudf(txtNacimiento.getText());   //  campo formateado no necesita trim()
+        LocalDate nacimiento=Utils.Cast.valueOf(txtNacimiento.getText());   //  campo formateado no necesita trim()
         
         
         
@@ -773,7 +771,8 @@ public class AltaUsuario extends javax.swing.JPanel {
             alertMessage("Debe seleccionar una fecha de nacimiento.", "Error");
             dchFechaDeNacimiento.requestFocus();
             return; }
-        else if(!Utils.Fecha.isCoherente(nacimiento, Date.from(Instant.now()))){
+//        else if(!Utils.Fecha.isCoherente(nacimiento, Date.from(Instant.now()))){
+        else if(!Utils.Fecha.isCoherente(nacimiento, LocalDate.now())){
             alertMessage("La fecha tiene que ser anterior a la fecha actual", "Error");
             dchFechaDeNacimiento.requestFocus();
             return; }
@@ -807,20 +806,19 @@ public class AltaUsuario extends javax.swing.JPanel {
         }
 
         try {
-            String nombreImagenFinal = cfg.IMAGE_USER;
-            if (imagenSeleccionada != null) {
-                Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nickname);
-                int dot = imagenSeleccionada.getName().lastIndexOf(".");
-                String ext = dot >= 0 ? imagenSeleccionada.getName().substring(dot) : ".png";
-                nombreImagenFinal = nickname + ext;
-            }
+            Utils.Imagen.save(imagenSeleccionada.getAbsolutePath(), nickname); 
+            //String imagen = GestorImagenes.guardarImagen(imagenSeleccionada,nickname);
+            //System.out.println("guardo : "+imagenSeleccionada.getAbsolutePath());
+            
+            //System.out.println("ebtro con mail : "+ email);
             DtUsuario usuarioModificado = new DtUsuario(
                 nickname,
                 null,
                 email,
                 nombre,
                 apellido,
-                nombreImagenFinal,
+                nickname+imagenSeleccionada.getName()
+                        .substring(imagenSeleccionada.getName().lastIndexOf(".")),
                 nacimiento,
                 institutos,
                 tipo

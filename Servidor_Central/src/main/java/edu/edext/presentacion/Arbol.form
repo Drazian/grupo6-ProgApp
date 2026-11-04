@@ -35,7 +35,9 @@
       <SubComponents>
         <Component class="javax.swing.JTree" name="jTree">
           <Events>
+            <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jTreeMouseDragged"/>
             <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="jTreeFocusGained"/>
+            <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jTreeMousePressed"/>
           </Events>
         </Component>
       </SubComponents>

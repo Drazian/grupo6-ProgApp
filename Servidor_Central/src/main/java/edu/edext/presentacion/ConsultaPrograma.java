@@ -2,10 +2,10 @@ package edu.edext.presentacion;
 
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtCurso;
+import edu.edext.datatypes.DtUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
-import edu.edext.tools.cfg;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JOptionPane;
@@ -16,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
  * @author pipo
  */
 public class ConsultaPrograma extends javax.swing.JPanel {
+    private final Utils.Mouse mouse=new Utils.Mouse();
 
     /**
      * Creates new form ConsultaPrograma
@@ -72,6 +73,16 @@ public class ConsultaPrograma extends javax.swing.JPanel {
 
         setMinimumSize(new java.awt.Dimension(615, 510));
         setPreferredSize(new java.awt.Dimension(615, 510));
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+        });
 
         lblPrograma.setText("Programa de formacion .:");
 
@@ -109,6 +120,10 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
                 {null, null, null, null, null, null}
             },
             new String [] {
@@ -139,12 +154,31 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                 {null, null, null, null},
                 {null, null, null, null},
                 {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Nickname", "Nombre", "Apellido", "Nacimiento"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane5.setViewportView(tblInscriptos);
 
         jTabbedPane1.addTab("Inscriptos", jScrollPane5);
@@ -259,7 +293,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
     private void cbProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProgramaActionPerformed
         try{            
             //TODO: cargar labels
-            if (cbPrograma.getItemCount() <= 0){
+            if (cbPrograma.getItemCount() < 0){
             //Si no hay ningun programa creado, no hay nada que cargar.
             return;
             }
@@ -285,10 +319,12 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                                     ? String.join(", ", categorias)
                                     : "Sin categorías";
             txtCategorias.setText(categoriasStr);
-            String imgProg = (aux.getImagen() != null && !aux.getImagen().isEmpty()) ? aux.getImagen() : cfg.IMAGE_USER;
-            int w = lblImagen.getWidth() > 0 ? lblImagen.getWidth() : 160;
-            int h = lblImagen.getHeight() > 0 ? lblImagen.getHeight() : 160;
-            lblImagen.setIcon(Utils.Imagen.resize(w, h, Utils.Imagen.loadSO(cfg.fullpathImagen() + imgProg)));
+            List<DtUsuario> inscriptos=ic.getEstudiantesInscriptosPrograma(programa);
+            //System.out.println();
+            for (DtUsuario ins : inscriptos)
+                Utils.GUI.addRow(tblInscriptos, new Object[]{ins.getNickname(), ins.getNombre(), ins.getApellido(), ins.getEmail()});
+            Utils.GUI.getModel(tblInscriptos).setRowCount(8);
+
             
             
             
@@ -298,6 +334,14 @@ public class ConsultaPrograma extends javax.swing.JPanel {
         }
         
     }//GEN-LAST:event_cbProgramaActionPerformed
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_formMouseDragged
   
         private void cargarProgramas(){
         //TODO: cargar lista de nombres de programas.
@@ -317,7 +361,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
     private void cargarCursos(){
         try{ 
             
-            if (cbPrograma.getItemCount() <= 0){
+            if (cbPrograma.getItemCount() < 0){
                 //Si no hay ningun programa creado, no hay curso asociado que cargar.
                 return;
             }

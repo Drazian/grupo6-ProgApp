@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/Servidor_Web"/>
+    <!-- reloadable = carga los servlets cuando se modifican -->
+<Context path="/Servidor_Web" reloadable="true">
+    
+    <!-- Desactiva el caché para js y css -->
+    <Resources cachingAllowed="false"/>
+    
+</Context>

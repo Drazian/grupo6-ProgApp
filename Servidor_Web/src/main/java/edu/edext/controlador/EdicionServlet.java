@@ -2,10 +2,21 @@ package edu.edext.controlador;
 
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtUsuario;
+import edu.edext.logica.IBridgeSOAP;
+import edu.edext.datatypes.DtInscripcionEdicion;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
-import edu.edext.logica.GestorImagenes; 
+import edu.edext.logica.GestorImagenes;
+
+//import edu.edext.controlador.ws.DtEdicion;
+//import edu.edext.controlador.ws.DtInscripcionEdicion;
+//import edu.edext.controlador.ws.DtUsuario;
+//import edu.edext.controlador.ws.IBridgeSOAP;
+//import edu.edext.controlador.ws.TipoUsuario;
+//import edu.edext.resources.GestorImagenes;
+
+import edu.edext.modelo.Remux;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig; 
@@ -18,7 +29,6 @@ import jakarta.servlet.http.Part;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import edu.edext.datatypes.DtInscripcionEdicion;
 import java.util.ArrayList;
 import java.util.HashSet; 
 import java.util.List;
@@ -29,7 +39,8 @@ import java.time.format.DateTimeParseException;
 @WebServlet("/EdicionServlet")
 @MultipartConfig // IMPORTANTE: Sin esto, el Servlet no puede leer el FormData con imágenes
 public class EdicionServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IControlador ic = Fabrica.getInstance().getIControlador();
+//    private final IBridgeSOAP ic = Fabrica.getConexion();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -51,7 +62,7 @@ public class EdicionServlet extends HttpServlet {
                     // 2. Cargar listas iniciales (Institutos y Docentes)
                     request.setAttribute("institutos", ic.listarInstitutos());
                     request.setAttribute("docentes", ic.listarDocentes());
-                    request.getRequestDispatcher("fragmentos/altaEdicion.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/altaEdicion.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
@@ -100,7 +111,8 @@ public class EdicionServlet extends HttpServlet {
 
                  if (todasLasInscripciones != null) {
                      for (DtInscripcionEdicion ins : todasLasInscripciones) {
-                         if (ins.getValorEstado() == 2) {
+//                         if (ins.getValorEstado() == 2) {
+                         if (ins.getEstado()== 2) {
                              aceptadas.add(ins);
                          }
                      }
@@ -108,7 +120,7 @@ public class EdicionServlet extends HttpServlet {
 
                  request.setAttribute("edicion", edicion);
                  request.setAttribute("inscripcionesAceptadas", aceptadas); // Pasamos la lista al JSP
-                 request.getRequestDispatcher("fragmentos/consultaEdicion.jsp").forward(request, response);
+                 request.getRequestDispatcher("/WEB-INF/fragmentos/consultaEdicion.jsp").forward(request, response);
              } catch (Exception e) {
                  response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error cargando la edición: " + e.getMessage());
              }
@@ -204,9 +216,11 @@ public class EdicionServlet extends HttpServlet {
                 }
 
                 // 6. Instanciar el DtEdicion
-                DtEdicion dt = new DtEdicion(
-                    nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen
-                );
+                    // ************************* Descomentar para ejecutar ************************
+                DtEdicion dt = new DtEdicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen);
+//                     ************************** Comentar para compilar **************************
+//                DtEdicion dt = Remux.DtEdicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen);
+                    // ****************************************************************************
 
                 // 7. Impactar en base de datos
                 ic.altaEdicionCurso(nombreCurso, dt);

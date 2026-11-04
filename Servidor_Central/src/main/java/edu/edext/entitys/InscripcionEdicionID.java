@@ -1,4 +1,4 @@
-package edu.edext.logica;
+package edu.edext.entitys;
 
 import java.io.Serializable;
 import java.util.Objects;

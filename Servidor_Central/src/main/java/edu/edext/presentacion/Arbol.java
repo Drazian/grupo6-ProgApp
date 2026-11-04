@@ -1,12 +1,14 @@
 package edu.edext.presentacion;
 
 import edu.edext.tools.ArbolHelper;
+import edu.edext.tools.Utils.Mouse;
 
 /**
  *
  * @author vdraco
  */
 public final class Arbol extends javax.swing.JPanel {
+    private final Mouse mouse=new Mouse();
 
     /**
      * Creates new form Arbol
@@ -29,9 +31,19 @@ public final class Arbol extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree = new javax.swing.JTree();
 
+        jTree.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jTreeMouseDragged(evt);
+            }
+        });
         jTree.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jTreeFocusGained(evt);
+            }
+        });
+        jTree.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTreeMousePressed(evt);
             }
         });
         jScrollPane1.setViewportView(jTree);
@@ -51,6 +63,14 @@ public final class Arbol extends javax.swing.JPanel {
     private void jTreeFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTreeFocusGained
         cargar();
     }//GEN-LAST:event_jTreeFocusGained
+
+    private void jTreeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTreeMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_jTreeMousePressed
+
+    private void jTreeMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTreeMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_jTreeMouseDragged
     
     private void cargar(){
         ArbolHelper tree=new ArbolHelper();

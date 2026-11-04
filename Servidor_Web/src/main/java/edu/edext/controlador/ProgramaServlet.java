@@ -5,7 +5,16 @@ import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
+import edu.edext.logica.IBridgeSOAP;
 import edu.edext.logica.IControlador;
+
+//import edu.edext.controlador.ws.DtCurso;
+//import edu.edext.controlador.ws.DtPrograma;
+//import edu.edext.controlador.ws.DtUsuario;
+//import edu.edext.controlador.ws.IBridgeSOAP;
+//import edu.edext.controlador.ws.TipoUsuario;
+
+import edu.edext.modelo.Remux;
 import java.io.IOException;
 import java.io.PrintWriter; 
 import jakarta.servlet.ServletException;
@@ -23,7 +32,8 @@ import java.util.List;
 @WebServlet("/ProgramaServlet")
 @MultipartConfig
 public class ProgramaServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IControlador ic = Fabrica.getInstance().getIControlador();
+//    private final IBridgeSOAP ic = Fabrica.getConexion();
     
     //Responsable de mostrar formularios
     @Override
@@ -42,10 +52,9 @@ public class ProgramaServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso exclusivo para Docentes.");
                     return;
                 }
-                request.getRequestDispatcher("fragmentos/crearPrograma.jsp").forward(request, response);
-                break;
+                request.getRequestDispatcher("/WEB-INF/fragmentos/crearPrograma.jsp").forward(request, response);
+            	break;
             }
-            
             case "formAgregarCurso": {
                 HttpSession session = request.getSession(false);
                 DtUsuario logueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
@@ -63,19 +72,19 @@ public class ProgramaServlet extends HttpServlet {
                 } catch (Exception e) {
                     request.setAttribute("error", e.getMessage());
                 }
-                request.getRequestDispatcher("fragmentos/agregarCursoPrograma.jsp").forward(request, response);
-                break;
-            }
+                request.getRequestDispatcher("/WEB-INF/fragmentos/agregarCursoPrograma.jsp").forward(request, response);
+		break;
+	    }
             
             case "formVerProgramas":
             try {
                     List<DtPrograma> programas = ic.listarProgramas(); 
 
                     request.setAttribute("listaProgramas", programas);
-                    request.getRequestDispatcher("fragmentos/verProgramas.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/verProgramas.jsp").forward(request, response);
                 } catch (Exception e) {
                     request.setAttribute("error", e.getMessage());
-                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/error.jsp").forward(request, response);
                 }
             break;
             
@@ -86,10 +95,10 @@ public class ProgramaServlet extends HttpServlet {
                     DtPrograma programa = ic.buscarPrograma(nombrePrograma); 
 
                     request.setAttribute("programa", programa);
-                    request.getRequestDispatcher("fragmentos/programaDetalles.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/programaDetalles.jsp").forward(request, response);
                 } catch (Exception e) {
                     request.setAttribute("error", e.getMessage());
-                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/error.jsp").forward(request, response);
                 }
             break;
             
@@ -105,16 +114,16 @@ public class ProgramaServlet extends HttpServlet {
                 try {
                     List<DtPrograma> programas = ic.listarProgramas();
                     request.setAttribute("listaProgramas", programas);
-                    request.getRequestDispatcher("fragmentos/inscripcionPrograma.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/inscripcionPrograma.jsp").forward(request, response);
                 } catch (Exception e) {
                     request.setAttribute("error", e.getMessage());
-                    request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/error.jsp").forward(request, response);
                 }
                 break;
             }
             
             default:
-                request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/fragmentos/error.jsp").forward(request, response);
             break;
         }
     }
@@ -149,40 +158,44 @@ public class ProgramaServlet extends HttpServlet {
                 if (nombre == null || nombre.trim().isEmpty() || desc == null || desc.trim().isEmpty() || 
                         fechaInicioStr == null || fechaInicioStr.trim().isEmpty() || fechaFinStr == null || fechaFinStr.trim().isEmpty()) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().write("Los datos no pueden estar vac?os.");
+                    response.getWriter().write("Los datos no pueden estar vacíos.");
                     return;
                 }
                 
+                //Conversion de fechas
+                LocalDate fechaInicio = LocalDate.parse(fechaInicioStr);
+                LocalDate fechaFin = LocalDate.parse(fechaFinStr);
+                
+                LocalDate fechaRegistro = LocalDate.now();
+                
+                //Gestion de imagenes
+                Part partImagen = request.getPart("imagen");
+                byte[] bytesImagen = null;
+                String nombreOriginal = null;
+                
+                if (partImagen != null && partImagen.getSize() > 0) {
+                    nombreOriginal = partImagen.getSubmittedFileName();
+                    try (InputStream is = partImagen.getInputStream()) {
+                        bytesImagen = is.readAllBytes();
+                    }
+                }
+
+                    // ************************* Descomentar para ejecutar ************************
+                DtPrograma programa = new DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
+                    // ************************** Comentar para compilar **************************
+//                DtPrograma programa = Remux.DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
+                    // ****************************************************************************
+                
                 try {
-                    LocalDate fechaInicio = LocalDate.parse(fechaInicioStr.trim());
-                    LocalDate fechaFin = LocalDate.parse(fechaFinStr.trim());
-                    if (fechaInicio.isAfter(fechaFin)) {
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        response.getWriter().write("La fecha de inicio no puede ser posterior a la fecha de fin.");
-                        return;
-                    }
-                    LocalDate fechaRegistro = LocalDate.now();
+                    boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);
                     
-                    Part partImagen = request.getPart("imagen");
-                    byte[] bytesImagen = null;
-                    String nombreOriginal = null;
-                    
-                    if (partImagen != null && partImagen.getSize() > 0) {
-                        nombreOriginal = partImagen.getSubmittedFileName();
-                        try (InputStream is = partImagen.getInputStream()) {
-                            bytesImagen = is.readAllBytes();
-                        }
-                    }
-                    
-                    DtPrograma programa = new DtPrograma(nombre.trim(), desc.trim(), fechaRegistro, fechaInicio, fechaFin);
-                    boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, logueado.getNickname());
-                    
-                    if (resultado){
+                    if (resultado == true){
                         response.setStatus(HttpServletResponse.SC_OK);
-                        response.getWriter().write("Programa " + nombre.trim() + " creado con ?xito.");                    
+                        response.getWriter().write("Programa " + nombre + " creado con exito.");                    
                     } else {
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        response.getWriter().write("No se pudo crear el programa (verifique que el nombre no exista y las fechas sean coherentes).");                         
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().write("No se pudo crear el programa (verifique que el nombre no exista y las fechas sean coherentes).");                         
+//                        response.getWriter().write("El programa " + nombre + " ya existe.");                         
                     }
                 } catch (Exception e){
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -191,7 +204,7 @@ public class ProgramaServlet extends HttpServlet {
                 break;
             }
             
-            case "agregarCurso": {
+	    case "agregarCurso": {
                 if (logueado == null || logueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("Acceso denegado. Solo los docentes pueden agregar cursos a un programa.");
@@ -231,8 +244,8 @@ public class ProgramaServlet extends HttpServlet {
                 } catch (Exception e){
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     response.getWriter().write("Error crítico al procesar: " + e.getMessage());                    
-                }                
-                break;
+                }
+	        break;
             }
             case "inscribirPrograma": {
                 //HttpSession session = request.getSession(false);
@@ -269,13 +282,10 @@ public class ProgramaServlet extends HttpServlet {
             }
             
             default:
-                request.getRequestDispatcher("fragmentos/error.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/fragmentos/error.jsp").forward(request, response);
             break;
         }        
-        
-        
+
     }
-
-
 
 }

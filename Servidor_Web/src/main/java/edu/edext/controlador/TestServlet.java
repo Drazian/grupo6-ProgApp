@@ -1,6 +1,14 @@
 package edu.edext.controlador;
 
+
 import edu.edext.datatypes.DtInstituto;
+import edu.edext.logica.Fabrica;
+import edu.edext.logica.IBridgeSOAP;
+import edu.edext.logica.IControlador;
+
+//import edu.edext.controlador.ws.DtInstituto;
+//import edu.edext.controlador.ws.IBridgeSOAP;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -8,9 +16,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import edu.edext.logica.IControlador;
-import edu.edext.logica.Fabrica;
 import java.util.List;
 
 /**
@@ -20,7 +25,8 @@ import java.util.List;
 
 @WebServlet("/TestServlet")
 public class TestServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IControlador ic = Fabrica.getInstance().getIControlador();
+//    private final IBridgeSOAP ic = Fabrica.getConexion();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -28,7 +34,7 @@ public class TestServlet extends HttpServlet {
 //        //Guardar
 //        request.setAttribute("mensaje", mensaje);
 //        //Mostrar
-//        request.getRequestDispatcher("/fragmentos/test.jsp").forward(request, response);
+//        request.getRequestDispatcher("/WEB-INF/fragmentos/test.jsp").forward(request, response);
 
         //Testear listarInstitutos
         
@@ -39,7 +45,7 @@ public class TestServlet extends HttpServlet {
             request.setAttribute("error", e.getMessage());
         }
         
-        request.getRequestDispatcher("fragmentos/test.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/fragmentos/test.jsp").forward(request, response);
         
     }
 
@@ -58,9 +64,9 @@ public class TestServlet extends HttpServlet {
         }
         
         try{
-            ic.crearInstituto(nombre);
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("Insituto " + nombre + " creado con exito.");
+//            ic.crearInstituto(nombre);
+//            response.setStatus(HttpServletResponse.SC_OK);
+//            response.getWriter().write("Insituto " + nombre + " creado con exito.");
         } catch (Exception e){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("Error al crear instituto: " + e.getMessage());
