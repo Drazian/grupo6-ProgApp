@@ -5,7 +5,17 @@ import edu.edext.datatypes.DtInscripcionEdicion;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.TipoUsuario;
 import edu.edext.logica.Fabrica;
+import edu.edext.logica.IBridgeSOAP;
 import edu.edext.logica.IControlador;
+
+//import edu.edext.controlador.ws.DtEdicion;
+//import edu.edext.controlador.ws.DtInscripcionEdicion;
+//import edu.edext.controlador.ws.DtUsuario;
+//import edu.edext.controlador.ws.IBridgeSOAP;
+//import edu.edext.controlador.ws.TipoUsuario;
+
+import edu.edext.controlador.ws.MapEntry;
+import edu.edext.controlador.ws.MapWrapper;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,7 +31,8 @@ import java.util.Enumeration;
 
 @WebServlet("/InscripcionServlet")
 public class InscripcionServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+//    private final IBridgeSOAP ic = Fabrica.getConexion();
+    private final IControlador ic = Fabrica.getInstance().getIControlador();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -41,7 +52,7 @@ public class InscripcionServlet extends HttpServlet {
 
                 try {
                     request.setAttribute("institutos", ic.listarInstitutos());
-                    request.getRequestDispatcher("fragmentos/inscripcionEdicion.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/inscripcionEdicion.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
@@ -81,7 +92,7 @@ public class InscripcionServlet extends HttpServlet {
 
                 try {
                     request.setAttribute("institutos", ic.listarInstitutos());
-                    request.getRequestDispatcher("fragmentos/seleccionEstudiantes.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/seleccionEstudiantes.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
@@ -101,7 +112,7 @@ public class InscripcionServlet extends HttpServlet {
                     
                     request.setAttribute("edicion", dtEdicion);
                     request.setAttribute("inscripciones", inscripciones);
-                    request.getRequestDispatcher("fragmentos/tablaInscripciones.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/tablaInscripciones.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo las inscripciones: " + e.getMessage());
                 }
@@ -121,7 +132,7 @@ public class InscripcionServlet extends HttpServlet {
 
                 try {
                     request.setAttribute("institutos", ic.listarInstitutos());
-                    request.getRequestDispatcher("fragmentos/listarAceptados.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/listarAceptados.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
                 }
@@ -143,7 +154,7 @@ public class InscripcionServlet extends HttpServlet {
                     List<DtInscripcionEdicion> aceptadas = new ArrayList<>();
                     if (todas != null) {
                         for (DtInscripcionEdicion ins : todas) {
-                            if (ins.getValorEstado() == 2) {
+                            if (ins.getEstado() == 2) {
                                 aceptadas.add(ins);
                             }
                         }
@@ -151,7 +162,7 @@ public class InscripcionServlet extends HttpServlet {
 
                     request.setAttribute("edicion", dtEdicion);
                     request.setAttribute("inscripcionesAceptadas", aceptadas);
-                    request.getRequestDispatcher("fragmentos/tablaAceptados.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/tablaAceptados.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo los estudiantes aceptados: " + e.getMessage());
                 }
@@ -172,7 +183,7 @@ public class InscripcionServlet extends HttpServlet {
                 try {
                     List<DtInscripcionEdicion> misInscripciones = ic.getInscripcionesDeEstudiante(estudiante.getNickname());
                     request.setAttribute("misInscripciones", misInscripciones);
-                    request.getRequestDispatcher("fragmentos/resultadosInscripciones.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/resultadosInscripciones.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al obtener resultados de inscripciones: " + e.getMessage());
                 }
@@ -200,8 +211,8 @@ public class InscripcionServlet extends HttpServlet {
 
             try {
                 String nombreEdicion = request.getParameter("edicion");
-                String videoURL = request.getParameter("videoURL");
-                String nicknameEstudiante = estudiante.getNickname();
+                String videoURL = request.getParameter("videoURL");   
+             	String nicknameEstudiante = estudiante.getNickname();
 
                 // Invocación corregida pasando los 3 parámetros
                 int resultado = ic.setInscripcion(nicknameEstudiante, nombreEdicion, videoURL);
@@ -221,6 +232,7 @@ public class InscripcionServlet extends HttpServlet {
                 } else {
                      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                      response.getWriter().write("Atención: Ya estás inscripto en esta edición.");
+//                     response.getWriter().write("No se pudo procesar. Es posible que ya estés inscripto a esta edición.");
                 }
 
             } catch (Exception e) {
@@ -248,13 +260,23 @@ public class InscripcionServlet extends HttpServlet {
                         String valorParam = request.getParameter(paramName);
                         //Verificamos que se haya seleccionado un estado
                         if (valorParam != null && !valorParam.trim().isEmpty()) {
-                            String nickname = paramName.substring(7);
-                            int estado = Integer.parseInt(request.getParameter(paramName));
-                            evaluaciones.put(nickname, estado);
+	                   String nickname = paramName.substring(7);
+			   int estado = Integer.parseInt(request.getParameter(paramName));
+			   evaluaciones.put(nickname, estado);
                         }
                     }
                 }
                 
+                
+                MapWrapper evaluar = new MapWrapper();
+                for(Map.Entry<String, Integer> entry : evaluaciones.entrySet()){
+                    MapEntry entryCliente = new MapEntry();
+                    entryCliente.setKey(entry.getKey());
+                    entryCliente.setValue(entry.getValue());
+                    evaluar.getEntry().add(entryCliente);
+                }
+                
+//                ic.evaluarInscripciones(nombreEdicion, evaluar);
                 ic.evaluarInscripciones(nombreEdicion, evaluaciones);
                 
                 response.setStatus(HttpServletResponse.SC_OK);

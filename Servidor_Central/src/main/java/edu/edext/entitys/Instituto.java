@@ -1,21 +1,21 @@
-package edu.edext.logica;
+package edu.edext.entitys;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
  
 @Entity
-@Table(name="Categoria")
-public class Categoria {
+@Table(name="Instituto")
+public class Instituto {
     @Id
     private String nombre;
-
-    public Categoria(){}
-    public Categoria(String nombre){
+    
+    public Instituto(){}
+    public Instituto(String nombre){
         this.nombre=nombre;
     }
     
     public String getNombre() {return nombre;}
-//    public void setNombre(String nombre) {this.nombre=nombre;}
+    public void setNombre(String nombre) {this.nombre=nombre;}
 
 }

@@ -1,5 +1,7 @@
 package edu.edext.logica;
 //**************************** Capa Logica *************************************
+import edu.edext.entitys.Usuario;
+import edu.edext.entitys.Edicion;
 import java.util.List;
 import java.util.ArrayList;
 import edu.edext.datatypes.DtCurso;
@@ -87,7 +89,7 @@ public DtEdicion getEdicion(){
         String ret;
         try { ret=db.find(Edicion.class, nombre).getNombre(); }
         catch (Exception e) { ret=null; }
-        finally { db.close(); db=null; }
+//	finally { db.close(); db=null; } // probar
         return ret;
     }
     private Edicion seekEdicion(){

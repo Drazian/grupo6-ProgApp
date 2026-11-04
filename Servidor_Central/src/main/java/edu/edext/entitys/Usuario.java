@@ -1,4 +1,4 @@
-package edu.edext.logica;
+package edu.edext.entitys;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -17,9 +17,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -54,7 +56,7 @@ public class Usuario {
     @NotNull
     @Past(message = "La fecha de nacimiento tiene que ser anterior a la fecha actual")
     @Temporal(TemporalType.DATE)
-    private Date fNacimiento;
+    private LocalDate fNacimiento;
     
     @ManyToMany
     @JoinTable(name = "vinculos",
@@ -66,7 +68,7 @@ public class Usuario {
     @ManyToMany(mappedBy = "seguidos")
     private List<Usuario> seguidores = new ArrayList<>();
 
-    public Usuario(String nickname, String password, String email, String nombre, String apellido, Date fNacimiento, String imagen) {
+    public Usuario(String nickname, String password, String email, String nombre, String apellido, LocalDate fNacimiento, String imagen) {
         this.nickname=nickname;
         this.password=password;
         this.email=email;
@@ -114,11 +116,11 @@ public class Usuario {
         this.apellido = apellido;
     }
 
-    public Date getfNacimiento() {
+    public LocalDate getfNacimiento() {
         return fNacimiento;
     }
 
-    public void setfNacimiento(Date fNacimiento) {
+    public void setfNacimiento(LocalDate fNacimiento) {
         this.fNacimiento = fNacimiento;
     }
 
@@ -159,4 +161,5 @@ public class Usuario {
             u.getSeguidores().remove(this);
         }
     }
+    
 }

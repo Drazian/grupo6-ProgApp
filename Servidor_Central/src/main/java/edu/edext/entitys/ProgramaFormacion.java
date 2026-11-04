@@ -1,4 +1,4 @@
-package edu.edext.logica;
+package edu.edext.entitys;
 
 import java.util.List;
 import java.util.Objects;
@@ -7,10 +7,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 
 /**
  *
@@ -31,11 +31,10 @@ public class ProgramaFormacion {
     @Column(nullable=false)
     private LocalDate fechaFin;
     private String imagen;
-    
+
     @ManyToOne
     @JoinColumn(name="docente")
     private Docente docente;
-    
 
     @ManyToMany
     @JoinTable(
@@ -59,17 +58,8 @@ public class ProgramaFormacion {
     
     public ProgramaFormacion(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio,
                              LocalDate fechaFin, List<Curso> cursos, List<Categoria> categorias, String imagen){
-        this.fechaRegistro=fechaRegistro;
-        this.fechaInicio=fechaInicio;
-        this.descripcion=descripcion;
-        this.categorias=categorias;
-        this.fechaFin=fechaFin;
-        this.cursos=cursos;
-        this.nombre=nombre;
-        this.imagen=imagen;
-        this.docente=null;
+        this(nombre, descripcion, fechaRegistro, fechaInicio, fechaFin, cursos, categorias, imagen, null);
     }
-    
     public ProgramaFormacion(String nombre, String descripcion, LocalDate fechaRegistro, LocalDate fechaInicio,
                              LocalDate fechaFin, List<Curso> cursos, List<Categoria> categorias, String imagen, Docente docente){
         this.fechaRegistro=fechaRegistro;
@@ -92,17 +82,17 @@ public class ProgramaFormacion {
 //    public void setFechaInicio(LocalDate fechaInicio){ this.fechaInicio=fechaInicio; }
 //    public void setCategorias(List<Categoria> categorias){this.categorias=categorias;   }
 //    public void setFechaRegistro(LocalDate fechaRegistro){ this.fechaRegistro=fechaRegistro; }
-    
-    public Docente getDocente() { return this.docente; }
+        
     public LocalDate getFechaRegistro (){ return this.fechaRegistro;  }
     public List<Categoria> getCategorias(){ return this.categorias; }
     public LocalDate getFechaInicio(){ return this.fechaInicio; }
     public String getDescripcion(){ return this.descripcion; }
     public LocalDate getFechaFin(){ return this.fechaFin; }
     public List<Curso> getCursos(){ return this.cursos; }
+    public Docente getDocente() { return this.docente; }
     public String getNombre(){ return this.nombre;   }
     public String getImagen(){ return this.imagen; }
-
+    
 //    public Set<DtCurso> getDtCursos(){
 //        Set<DtCurso> ret= new HashSet<>();
 //        for (Curso c : cursos) {

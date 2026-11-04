@@ -1,8 +1,15 @@
 package edu.edext.datatypes;
 
-public class DtInstituto {
-    private final String nombre;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement(name = "DtInstituto")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DtInstituto {
+    private String nombre;
+
+    public DtInstituto(){};
     public DtInstituto(String nombre){ 
         this.nombre=nombre;
     }

@@ -19,7 +19,11 @@ public class CrearProgramaHelper{
     //private List<String> listaData=new ArrayList<>();
      
     public CrearProgramaHelper(){
-        setLista();
+       
+        listData.add("Programa 1 ");
+        listData.add("Edicion 2 ");
+        listData.add("Inscripcion 3 ");
+        listData.add("Cursos 6 ");
     }
     
     public String[] getArray(ArrayList<String> obj){
@@ -40,7 +44,6 @@ public class CrearProgramaHelper{
     }
     
     public boolean isExist(String nombre){
-        setLista();
         return listData.contains(nombre);
     }
     

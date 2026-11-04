@@ -12,11 +12,13 @@
     <packaging>war</packaging>
     
     <dependencies>
+        
         <dependency>
             <groupId>edu</groupId>
             <artifactId>Servidor_Central</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency> 
+        </dependency>
+        
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-web-api</artifactId>
@@ -27,6 +29,17 @@
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
             <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>        
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
+            <version>4.0.2</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.web</groupId>
@@ -43,19 +56,75 @@
             <artifactId>tinylog-impl</artifactId>
             <version>2.7.0</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>2.0.16</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.tinylog</groupId>
+            <artifactId>jul-tinylog</artifactId>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.tinylog</groupId>
             <artifactId>slf4j-tinylog</artifactId>
             <version>2.7.0</version>
         </dependency>
+<!--        <dependency>
+            <groupId>org.glassfish.metro</groupId>
+            <artifactId>webservices-rt</artifactId>
+            <version>2.3</version>
+        </dependency>-->
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <!--<file>${project.basedir}/src/main/resources/jaxws.properties</file>-->
+                                <file>${user.home}/.edEXT/jaxws.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.sun.xml.ws</groupId>
+                <artifactId>jaxws-maven-plugin</artifactId>
+                <version>4.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsimport</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlUrls>
+                                <wsdlUrl>${wsdl.url}</wsdlUrl>
+                            </wsdlUrls>
+                            <keep>true</keep>
+                            <packageName>edu.edext.controlador.ws</packageName>
+                            <sourceDestDir>${project.build.directory}/generated-sources/wsimport</sourceDestDir>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun.xml.ws</groupId>
+                        <artifactId>jaxws-tools</artifactId>
+                        <version>4.0.2</version>
+                    </dependency>
+                </dependencies> 
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -67,4 +136,3 @@
         </plugins>
     </build>
 </project>
-

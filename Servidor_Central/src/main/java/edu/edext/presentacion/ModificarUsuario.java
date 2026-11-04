@@ -3,6 +3,7 @@ package edu.edext.presentacion;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.tools.Utils.Mouse;
 import java.awt.BorderLayout;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -14,6 +15,8 @@ import javax.swing.SwingUtilities;
  * @author usuario
  */
 public class ModificarUsuario extends javax.swing.JPanel {
+    private final Mouse mouse=new Mouse();
+
 
     
     /**
@@ -85,6 +88,16 @@ public class ModificarUsuario extends javax.swing.JPanel {
         );
 
         lisUsuario.setMinimumSize(new java.awt.Dimension(2, 2));
+        lisUsuario.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                lisUsuarioMouseDragged(evt);
+            }
+        });
+        lisUsuario.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                lisUsuarioMousePressed(evt);
+            }
+        });
         lisUsuario.addListSelectionListener(this::lisUsuarioValueChanged);
         jSUsuario.setViewportView(lisUsuario);
 
@@ -131,6 +144,14 @@ public class ModificarUsuario extends javax.swing.JPanel {
             formularioUsuario.cargarFormulario(usuario);
         });  
     }//GEN-LAST:event_lisUsuarioValueChanged
+
+    private void lisUsuarioMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lisUsuarioMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_lisUsuarioMousePressed
+
+    private void lisUsuarioMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lisUsuarioMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_lisUsuarioMouseDragged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -1,4 +1,4 @@
-package edu.edext.logica;
+package edu.edext.entitys;
 
 import java.util.Objects;
 import java.time.LocalDate;
@@ -42,7 +42,7 @@ public class InscripcionEdicion {
     @NotNull
     @JoinColumn(nullable=false)
     private Edicion edicion;
-    
+
     @Column(name = "video_url", nullable = true, length = 500)
     private String videoURL;
     

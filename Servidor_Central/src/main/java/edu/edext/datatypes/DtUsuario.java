@@ -1,5 +1,11 @@
 package edu.edext.datatypes;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,25 +15,31 @@ import java.util.Objects;
  *
  * @author Diego
  */
+@XmlRootElement(name = "DtUsuario")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DtUsuario {
     
-    private final String nickname;
-    private final String password;
-    private final String email;
-    private final String nombre;
-    private final String apellido;
-    private final String imagen;
-    private final Date fNacimiento;
-    private final List<String> institutos;
-    private final TipoUsuario tipoUsuario;
-    private final List<String> seguidos;
-    private final List<String> seguidores;
+    private String nickname;
+    private String password;
+    private String email;
+    private String nombre;
+    private String apellido;
+    private String imagen;
+//    @jakarta.xml.bind.annotation.XmlSchemaType(name = "fNacimiento")
+    @XmlElement(name = "fNacimiento")
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate fNacimiento;
+    private List<String> institutos;
+    private TipoUsuario tipoUsuario;
+    private List<String> seguidos;
+    private List<String> seguidores;
 
-    public DtUsuario(String nickname, String password, String email, String nombre, String apellido, String imagen, Date fNacimiento, List<String> institutos, TipoUsuario tipoUsuario) {
+    public DtUsuario(){};
+    public DtUsuario(String nickname, String password, String email, String nombre, String apellido, String imagen, LocalDate fNacimiento, List<String> institutos, TipoUsuario tipoUsuario) {
         this(nickname, password, email, nombre, apellido, imagen, fNacimiento, institutos, tipoUsuario, new ArrayList<>(), new ArrayList<>());
     }
 
-    public DtUsuario(String nickname, String password, String email, String nombre, String apellido, String imagen, Date fNacimiento, List<String> institutos, TipoUsuario tipoUsuario, List<String> seguidos, List<String> seguidores) {
+    public DtUsuario(String nickname, String password, String email, String nombre, String apellido, String imagen, LocalDate fNacimiento, List<String> institutos, TipoUsuario tipoUsuario, List<String> seguidos, List<String> seguidores) {
         this.nickname = nickname;
         this.password = password;
         this.email = email;
@@ -63,7 +75,7 @@ public class DtUsuario {
         return imagen;
     }
 
-    public Date getfNacimiento() {
+    public LocalDate getfNacimiento() {
         return fNacimiento;
     }
 

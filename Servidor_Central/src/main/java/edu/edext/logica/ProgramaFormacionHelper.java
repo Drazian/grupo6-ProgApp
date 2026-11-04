@@ -1,6 +1,10 @@
 package edu.edext.logica;
 //**************************** Capa Logica *************************************
+import edu.edext.entitys.Curso;
+import edu.edext.entitys.Categoria;
+import edu.edext.entitys.ProgramaFormacion;
 import edu.edext.datatypes.DtPrograma;
+import edu.edext.entitys.Docente;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -68,9 +72,7 @@ public class ProgramaFormacionHelper{
             categorias.add(findCategoria(categoria));
         for(String curso : DTO.getNameCursos())
             cursos.add(findCurso(curso));
-        
         Docente docente = findDocente(DTO.getDocente());
-        
         return new ProgramaFormacion(DTO.getNombre(), DTO.getDescripcion(), DTO.getFechaRegistro(), DTO.getFechaInicio(), DTO.getFechaFin(), cursos, categorias, DTO.getImagen(), docente);
     }
     
@@ -80,6 +82,7 @@ public class ProgramaFormacionHelper{
         if(flag) if(DTO.getFechaRegistro()==null) flag=false;
         if(flag) if(DTO.getFechaInicio()==null) flag=false;
         if(flag) if(DTO.getFechaFin()==null) flag=false;
+//        if(flag2) if(DTO.getFechaFin()==null) flag=false;
         if(flag && flag2) if(DTO.getFechaInicio().isAfter(DTO.getFechaFin())) flag=false;
         return flag && flag2;
     }
@@ -97,14 +100,20 @@ public class ProgramaFormacionHelper{
         }
         return flag;
     }
- 
+
     // Usa el mismo EntityManager de la transaccion abierta en persist()
     private Categoria findCategoria(String categoria){
         Categoria c = db.find(Categoria.class, categoria);
         if (c == null) throw new IllegalArgumentException("No existe la categoria '" + categoria + "'.");
         return c;
+//        db=DB.createEntityManager();
+//        return db.find(Categoria.class, categoria);
     }
     
+//    private Curso findCurso(String curso){
+//        db=DB.createEntityManager();
+//        return db.find(Curso.class, curso);
+//    }
     private Curso findCurso(String curso){
         Curso c = db.find(Curso.class, curso);
         if (c == null) throw new IllegalArgumentException("No existe el curso '" + curso + "'.");
@@ -115,5 +124,5 @@ public class ProgramaFormacionHelper{
         if (docente == null || docente.trim().isEmpty()) return null;
         return db.find(Docente.class, docente);
     }
-    
+
 }

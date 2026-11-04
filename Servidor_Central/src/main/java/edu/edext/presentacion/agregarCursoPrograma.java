@@ -14,6 +14,7 @@ import javax.swing.table.DefaultTableModel;
  * @author pipo
  */
 public class agregarCursoPrograma extends javax.swing.JPanel {
+    private final Utils.Mouse mouse=new Utils.Mouse();
 
     /**
      * Creates new form AgregarCursoPrograma
@@ -87,6 +88,16 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
 
         lblSeleccionarCurso.setText("Seleccionar curso:");
 
+        jPanel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPanel1MouseDragged(evt);
+            }
+        });
+        jPanel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jPanel1MousePressed(evt);
+            }
+        });
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
         lblCurso.setText("Curso seleccionado:");
@@ -131,11 +142,6 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         jPanel3.add(cbPrograma, gridBagConstraints);
 
         lblPrograma.setText("Seleccionar Programa de Formacion:");
-        lblPrograma.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblProgramaMouseClicked(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -172,7 +178,7 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     private void tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMouseClicked
         int filaSeleccionada = tbl.getSelectedRow();
         
-        if (filaSeleccionada != -1 && tbl.getValueAt(filaSeleccionada, 0) != null){
+        if (filaSeleccionada != -1){
             String curso = tbl.getValueAt(filaSeleccionada,0).toString();
             txtCurso.setText(curso);
         }
@@ -235,8 +241,8 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         try{
             
-            if (cbPrograma.getItemCount() <= 0 || cbPrograma.getSelectedItem() == null){
-                JOptionPane.showMessageDialog(this, "No hay programas de formación disponibles.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            if (cbPrograma.getItemCount() < 0){
+                //Si no hay ningun programa creado, no hay donde agregar un curso.
                 return;
             }
             
@@ -259,9 +265,13 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         
     }//GEN-LAST:event_btnAgregarActionPerformed
 
-    private void lblProgramaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblProgramaMouseClicked
-        System.out.println("Dimensiones : "+this.getWidth()+", "+this.getHeight());
-    }//GEN-LAST:event_lblProgramaMouseClicked
+    private void jPanel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_jPanel1MousePressed
+
+    private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_jPanel1MouseDragged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

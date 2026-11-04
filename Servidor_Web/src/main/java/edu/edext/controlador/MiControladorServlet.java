@@ -3,7 +3,13 @@ package edu.edext.controlador;
 import edu.edext.datatypes.DtCategoria;
 import edu.edext.datatypes.DtInstituto;
 import edu.edext.logica.Fabrica;
+import edu.edext.logica.IBridgeSOAP;
 import edu.edext.logica.IControlador;
+
+//import edu.edext.controlador.ws.DtCategoria;
+//import edu.edext.controlador.ws.DtInstituto;
+//import edu.edext.controlador.ws.IBridgeSOAP;
+
 import edu.edext.modelo.Producto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,17 +22,16 @@ import java.util.ArrayList;
 import java.util.List;
 import org.tinylog.Logger;
  
-// Nota: Si usas una versión muy antigua de Java EE, cambia "jakarta" por "javax"
 @WebServlet("/MiControladorServlet")
 public class MiControladorServlet extends HttpServlet {
-    private IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IControlador ic = Fabrica.getInstance().getIControlador();
+//    private final IBridgeSOAP ic = Fabrica.getConexion();
 
-    // Método principal que recibe peticiones GET (clics del menú y búsquedas)
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         String accion = request.getParameter("accion");
-        String vistaDestino = "/fragmentos/error.jsp"; // Por si falla algo
+        String vistaDestino = "/WEB-INF/fragmentos/error.jsp"; // Por si falla algo
 
         // CASO 1: Listar productos desde el Menú Lateral
         if ("productos".equals(accion)) {
@@ -38,7 +43,7 @@ public class MiControladorServlet extends HttpServlet {
 
             // Guardamos la lista en el request para que el JSP pueda leerla
             request.setAttribute("listaProductos", lista);
-            vistaDestino = "/fragmentos/productos.jsp";
+            vistaDestino = "/WEB-INF/fragmentos/productos.jsp";
         }
         
         // CASO 2: Procesar la Barra de Búsqueda del Sector 1
@@ -52,16 +57,16 @@ public class MiControladorServlet extends HttpServlet {
             }
             
             request.setAttribute("mensajeBusqueda", resultadoBusqueda);
-            vistaDestino = "/fragmentos/resultados.jsp";
+            vistaDestino = "/WEB-INF/fragmentos/resultados.jsp";
         }
         
         // CASO 3: Cargar un formulario interactivo
         else if ("abrirFormulario".equals(accion)) {
-            vistaDestino = "/fragmentos/formulario.jsp";
+            vistaDestino = "/WEB-INF/fragmentos/formulario.jsp";
         }
         
         else if ("reportes".equals(accion)) {
-            vistaDestino="/fragmentos/Central-01-10-2026.log";
+            vistaDestino="/WEB-INF/fragmentos/Central-01-10-2026.log";
         }
         
         // CASO 4: Obtener Institutos en JSON para el menu izquierdo de index.jsp
@@ -133,4 +138,3 @@ public class MiControladorServlet extends HttpServlet {
         response.getWriter().write("<div class='alerta-exito'>¡Producto '" + nombreNuevo + "' guardado exitosamente!</div>");
     }
 }
-

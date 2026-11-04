@@ -3,6 +3,7 @@ package edu.edext.presentacion;
 import edu.edext.tools.ConsultaEdicionHelper;
 import javax.swing.DefaultComboBoxModel;
 import edu.edext.tools.Utils;
+import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
 import java.awt.HeadlessException;
 import javax.swing.JOptionPane;
@@ -18,7 +19,8 @@ public class ConsultaEdicion extends javax.swing.JPanel {
     private final int FORMGRANDE=1;
     private final int formHeigth=410;
     private final int sizeWForm[]={335,795};
- 
+    private final Mouse mouse=new Mouse();
+
     
     /**
      * Creates new form consultaEdicionCurso
@@ -84,6 +86,16 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(335, 410));
         setName(""); // NOI18N
         setPreferredSize(new java.awt.Dimension(335, 410));
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+        });
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentHidden(java.awt.event.ComponentEvent evt) {
                 formComponentHidden(evt);
@@ -297,6 +309,14 @@ public class ConsultaEdicion extends javax.swing.JPanel {
 
     }//GEN-LAST:event_jPDataComponentHidden
 
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_formMouseDragged
+
     private void loadData(){
         ConsultaEdicionHelper ceh=new ConsultaEdicionHelper();
         String cupo, edicion=jLEdiciones.getSelectedValue();
@@ -310,11 +330,8 @@ public class ConsultaEdicion extends javax.swing.JPanel {
             jTcurso.setText(ceh.getCurso());
             jLdocentes.setListData(ceh.getDocentes().toArray(String[]::new));
             //jTdocentej.setText(ceh.));
-            if(!Utils.Validate.isEmpty(ceh.getImagen())){
-                System.out.println("Entre con"+cfg.fullpathImagen()+ceh.getImagen());
-                
+            if(!Utils.Validate.isEmpty(ceh.getImagen()))
                 lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(cfg.fullpathImagen()+ceh.getImagen())));
-            }
             jLInscriptos.setListData(ceh.getListaInscriptos(edicion));
             jPData.setVisible(true);
         }

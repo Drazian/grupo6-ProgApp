@@ -1,4 +1,4 @@
-package edu.edext.logica;
+package edu.edext.entitys;
 
 import java.util.Objects;
 import java.time.LocalDate;
