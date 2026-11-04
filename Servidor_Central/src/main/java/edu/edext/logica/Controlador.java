@@ -737,18 +737,27 @@ public class Controlador implements IControlador {
     }
 
 //******************************* Inscripcion ********************************//
+    
     @Override
-    public int setInscripcion(String nomEstudiante, String nomEdicion) throws Exception{
-        InscripcionEdicionHelper regInscrip=new InscripcionEdicionHelper(emf, "");
-        int ret=-1;
+    public int setInscripcion(String nomEstudiante, String nomEdicion, String videoURL) throws Exception {
+        InscripcionEdicionHelper regInscrip = new InscripcionEdicionHelper(emf, "");
+        int ret = -1;
         try {
-            ret=regInscrip.inscribirEstudiante(nomEstudiante, nomEdicion);
-        } catch (Exception e) {}
-        finally{
+            ret = regInscrip.inscribirEstudiante(nomEstudiante, nomEdicion, videoURL);
+        } catch (Exception e) {
+        } finally {
             regInscrip.kill();
-            regInscrip=null; }
+            regInscrip = null;
+        }
         return ret;
     }
+
+    // Puedes mantener esta sobrecarga para compatibilidad si otros componentes llaman sin videoURL:
+    @Override
+    public int setInscripcion(String nomEstudiante, String nomEdicion) throws Exception {
+        return setInscripcion(nomEstudiante, nomEdicion, null);
+    }
+    
     @Override
     public int delInscripcion(String estudiante, String edicion) throws Exception{
         InscripcionEdicionHelper cancel=new InscripcionEdicionHelper(emf, "");

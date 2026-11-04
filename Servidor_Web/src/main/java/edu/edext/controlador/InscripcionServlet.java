@@ -191,7 +191,7 @@ public class InscripcionServlet extends HttpServlet {
 
         if ("inscribir".equals(accion)) {
             DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
-            
+
             if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("La sesión expiró o no tienes permisos de Estudiante.");
@@ -200,10 +200,12 @@ public class InscripcionServlet extends HttpServlet {
 
             try {
                 String nombreEdicion = request.getParameter("edicion");
+                String videoURL = request.getParameter("videoURL");
                 String nicknameEstudiante = estudiante.getNickname();
-                
-                int resultado = ic.setInscripcion(nicknameEstudiante, nombreEdicion);
-                
+
+                // Invocación corregida pasando los 3 parámetros
+                int resultado = ic.setInscripcion(nicknameEstudiante, nombreEdicion, videoURL);
+
                 if (resultado == 0) {
                      response.setStatus(HttpServletResponse.SC_OK);
                      response.getWriter().write("¡Inscripción realizada con éxito!");
@@ -220,7 +222,7 @@ public class InscripcionServlet extends HttpServlet {
                      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                      response.getWriter().write("Atención: Ya estás inscripto en esta edición.");
                 }
-                
+
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Error del sistema: " + e.getMessage());

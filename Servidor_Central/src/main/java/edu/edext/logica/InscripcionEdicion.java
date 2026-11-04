@@ -42,6 +42,25 @@ public class InscripcionEdicion {
     @NotNull
     @JoinColumn(nullable=false)
     private Edicion edicion;
+    
+    @Column(name = "video_url", nullable = true, length = 500)
+    private String videoURL;
+    
+    public InscripcionEdicion(Estudiante estudiante, Edicion edicion, LocalDate fechaInscripcion, int estado, String videoURL){
+        this.fechaInscripcion = fechaInscripcion;
+        this.estudiante = estudiante;
+        this.edicion = edicion;
+        this.estado = estado;
+        this.videoURL = videoURL;
+    }
+
+    public String getVideoURL() { 
+        return this.videoURL; 
+    }
+
+    public void setVideoURL(String videoURL) { 
+        this.videoURL = videoURL; 
+    }
 
     public InscripcionEdicion(){}
     

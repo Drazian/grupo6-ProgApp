@@ -2053,3 +2053,44 @@ function ejecutarDesistirInscripcion(nombreEdicion, nickname) {
         alert(error.message || 'Error al procesar el desistimiento.');
     });
 }
+
+// =======================
+// REPRODUCCIÓN DE VIDEO 
+// =======================
+function reproducirVideoMotivacion(urlRaw, nombreEstudiante) {
+    if (!urlRaw || urlRaw.trim() === '') {
+        alert("Esta inscripción no contiene una URL de video válida.");
+        return;
+    }
+
+    // Convertir enlace normal de YouTube al formato embed para iframe
+    let embedUrl = urlRaw.trim();
+    if (embedUrl.includes("youtube.com/watch?v=")) {
+        const videoId = embedUrl.split("v=")[1].split("&")[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    } else if (embedUrl.includes("youtu.be/")) {
+        const videoId = embedUrl.split("youtu.be/")[1].split("?")[0];
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    const htmlCuerpo = `
+        <div style="text-align: center;">
+            <p style="margin-bottom: 12px; color: #7f8c8d; font-size: 13px;">
+                Video motivacional de: <strong style="color: #2c3e50;">${nombreEstudiante}</strong>
+            </p>
+            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 6px; background: #000; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                <iframe src="${embedUrl}" 
+                        style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border: 0;" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    `;
+
+    const htmlBotones = `
+        <button class="btn-moderno" style="background-color: #34495e;" onclick="cerrarModal()">Cerrar Reproductor</button>
+    `;
+
+    mostrarModal('Reproducción de Video', htmlCuerpo, htmlBotones);
+}

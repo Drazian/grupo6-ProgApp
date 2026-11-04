@@ -30,10 +30,6 @@ public class InscripcionEdicionHelper {
         this.nombre=nombre;
     }
     
-    
-//    public List<String> getEstudiantesInscriptos(){
-//        return getInscriptos();
-//    }
     public List<String> getEstudiantesInscriptos(){
         return getInscriptos();
     }
@@ -48,7 +44,6 @@ public class InscripcionEdicionHelper {
         DTO=null;
         db=null;
     }
-    
     
     //***************************** pipeline ***********************************
     
@@ -79,36 +74,36 @@ public class InscripcionEdicionHelper {
         return ret;
     }
     
-    public int inscribirEstudiante(String nomEstudiante, String nomEdicion){ // incompleta falta aislacion y modularizacion
-        int ret=-1;
-        db=DB.createEntityManager();
+    public int inscribirEstudiante(String nomEstudiante, String nomEdicion, String videoURL) {
+        int ret = -1;
+        db = DB.createEntityManager();
         try {
             db.getTransaction().begin();
             Estudiante estudiante = db.find(Estudiante.class, nomEstudiante);
             Edicion edicion = db.find(Edicion.class, nomEdicion);
-            if(estudiante==null){ db.getTransaction().rollback(); return 1; }
-            if (edicion==null){ db.getTransaction().rollback(); return 2; }
-            if (edicion.getFechaFin()!=null && edicion.getFechaFin().isBefore(LocalDate.now())){
+            if (estudiante == null) { db.getTransaction().rollback(); return 1; }
+            if (edicion == null) { db.getTransaction().rollback(); return 2; }
+            if (edicion.getFechaFin() != null && edicion.getFechaFin().isBefore(LocalDate.now())) {
                 db.getTransaction().rollback();
-                return 4; // la edicion ya finalizo
+                return 4; // la edicion ya finalizó
             }
             InscripcionEdicionID idDual = new InscripcionEdicionID(nomEstudiante, nomEdicion);
             InscripcionEdicion isExist = db.find(InscripcionEdicion.class, idDual);
-            if(isExist==null){
-                InscripcionEdicion newInscripcion=new InscripcionEdicion(estudiante, edicion, LocalDate.now(), INSCRIPTO);
+            if (isExist == null) {
+                // Pasar la variable videoURL al crear el objeto de persistencia
+                InscripcionEdicion newInscripcion = new InscripcionEdicion(estudiante, edicion, LocalDate.now(), INSCRIPTO, videoURL);
                 db.persist(newInscripcion);
                 db.getTransaction().commit();
                 Logger.info("Se Inscribio el Estudiante {} en la edicion {}", nomEstudiante, nomEdicion);
-                ret=0;
+                ret = 0;
             } else {
                 db.getTransaction().rollback();
-                ret=3; // ya inscripto
+                ret = 3; // ya inscripto
             }
         } catch (Exception e) {
-            if(db.getTransaction().isActive()) db.getTransaction().rollback();
+            if (db.getTransaction().isActive()) db.getTransaction().rollback();
             Logger.error("Error al Inscribir al estudiante {} en la edicion {}", nomEstudiante, nomEdicion);
-        }
-        finally{
+        } finally {
             db.close();
         }
         return ret;
@@ -163,13 +158,10 @@ public class InscripcionEdicionHelper {
         return ret;
     }
     
-  // =========================================================================
+    // =========================================================================
     // NUEVOS MÉTODOS PARA EL CASO DE USO "SELECCIONAR ESTUDIANTES"
     // =========================================================================
 
-    /**
-     * Calcula la prioridad de un estudiante según la fórmula ipr * 0.5
-     */
     private static class CupoExcedidoException extends RuntimeException {
         CupoExcedidoException(String m){ super(m); }
     }
@@ -177,7 +169,6 @@ public class InscripcionEdicionHelper {
     private double calcularPrioridad(String nicknameEstudiante, String nombreCurso) {
         EntityManager emAux = DB.createEntityManager();
         try {
-            // Cuenta inscripciones previas rechazadas (estado=3) a ediciones finalizadas del MISMO curso
             Long ipr = emAux.createQuery(
                 "SELECT COUNT(i) FROM InscripcionEdicion i " +
                 "WHERE i.estudiante.nickname = :estudiante " +
@@ -216,15 +207,14 @@ public class InscripcionEdicionHelper {
                 Edicion ed = i.getEdicion();
                 
                 DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), "usr.png");
-//                DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), null, null, 0, 0, null, null, null, null, null, "usr.png");
-                
                 
                 DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, "usr.png");
 
                 // Cálculo en caliente del requerimiento 7.5
                 double prioridad = calcularPrioridad(e.getNickname(), ed.getCurso().getNombre());
 
-                ret.add(new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), prioridad));
+                // Se pasa i.getVideoURL() como 6to argumento al DTO
+                ret.add(new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), prioridad, i.getVideoURL()));
             }
         } catch (Exception e) {
             Logger.error("Error al obtener inscripciones completas: " + e.getMessage());
@@ -235,10 +225,6 @@ public class InscripcionEdicionHelper {
         return ret;
     }
 
-    /**
-     * Aplica el dictamen del docente (Aceptado/Rechazado) masivamente a la lista de estudiantes.
-     * @param evaluaciones Map donde Key = Nickname del Estudiante, Value = Nuevo Estado (2 o 3)
-     */
     public void evaluarInscripciones(Map<String, Integer> evaluaciones) throws Exception {
         db = DB.createEntityManager();
         try {
@@ -307,7 +293,7 @@ public class InscripcionEdicionHelper {
                         ? ed.getImagen() : "usr.png";
                 DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, imgEdicion);
 
-                ret.add(new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0));
+                ret.add(new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0, i.getVideoURL()));
             }
         } catch (Exception e) {
             Logger.error("Error al obtener inscripciones del estudiante " + this.nombre + ": " + e.getMessage());
@@ -317,8 +303,4 @@ public class InscripcionEdicionHelper {
         }
         return ret;
     }  
-    
-    
-    
-    
 }

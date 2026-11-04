@@ -52,12 +52,14 @@ public interface IControlador {
     List<DtEdicion> listarEdicionPorCurso(String curso) throws Exception;
     List<DtEdicion> listarEdicionesPorUsuario(String nickname) throws Exception;
     DtEdicion buscarEdicion(String nombre) throws Exception;
+    
 
 //******************************* Inscripcion ********************************//
     int setInscripcion(String estudiante, String edicion) throws Exception;
     int delInscripcion(String estudiante, String edicion) throws Exception;
     List<String> getEstudiantesInscriptosEdicion(String nombre) throws Exception;
     List<String> getEstudiantesCandidatosEdicion(String nombre) throws Exception;
+    int setInscripcion(String nomEstudiante, String nomEdicion, String videoURL) throws Exception;
 
 //**************************** ProgramaFormacion *****************************//
     boolean setCrearProgramaFormacion(DtPrograma programa) throws Exception;
