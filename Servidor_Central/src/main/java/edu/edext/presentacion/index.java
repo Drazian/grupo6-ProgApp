@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 import javax.swing.JOptionPane;
 import org.tinylog.Logger;
-
+ 
 public class index extends javax.swing.JFrame {
     
     private final indexHelper form;
@@ -66,10 +66,10 @@ public class index extends javax.swing.JFrame {
         jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(700, 420));
-        setPreferredSize(new java.awt.Dimension(810, 540));
+        setMinimumSize(new java.awt.Dimension(700, 437));
+        setPreferredSize(new java.awt.Dimension(945, 590));
 
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(810, 540));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(200, 200));
 
         dpIndex.setDoubleBuffered(true);
         dpIndex.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {

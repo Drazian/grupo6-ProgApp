@@ -1,11 +1,11 @@
 package edu.edext.controlador;
 
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
 
-//import edu.edext.controlador.ws.IBridgeSOAP;
-
+import edu.edext.controlador.ws.IBridgeSOAP;
+ 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import jakarta.servlet.Filter;
@@ -28,8 +28,8 @@ import org.tinylog.Logger;
  */
 @WebFilter(urlPatterns = {"/CursoServlet", "/movil/curso"})
 public class VisitasCursoFilter implements Filter {
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {

@@ -1,16 +1,16 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtActaEstudio;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
+//import edu.edext.datatypes.DtActaEstudio;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.datatypes.TipoUsuario;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
 
-//import edu.edext.controlador.ws.DtActaEstudio;
-//import edu.edext.controlador.ws.DtUsuario;
-//import edu.edext.controlador.ws.IBridgeSOAP;
-//import edu.edext.controlador.ws.TipoUsuario;
+import edu.edext.controlador.ws.DtActaEstudio;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.TipoUsuario;
 
 import edu.edext.modelo.ActaEstudioPdf;
 import java.io.ByteArrayOutputStream;
@@ -32,8 +32,8 @@ import org.tinylog.Logger;
  */
 @WebServlet("/ActaEstudioServlet")
 public class ActaEstudioServlet extends HttpServlet {
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
