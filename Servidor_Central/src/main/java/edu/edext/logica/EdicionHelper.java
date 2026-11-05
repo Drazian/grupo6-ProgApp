@@ -48,8 +48,8 @@ public DtEdicion getEdicion(){
                         d.getfNacimiento(), null, null));
             }
             
-            return new DtEdicion(
-                    tmp.getNombre(), 
+            DtEdicion dt = new DtEdicion(
+                    tmp.getNombre(),
                     tmp.getCupo(), 
                     tmp.getFechaInicio(), 
                     tmp.getFechaFin(), 
@@ -61,6 +61,8 @@ public DtEdicion getEdicion(){
                             tmp.getCurso().getImagen()), 
                     docentes,
                     tmp.getImagen()); // <--- IMAGEN DE LA EDICIÓN
+            dt.setFechaCierre(tmp.getFechaCierre());
+            return dt;
         }
         else return null;
     }

@@ -49,7 +49,11 @@ public class Edicion {
 //    @JoinColumn(name="curso_nombre", nullable=false)
     @JoinColumn(name="curso", nullable=false)
     private Curso curso;
- 
+
+    // Fecha en que el docente cerro la edicion (resultados definitivos). Null = edicion abierta.
+    @Column(nullable = true)
+    private LocalDate fechaCierre;
+
     public Edicion(){}
     
     public Edicion(String nombre, Integer cupo, LocalDate fechaPublicacion, LocalDate fechaInicio, LocalDate fechaFin, Curso curso, List<Docente> docente, String imagen){
@@ -80,7 +84,11 @@ public class Edicion {
     public String getImagen(){ return this.imagen; }
     public Integer getCupo(){ return this.cupo; }
     public Curso getCurso(){ return this.curso; }
-    
+
+    public LocalDate getFechaCierre(){ return this.fechaCierre; }
+    public void setFechaCierre(LocalDate fechaCierre){ this.fechaCierre=fechaCierre; }
+    public boolean isCerrada(){ return this.fechaCierre != null; }
+
     @Override
     public int hashCode() {
         int hash = 7;

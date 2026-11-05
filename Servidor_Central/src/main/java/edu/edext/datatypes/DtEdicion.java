@@ -33,7 +33,12 @@ public class DtEdicion {
     private LocalDate fechaPublicacion;
     private List<DtUsuario> docentes;
     private Set<String> nameDocentes;
-    
+    // Cierre de la edicion: una vez cerrada, las notas quedan definitivas (acta)
+    @XmlElement(name = "fechaCierre")
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    private LocalDate fechaCierre;
+    private boolean cerrada;
+
     public DtEdicion(){};
     public DtEdicion(String nombre, Integer cupo, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaPublicacion){
         this(nombre, cupo, fechaInicio, fechaFin, fechaPublicacion, null, null, null, null);
@@ -95,5 +100,11 @@ public DtEdicion(String nombre, Integer cupo, LocalDate fechaInicio, LocalDate f
     public Set<String> getNameDocentes(){ return this.nameDocentes; }
     public LocalDate getFechaPublicacion(){ return this.fechaPublicacion; }
     public List<String> getDocentes_toArray(){ return new ArrayList<>(nameDocentes); }
-    
+    public LocalDate getFechaCierre(){ return this.fechaCierre; }
+    public boolean isCerrada(){ return this.cerrada; }
+    public void setFechaCierre(LocalDate fechaCierre){
+        this.fechaCierre = fechaCierre;
+        this.cerrada = fechaCierre != null;
+    }
+
 }

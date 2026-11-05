@@ -189,7 +189,91 @@ public class InscripcionServlet extends HttpServlet {
                 }
                 break;
             }
+
+            // =====================================================================
+            // CASO DE USO: "VER RESULTADOS DE EVALUACIONES EN EDICIONES DE CURSOS" (DOCENTE)
+            // =====================================================================
+
+            case "formularioResultados": {
+                DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo Docentes pueden ver los resultados de las evaluaciones.");
+                    return;
+                }
+
+                try {
+                    request.setAttribute("institutos", ic.listarInstitutos());
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/verResultadosEdicion.jsp").forward(request, response);
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                }
+                break;
+            }
+
+            case "listarEdicionesCerradas": {
+                DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
+                    return;
+                }
+
+                try {
+                    // Solo las ediciones cerradas del curso en las que el docente logueado participa
+                    List<String> ediciones = ic.listarEdicionesCerradasDeDocente(docente.getNickname(), request.getParameter("curso"));
+
+                    StringBuilder json = new StringBuilder("[");
+                    for (int i = 0; i < ediciones.size(); i++) {
+                        if (i > 0) json.append(",");
+                        json.append("\"").append(escaparJson(ediciones.get(i))).append("\"");
+                    }
+                    json.append("]");
+
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write(json.toString());
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo las ediciones cerradas.");
+                }
+                break;
+            }
+
+            case "verActa": {
+                DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
+                    return;
+                }
+
+                String edicion = request.getParameter("edicion");
+                try {
+                    // El Central valida que la edicion exista, este cerrada y que el docente participe en ella
+                    List<DtInscripcionEdicion> acta = ic.getActaEdicion(edicion, docente.getNickname());
+
+                    int conNota = 0, suma = 0;
+                    for (DtInscripcionEdicion ins : acta) {
+                        if (ins.getNota() != null) {
+                            conNota++;
+                            suma += ins.getNota();
+                        }
+                    }
+
+                    request.setAttribute("edicion", ic.getEdicion(edicion));
+                    request.setAttribute("acta", acta);
+                    if (conNota > 0) request.setAttribute("promedioActa", String.format(java.util.Locale.ROOT, "%.2f", (double) suma / conNota));
+                } catch (Exception e) {
+                    request.setAttribute("errorActa", e.getMessage());
+                }
+                request.getRequestDispatcher("/WEB-INF/fragmentos/tablaActaEdicion.jsp").forward(request, response);
+                break;
+            }
         }
+    }
+
+    private static String escaparJson(String texto) {
+        if (texto == null) return "";
+        return texto.replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "\\n")
+                    .replace("\r", "\\r");
     }
 
     @Override

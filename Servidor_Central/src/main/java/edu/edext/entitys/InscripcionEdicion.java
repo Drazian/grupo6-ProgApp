@@ -46,6 +46,12 @@ public class InscripcionEdicion {
     @Column(name = "video_url", nullable = true, length = 500)
     private String videoURL;
     
+    // Nota de la evaluacion del estudiante (escala 1 al 12). Null mientras no se ingrese.
+    @Min(1)
+    @Max(12)
+    @Column(nullable = true)
+    private Integer nota;
+
     public InscripcionEdicion(Estudiante estudiante, Edicion edicion, LocalDate fechaInscripcion, int estado, String videoURL){
         this.fechaInscripcion = fechaInscripcion;
         this.estudiante = estudiante;
@@ -61,6 +67,9 @@ public class InscripcionEdicion {
     public void setVideoURL(String videoURL) { 
         this.videoURL = videoURL; 
     }
+
+    public Integer getNota() { return this.nota; }
+    public void setNota(Integer nota) { this.nota = nota; }
 
     public InscripcionEdicion(){}
     

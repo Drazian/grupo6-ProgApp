@@ -31,6 +31,7 @@ public class DtInscripcionEdicion {
     private String[] nomEstado={"No Inscripto", "Inscripto", "Aceptado", "Rechazado"};
     private double prioridad;
     private String videoURL;
+    private Integer nota;   // nota de la evaluacion (1 al 12); null si todavia no se ingreso
 
     public DtInscripcionEdicion(){};
     public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado, double prioridad, String videoURL){
@@ -57,4 +58,6 @@ public class DtInscripcionEdicion {
     public LocalDate getFechaInscripcion(){ return this.fechaInscripcion; }
     public double getPrioridad(){ return this.prioridad; }
     public String getVideoURL(){ return this.videoURL; } // <-- NUEVO GETTER
+    public Integer getNota(){ return this.nota; }
+    public void setNota(Integer nota){ this.nota = nota; }
 }
