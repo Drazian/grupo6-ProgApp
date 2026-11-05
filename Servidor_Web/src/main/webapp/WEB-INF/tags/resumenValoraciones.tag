@@ -20,11 +20,13 @@
             <div style="flex: 1; min-width: 240px;">
                 <c:forEach begin="0" end="4" var="i">
                     <c:set var="puntos" value="${5 - i}"/>
+                    <%-- Colores como en la Figura 7 de la letra: verde (5 estrellas) a rojo (1 estrella) --%>
+                    <c:set var="colorBarra" value="${puntos == 5 ? '#8bc34a' : (puntos == 4 ? '#c0ca33' : (puntos == 3 ? '#fdd835' : (puntos == 2 ? '#ffa726' : '#ff5722')))}"/>
                     <div class="fila-resumen" data-puntaje="${puntos}" style="display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 13px; color: #34495e;">
                         <span style="width: 70px; white-space: nowrap;">${puntos} ${puntos == 1 ? 'estrella' : 'estrellas'}</span>
                         <span style="flex: 1; height: 12px; background: #ecf0f1; border-radius: 6px; overflow: hidden;"
                               role="img" aria-label="${v.porcentajePorPuntaje[puntos - 1]}% de las valoraciones">
-                            <span style="display: block; height: 100%; width: ${v.porcentajePorPuntaje[puntos - 1]}%; background: #f5b301;"></span>
+                            <span style="display: block; height: 100%; width: ${v.porcentajePorPuntaje[puntos - 1]}%; background: ${colorBarra};"></span>
                         </span>
                         <span class="cantidad-puntaje" style="width: 70px; text-align: right; white-space: nowrap;">${v.porcentajePorPuntaje[puntos - 1]}% (${v.cantidadPorPuntaje[puntos - 1]})</span>
                     </div>
