@@ -26,8 +26,10 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -115,6 +117,7 @@ public class MovilServlet extends HttpServlet {
                         edicionesDelCurso(request, response);
                     } else {
                         listarCursos(request);
+                        contarEdiciones(request);
                         vista(request, response, "cursos.jsp");
                     }
                     break;
@@ -250,6 +253,17 @@ public class MovilServlet extends HttpServlet {
         request.setAttribute("categorias", categorias);
         request.setAttribute("filtroInstituto", instituto);
         request.setAttribute("filtroCategoria", categoria);
+    }
+
+    // "Ver Ediciones": cantidad de ediciones de cada curso listado, para mostrarla debajo del nombre
+    @SuppressWarnings("unchecked")
+    private void contarEdiciones(HttpServletRequest request) throws Exception {
+        Map<String, Integer> cantidad = new HashMap<>();
+        for (DtCurso c : (List<DtCurso>) request.getAttribute("cursos")) {
+            List<String> ediciones = ic.listaEdicionPorCurso(c.getNombre());
+            cantidad.put(c.getNombre(), ediciones == null ? 0 : ediciones.size());
+        }
+        request.setAttribute("cantidadEdiciones", cantidad);
     }
 
     private void detalleCurso(HttpServletRequest request, HttpServletResponse response, DtUsuario estudiante) throws Exception {

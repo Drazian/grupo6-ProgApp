@@ -66,7 +66,20 @@
                     <div class="col-12 col-sm-6 col-lg-4">
                         <a class="card h-100 tarjeta-elemento tarjeta-curso" href="${urlCurso}">
                             <img onerror="this.onerror=null; this.src='${ctx}/ImagenServlet?nombre=usr.png'" class="card-img-top" src="${urlImagen}" alt="<c:out value='${curso.nombre}'/>" loading="lazy">
-                            <div class="card-body"><c:out value="${curso.nombre}"/></div>
+                            <div class="card-body">
+                                <c:out value="${curso.nombre}"/>
+                                <%-- En "Ver Ediciones" se indica cuántas ediciones tiene el curso: al tocarlo se listan --%>
+                                <c:if test="${paraEdiciones}">
+                                    <c:set var="cant" value="${cantidadEdiciones[curso.nombre]}"/>
+                                    <div class="cantidad-ediciones ${cant == 0 ? 'text-muted' : 'text-primary'}">
+                                        <c:choose>
+                                            <c:when test="${cant == 0}">Sin ediciones</c:when>
+                                            <c:when test="${cant == 1}">1 edición &rsaquo;</c:when>
+                                            <c:otherwise>${cant} ediciones &rsaquo;</c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </c:if>
+                            </div>
                         </a>
                     </div>
                 </c:forEach>

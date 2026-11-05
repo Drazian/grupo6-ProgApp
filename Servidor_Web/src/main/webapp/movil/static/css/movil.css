@@ -142,6 +142,11 @@ body.movil-login {
     padding: 8px 10px;
     font-size: 13px;
 }
+.tarjeta-elemento .cantidad-ediciones {
+    margin-top: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
 
 /* ------------------------- Figura 3(c): Detalle ------------------------- */
 .detalle .imagen-detalle {
