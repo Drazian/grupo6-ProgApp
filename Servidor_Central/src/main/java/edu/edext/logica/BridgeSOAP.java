@@ -187,6 +187,23 @@ public class BridgeSOAP implements IBridgeSOAP{
     public void ingresarResultados(String nombreEdicion, String nicknameDocente, Map<String, Integer> notas, boolean cerrarEdicion) throws Exception {
         bridge.ingresarResultados(nombreEdicion, nicknameDocente, notas, cerrarEdicion);
     }
+//******************************* Valoraciones *******************************//
+    @Override
+    public List<String> listarCursosParaValorar(String nicknameEstudiante) throws Exception {
+        return bridge.listarCursosParaValorar(nicknameEstudiante);
+    }
+    @Override
+    public edu.edext.datatypes.DtValoracionesCurso getValoracionesCurso(String nombreCurso, String nicknameEstudiante) throws Exception {
+        return bridge.getValoracionesCurso(nombreCurso, nicknameEstudiante);
+    }
+    @Override
+    public void valorarCurso(String nicknameEstudiante, String nombreCurso, int puntaje) throws Exception {
+        bridge.valorarCurso(nicknameEstudiante, nombreCurso, puntaje);
+    }
+    @Override
+    public List<edu.edext.datatypes.DtValoracionesCurso> listarResumenesValoraciones() throws Exception {
+        return bridge.listarResumenesValoraciones();
+    }
     @Override
     public int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception {
         return bridge.setInscripcionPrograma(nomEstudiante, nomPrograma);

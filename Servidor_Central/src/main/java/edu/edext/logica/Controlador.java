@@ -1423,6 +1423,27 @@ public class Controlador implements IControlador {
         }
     }
 
+    // CU "Valorar un Curso" (Estudiante) y requerimiento 7.6
+    @Override
+    public List<String> listarCursosParaValorar(String nicknameEstudiante) throws Exception {
+        return new ValoracionHelper(emf).listarCursosQueParticipa(nicknameEstudiante);
+    }
+
+    @Override
+    public edu.edext.datatypes.DtValoracionesCurso getValoracionesCurso(String nombreCurso, String nicknameEstudiante) throws Exception {
+        return new ValoracionHelper(emf).getValoraciones(nombreCurso, nicknameEstudiante);
+    }
+
+    @Override
+    public void valorarCurso(String nicknameEstudiante, String nombreCurso, int puntaje) throws Exception {
+        new ValoracionHelper(emf).valorar(nicknameEstudiante, nombreCurso, puntaje);
+    }
+
+    @Override
+    public List<edu.edext.datatypes.DtValoracionesCurso> listarResumenesValoraciones() throws Exception {
+        return new ValoracionHelper(emf).listarResumenes();
+    }
+
     // Ediciones del curso en las que participa el docente: cerradas (mas reciente primero) o abiertas (mas nueva primero)
     private List<String> listarEdicionesDeDocente(String nicknameDocente, String nombreCurso, boolean cerradas) {
         try (EntityManager em = emf.createEntityManager()) {

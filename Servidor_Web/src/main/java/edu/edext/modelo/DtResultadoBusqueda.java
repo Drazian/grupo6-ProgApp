@@ -8,7 +8,9 @@ public class DtResultadoBusqueda {
     private String tipo; //curso, programa o usuario (DOCENTE o ESTUDIANTE)
     private LocalDate fechaPublicacion;
     private String imagen;
-    
+    private double promedioValoracion;   // solo cursos (requerimiento 7.6); 0 si no tiene valoraciones
+    private int cantidadValoraciones;
+
     public DtResultadoBusqueda(){}
     public DtResultadoBusqueda(String nombre, String descripcion, LocalDate fechaPublicacion, String imagen, String tipo){
         this.nombre=nombre;
@@ -23,5 +25,12 @@ public class DtResultadoBusqueda {
     public String getTipo(){return tipo;}
     public LocalDate getFechaPublicacion(){return fechaPublicacion;}
     public String getImagen(){return imagen;}
-    
+    public double getPromedioValoracion(){return promedioValoracion;}
+    public int getCantidadValoraciones(){return cantidadValoraciones;}
+
+    public void setValoracion(double promedio, int cantidad){
+        this.promedioValoracion=promedio;
+        this.cantidadValoraciones=cantidad;
+    }
+
 }

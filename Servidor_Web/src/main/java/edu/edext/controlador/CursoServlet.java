@@ -204,7 +204,17 @@ public class CursoServlet extends HttpServlet {
                     // Pasamos el instituto como una variable separada al JSP
                     request.setAttribute("institutoDelCurso", institutoDelCurso);
                     // =========================================================================
-                    
+
+                    // Requerimiento 7.6: promedio y resumen de valoraciones del curso.
+                    // Si el que consulta es un estudiante, tambien viaja su puntaje (y si puede valorarlo).
+                    try {
+                        DtUsuario logueado = (DtUsuario) request.getSession().getAttribute("usuarioLogueado");
+                        String nickEstudiante = (logueado != null && logueado.getTipoUsuario() == TipoUsuario.ESTUDIANTE) ? logueado.getNickname() : null;
+                        request.setAttribute("valoraciones", ic.getValoracionesCurso(dtCurso.getNombre(), nickEstudiante));
+                    } catch (Exception ignored) {
+                        // Si fallan las valoraciones, el detalle del curso se muestra igual
+                    }
+
                     request.setAttribute("curso", dtCurso);
                     request.getRequestDispatcher("/WEB-INF/fragmentos/consultaCurso.jsp").forward(request, response);
                 } catch (Exception e) {
