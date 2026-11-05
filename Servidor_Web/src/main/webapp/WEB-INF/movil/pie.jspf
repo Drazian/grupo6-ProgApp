@@ -1,0 +1,5 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- Pie común del Dispositivo Móvil: scripts de Bootstrap (menú hamburguesa y desplegables) --%>
+<script src="${ctx}/movil/static/js/bootstrap.bundle.min.js?v=${applicationScope.versionRecursosMovil}"></script>
+</body>
+</html>

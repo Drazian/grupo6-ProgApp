@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80" role="img" aria-label="edEXT">
+  <circle cx="40" cy="40" r="37" fill="#ffffff" stroke="#2c3e50" stroke-width="4"/>
+  <circle cx="40" cy="40" r="31" fill="none" stroke="#3498db" stroke-width="1.5"/>
+  <path d="M24 30 L40 23 L56 30 L40 37 Z" fill="#2c3e50"/>
+  <path d="M31 33.5 V39 C31 42 49 42 49 39 V33.5" fill="none" stroke="#2c3e50" stroke-width="2"/>
+  <text x="40" y="57" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#2c3e50">edEXT</text>
+</svg>
