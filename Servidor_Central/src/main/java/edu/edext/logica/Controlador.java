@@ -1461,6 +1461,17 @@ public class Controlador implements IControlador {
         return new ActaEstudioHelper(emf).getActa(nicknameEstudiante, nombrePrograma);
     }
 
+    // Requerimiento 7.3 "Listado de tendencias"
+    @Override
+    public boolean registrarVisitaCurso(String nombreCurso) throws Exception {
+        return new TendenciasHelper(emf).registrarVisita(nombreCurso);
+    }
+
+    @Override
+    public List<edu.edext.datatypes.DtCursoVisitas> listarCursosMasVisitados() throws Exception {
+        return new TendenciasHelper(emf).listarMasVisitados();
+    }
+
     // Ediciones del curso en las que participa el docente: cerradas (mas reciente primero) o abiertas (mas nueva primero)
     private List<String> listarEdicionesDeDocente(String nicknameDocente, String nombreCurso, boolean cerradas) {
         try (EntityManager em = emf.createEntityManager()) {

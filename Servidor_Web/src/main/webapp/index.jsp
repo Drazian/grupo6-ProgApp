@@ -126,8 +126,11 @@
                         <li style="margin-bottom: 5px;">
                             <a href="#" onclick="cargarSelectorConsultaEdicion(); return false;">Consulta de Edición de Curso</a>
                         </li>
-                        <li>
+                        <li style="margin-bottom: 5px;">
                             <a href="#" onclick="ProgramaServlet('formVerProgramas')">Ver Programas</a>
+                        </li>
+                        <li>
+                            <a href="#" onclick="cargarTendencias(); return false;">Cursos más visitados</a>
                         </li>
                     </ul>
                 </details>
