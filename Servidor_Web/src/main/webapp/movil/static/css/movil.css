@@ -1,0 +1,171 @@
+/* =====================================================================
+   edEXT - Dispositivo Móvil (requerimiento 7.1, Responsive Web Design)
+   Estilos propios sobre Bootstrap 5, siguiendo las Figuras 2 y 3 de la letra.
+   ===================================================================== */
+
+/* Escala base de 14px (como el Bootstrap 3 de las figuras): todo lo que usa rem queda más compacto */
+html {
+    font-size: 87.5%;
+}
+
+body.movil {
+    background-color: #ffffff;
+    color: #333;
+}
+
+/* Desplegables de Instituto / Categoría: chicos y con scroll si hay muchos elementos (Figura 3(b)) */
+.movil .dropdown-menu {
+    max-height: 55vh;
+    max-width: 85vw;
+    overflow-y: auto;
+    font-size: 13px;
+}
+.movil .dropdown-item {
+    padding: 4px 14px;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* ------------------------- Figura 2: Inicio de sesión ------------------------- */
+body.movil-login {
+    background-color: #e4e4e8;
+    min-height: 100vh;
+}
+.form-signin {
+    width: 100%;
+    max-width: 330px;
+    padding: 18vh 15px 15px 15px;
+    margin: 0 auto;
+}
+.form-signin h2 {
+    font-weight: 400;
+    margin-bottom: 12px;
+}
+/* Los dos campos van "pegados", como en el ejemplo Signin de Bootstrap */
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    padding: 7px 10px;
+    font-size: 14px;
+}
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+.form-signin input[name="identificador"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+.form-signin input[name="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+.form-signin .btn-login {
+    background-image: linear-gradient(to bottom, #337ab7 0, #265a88 100%);
+    border-color: #245580;
+}
+
+/* ------------------------- Figura 3(a): Barra de navegación ------------------------- */
+.movil-navbar {
+    min-height: 58px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.movil-navbar .navbar-toggler {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 9px;
+}
+.movil-navbar .navbar-toggler:focus {
+    box-shadow: none;
+}
+.movil-navbar .saludo {
+    font-size: 16px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60vw;
+}
+.movil-navbar .logo-edext {
+    width: 40px;
+    height: 40px;
+}
+/* Menú desplegado en pantallas chicas: panel gris debajo de la barra */
+@media (max-width: 767.98px) {
+    .movil-navbar .navbar-collapse {
+        background: #f5f5f5;
+        margin: 8px -12px -8px -12px;
+        padding: 4px 16px;
+        border-top: 1px solid #e5e5e5;
+    }
+    .movil-navbar .nav-link {
+        font-size: 14px;
+        padding: 6px 0;
+        color: #777;
+    }
+    .movil-navbar .nav-link.active {
+        color: #333;
+    }
+}
+
+/* ------------------------- Bienvenida ------------------------- */
+.bienvenida {
+    font-weight: 700;
+    text-align: center;
+    margin-top: 28px;
+    letter-spacing: 0.5px;
+}
+
+/* ------------------------- Figura 3(b): Listado en grilla ------------------------- */
+.titulo-seccion {
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 14px;
+}
+.tarjeta-elemento {
+    color: #333;
+    text-decoration: none;
+    transition: box-shadow 0.15s ease;
+}
+.tarjeta-elemento:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+    color: #333;
+}
+.tarjeta-elemento .card-img-top {
+    height: 190px;
+    object-fit: cover;
+    background: #f4f6f7;
+}
+.tarjeta-elemento .card-body {
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+/* ------------------------- Figura 3(c): Detalle ------------------------- */
+.detalle .imagen-detalle {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+}
+.detalle .list-group-item {
+    padding: 6px 0;
+    font-size: 13px;
+}
+.detalle h6 {
+    font-weight: 600;
+    margin-top: 16px;
+}
+.detalle .foto-docente {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+/* Estrellas de las valoraciones (mismo tag que el sitio web) */
+.detalle .estrellas {
+    vertical-align: middle;
+}
