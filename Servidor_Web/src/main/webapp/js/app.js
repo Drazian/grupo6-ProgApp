@@ -1932,6 +1932,70 @@ function enviarValoracion() {
         });
 }
 
+// =====================================================================
+// CU: TRAMITAR ACTA DE ESTUDIO (ESTUDIANTE) - Requerimiento 7.4
+// En su perfil (pestaña Programas de Formación) el estudiante descarga el acta en PDF de un programa
+// =====================================================================
+
+// Abre "Mi Perfil" directamente en la pestaña de Programas de Formación, donde están los enlaces al acta
+function cargarTramitarActa(nickname) {
+    cargarMiPerfil(nickname);
+    let intentos = 0;
+    const espera = setInterval(() => {
+        intentos++;
+        if (document.getElementById('tabProgramas')) {
+            clearInterval(espera);
+            cambiarPestana('tabProgramas');
+            document.getElementById('tabProgramas').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (intentos > 50) {
+            clearInterval(espera);
+        }
+    }, 100);
+}
+
+function nombreArchivoDescarga(contentDisposition) {
+    if (!contentDisposition) return null;
+    const utf8 = /filename\*=UTF-8''([^;]+)/i.exec(contentDisposition);
+    if (utf8) return decodeURIComponent(utf8[1]);
+    const simple = /filename="([^"]+)"/i.exec(contentDisposition);
+    return simple ? simple[1] : null;
+}
+
+// Descarga el PDF con fetch: si el servidor responde un error, se muestra en un modal en vez de bajar un archivo roto
+function descargarActaEstudio(enlace) {
+    const contenidoOriginal = enlace.innerHTML;
+    enlace.style.pointerEvents = 'none';
+    enlace.textContent = 'Generando acta...';
+
+    fetch(enlace.href)
+        .then(response => {
+            const tipo = response.headers.get('Content-Type') || '';
+            if (!response.ok || !tipo.includes('application/pdf'))
+                return response.text().then(texto => { throw new Error(texto || 'No se pudo generar el acta de estudio.'); });
+            return response.blob().then(blob => ({
+                blob,
+                nombre: nombreArchivoDescarga(response.headers.get('Content-Disposition')) || 'Acta de Estudio.pdf'
+            }));
+        })
+        .then(({ blob, nombre }) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nombre;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+        })
+        .catch(error => {
+            mostrarModal('No se pudo generar el acta', `<p style="text-align:center; color: #c0392b;">${escaparTextoHtml(error.message)}</p>`);
+        })
+        .finally(() => {
+            enlace.innerHTML = contenidoOriginal;
+            enlace.style.pointerEvents = '';
+        });
+}
+
 function cargarResultadosInscripciones() {
     fetch('InscripcionServlet?accion=misResultados')
         .then(response => {

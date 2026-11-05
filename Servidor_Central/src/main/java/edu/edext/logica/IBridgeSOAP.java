@@ -175,6 +175,11 @@ public interface IBridgeSOAP {
             @WebParam(name="puntaje") int puntaje) throws Exception;
     @WebMethod(operationName="listarResumenesValoraciones")
     List<edu.edext.datatypes.DtValoracionesCurso> listarResumenesValoraciones() throws Exception;
+//****************************** Acta de Estudio *****************************//
+    @WebMethod(operationName="getActaEstudio")
+    edu.edext.datatypes.DtActaEstudio getActaEstudio(
+            @WebParam(name="nicknameEstudiante") String nicknameEstudiante,
+            @WebParam(name="nombrePrograma") String nombrePrograma) throws Exception;
     @WebMethod(operationName="setInscripcionPrograma")
     int setInscripcionPrograma(
             @WebParam(name="nomEstudiante") String nomEstudiante,

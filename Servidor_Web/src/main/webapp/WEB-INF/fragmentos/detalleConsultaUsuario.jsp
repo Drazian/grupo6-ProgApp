@@ -351,6 +351,15 @@
                                         style="background: #8e44ad; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">
                                     Ver Programa
                                 </button>
+                                <%-- CU "Tramitar Acta de Estudio" (7.4): el estudiante, en su propio perfil, descarga el acta del programa en PDF --%>
+                                <c:if test="${requestScope.esPropioPerfil and requestScope.usuarioPerfil.tipoUsuario == 'ESTUDIANTE'}">
+                                    <c:url var="urlActa" value="ActaEstudioServlet"><c:param name="programa" value="${prog.nombre}"/></c:url>
+                                    <a href="${urlActa}" class="link-acta-estudio" data-programa="<c:out value='${prog.nombre}'/>"
+                                       onclick="descargarActaEstudio(this); return false;"
+                                       style="display: inline-block; margin-top: 6px; background: #c0392b; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; text-decoration: none; white-space: nowrap;">
+                                        &#128196; Acta de Estudio (PDF)
+                                    </a>
+                                </c:if>
                             </td>
                         </tr>
                     </c:forEach>
