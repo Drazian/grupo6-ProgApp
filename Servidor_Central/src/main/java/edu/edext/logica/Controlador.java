@@ -1423,6 +1423,17 @@ public class Controlador implements IControlador {
         }
     }
 
+    // CU "Listar resultados de evaluaciones en ediciones de cursos" (Estudiante)
+    @Override
+    public List<edu.edext.datatypes.DtInscripcionEdicion> listarResultadosEvaluaciones(String nicknameEstudiante) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nicknameEstudiante);
+        try {
+            return helper.getResultadosEvaluacionesDeEstudiante();
+        } finally {
+            helper.kill();
+        }
+    }
+
     // CU "Valorar un Curso" (Estudiante) y requerimiento 7.6
     @Override
     public List<String> listarCursosParaValorar(String nicknameEstudiante) throws Exception {

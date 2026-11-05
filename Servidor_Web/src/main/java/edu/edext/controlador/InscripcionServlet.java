@@ -191,6 +191,41 @@ public class InscripcionServlet extends HttpServlet {
             }
 
             // =====================================================================
+            // CASO DE USO: "LISTAR RESULTADOS DE EVALUACIONES EN EDICIONES DE CURSOS" (ESTUDIANTE)
+            // =====================================================================
+
+            case "misEvaluaciones": {
+                DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los Estudiantes pueden consultar sus resultados de evaluaciones.");
+                    return;
+                }
+
+                try {
+                    // Inscripciones a ediciones cerradas, con nota y resultado (Aprobado / No aprobado)
+                    List<DtInscripcionEdicion> resultados = ic.listarResultadosEvaluaciones(estudiante.getNickname());
+
+                    int evaluadas = 0, aprobadas = 0, suma = 0;
+                    for (DtInscripcionEdicion r : resultados) {
+                        if (r.getNota() != null) {
+                            evaluadas++;
+                            suma += r.getNota();
+                            if ("Aprobado".equals(r.getResultado())) aprobadas++;
+                        }
+                    }
+                    request.setAttribute("resultadosEvaluaciones", resultados);
+                    request.setAttribute("cantidadEvaluadas", evaluadas);
+                    request.setAttribute("cantidadAprobadas", aprobadas);
+                    if (evaluadas > 0)
+                        request.setAttribute("promedioNotas", String.format(java.util.Locale.ROOT, "%.2f", (double) suma / evaluadas));
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/resultadosEvaluaciones.jsp").forward(request, response);
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al obtener los resultados de evaluaciones: " + e.getMessage());
+                }
+                break;
+            }
+
+            // =====================================================================
             // CASO DE USO: "VER RESULTADOS DE EVALUACIONES EN EDICIONES DE CURSOS" (DOCENTE)
             // =====================================================================
 
