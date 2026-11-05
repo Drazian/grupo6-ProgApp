@@ -1996,6 +1996,26 @@ function descargarActaEstudio(enlace) {
         });
 }
 
+// =====================================================================
+// CU: LISTAR RESULTADOS DE EVALUACIONES EN EDICIONES DE CURSOS (ESTUDIANTE)
+// Inscripciones a ediciones cerradas con su nota y resultado
+// =====================================================================
+
+function cargarResultadosEvaluaciones() {
+    fetch('InscripcionServlet?accion=misEvaluaciones')
+        .then(response => {
+            if (!response.ok) throw new Error("Acceso denegado. Función exclusiva para Estudiantes.");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA();
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
+        });
+}
+
 function cargarResultadosInscripciones() {
     fetch('InscripcionServlet?accion=misResultados')
         .then(response => {

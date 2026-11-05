@@ -32,6 +32,7 @@ public class DtInscripcionEdicion {
     private double prioridad;
     private String videoURL;
     private Integer nota;   // nota de la evaluacion (1 al 12); null si todavia no se ingreso
+    private String resultado; // "Aprobado" / "No aprobado" en ediciones cerradas con nota; null si no hay evaluacion
 
     public DtInscripcionEdicion(){};
     public DtInscripcionEdicion(DtUsuario estudiante, DtEdicion edicion, LocalDate fechaInscripcion, int estado, double prioridad, String videoURL){
@@ -60,4 +61,6 @@ public class DtInscripcionEdicion {
     public String getVideoURL(){ return this.videoURL; } // <-- NUEVO GETTER
     public Integer getNota(){ return this.nota; }
     public void setNota(Integer nota){ this.nota = nota; }
+    public String getResultado(){ return this.resultado; }
+    public void setResultado(String resultado){ this.resultado = resultado; }
 }

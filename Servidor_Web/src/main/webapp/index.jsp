@@ -105,6 +105,7 @@
                             <li><a href="#" onclick="cargarFormInscripcion()">Inscripción a Edición</a></li>
                             <li><a href="#" onclick="cargarFormInscripcionPrograma(); return false;">Inscripción a Programa de Formación</a></li>
                             <li><a href="#" onclick="cargarResultadosInscripciones()">Ver Resultados</a></li>
+                            <li><a href="#" onclick="cargarResultadosEvaluaciones(); return false;">Resultados de Evaluaciones</a></li>
                             <li><a href="#" onclick="cargarFormValorarCurso(); return false;">Valorar un Curso</a></li>
                         </ul>
                     </details>
