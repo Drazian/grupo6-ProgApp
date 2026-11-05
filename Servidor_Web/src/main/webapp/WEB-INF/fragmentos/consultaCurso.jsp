@@ -45,8 +45,8 @@
         <p><strong>Fecha de Alta:</strong> ${curso.fechaRegistro}</p>
         <p><strong>Categorías:</strong>  
             <c:choose>
-                <c:when test="${not empty curso.categorias_toArray}">
-                    <c:forEach var="catStr" items="${curso.categorias_toArray}" varStatus="loop">
+                <c:when test="${not empty curso.nameCategorias}">
+                    <c:forEach var="catStr" items="${curso.nameCategorias}" varStatus="loop">
                         <span style="background: #f1f2f6; padding: 2px 6px; border-radius: 4px; border: 1px solid #dcdde1; font-size: 13px;">${catStr}</span>${!loop.last ? ' ' : ''}
                     </c:forEach>
                 </c:when>

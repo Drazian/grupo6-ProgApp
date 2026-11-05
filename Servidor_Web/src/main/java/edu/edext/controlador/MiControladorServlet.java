@@ -1,16 +1,16 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtCategoria;
-import edu.edext.datatypes.DtInstituto;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
+//import edu.edext.datatypes.DtCategoria;
+//import edu.edext.datatypes.DtInstituto;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
 
-//import edu.edext.controlador.ws.DtCategoria;
-//import edu.edext.controlador.ws.DtInstituto;
-//import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.DtCategoria;
+import edu.edext.controlador.ws.DtInstituto;
+import edu.edext.controlador.ws.IBridgeSOAP;
 
-import edu.edext.modelo.Producto;
+//import edu.edext.modelo.Producto;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,53 +24,46 @@ import org.tinylog.Logger;
  
 @WebServlet("/MiControladorServlet")
 public class MiControladorServlet extends HttpServlet {
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         String accion = request.getParameter("accion");
-        String vistaDestino = "/WEB-INF/fragmentos/error.jsp"; // Por si falla algo
+//        String vistaDestino = "/WEB-INF/fragmentos/error.jsp"; // Por si falla algo
 
-        // CASO 1: Listar productos desde el Menú Lateral
-        if ("productos".equals(accion)) {
+//        if ("productos".equals(accion)) {
             // Simulamos datos de una Base de Datos usando la clase Modelo
-            List<Producto> lista = new ArrayList<>();
-            lista.add(new Producto(101, "Laptop Gamer ASUS", 1200.50));
-            lista.add(new Producto(102, "Mouse Óptico Inalámbrico", 25.00));
-            lista.add(new Producto(103, "Monitor 4K 27 pulgadas", 350.99));
+//            List<Producto> lista = new ArrayList<>();
+//            lista.add(new Producto(101, "Laptop Gamer ASUS", 1200.50));
+//            lista.add(new Producto(102, "Mouse Óptico Inalámbrico", 25.00));
+//            lista.add(new Producto(103, "Monitor 4K 27 pulgadas", 350.99));
 
             // Guardamos la lista en el request para que el JSP pueda leerla
-            request.setAttribute("listaProductos", lista);
-            vistaDestino = "/WEB-INF/fragmentos/productos.jsp";
-        }
+//            request.setAttribute("listaProductos", lista);
+//            vistaDestino = "/WEB-INF/fragmentos/productos.jsp";
+//        }
         
-        // CASO 2: Procesar la Barra de Búsqueda del Sector 1
-        else if ("buscar".equals(accion)) {
-            String query = request.getParameter("query");
-            
-            // Simulación básica de filtro
-            String resultadoBusqueda = "No se encontraron resultados para: " + query;
-            if (query != null && !query.trim().isEmpty()) {
-                resultadoBusqueda = "Mostrando resultados en tiempo real para el término: '" + query + "'";
-            }
-            
-            request.setAttribute("mensajeBusqueda", resultadoBusqueda);
-            vistaDestino = "/WEB-INF/fragmentos/resultados.jsp";
-        }
+//        else if ("buscar".equals(accion)) {
+//            String query = request.getParameter("query");
+//            
+//            // Simulación básica de filtro
+//            String resultadoBusqueda = "No se encontraron resultados para: " + query;
+//            if (query != null && !query.trim().isEmpty()) {
+//                resultadoBusqueda = "Mostrando resultados en tiempo real para el término: '" + query + "'";
+//            }
+//            
+//            request.setAttribute("mensajeBusqueda", resultadoBusqueda);
+//            vistaDestino = "/WEB-INF/fragmentos/resultados.jsp";
+//        }
         
-        // CASO 3: Cargar un formulario interactivo
-        else if ("abrirFormulario".equals(accion)) {
-            vistaDestino = "/WEB-INF/fragmentos/formulario.jsp";
-        }
+//        else if ("abrirFormulario".equals(accion)) {
+////            vistaDestino = "/WEB-INF/fragmentos/formulario.jsp";
+//        }
         
-        else if ("reportes".equals(accion)) {
-            vistaDestino="/WEB-INF/fragmentos/Central-01-10-2026.log";
-        }
-        
-        // CASO 4: Obtener Institutos en JSON para el menu izquierdo de index.jsp
-        else if ("obtenerInstitutosJSON".equals(accion)) {
+        //  Obtener Institutos 
+        if ("obtenerInstitutosJSON".equals(accion)) {
             response.setContentType("application/json;charset=UTF-8");
             try {
                 List<DtInstituto> institutos = ic.listarInstitutos();
@@ -93,7 +86,7 @@ public class MiControladorServlet extends HttpServlet {
             return;
         }
 
-        // CASO 5: Obtener Categorías en JSON para el menu izquierdo de index.jsp
+        //  Obtener Categorías 
         else if ("obtenerCategoriasJSON".equals(accion)) {
             response.setContentType("application/json;charset=UTF-8");
             try {
@@ -117,24 +110,12 @@ public class MiControladorServlet extends HttpServlet {
             return;
         }
         
-        // Despachador: Toma los datos procesados y renderiza el JSP correspondiente
-        request.getRequestDispatcher(vistaDestino).forward(request, response);
+//        request.getRequestDispatcher(vistaDestino).forward(request, response);
     }
 
-    // Método que procesa los envíos de datos (POST) como guardar un formulario
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        // Ejemplo de cómo recibir datos de un formulario asíncrono
-        String nombreNuevo = request.getParameter("nombreProd");
-        String precioNuevo = request.getParameter("precioProd");
-
-        // Aquí iría tu código para guardar en Base de Datos (DAO)
-        System.out.println("Guardando producto: " + nombreNuevo + " - $" + precioNuevo);
-
-        // Respondemos un texto simple confirmando el éxito para que AJAX lo muestre
-        response.setContentType("text/html;charset=UTF-8");
-        response.getWriter().write("<div class='alerta-exito'>¡Producto '" + nombreNuevo + "' guardado exitosamente!</div>");
-    }
+//    @Override
+//    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+//            throws ServletException, IOException {
+//        
+//    }
 }

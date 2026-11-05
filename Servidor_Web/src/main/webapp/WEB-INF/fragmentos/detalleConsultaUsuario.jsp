@@ -75,7 +75,7 @@
                 <li><b>Nombre:</b> ${requestScope.usuarioPerfil.nombre}</li>
                 <li><b>Apellido:</b> ${requestScope.usuarioPerfil.apellido}</li>
                 <li><b>Correo electrónico:</b> ${requestScope.usuarioPerfil.email}</li>
-                <li><b>Fecha de Nacimiento:</b> ${requestScope.usuarioPerfil.fNacimiento}</li>
+                <li><b>Fecha de Nacimiento:</b> ${requestScope.usuarioPerfil.FNacimiento}</li>
                 
                 <c:if test="${requestScope.usuarioPerfil.tipoUsuario == 'DOCENTE'}">
                     <li>
@@ -183,12 +183,12 @@
                     </thead>
                     <tbody>
                         <c:forEach var="ins" items="${requestScope.listaInscripcionesCompletas}">
-                            <%-- REGLA DE NEGOCIO: Si es Rechazada (estado == 3), solo se muestra si es el propio perfil del usuario --%>
-                            <c:if test="${ins.estado != 3 or requestScope.esPropioPerfil}">
+                            <%-- REGLA DE NEGOCIO: Si es Rechazada (valorEstado == 3), solo se muestra si es el propio perfil del usuario --%>
+                            <c:if test="${ins.valorEstado != 3 or requestScope.esPropioPerfil}">
                                 <tr style="border-bottom: 1px solid #eee;">
                                     <%-- Columna estrecha para desistir de inscripciones propias pendientes --%>
                                     <td style="width: 28px; min-width: 28px; padding: 4px; text-align: center; vertical-align: middle;">
-                                        <c:if test="${requestScope.esPropioPerfil and ins.estado != 2 and ins.estado != 3}">
+                                        <c:if test="${requestScope.esPropioPerfil and ins.valorEstado != 2 and ins.valorEstado != 3}">
                                             <button type="button"
                                                     onclick="desistirInscripcionAccion('${ins.edicion.nombre}')"
                                                     title="Desistir de esta inscripción"
@@ -221,12 +221,12 @@
                                     <!-- Estado de la inscripcion -->
                                     <td style="padding: 10px; text-align: center;">
                                         <c:choose>
-                                            <c:when test="${ins.estado == 2}">
+                                            <c:when test="${ins.valorEstado == 2}">
                                                 <span style="background: #2ecc71; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">
                                                     Aceptada
                                                 </span>
                                             </c:when>
-                                            <c:when test="${ins.estado == 3}">
+                                            <c:when test="${ins.valorEstado == 3}">
                                                 <span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">
                                                     Rechazada
                                                 </span>

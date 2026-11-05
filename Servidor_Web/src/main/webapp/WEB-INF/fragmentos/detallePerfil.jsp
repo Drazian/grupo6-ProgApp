@@ -51,7 +51,7 @@
         <p><b>Nombre:</b> ${requestScope.usuarioPerfil.nombre}</p>
         <p><b>Apellido:</b> ${requestScope.usuarioPerfil.apellido}</p>
         <p><b>Correo electrónico:</b> ${requestScope.usuarioPerfil.email}</p>
-        <p><b>Fecha de Nacimiento:</b> ${requestScope.usuarioPerfil.fNacimiento}</p>
+        <p><b>Fecha de Nacimiento:</b> ${requestScope.usuarioPerfil.FNacimiento}</p>
     </div>
 
     <!-- Paneles de Red Social al costado (Seguidores y Seguidos) -->

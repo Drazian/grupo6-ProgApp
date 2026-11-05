@@ -1,4 +1,4 @@
-package edu.edext.modelo;
+package edu.edext.tools;
 //****************************** Libreria **************************************
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;

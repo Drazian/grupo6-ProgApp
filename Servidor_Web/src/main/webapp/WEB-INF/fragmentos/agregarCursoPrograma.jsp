@@ -14,7 +14,7 @@
             <select id="selectPrograma" name="nombrePrograma" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: #fff; font-size: 14px;">
                 <option value="" disabled selected>-- Seleccione un Programa --</option>
                 <c:forEach var="prog" items="${programas}">
-                    <option value="${prog.getNombre()}">${prog.getNombre()}</option>
+                    <option value="${prog.nombre}">${prog.nombre}</option>
                 </c:forEach>
             </select>
         </div>
@@ -41,7 +41,7 @@
                                 onmouseout="this.style.backgroundColor='transparent';">
                                 
                                 <td style="padding: 10px; text-align: center;">
-                                    <input type="checkbox" name="cursosSeleccionados" value="${cur.getNombre()}" class="check-curso" style="transform: scale(1.2); cursor: pointer;">
+                                    <input type="checkbox" name="cursosSeleccionados" value="${cur.nombre}" class="check-curso" style="transform: scale(1.2); cursor: pointer;">
                                 </td>
                                 <td style="padding: 10px; text-align: center;">
                                     <img src="ImagenServlet?nombre=${empty cur.imagen ? 'usr.png' : cur.imagen}" 
@@ -49,10 +49,10 @@
                                          style="width: 38px; height: 38px; object-fit: cover; border-radius: 50%; border: 1px solid #ccc;">
                                 </td>
                                 <td style="padding: 10px; font-weight: 500; color: #2c3e50;">
-                                    ${cur.getNombre()}
+                                    ${cur.nombre}
                                 </td>
                                 <td style="padding: 10px; color: #666;">
-                                    ${cur.getInstituto() != null ? cur.getInstituto().getNombre() : 'Sin instituto'}
+                                    ${cur.instituto != null ? cur.instituto.nombre : 'Sin instituto'}
                                 </td>
                             </tr>
                         </c:forEach>

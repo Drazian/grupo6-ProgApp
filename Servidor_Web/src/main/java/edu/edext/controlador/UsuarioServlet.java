@@ -1,24 +1,24 @@
 package edu.edext.controlador;
  
-import edu.edext.datatypes.DtEdicion;
-import edu.edext.datatypes.DtInscripcionEdicion;
-import edu.edext.datatypes.DtInstituto;
-import edu.edext.datatypes.DtPrograma;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
+//import edu.edext.datatypes.DtEdicion;
+//import edu.edext.datatypes.DtInscripcionEdicion;
+//import edu.edext.datatypes.DtInstituto;
+//import edu.edext.datatypes.DtPrograma;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.datatypes.TipoUsuario;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IControlador;
 
-//import edu.edext.controlador.ws.DtEdicion;
-//import edu.edext.controlador.ws.DtInscripcionEdicion;
-//import edu.edext.controlador.ws.DtInstituto;
-//import edu.edext.controlador.ws.DtPrograma;
-//import edu.edext.controlador.ws.DtUsuario;
-//import edu.edext.controlador.ws.IBridgeSOAP;
-//import edu.edext.controlador.ws.TipoUsuario;
+import edu.edext.controlador.ws.DtEdicion;
+import edu.edext.controlador.ws.DtInscripcionEdicion;
+import edu.edext.controlador.ws.DtInstituto;
+import edu.edext.controlador.ws.DtPrograma;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.TipoUsuario;
 
 import edu.edext.modelo.Remux;
-import edu.edext.modelo.Utils;
+import edu.edext.tools.Utils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -39,8 +39,8 @@ import java.util.List;
 @WebServlet(name = "UsuarioServlet", urlPatterns = {"/UsuarioServlet"})
 @MultipartConfig
 public class UsuarioServlet extends HttpServlet {
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
     
     private void cargarInstitutos(HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
@@ -274,13 +274,13 @@ public class UsuarioServlet extends HttpServlet {
                 TipoUsuario tipo = TipoUsuario.valueOf(tipoUsuario);
 
 // ************************ Descomentar para ejecutar **************************
-                DtUsuario usuario = new DtUsuario(
-                    nickname, password, email, nombre, apellido,
-                    null, fecha, institutos, tipo );
-// ************************* Comentar para compilar ****************************
-//                DtUsuario usuario = Remux.DtUsuario(
+//                DtUsuario usuario = new DtUsuario(
 //                    nickname, password, email, nombre, apellido,
 //                    null, fecha, institutos, tipo );
+// ************************* Comentar para compilar ****************************
+                DtUsuario usuario = Remux.DtUsuario(
+                    nickname, password, email, nombre, apellido,
+                    null, fecha, institutos, tipo );
 // *****************************************************************************
 
                 ic.crearUsuario(usuario, bytesImagen, nombreOriginal);
@@ -344,18 +344,7 @@ public class UsuarioServlet extends HttpServlet {
                 }
 
 // ************************* Comentar para ejecutar ****************************
-                DtUsuario usuarioModificado = new DtUsuario(
-                    usuarioActual.getNickname(),
-                    passwordParaControlador,
-                    usuarioActual.getEmail(),
-                    nombre,
-                    apellido,
-                    nombreImagenFinal, 
-                    fecha,
-                    institutos,
-                    usuarioActual.getTipoUsuario());
-// ************************* Comentar para compilar ****************************
-//                DtUsuario usuarioModificado = Remux.DtUsuario(
+//                DtUsuario usuarioModificado = new DtUsuario(
 //                    usuarioActual.getNickname(),
 //                    passwordParaControlador,
 //                    usuarioActual.getEmail(),
@@ -365,6 +354,17 @@ public class UsuarioServlet extends HttpServlet {
 //                    fecha,
 //                    institutos,
 //                    usuarioActual.getTipoUsuario());
+// ************************* Comentar para compilar ****************************
+                DtUsuario usuarioModificado = Remux.DtUsuario(
+                    usuarioActual.getNickname(),
+                    passwordParaControlador,
+                    usuarioActual.getEmail(),
+                    nombre,
+                    apellido,
+                    nombreImagenFinal, 
+                    fecha,
+                    institutos,
+                    usuarioActual.getTipoUsuario());
 // *****************************************************************************
 
                 ic.modificarUsuario(usuarioModificado, bytesImagen, nombreOriginal);
@@ -561,29 +561,29 @@ public class UsuarioServlet extends HttpServlet {
         DtUsuario u = ic.obtenerUsuario(nickname);
         if (u != null) {
                     // ************************** Comentar para ejecutar **************************
-            DtUsuario sinPassword = new DtUsuario(
-                u.getNickname(),
-                null,
-                u.getEmail(),
-                u.getNombre(),
-                u.getApellido(),
-                u.getImagen(),
-                u.getfNacimiento(),
-                u.getInstitutos(),
-                u.getTipoUsuario()
-            );
-                    // ************************** Comentar para compilar **************************
-//            DtUsuario sinPassword = Remux.DtUsuario(
+//            DtUsuario sinPassword = new DtUsuario(
 //                u.getNickname(),
 //                null,
 //                u.getEmail(),
 //                u.getNombre(),
 //                u.getApellido(),
 //                u.getImagen(),
-//                Utils.Cast.valueOf(u.getFNacimiento()),
+//                u.getfNacimiento(),
 //                u.getInstitutos(),
 //                u.getTipoUsuario()
 //            );
+                    // ************************** Comentar para compilar **************************
+            DtUsuario sinPassword = Remux.DtUsuario(
+                u.getNickname(),
+                null,
+                u.getEmail(),
+                u.getNombre(),
+                u.getApellido(),
+                u.getImagen(),
+                Utils.Cast.valueOf(u.getFNacimiento()),
+                u.getInstitutos(),
+                u.getTipoUsuario()
+            );
                     // ****************************************************************************
             request.getSession().setAttribute("usuarioLogueado", sinPassword);
         }

@@ -1,13 +1,13 @@
 package edu.edext.controlador;
 
 
-import edu.edext.datatypes.DtInstituto;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
+//import edu.edext.datatypes.DtInstituto;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
 
-//import edu.edext.controlador.ws.DtInstituto;
-//import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.DtInstituto;
+import edu.edext.controlador.ws.IBridgeSOAP;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,8 +25,8 @@ import java.util.List;
 
 @WebServlet("/TestServlet")
 public class TestServlet extends HttpServlet {
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

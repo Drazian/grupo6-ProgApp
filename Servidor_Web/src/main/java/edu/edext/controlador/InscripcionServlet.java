@@ -1,18 +1,18 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtEdicion;
-import edu.edext.datatypes.DtInscripcionEdicion;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
+//import edu.edext.datatypes.DtEdicion;
+//import edu.edext.datatypes.DtInscripcionEdicion;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.datatypes.TipoUsuario;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
 
-//import edu.edext.controlador.ws.DtEdicion;
-//import edu.edext.controlador.ws.DtInscripcionEdicion;
-//import edu.edext.controlador.ws.DtUsuario;
-//import edu.edext.controlador.ws.IBridgeSOAP;
-//import edu.edext.controlador.ws.TipoUsuario;
+import edu.edext.controlador.ws.DtEdicion;
+import edu.edext.controlador.ws.DtInscripcionEdicion;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.TipoUsuario;
 
 import edu.edext.controlador.ws.MapEntry;
 import edu.edext.controlador.ws.MapWrapper;
@@ -31,8 +31,8 @@ import java.util.Enumeration;
 
 @WebServlet("/InscripcionServlet")
 public class InscripcionServlet extends HttpServlet {
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -446,16 +446,16 @@ public class InscripcionServlet extends HttpServlet {
                 }
                 
                 
-                MapWrapper evaluar = new MapWrapper();
-                for(Map.Entry<String, Integer> entry : evaluaciones.entrySet()){
-                    MapEntry entryCliente = new MapEntry();
-                    entryCliente.setKey(entry.getKey());
-                    entryCliente.setValue(entry.getValue());
-                    evaluar.getEntry().add(entryCliente);
-                }
+//                MapWrapper evaluar = new MapWrapper();
+//                for(Map.Entry<String, Integer> entry : evaluaciones.entrySet()){
+//                    MapEntry entryCliente = new MapEntry();
+//                    entryCliente.setKey(entry.getKey());
+//                    entryCliente.setValue(entry.getValue());
+//                    evaluar.getEntry().add(entryCliente);
+//                }
                 
-//                ic.evaluarInscripciones(nombreEdicion, evaluar);
-                ic.evaluarInscripciones(nombreEdicion, evaluaciones);
+                ic.evaluarInscripciones(nombreEdicion, toWrapper(evaluaciones));
+//                ic.evaluarInscripciones(nombreEdicion, evaluaciones);
                 
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("Selección de estudiantes guardada con éxito.");
@@ -500,7 +500,7 @@ public class InscripcionServlet extends HttpServlet {
             }
 
             try {
-                ic.ingresarResultados(nombreEdicion, docente.getNickname(), notas, cerrar);
+                ic.ingresarResultados(nombreEdicion, docente.getNickname(), toWrapper(notas), cerrar);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write(cerrar
                         ? "Notas guardadas y edición cerrada. Ya puede consultar el acta en \"Ver Resultados de Evaluaciones\"."
@@ -511,4 +511,16 @@ public class InscripcionServlet extends HttpServlet {
             }
         }
     }
+    
+    private MapWrapper toWrapper(Map<String, Integer>  map){
+        MapWrapper ret = new MapWrapper();
+        for(Map.Entry<String, Integer> entry : map.entrySet()){
+            MapEntry entryCliente = new MapEntry();
+            entryCliente.setKey(entry.getKey());
+            entryCliente.setValue(entry.getValue());
+            ret.getEntry().add(entryCliente);
+        }
+        return ret;
+    }
+    
 }
