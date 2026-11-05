@@ -160,6 +160,21 @@ public interface IBridgeSOAP {
             @WebParam(name="notas")
             @XmlJavaTypeAdapter(MapAdapter.class) Map<String, Integer> notas,
             @WebParam(name="cerrarEdicion") boolean cerrarEdicion) throws Exception;
+//******************************* Valoraciones *******************************//
+    @WebMethod(operationName="listarCursosParaValorar")
+    List<String> listarCursosParaValorar(
+            @WebParam(name="nicknameEstudiante") String nicknameEstudiante) throws Exception;
+    @WebMethod(operationName="getValoracionesCurso")
+    edu.edext.datatypes.DtValoracionesCurso getValoracionesCurso(
+            @WebParam(name="nombreCurso") String nombreCurso,
+            @WebParam(name="nicknameEstudiante") String nicknameEstudiante) throws Exception;
+    @WebMethod(operationName="valorarCurso")
+    void valorarCurso(
+            @WebParam(name="nicknameEstudiante") String nicknameEstudiante,
+            @WebParam(name="nombreCurso") String nombreCurso,
+            @WebParam(name="puntaje") int puntaje) throws Exception;
+    @WebMethod(operationName="listarResumenesValoraciones")
+    List<edu.edext.datatypes.DtValoracionesCurso> listarResumenesValoraciones() throws Exception;
     @WebMethod(operationName="setInscripcionPrograma")
     int setInscripcionPrograma(
             @WebParam(name="nomEstudiante") String nomEstudiante,

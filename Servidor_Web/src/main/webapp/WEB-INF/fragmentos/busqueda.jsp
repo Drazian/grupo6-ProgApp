@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ taglib prefix="ed" tagdir="/WEB-INF/tags" %>
 
 <div style="max-width: 1100px; margin: 0 auto; padding: 25px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
     
@@ -62,6 +63,20 @@
                         
                         <td style="padding: 12px 10px; font-weight: bold; color: #2c3e50; vertical-align: top;">
                             ${item.nombre}
+                            <%-- Requerimiento 7.6: puntaje promedio del curso con 5 estrellas --%>
+                            <c:if test="${item.tipo == 'curso'}">
+                                <div class="valoracion-resultado" style="margin-top: 4px; font-weight: normal; font-size: 12px; color: #7f8c8d; white-space: nowrap;">
+                                    <c:choose>
+                                        <c:when test="${item.cantidadValoraciones > 0}">
+                                            <ed:estrellas valor="${item.promedioValoracion}" tamano="15px"/>
+                                            <span style="color: #34495e; font-weight: bold;">${item.promedioValoracion}</span> (${item.cantidadValoraciones})
+                                        </c:when>
+                                        <c:otherwise>
+                                            <ed:estrellas valor="0" tamano="15px"/> <span style="font-style: italic;">Sin valoraciones</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </c:if>
                         </td>
 
                         <td style="padding: 12px 10px; color: #555; max-width: 450px; vertical-align: top; word-break: break-word;" title="${item.descripcion}">

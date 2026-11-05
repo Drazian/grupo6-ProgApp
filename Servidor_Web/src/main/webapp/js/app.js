@@ -1815,6 +1815,123 @@ function guardarResultados(event, cerrar) {
         .finally(() => botones.forEach(b => { if (b && document.body.contains(b)) b.disabled = false; }));
 }
 
+// =====================================================================
+// CU: VALORAR UN CURSO (ESTUDIANTE)
+// Curso en el que participa -> promedio + resumen -> puntaje de 1 a 5 (una única vez)
+// =====================================================================
+
+const TEXTOS_PUNTAJE = ['', 'Muy insatisfecho', 'Insatisfecho', 'Neutral', 'Satisfecho', 'Muy satisfecho'];
+let puntajeElegido = 0;
+
+function cargarFormValorarCurso(cursoPreseleccionado) {
+    const url = 'ValoracionServlet?accion=formulario' + (cursoPreseleccionado ? '&curso=' + encodeURIComponent(cursoPreseleccionado) : '');
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error("Acceso denegado. Función exclusiva para Estudiantes.");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA();
+            const select = document.getElementById('cursoValorar');
+            if (select && select.value) cargarDetalleValoracion(select.value);
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
+        });
+}
+
+function cargarDetalleValoracion(nombreCurso) {
+    const contenedor = document.getElementById('contenedor-valoracion');
+    puntajeElegido = 0;
+    if (!nombreCurso) {
+        contenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 30px;">Seleccione un curso para ver su puntaje promedio y asignarle su valoración.</p>';
+        return Promise.resolve();
+    }
+    contenedor.innerHTML = '<h4 style="text-align:center; color: #f39c12;">Cargando las valoraciones del curso...</h4>';
+
+    return fetch(`ValoracionServlet?accion=detalle&curso=${encodeURIComponent(nombreCurso)}`)
+        .then(response => {
+            if (!response.ok) throw new Error("No se pudieron obtener las valoraciones del curso.");
+            return response.text();
+        })
+        .then(html => {
+            contenedor.innerHTML = html;
+            guardarEstadoActualSPA();
+        })
+        .catch(error => {
+            contenedor.innerHTML = `<p style="color:red; text-align:center;">${escaparTextoHtml(error.message)}</p>`;
+        });
+}
+
+function resaltarEstrellas(n) {
+    document.querySelectorAll('#selector-estrellas .estrella-opcion').forEach(boton => {
+        boton.style.color = Number(boton.dataset.valor) <= n ? '#f5b301' : '#d5d8dc';
+    });
+    const texto = document.getElementById('texto-puntaje');
+    if (texto) texto.textContent = n ? `${n} de 5 · ${TEXTOS_PUNTAJE[n]}` : 'Elija un puntaje';
+}
+
+function elegirPuntaje(n) {
+    puntajeElegido = n;
+    document.querySelectorAll('#selector-estrellas .estrella-opcion').forEach(boton => {
+        boton.setAttribute('aria-checked', Number(boton.dataset.valor) === n ? 'true' : 'false');
+    });
+    resaltarEstrellas(n);
+    document.getElementById('btnValorar').disabled = false;
+    document.getElementById('mensaje-valoracion').style.display = 'none';
+}
+
+function mostrarMensajeValoracion(ok, texto) {
+    const msgDiv = document.getElementById('mensaje-valoracion');
+    if (!msgDiv) return;
+    msgDiv.style.display = 'block';
+    msgDiv.style.backgroundColor = ok ? '#dff0d8' : '#f2dede';
+    msgDiv.style.color = ok ? '#3c763d' : '#a94442';
+    msgDiv.innerHTML = (ok ? '✔ ' : '<strong>Error:</strong> ') + escaparTextoHtml(texto);
+}
+
+// La valoración es definitiva: se pide confirmación antes de enviarla
+function confirmarValoracion() {
+    if (puntajeElegido < 1 || puntajeElegido > 5) {
+        mostrarMensajeValoracion(false, 'Debe elegir un puntaje de 1 a 5.');
+        return;
+    }
+    const curso = document.getElementById('form-valoracion').dataset.curso;
+    const htmlCuerpo = `
+        <div style="text-align: center; padding: 10px;">
+            <p style="font-size: 15px; color: #2c3e50;">Va a valorar <strong>${escaparTextoHtml(curso)}</strong> con
+                <strong>${puntajeElegido} de 5</strong> (${TEXTOS_PUNTAJE[puntajeElegido]}).</p>
+            <p style="font-size: 14px; color: #c0392b;">Cada curso se puede valorar una única vez: después no podrá cambiarla.</p>
+        </div>
+    `;
+    const htmlBotones = `
+        <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn-moderno" id="btnConfirmarValoracion" style="background-color: #f39c12; margin-left: 10px;" onclick="cerrarModal(); enviarValoracion()">Sí, valorar</button>
+    `;
+    mostrarModal('Confirmar valoración', htmlCuerpo, htmlBotones);
+}
+
+function enviarValoracion() {
+    const curso = document.getElementById('form-valoracion').dataset.curso;
+    const boton = document.getElementById('btnValorar');
+    boton.disabled = true;
+
+    const datos = new URLSearchParams({ accion: 'valorar', curso: curso, puntaje: String(puntajeElegido) });
+    fetch('ValoracionServlet', { method: 'POST', body: datos })
+        .then(response => response.text().then(texto => ({ ok: response.ok, texto })))
+        .then(({ ok, texto }) => {
+            if (!ok) throw new Error(texto);
+            // Se recarga el detalle: ahora muestra el nuevo promedio y la valoración del estudiante
+            return cargarDetalleValoracion(curso).then(() =>
+                mostrarModal('Valoración registrada', `<p style="text-align:center; font-size: 15px; color: #2c3e50;">${escaparTextoHtml(texto)}</p>`));
+        })
+        .catch(error => {
+            mostrarMensajeValoracion(false, error.message);
+            if (document.body.contains(boton)) boton.disabled = false;
+        });
+}
+
 function cargarResultadosInscripciones() {
     fetch('InscripcionServlet?accion=misResultados')
         .then(response => {

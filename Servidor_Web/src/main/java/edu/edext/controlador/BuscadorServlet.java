@@ -4,10 +4,12 @@ package edu.edext.controlador;
 //import edu.edext.controlador.ws.DtPrograma;
 //import edu.edext.controlador.ws.DtUsuario;
 //import edu.edext.controlador.ws.IBridgeSOAP;
+//import edu.edext.controlador.ws.DtValoracionesCurso;
 
 import edu.edext.datatypes.DtCurso;
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
+import edu.edext.datatypes.DtValoracionesCurso;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IBridgeSOAP;
 import edu.edext.logica.IControlador;
@@ -25,7 +27,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList; 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/BuscadorServlet")
 public class BuscadorServlet extends HttpServlet {
@@ -65,6 +69,15 @@ public class BuscadorServlet extends HttpServlet {
                 }
             }      
             
+            // Requerimiento 7.6: promedio de valoraciones de cada curso (una sola consulta para toda la busqueda)
+            Map<String, DtValoracionesCurso> valoraciones = new HashMap<>();
+            try {
+                for (DtValoracionesCurso v : ic.listarResumenesValoraciones())
+                    valoraciones.put(v.getCurso(), v);
+            } catch (Exception ignored) {
+                // Sin valoraciones la busqueda funciona igual
+            }
+
             List<DtCurso> cursos = ic.listarCursos();
             if (cursos != null){
                 for (DtCurso curso : cursos){
@@ -79,6 +92,8 @@ public class BuscadorServlet extends HttpServlet {
 //                        LocalDate fechaReg = Utils.Cast.valueOf(curso.getFechaRegistro());
                     // ****************************************************************************
                         DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,curso.getImagen(),"curso");
+                        DtValoracionesCurso v = valoraciones.get(nombre);
+                        if (v != null) res.setValoracion(v.getPromedio(), v.getCantidad());
                         resultados.add(res);
                     }
                 }
