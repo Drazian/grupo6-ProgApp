@@ -9,7 +9,7 @@ import java.time.LocalDate;
  * 1 inscripto
  * 2 aceptado
  * 3 recharado
- */
+ */ 
 public class DtInscripcionPrograma {
     private final int estado;
     public final int ACEPTADO=2;
@@ -28,9 +28,9 @@ public class DtInscripcionPrograma {
         this.estado=estado;
     }
    
-    public int getValorEstado(){ return this.estado; }
+    public int getEstado(){ return this.estado; }
     public DtPrograma getPrograma(){ return this.programa; }
-    public String getEstado(){ return nomEstado[this.estado]; }
+    public String getNameEstado(){ return nomEstado[this.estado]; }
     public DtUsuario getEstudiante(){  return this.estudiante;  }
     public LocalDate getFechaInscripcion(){ return this.fechaInscripcion; }
     

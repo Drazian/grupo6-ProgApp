@@ -1,11 +1,11 @@
 package edu.edext.modelo;
 
-import edu.edext.datatypes.DtActaEstudio;
-import edu.edext.datatypes.DtResultadoCurso;
+//import edu.edext.datatypes.DtActaEstudio;
+//import edu.edext.datatypes.DtResultadoCurso;
 
-//import edu.edext.controlador.ws.DtActaEstudio;
-//import edu.edext.controlador.ws.DtResultadoCurso;
-
+import edu.edext.controlador.ws.DtActaEstudio;
+import edu.edext.controlador.ws.DtResultadoCurso;
+ 
 import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.Color;
@@ -27,6 +27,8 @@ import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
+import edu.edext.controlador.ws.ResultadoCurso;
+import edu.edext.tools.Utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
@@ -103,8 +105,8 @@ public final class ActaEstudioPdf {
             filaDato(datos, "Correo electrónico", texto(acta.getEmailEstudiante()), negrita);
             filaDato(datos, "Programa", texto(acta.getPrograma()), negrita);
             if (acta.getFechaInicioPrograma() != null || acta.getFechaFinPrograma() != null)
-                filaDato(datos, "Período del programa", fecha(acta.getFechaInicioPrograma()) + " al " + fecha(acta.getFechaFinPrograma()), negrita);
-            filaDato(datos, "Fecha de emisión", fecha(acta.getFechaEmision()), negrita);
+                filaDato(datos, "Período del programa", acta.getFechaInicioPrograma() + " al " + acta.getFechaFinPrograma(), negrita);
+            filaDato(datos, "Fecha de emisión", acta.getFechaEmision(), negrita);
             doc.add(datos);
 
             if (acta.getDescripcionPrograma() != null && !acta.getDescripcionPrograma().isBlank())
@@ -150,7 +152,7 @@ public final class ActaEstudioPdf {
                     tabla.addCell(celda(String.valueOf(r.getCreditos()), normal, TextAlignment.CENTER, fondo));
                     tabla.addCell(celda(r.getNota() == null ? "-" : String.valueOf(r.getNota()), negrita, TextAlignment.CENTER, fondo));
                     tabla.addCell(celda(texto(r.getResultado()), negrita, TextAlignment.CENTER, fondo).setFontColor(colorResultado(r.getResultado())));
-                    tabla.addCell(celda(r.getFechaResultado() == null ? "-" : fecha(r.getFechaResultado()), normal, TextAlignment.CENTER, fondo));
+                    tabla.addCell(celda(r.getFechaResultado() == null ? "-" : r.getFechaResultado(), normal, TextAlignment.CENTER, fondo));
                 }
             }
             doc.add(tabla);
@@ -208,9 +210,13 @@ public final class ActaEstudioPdf {
     }
 
     private static Color colorResultado(String resultado) {
-        if (DtResultadoCurso.APROBADO.equals(resultado)) return VERDE;
-        if (DtResultadoCurso.NO_APROBADO.equals(resultado)) return ROJO;
-        if (DtResultadoCurso.EN_CURSO.equals(resultado)) return NARANJA;
+//        if (DtResultadoCurso.APROBADO.equals(resultado)) return VERDE;
+//        if (DtResultadoCurso.NO_APROBADO.equals(resultado)) return ROJO;
+//        if (DtResultadoCurso.EN_CURSO.equals(resultado)) return NARANJA;
+//        return GRIS_TEXTO;
+        if (ResultadoCurso.APROBADO.equals(resultado)) return VERDE;
+        if (ResultadoCurso.NO_APROBADO.equals(resultado)) return ROJO;
+        if (ResultadoCurso.EN_CURSO.equals(resultado)) return NARANJA;
         return GRIS_TEXTO;
     }
 

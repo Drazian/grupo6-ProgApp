@@ -1,27 +1,27 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtCategoria;
-import edu.edext.datatypes.DtConsultaCurso;
-import edu.edext.datatypes.DtCurso;
-import edu.edext.datatypes.DtEdicion;
-import edu.edext.datatypes.DtInstituto;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
-
-//import edu.edext.controlador.ws.DtCategoria;
-//import edu.edext.controlador.ws.DtConsultaCurso;
-//import edu.edext.controlador.ws.DtCurso;
-//import edu.edext.controlador.ws.DtEdicion;
-//import edu.edext.controlador.ws.DtInstituto;
-//import edu.edext.controlador.ws.DtUsuario;
-//import edu.edext.controlador.ws.IBridgeSOAP;
-//import edu.edext.controlador.ws.TipoUsuario;
+//import edu.edext.datatypes.DtCategoria;
+//import edu.edext.datatypes.DtConsultaCurso;
+//import edu.edext.datatypes.DtCurso;
+//import edu.edext.datatypes.DtEdicion;
+//import edu.edext.datatypes.DtInstituto;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.datatypes.TipoUsuario;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
+ 
+import edu.edext.controlador.ws.DtCategoria;
+import edu.edext.controlador.ws.DtConsultaCurso;
+import edu.edext.controlador.ws.DtCurso;
+import edu.edext.controlador.ws.DtEdicion;
+import edu.edext.controlador.ws.DtInstituto;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.TipoUsuario;
 
 import edu.edext.modelo.RecordarmeMovil;
-import edu.edext.modelo.Utils;
+import edu.edext.tools.Utils;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -57,8 +57,8 @@ import org.tinylog.Logger;
 @WebServlet(urlPatterns = {"/movil", "/movil/", "/movil/login", "/movil/inicio", "/movil/salir",
                            "/movil/cursos", "/movil/curso", "/movil/ediciones", "/movil/edicion"})
 public class MovilServlet extends HttpServlet {
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
     private final LoginHelper login = new LoginHelper();
 
     private static final String VISTAS = "/WEB-INF/movil/";
