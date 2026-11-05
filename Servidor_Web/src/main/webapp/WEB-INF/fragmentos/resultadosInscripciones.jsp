@@ -34,7 +34,7 @@
                 </thead>
                 <tbody id="tablaMisInscripcionesBody">
                     <c:forEach var="ins" items="${misInscripciones}">
-                        <tr class="fila-mi-inscripcion" data-estado="${ins.valorEstado}">
+                        <tr class="fila-mi-inscripcion" data-estado="${ins.estado}">
                             <!-- Imagen de la Edición (Req. 7.2) -->
                             <td style="padding: 10px; border: 1px solid #ddd; background: #fff; text-align: center;">
                                 <img src="ImagenServlet?nombre=${empty ins.edicion.imagen ? 'usr.png' : ins.edicion.imagen}" 
@@ -69,17 +69,17 @@
                             <!-- Estado de la Inscripción (Tabla 1: Inscripto, Aceptada, Rechazada) -->
                             <td style="padding: 10px; border: 1px solid #ddd; background: #fff; text-align: center;">
                                 <c:choose>
-                                    <c:when test="${ins.Estado == 1}">
+                                    <c:when test="${ins.estado == 1}">
                                         <span style="background: #f39c12; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
                                             Inscripto
                                         </span>
                                     </c:when>
-                                    <c:when test="${ins.Estado == 2}">
+                                    <c:when test="${ins.estado == 2}">
                                         <span style="background: #27ae60; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
                                             Aceptada
                                         </span>
                                     </c:when>
-                                    <c:when test="${ins.Estado == 3}">
+                                    <c:when test="${ins.estado == 3}">
                                         <span style="background: #c0392b; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
                                             Rechazada
                                         </span>

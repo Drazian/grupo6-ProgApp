@@ -27,7 +27,7 @@
                             <div class="card-body">
                                 <c:out value="${edicion.nombre}"/>
                                 <div class="text-muted" style="font-size: 12px;">
-                                    ${empty edicion.fechaInicio ? '' : edicion.fechaInicio.format(fmtFecha)} al ${empty edicion.fechaFin ? '' : edicion.fechaFin.format(fmtFecha)}
+                                    ${empty edicion.fechaInicio ? '' : edicion.fechaInicio} al ${empty edicion.fechaFin ? '' : edicion.fechaFin}
                                 </div>
                             </div>
                         </a>

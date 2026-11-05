@@ -4,6 +4,7 @@ package edu.edext.controlador;
 import edu.edext.controlador.ws.DtUsuario;
 import edu.edext.tools.Utils;
 import java.io.IOException;
+import java.time.LocalDate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -63,8 +64,19 @@ public class LoginServlet extends HttpServlet {
         else if("altaUsuario".equals(accion))
             request.getRequestDispatcher("/WEB-INF/fragmentos/altaUsuario.jsp").forward(request, response);
 
-        else if("ModificarUsuario".equals(accion))
+        else if("ModificarUsuario".equals(accion)){
+            request.setAttribute("fechaNacimientoISO", fechaNacimientoISO(request));
             request.getRequestDispatcher("/WEB-INF/fragmentos/ModificarUsuario.jsp").forward(request, response);
+        }
+    }
+
+    // <input type="date"> solo acepta yyyy-MM-dd y el Servidor Central manda la fecha como dd/MM/yyyy
+    private static String fechaNacimientoISO(HttpServletRequest request){
+        HttpSession session = request.getSession(false);
+        Object usuario = session != null ? session.getAttribute("usuarioLogueado") : null;
+        if(!(usuario instanceof DtUsuario)) return "";
+        LocalDate fecha = Utils.Cast.valueOf(((DtUsuario) usuario).getFNacimiento());
+        return fecha == null ? "" : fecha.toString();
     }
 
 }

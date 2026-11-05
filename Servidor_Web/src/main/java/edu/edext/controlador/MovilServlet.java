@@ -23,6 +23,7 @@ import edu.edext.controlador.ws.TipoUsuario;
 import edu.edext.modelo.RecordarmeMovil;
 import edu.edext.tools.Utils;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -62,8 +63,8 @@ public class MovilServlet extends HttpServlet {
     private final LoginHelper login = new LoginHelper();
 
     private static final String VISTAS = "/WEB-INF/movil/";
+    // Las fechas llegan del Servidor Central como texto dd/MM/yyyy; la fecha de registro del curso se muestra corta (Figura 3)
     private static final DateTimeFormatter FECHA_CORTA = DateTimeFormatter.ofPattern("dd/MM/yy");
-    private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Versión de los recursos estáticos (?v=): cambia en cada despliegue. El war se arma con fecha fija (1980)
     // y sin esto el navegador sigue usando el CSS/JS viejo después de redesplegar.
@@ -94,8 +95,6 @@ public class MovilServlet extends HttpServlet {
         }
 
         request.setAttribute("saludo", saludo(estudiante));
-        request.setAttribute("fmtFechaCorta", FECHA_CORTA);
-        request.setAttribute("fmtFecha", FECHA);
         try {
             switch (ruta) {
                 case "/movil/inicio":
@@ -274,6 +273,7 @@ public class MovilServlet extends HttpServlet {
             return;
         }
         request.setAttribute("curso", curso);
+        request.setAttribute("fechaRegistro", fechaCorta(curso.getFechaRegistro()));
         request.setAttribute("ediciones", edicionesOrdenadas(curso));
         try {
             request.setAttribute("instituto", ic.obtenerInstitutoPorCurso(nombre));
@@ -312,8 +312,17 @@ public class MovilServlet extends HttpServlet {
     // Ediciones del curso, de la más nueva a la más vieja
     private static List<DtEdicion> edicionesOrdenadas(DtConsultaCurso curso) {
         List<DtEdicion> ediciones = new ArrayList<>(curso.getEdiciones() != null ? curso.getEdiciones() : List.of());
-        ediciones.sort(Comparator.comparing(DtEdicion::getFechaInicio, Comparator.nullsLast(Comparator.reverseOrder())));
+        // La fecha llega como texto dd/MM/yyyy: se ordena por la fecha, no por el texto ("02/08/2026" va antes que "15/03/2025")
+        ediciones.sort(Comparator.comparing((DtEdicion e) -> Utils.Cast.valueOf(e.getFechaInicio()),
+                Comparator.nullsLast(Comparator.reverseOrder())));
         return ediciones;
+    }
+
+    // "15/03/2025" -> "15/03/25"; si no se puede interpretar se muestra tal cual
+    private static String fechaCorta(String fecha) {
+        if (fecha == null || fecha.isBlank()) return null;
+        LocalDate f = Utils.Cast.valueOf(fecha);
+        return f == null ? fecha : f.format(FECHA_CORTA);
     }
 
     // ----------------------------- auxiliares -----------------------------

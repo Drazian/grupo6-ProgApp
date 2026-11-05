@@ -27,10 +27,10 @@
                 <li class="list-group-item">Duración: <c:out value="${curso.duracion}"/></li>
                 <li class="list-group-item">Horas: ${curso.cantidadHoras}</li>
                 <li class="list-group-item">Créditos: ${curso.creditos}</li>
-                <li class="list-group-item">Fecha de registro: ${empty curso.fechaRegistro ? '-' : curso.fechaRegistro.format(fmtFechaCorta)}</li>
-                <c:if test="${not empty curso.categorias_toArray}">
+                <li class="list-group-item">Fecha de registro: ${empty fechaRegistro ? '-' : fechaRegistro}</li>
+                <c:if test="${not empty curso.nameCategorias}">
                     <li class="list-group-item">Categorías:
-                        <c:forEach var="cat" items="${curso.categorias_toArray}" varStatus="st"><c:out value="${cat}"/><c:if test="${not st.last}">, </c:if></c:forEach>
+                        <c:forEach var="cat" items="${curso.nameCategorias}" varStatus="st"><c:out value="${cat}"/><c:if test="${not st.last}">, </c:if></c:forEach>
                     </li>
                 </c:if>
             </ul>

@@ -184,11 +184,11 @@
                     <tbody>
                         <c:forEach var="ins" items="${requestScope.listaInscripcionesCompletas}">
                             <%-- REGLA DE NEGOCIO: Si es Rechazada (Estado == 3), solo se muestra si es el propio perfil del usuario --%>
-                            <c:if test="${ins.Estado != 3 or requestScope.esPropioPerfil}">
+                            <c:if test="${ins.estado != 3 or requestScope.esPropioPerfil}">
                                 <tr style="border-bottom: 1px solid #eee;">
                                     <%-- Columna estrecha para desistir de inscripciones propias pendientes --%>
                                     <td style="width: 28px; min-width: 28px; padding: 4px; text-align: center; vertical-align: middle;">
-                                        <c:if test="${requestScope.esPropioPerfil and ins.Estado != 2 and ins.Estado != 3}">
+                                        <c:if test="${requestScope.esPropioPerfil and ins.estado != 2 and ins.estado != 3}">
                                             <button type="button"
                                                     onclick="desistirInscripcionAccion('${ins.edicion.nombre}')"
                                                     title="Desistir de esta inscripción"
@@ -221,12 +221,12 @@
                                     <!-- Estado de la inscripcion -->
                                     <td style="padding: 10px; text-align: center;">
                                         <c:choose>
-                                            <c:when test="${ins.Estado == 2}">
+                                            <c:when test="${ins.estado == 2}">
                                                 <span style="background: #2ecc71; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">
                                                     Aceptada
                                                 </span>
                                             </c:when>
-                                            <c:when test="${ins.Estado == 3}">
+                                            <c:when test="${ins.estado == 3}">
                                                 <span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">
                                                     Rechazada
                                                 </span>

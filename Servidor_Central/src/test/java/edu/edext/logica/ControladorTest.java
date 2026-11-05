@@ -725,7 +725,9 @@ public class ControladorTest {
         ic.delInscripcion(estudiante, edicion);
         
         int resultado = ic.delInscripcion(estudiante, edicion);
-        assertEquals(resultado, -1); //Codigo de error generico/default.
+        // 1 = no existe esa inscripcion (CU Desistir: el Servidor Web responde "No existe esa inscripción");
+        // 0 = cancelada; -1 = error al cancelar
+        assertEquals(1, resultado, "Un estudiante inexistente no tiene inscripción para cancelar");
     }
     
     @Test
@@ -910,6 +912,7 @@ public class ControladorTest {
         List<String> institutos=new ArrayList<>();
         LocalDate fecha=LocalDate.now();
         String nickname="NICKNAME", nickname2="NICKNAME_DOCENTE", email="nick@gamil.com";
+        String email2="nick_docente@gamil.com";   // el email es unico por usuario: el docente no puede usar el del estudiante
         String pathImage=cfg.PATH_INTERNAL.substring(1)+"benkenobi.jpg";
         institutos.add("Física");
         institutos.add("Eléctrica");
@@ -917,7 +920,7 @@ public class ControladorTest {
 //        DtUsuario estudiante=new DtUsuario(nickname, "passNick", (Utils.Validate.isEmail(email)?email:null), "nombreNick", "apellidoNick", "imagenNick", Utils.Cast.valueOf(fecha), institutos, TipoUsuario.ESTUDIANTE);
 //        DtUsuario docente=new DtUsuario(nickname2, "passNick", (Utils.Validate.isEmail(email)?email:null), "nombreNick", "apellidoNick", "imagenNick", Utils.Cast.valueOf(fecha), institutos, TipoUsuario.DOCENTE);
         DtUsuario estudiante=new DtUsuario(nickname, "passNick", (Utils.Validate.isEmail(email)?email:null), "nombreNick", "apellidoNick", "imagenNick",fecha, institutos, TipoUsuario.ESTUDIANTE);
-        DtUsuario docente=new DtUsuario(nickname2, "passNick", (Utils.Validate.isEmail(email)?email:null), "nombreNick", "apellidoNick", "imagenNick",fecha, institutos, TipoUsuario.DOCENTE);
+        DtUsuario docente=new DtUsuario(nickname2, "passNick", (Utils.Validate.isEmail(email2)?email2:null), "nombreNick", "apellidoNick", "imagenNick",fecha, institutos, TipoUsuario.DOCENTE);
         byte[] imagen=null;
           InputStream tmpImage=ControladorTest.class.getClassLoader().getResourceAsStream(pathImage);
           assertNotNull(tmpImage, "Error cargando la imagen "+pathImage);
