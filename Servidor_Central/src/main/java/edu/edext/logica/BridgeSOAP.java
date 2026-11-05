@@ -204,6 +204,11 @@ public class BridgeSOAP implements IBridgeSOAP{
     public List<edu.edext.datatypes.DtValoracionesCurso> listarResumenesValoraciones() throws Exception {
         return bridge.listarResumenesValoraciones();
     }
+//****************************** Acta de Estudio *****************************//
+    @Override
+    public edu.edext.datatypes.DtActaEstudio getActaEstudio(String nicknameEstudiante, String nombrePrograma) throws Exception {
+        return bridge.getActaEstudio(nicknameEstudiante, nombrePrograma);
+    }
     @Override
     public int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception {
         return bridge.setInscripcionPrograma(nomEstudiante, nomPrograma);

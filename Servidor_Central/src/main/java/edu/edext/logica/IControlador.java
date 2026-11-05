@@ -2,6 +2,7 @@ package edu.edext.logica;
 
 import edu.edext.datatypes.DtInscripcionEdicion;
 import edu.edext.datatypes.DtValoracionesCurso;
+import edu.edext.datatypes.DtActaEstudio;
 import edu.edext.datatypes.DtConsultaCurso;
 import edu.edext.datatypes.DtInstituto;
 import edu.edext.datatypes.DtCategoria;
@@ -82,6 +83,9 @@ public interface IControlador {
     DtValoracionesCurso getValoracionesCurso(String nombreCurso, String nicknameEstudiante) throws Exception; // exporta a Web
     void valorarCurso(String nicknameEstudiante, String nombreCurso, int puntaje) throws Exception;          // exporta a Web
     List<DtValoracionesCurso> listarResumenesValoraciones() throws Exception;                               // exporta a Web
+
+//****************************** Acta de Estudio *****************************//
+    DtActaEstudio getActaEstudio(String nicknameEstudiante, String nombrePrograma) throws Exception;       // exporta a Web
     int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception;  // exporta a Web
 
 //**************************** ProgramaFormacion *****************************//

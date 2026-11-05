@@ -1444,6 +1444,12 @@ public class Controlador implements IControlador {
         return new ValoracionHelper(emf).listarResumenes();
     }
 
+    // CU "Tramitar Acta de Estudio" (Estudiante) y requerimiento 7.4
+    @Override
+    public edu.edext.datatypes.DtActaEstudio getActaEstudio(String nicknameEstudiante, String nombrePrograma) throws Exception {
+        return new ActaEstudioHelper(emf).getActa(nicknameEstudiante, nombrePrograma);
+    }
+
     // Ediciones del curso en las que participa el docente: cerradas (mas reciente primero) o abiertas (mas nueva primero)
     private List<String> listarEdicionesDeDocente(String nicknameDocente, String nombreCurso, boolean cerradas) {
         try (EntityManager em = emf.createEntityManager()) {

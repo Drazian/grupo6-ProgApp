@@ -62,6 +62,9 @@
                         <ul style="list-style: none; padding-left: 15px; margin-top: 5px;">
                                 <li><a href="#" onclick="cargarModificarUsuario(); return false;">Modificar perfil</a></li>
                                 <li><a href="#" onclick="cargarSocial(); return false;">Social</a></li>
+                                <c:if test="${sessionScope.usuarioLogueado.tipoUsuario == 'ESTUDIANTE'}">
+                                    <li><a href="#" data-nickname="<c:out value='${sessionScope.usuarioLogueado.nickname}'/>" onclick="cargarTramitarActa(this.dataset.nickname); return false;">Tramitar Acta de Estudio</a></li>
+                                </c:if>
                         </ul>
                     </details>
                  <hr style="opacity: 0.2; margin: 10px 0;">
