@@ -10,7 +10,7 @@
         <h1>Institutos</h1>
         <ul>
             <c:forEach var="i" items="${institutos}">
-                <li>${i.getNombre()}</li>
+                <li>${i.nombre}</li>
             </c:forEach>
         </ul>
         

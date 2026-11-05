@@ -16,10 +16,10 @@
                         onmouseout="this.style.backgroundColor='#fff';">
                         
                         <span style="font-weight: bold; color: #2c3e50; font-size: 15px;">
-                            📚 ${prog.getNombre()}
+                            📚 ${prog.nombre}
                         </span>
                         
-                        <button type="button" onclick="cargarDetallePrograma('${prog.getNombre()}')"
+                        <button type="button" onclick="cargarDetallePrograma('${prog.nombre}')"
                                 style="background-color: #0275d8; color: white; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.2s;"
                                 onmouseover="this.style.backgroundColor='#025aa5';" 
                                 onmouseout="this.style.backgroundColor='#0275d8';">

@@ -41,8 +41,8 @@
             <div style="margin-top: 12px;">
                 <strong style="font-size: 14px; color: #333; margin-right: 8px;">Categorías:</strong>
                 <c:choose>
-                    <c:when test="${not empty programa.getCategorias()}">
-                        <c:forEach var="categoria" items="${programa.getCategorias()}">
+                    <c:when test="${not empty programa.categorias}">
+                        <c:forEach var="categoria" items="${programa.categorias}">
                             <span style="font-size: 11px; background: #e9ecef; padding: 4px 8px; border-radius: 12px; border: 1px solid #ced4da; font-weight: bold; color: #495057; display: inline-block; margin-right: 5px; margin-bottom: 4px; text-transform: uppercase;">
                                 <c:out value="${categoria}"/>
                             </span>
@@ -63,7 +63,7 @@
         <h3 style="margin-top: 0; color: #333; font-size: 18px; margin-bottom: 15px;">Cursos del Programa</h3>
         
         <c:choose>
-            <c:when test="${not empty programa.getCursos()}">
+            <c:when test="${not empty programa.cursos}">
                 <div style="overflow-x: auto; border: 1px solid #dee2e6; border-radius: 6px;">
                     <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
                         <thead>
@@ -74,7 +74,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach var="curso" items="${programa.getCursos()}">
+                            <c:forEach var="curso" items="${programa.cursos}">
                                 <tr style="border-bottom: 1px solid #eee; transition: background 0.15s;"
                                     onmouseover="this.style.backgroundColor='#fcfcfc';" 
                                     onmouseout="this.style.backgroundColor='transparent';">

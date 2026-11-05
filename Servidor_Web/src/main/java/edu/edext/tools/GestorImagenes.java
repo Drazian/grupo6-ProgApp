@@ -1,6 +1,6 @@
-package edu.edext.resources;
+package edu.edext.tools;
 
-import edu.edext.modelo.cfg;
+import edu.edext.tools.cfg;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

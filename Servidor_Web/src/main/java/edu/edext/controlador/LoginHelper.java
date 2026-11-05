@@ -1,8 +1,8 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.logica.Fabrica;
-//import edu.edext.controlador.ws.DtUsuario;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.logica.Fabrica;
+import edu.edext.controlador.ws.DtUsuario;
 import org.tinylog.Logger;
 
 /**
@@ -68,23 +68,23 @@ public class LoginHelper {
 //   }
 
     private boolean findNick(String nick) throws Exception{
-        return Fabrica.getInstance().getIControlador().existeUsuario(nick); // **** Descomentar para ejecutar ****
-//        return Fabrica.getConexion().existeUsuario(nick); // **** Comentar para compilar ****
+//        return Fabrica.getInstance().getIControlador().existeUsuario(nick); // **** Descomentar para ejecutar ****
+        return Fabrica.getConexion().existeUsuario(nick); // **** Comentar para compilar ****
     }
 
     private boolean findEmail(String email) throws Exception{
-        return Fabrica.getInstance().getIControlador().existeEmail(email);  // **** Descomentar para ejecutar ****
-//        return Fabrica.getConexion().existeEmail(email);  // **** Comentar para compilar ****
+//        return Fabrica.getInstance().getIControlador().existeEmail(email);  // **** Descomentar para ejecutar ****
+        return Fabrica.getConexion().existeEmail(email);  // **** Comentar para compilar ****
     }
     
     private DtUsuario validateNick(String nick, String pass) throws Exception{ 
-        return Fabrica.getInstance().getIControlador().validarNick(nick, pass); // **** Descomentar para ejecutar ****
-//        return Fabrica.getConexion().validarNick(nick, pass); // **** Comentar para compilar ****
+//        return Fabrica.getInstance().getIControlador().validarNick(nick, pass); // **** Descomentar para ejecutar ****
+        return Fabrica.getConexion().validarNick(nick, pass); // **** Comentar para compilar ****
     }
     
     private DtUsuario validateEmail(String email, String pass) throws Exception{
-        return Fabrica.getInstance().getIControlador().validarEmail(email, pass);   // **** Descomentar para ejecutar ****
-//        return Fabrica.getConexion().validarEmail(email, pass);   // **** Comentar para compilar ****
+//        return Fabrica.getInstance().getIControlador().validarEmail(email, pass);   // **** Descomentar para ejecutar ****
+        return Fabrica.getConexion().validarEmail(email, pass);   // **** Comentar para compilar ****
     }
 
 //    private DtSessionUsuario validateNick(String nick, String pass) throws Exception{

@@ -16,7 +16,11 @@ import java.util.Map;
  *
  * @author vdraco
  */
-@WebService(endpointInterface = "edu.edext.logica.IBridgeSOAP")
+//@WebService(endpointInterface = "edu.edext.logica.IBridgeSOAP")
+@WebService(
+    serviceName = "IBridgeSOAPService", 
+    endpointInterface = "edu.edext.logica.IBridgeSOAP"
+)
 public class BridgeSOAP implements IBridgeSOAP{
     private final IControlador bridge=Fabrica.getInstance().getIControlador();
 

@@ -1,7 +1,7 @@
 package edu.edext.controlador;
 
 //import edu.edext.logica.GestorImagenes;
-import edu.edext.resources.GestorImagenes;
+import edu.edext.tools.GestorImagenes;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

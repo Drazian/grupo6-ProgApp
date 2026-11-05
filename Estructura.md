@@ -1,6 +1,7 @@
 └── edEXT/
     ├── nb-configuration.xml
     ├── pom.xml
+    ├── Estructura.md
     ├── nbactions.xml
     ├── Servidor_Web/
     │   ├── nb-configuration.xml
@@ -23,20 +24,17 @@
     │           │   │   └── app.js
     │           │   ├── css/
     │           │   │   └── estilos.css
-    │           │   ├── fragmentos/
-    │           │   │   ├── altaUsuario.jsp
-    │           │   │   ├── ModificarUsuario.jsp
-    │           │   │   └── login.jsp
     │           │   ├── WEB-INF/
     │           │   │   ├── beans.xml
     │           │   │   ├── web.xml
     │           │   │   └── fragmentos/
     │           │   │       ├── listarAceptados.jsp
     │           │   │       ├── consultaCurso.jsp
+    │           │   │       ├── fragmentos.7z
     │           │   │       ├── programaDetalles.jsp
     │           │   │       ├── altaCurso.jsp
+    │           │   │       ├── error.jsp
     │           │   │       ├── tablaAceptados.jsp
-    │           │   │       ├── formulario.jsp
     │           │   │       ├── test.jsp
     │           │   │       ├── inscripcionEdicion.jsp
     │           │   │       ├── listaCursos.jsp
@@ -45,8 +43,10 @@
     │           │   │       ├── verProgramas.jsp
     │           │   │       ├── busqueda.jsp
     │           │   │       ├── crearPrograma.jsp
-    │           │   │       ├── productos.jsp
+    │           │   │       ├── altaUsuario.jsp
     │           │   │       ├── seguidos.jsp
+    │           │   │       ├── ModificarUsuario.jsp
+    │           │   │       ├── login.jsp
     │           │   │       ├── altaEdicion.jsp
     │           │   │       ├── consultaUsuario.jsp
     │           │   │       ├── resultadosInscripciones.jsp
@@ -61,6 +61,10 @@
     │           └── java/
     │               └── edu/
     │                   └── edext/
+    │                       ├── tools/
+    │                       │   ├── GestorImagenes.java
+    │                       │   ├── cfg.java
+    │                       │   └── Utils.java
     │                       ├── controlador/
     │                       │   ├── Fabrica.java
     │                       │   ├── UsuarioServlet.java
@@ -74,14 +78,9 @@
     │                       │   ├── MiControladorServlet.java
     │                       │   ├── TestServlet.java
     │                       │   └── ProgramaServlet.java
-    │                       ├── resources/
-    │                       │   └── GestorImagenes.java
     │                       └── modelo/
-    │                           ├── cfg.java
-    │                           ├── Producto.java
     │                           ├── DtResultadoBusqueda.java
-    │                           ├── Remux.java
-    │                           └── Utils.java
+    │                           └── Remux.java
     └── Servidor_Central/
         ├── nb-configuration.xml
         ├── pom.xml
@@ -123,6 +122,16 @@
             │       └── edu/
             │           └── edext/
             │               ├── edEXT.java
+            │               ├── tools/
+            │               │   ├── jTable.java
+            │               │   ├── cfg.java
+            │               │   ├── cronometroHelper.java
+            │               │   ├── ArbolHelper.java
+            │               │   ├── indexHelper.java
+            │               │   ├── ConsultaEdicionHelper.java
+            │               │   ├── CrearProgramaHelper.java
+            │               │   ├── InscripcionEdicionHelper.java
+            │               │   └── Utils.java
             │               ├── datatypes/
             │               │   ├── DtInscripcionPrograma.java
             │               │   ├── DtCurso.java
@@ -131,25 +140,11 @@
             │               │   ├── DtEdicion.java
             │               │   ├── LocalDateAdapter.java
             │               │   ├── DtCategoria.java
-            │               │   ├── datatypes reales.7z
             │               │   ├── MapAdapter.java
             │               │   ├── DtUsuario.java
             │               │   ├── DtInscripcionEdicion.java
             │               │   ├── TipoUsuario.java
             │               │   └── DtConsultaCurso.java
-            │               ├── entitys/
-            │               │   ├── Instituto.java
-            │               │   ├── ProgramaFormacion.java
-            │               │   ├── Usuario.java
-            │               │   ├── InscripcionEdicion.java
-            │               │   ├── InscripcionEdicionID.java
-            │               │   ├── Estudiante.java
-            │               │   ├── Categoria.java
-            │               │   ├── Curso.java
-            │               │   ├── InscripcionProgramaID.java
-            │               │   ├── Docente.java
-            │               │   ├── InscripcionPrograma.java
-            │               │   └── Edicion.java
             │               ├── logica/
             │               │   ├── Fabrica.java
             │               │   ├── GestorImagenes.java
@@ -172,7 +167,6 @@
             │               │   ├── ConsultaPrograma.form
             │               │   ├── Config.java
             │               │   ├── AltaCurso.java
-            │               │   ├── NewJFrame.form
             │               │   ├── InscripcionEdicion.form
             │               │   ├── Config.form
             │               │   ├── CrearProgramaForm.java
@@ -192,23 +186,25 @@
             │               │   ├── CrearProgramaForm.form
             │               │   ├── Arbol.form
             │               │   ├── AltaCategoria.java
-            │               │   ├── NewJFrame.java
             │               │   ├── ModificarUsuario.form
             │               │   ├── AltaEdicion.java
             │               │   ├── AltaEdicion.form
             │               │   ├── index.form
             │               │   ├── ConsultaPrograma.java
             │               │   └── agregarCursoPrograma.form
-            │               └── tools/
-            │                   ├── jTable.java
-            │                   ├── cfg.java
-            │                   ├── cronometroHelper.java
-            │                   ├── ArbolHelper.java
-            │                   ├── indexHelper.java
-            │                   ├── ConsultaEdicionHelper.java
-            │                   ├── CrearProgramaHelper.java
-            │                   ├── InscripcionEdicionHelper.java
-            │                   └── Utils.java
+            │               └── entitys/
+            │                   ├── Instituto.java
+            │                   ├── ProgramaFormacion.java
+            │                   ├── Usuario.java
+            │                   ├── InscripcionEdicion.java
+            │                   ├── InscripcionEdicionID.java
+            │                   ├── Estudiante.java
+            │                   ├── Categoria.java
+            │                   ├── Curso.java
+            │                   ├── InscripcionProgramaID.java
+            │                   ├── Docente.java
+            │                   ├── InscripcionPrograma.java
+            │                   └── Edicion.java
             └── test/
                 ├── resources/
                 │   └── Images/

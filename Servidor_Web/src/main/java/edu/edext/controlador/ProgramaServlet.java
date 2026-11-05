@@ -1,18 +1,18 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtCurso;
-import edu.edext.datatypes.DtPrograma;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
+//import edu.edext.datatypes.DtCurso;
+//import edu.edext.datatypes.DtPrograma;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.datatypes.TipoUsuario;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
 
-//import edu.edext.controlador.ws.DtCurso;
-//import edu.edext.controlador.ws.DtPrograma;
-//import edu.edext.controlador.ws.DtUsuario;
-//import edu.edext.controlador.ws.IBridgeSOAP;
-//import edu.edext.controlador.ws.TipoUsuario;
+import edu.edext.controlador.ws.DtCurso;
+import edu.edext.controlador.ws.DtPrograma;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.TipoUsuario;
 
 import edu.edext.modelo.Remux;
 import java.io.IOException;
@@ -32,8 +32,8 @@ import java.util.List;
 @WebServlet("/ProgramaServlet")
 @MultipartConfig
 public class ProgramaServlet extends HttpServlet {
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
     
     //Responsable de mostrar formularios
     @Override
@@ -181,9 +181,9 @@ public class ProgramaServlet extends HttpServlet {
                 }
 
                     // ************************* Descomentar para ejecutar ************************
-                DtPrograma programa = new DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
+//                DtPrograma programa = new DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
                     // ************************** Comentar para compilar **************************
-//                DtPrograma programa = Remux.DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
+                DtPrograma programa = Remux.DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
                     // ****************************************************************************
                 
                 try {

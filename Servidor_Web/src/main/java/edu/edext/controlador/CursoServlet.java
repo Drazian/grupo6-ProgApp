@@ -1,26 +1,26 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtCategoria;
-import edu.edext.datatypes.DtConsultaCurso;
-import edu.edext.datatypes.DtCurso;
-import edu.edext.datatypes.DtInstituto;
-import edu.edext.datatypes.DtPrograma;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.GestorImagenes;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
+//import edu.edext.datatypes.DtCategoria;
+//import edu.edext.datatypes.DtConsultaCurso;
+//import edu.edext.datatypes.DtCurso;
+//import edu.edext.datatypes.DtInstituto;
+//import edu.edext.datatypes.DtPrograma;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.datatypes.TipoUsuario;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.GestorImagenes;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
 
-//import edu.edext.controlador.ws.DtCategoria;
-//import edu.edext.controlador.ws.DtConsultaCurso;
-//import edu.edext.controlador.ws.DtCurso;
-//import edu.edext.controlador.ws.DtInstituto;
-//import edu.edext.controlador.ws.DtPrograma;
-//import edu.edext.controlador.ws.DtUsuario;
-//import edu.edext.controlador.ws.IBridgeSOAP;
-//import edu.edext.controlador.ws.TipoUsuario;
-//import edu.edext.resources.GestorImagenes;
+import edu.edext.controlador.ws.DtCategoria;
+import edu.edext.controlador.ws.DtConsultaCurso;
+import edu.edext.controlador.ws.DtCurso;
+import edu.edext.controlador.ws.DtInstituto;
+import edu.edext.controlador.ws.DtPrograma;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.TipoUsuario;
+import edu.edext.tools.GestorImagenes;
 
 import edu.edext.modelo.Remux;
 import java.io.IOException;
@@ -44,8 +44,8 @@ import java.util.Set;
 @WebServlet("/CursoServlet")
 @MultipartConfig 
 public class CursoServlet extends HttpServlet {
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -77,8 +77,7 @@ public class CursoServlet extends HttpServlet {
                         
                         if (listaProgramas != null) {
                                 for (DtPrograma programa : listaProgramas) {
-                                    Set<String> categoriasPrograma = new HashSet<>(programa.getCategorias());
-//                                    Set<String> categoriasPrograma = new HashSet<>();
+                                    Set<String> categoriasPrograma = programa.getCategorias()!=null?new HashSet<>(programa.getCategorias()):new HashSet<>();
 
                                     if (categoriasPrograma != null) {
                                         boolean perteneceACategoria = false;
@@ -315,11 +314,11 @@ public class CursoServlet extends HttpServlet {
                     }
 
                     // ************************* Descomentar para ejecutar ************************
-                    DtCurso dtCurso = new DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
-                            fechaRegistro, new DtInstituto(nombreInstituto), previas, categorias, nombreImagen);
+//                    DtCurso dtCurso = new DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
+//                            fechaRegistro, new DtInstituto(nombreInstituto), previas, categorias, nombreImagen);
                     // ************************** Comentar para compilar **************************
-//                    DtCurso dtCurso = Remux.DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
-//                            fechaRegistro, Remux.DtInstituto(nombreInstituto), previas, categorias, nombreImagen);
+                    DtCurso dtCurso = Remux.DtCurso(nombreCurso, descripcion, duracion, cantidadHoras, creditos, url, 
+                            fechaRegistro, Remux.DtInstituto(nombreInstituto), previas, categorias, nombreImagen);
                     // ****************************************************************************
 
                     ic.altaCurso(dtCurso, nombreInstituto); 

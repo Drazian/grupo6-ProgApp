@@ -20,7 +20,8 @@ import java.util.Map;
  *
  * @author vdraco
  */
-@WebService(serviceName="IBridgeSOAP")
+//@WebService(serviceName="IBridgeSOAP")
+@WebService
 public interface IBridgeSOAP {
 
 //******************************** Institutos ********************************//

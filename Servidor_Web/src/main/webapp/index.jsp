@@ -12,7 +12,7 @@
 </head>
 <body>
 
-    <!-- SECTOR 1: Barra Superior Completa -->
+    <!-- SECTOR 1: Barra Superior  -->
     <header class="sector-1">
         <div class="logo">edEXT</div>
         
@@ -21,14 +21,14 @@
             <button type="button" onclick="BuscadorServlet()">Buscar</button>
         </div>      
         
-        <!-- Bloque de Sesión (Dinámico) -->
+        <!-- Bloque de Sesión  -->
         <div class="sesion" style="display: flex; align-items: center; gap: 15px;">
             <c:choose>
                 <c:when test="${not empty sessionScope.usuarioLogueado}">
                     <!-- Si hay sesión: Mostramos Imagen, Saludo con Rol y botón Salir -->
                     <div style="display: flex; align-items: center; gap: 10px;">
                         
-                        <!-- Foto de perfil servida dinámicamente desde ImagenServlet -->
+                        <!-- Foto de perfil  -->
                         <img src="ImagenServlet?nombre=${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
                              alt="Foto de perfil" 
                              onclick="event.preventDefault(); cargarMiPerfil('${sessionScope.usuarioLogueado.nickname}');"
@@ -43,7 +43,7 @@
                     </div>
                 </c:when>
                 <c:otherwise>
-                    <!-- Si NO hay sesión: Botón de Iniciar Sesión -->
+                    <!-- Botón Iniciar Sesión -->
                     <button onclick="cargarLogin()" style="background-color: #5cb85c; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;">Iniciar Sesión</button>
                     <button onclick="cargarAltaUsuario()" style="background-color: #0275d8; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;">Registrarse</button>
                 </c:otherwise>
@@ -52,7 +52,7 @@
     </header>
 
     <div class="contenedor-inferior">
-        <!-- SECTOR 2: Menú Lateral Izquierdo -->
+        <!-- SECTOR 2: Menú Lateral -->
         <aside class="sector-2">
             <nav>
                 <!-- Menú Usuarios -->
@@ -130,7 +130,7 @@
                 
                 <hr style="opacity: 0.2; margin: 10px 0;">
                 
-                <!-- Institutos (Dinamico) -->
+                <!-- Institutos -->
                 <details open>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Institutos</summary>
                     <ul id="lista-institutos" style="list-style: none; padding-left: 15px;">
@@ -140,7 +140,7 @@
                 
                 <hr style="opacity: 0.2; margin: 10px 0;">
                 
-                <!-- Categorias (Dinamico) -->
+                <!-- Categorias -->
                 <details open>
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Categorias</summary>
                     <ul id="lista-categorias" style="list-style: none; padding-left: 15px;">
@@ -163,7 +163,7 @@
             </nav>
         </aside>
 
-        <!-- SECTOR 3: Panel de Contenido Dinámico -->
+        <!-- SECTOR 3: Browser -->
         <main class="sector-3" id="contenido-dinamico">
             <h2>Bienvenido</h2>
             <p>Selecciona una opción del menú o realiza una búsqueda.</p>

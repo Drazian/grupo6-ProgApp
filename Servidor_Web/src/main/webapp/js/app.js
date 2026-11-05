@@ -661,7 +661,16 @@ function cargarAltaCurso() {
 }
 
 function cargarAltaUsuario() {
-    fetch('fragmentos/altaUsuario.jsp')
+//    fetch('fragmentos/altaUsuario.jsp')
+//        .then(response => response.text())
+//        .then(html => {
+//            document.getElementById('contenido-dinamico').innerHTML = html;
+//            inicializarEventosUsuario(); 
+//            crearNuevoEstadoSPA(); // FIX: Nuevo estado
+//        })
+//        .catch(error => console.error("Error al cargar la vista:", error));
+
+    fetch('LoginServlet?accion=altaUsuario')
         .then(response => response.text())
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
@@ -669,6 +678,7 @@ function cargarAltaUsuario() {
             crearNuevoEstadoSPA(); // FIX: Nuevo estado
         })
         .catch(error => console.error("Error al cargar la vista:", error));
+
 }
 
 function inicializarEventosUsuario() {
@@ -788,7 +798,8 @@ function inicializarEventosUsuario() {
 }
 
 function cargarLogin() {
-    fetch('fragmentos/login.jsp')
+//    fetch('fragmentos/login.jsp')
+    fetch('LoginServlet?accion=login')
         .then(response => response.text())
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
@@ -915,7 +926,8 @@ function cargarCursosDeInstituto(nombreInstituto) {
 
 function cargarModificarUsuario() {
     const contenedor = document.getElementById('contenido-dinamico');
-    fetch('fragmentos/ModificarUsuario.jsp')
+//    fetch('fragmentos/ModificarUsuario.jsp')
+    fetch('LoginServlet?accion=ModificarUsuario')
         .then(response => {
             if (!response.ok) throw new Error("No se pudo cargar la vista.");
             return response.text();

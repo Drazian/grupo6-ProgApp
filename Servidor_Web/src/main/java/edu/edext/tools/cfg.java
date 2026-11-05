@@ -1,6 +1,6 @@
-package edu.edext.modelo;
+package edu.edext.tools;
 
-import edu.edext.modelo.Utils.CfgDB;
+import edu.edext.tools.Utils.CfgDB;
 import java.io.File;
 
 /**

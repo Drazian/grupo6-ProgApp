@@ -1,21 +1,20 @@
 package edu.edext.controlador;
 
-//import edu.edext.controlador.ws.DtCurso;
-//import edu.edext.controlador.ws.DtPrograma;
-//import edu.edext.controlador.ws.DtUsuario;
-//import edu.edext.controlador.ws.IBridgeSOAP;
-//import edu.edext.controlador.ws.DtValoracionesCurso;
+import edu.edext.controlador.ws.DtCurso;
+import edu.edext.controlador.ws.DtPrograma;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.DtValoracionesCurso;
 
-import edu.edext.datatypes.DtCurso;
-import edu.edext.datatypes.DtPrograma;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.datatypes.DtValoracionesCurso;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.logica.IControlador;
+//import edu.edext.datatypes.DtCurso;
+//import edu.edext.datatypes.DtPrograma;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.logica.IControlador;
 
 import edu.edext.modelo.DtResultadoBusqueda;
-import edu.edext.modelo.Utils;
+import edu.edext.tools.Utils;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -33,8 +32,8 @@ import java.util.Map;
 
 @WebServlet("/BuscadorServlet")
 public class BuscadorServlet extends HttpServlet {
-      private final IControlador ic = Fabrica.getInstance().getIControlador();
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
+//      private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -58,9 +57,9 @@ public class BuscadorServlet extends HttpServlet {
                     if (queryLower.isEmpty() || nombre.toLowerCase().contains(queryLower) || desc.toLowerCase().contains(queryLower)){
 
                     // ************************* Descomentar para ejecutar ************************
-                        LocalDate fechaReg = prog.getFechaRegistro() != null ? prog.getFechaRegistro() : LocalDate.now();
+//                        LocalDate fechaReg = prog.getFechaRegistro() != null ? prog.getFechaRegistro() : LocalDate.now();
                     // ************************** Comentar para compilar **************************
-//                        LocalDate fechaReg = prog.getFechaRegistro() != null ? Utils.Cast.valueOf(prog.getFechaRegistro()) : LocalDate.now();
+                        LocalDate fechaReg = prog.getFechaRegistro() != null ? Utils.Cast.valueOf(prog.getFechaRegistro()) : LocalDate.now();
                     // ****************************************************************************
 
                         DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,prog.getImagen(),"programa");
@@ -87,9 +86,9 @@ public class BuscadorServlet extends HttpServlet {
                     if (queryLower.isEmpty() || nombre.toLowerCase().contains(queryLower) || desc.toLowerCase().contains(queryLower)) {
                         
                     // ************************* Descomentar para ejecutar ************************
-                        LocalDate fechaReg = curso.getFechaRegistro();
+//                        LocalDate fechaReg = curso.getFechaRegistro();
                     // ************************** Comentar para compilar **************************
-//                        LocalDate fechaReg = Utils.Cast.valueOf(curso.getFechaRegistro());
+                        LocalDate fechaReg = Utils.Cast.valueOf(curso.getFechaRegistro());
                     // ****************************************************************************
                         DtResultadoBusqueda res = new DtResultadoBusqueda(nombre,desc,fechaReg,curso.getImagen(),"curso");
                         DtValoracionesCurso v = valoraciones.get(nombre);
@@ -112,9 +111,9 @@ public class BuscadorServlet extends HttpServlet {
                     
                     if (queryLower.isEmpty() || nickname.toLowerCase().contains(queryLower) || nombre.toLowerCase().contains(queryLower)){
                     // ************************* Descomentar para ejecutar ************************
-                        LocalDate fechaN = user.getfNacimiento() != null ? user.getfNacimiento() : LocalDate.now();
+//                        LocalDate fechaN = user.getfNacimiento() != null ? user.getfNacimiento() : LocalDate.now();
                     // ************************** Comentar para compilar **************************
-//                        LocalDate fechaN = user.getFNacimiento() != null ? Utils.Cast.valueOf(user.getFNacimiento()) : LocalDate.now();
+                        LocalDate fechaN = user.getFNacimiento() != null ? Utils.Cast.valueOf(user.getFNacimiento()) : LocalDate.now();
                     // ****************************************************************************
                         DtResultadoBusqueda res = new DtResultadoBusqueda(nickname, nombre, fechaN, user.getImagen(),tip.toLowerCase());
                         resultados.add(res);

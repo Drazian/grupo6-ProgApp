@@ -1,8 +1,8 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtUsuario;
-//import edu.edext.controlador.ws.DtUsuario;
-import edu.edext.modelo.Utils;
+//import edu.edext.datatypes.DtUsuario;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.tools.Utils;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
     private final LoginHelper hlp=new LoginHelper();
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -40,6 +41,10 @@ public class LoginServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Usuario o contraseña incorrectos."); } } 
     // *********************************************************************  //
+        else if("altaUsuario".equals(accion)){
+            request.getRequestDispatcher("/WEB-INF/fragmentos/altaUsuario.jsp").forward(request, response);
+        }
+
         else if ("logout".equals(accion)) {
             HttpSession session = request.getSession(false);
             if (session != null) {
@@ -48,4 +53,18 @@ public class LoginServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
         }
     }
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String accion = request.getParameter("accion");
+        if("login".equals(accion))
+            request.getRequestDispatcher("/WEB-INF/fragmentos/login.jsp").forward(request, response);
+
+        else if("altaUsuario".equals(accion))
+            request.getRequestDispatcher("/WEB-INF/fragmentos/altaUsuario.jsp").forward(request, response);
+
+        else if("ModificarUsuario".equals(accion))
+            request.getRequestDispatcher("/WEB-INF/fragmentos/ModificarUsuario.jsp").forward(request, response);
+    }
+
 }

@@ -1,20 +1,20 @@
 package edu.edext.controlador;
 
-import edu.edext.datatypes.DtEdicion;
-import edu.edext.datatypes.DtUsuario;
-import edu.edext.logica.IBridgeSOAP;
-import edu.edext.datatypes.DtInscripcionEdicion;
-import edu.edext.datatypes.TipoUsuario;
-import edu.edext.logica.Fabrica;
-import edu.edext.logica.IControlador;
-import edu.edext.logica.GestorImagenes;
+//import edu.edext.datatypes.DtEdicion;
+//import edu.edext.datatypes.DtUsuario;
+//import edu.edext.logica.IBridgeSOAP;
+//import edu.edext.datatypes.DtInscripcionEdicion;
+//import edu.edext.datatypes.TipoUsuario;
+//import edu.edext.logica.Fabrica;
+//import edu.edext.logica.IControlador;
+//import edu.edext.logica.GestorImagenes;
 
-//import edu.edext.controlador.ws.DtEdicion;
-//import edu.edext.controlador.ws.DtInscripcionEdicion;
-//import edu.edext.controlador.ws.DtUsuario;
-//import edu.edext.controlador.ws.IBridgeSOAP;
-//import edu.edext.controlador.ws.TipoUsuario;
-//import edu.edext.resources.GestorImagenes;
+import edu.edext.controlador.ws.DtEdicion;
+import edu.edext.controlador.ws.DtInscripcionEdicion;
+import edu.edext.controlador.ws.DtUsuario;
+import edu.edext.controlador.ws.IBridgeSOAP;
+import edu.edext.controlador.ws.TipoUsuario;
+import edu.edext.tools.GestorImagenes;
 
 import edu.edext.modelo.Remux;
 import java.io.IOException;
@@ -39,8 +39,8 @@ import java.time.format.DateTimeParseException;
 @WebServlet("/EdicionServlet")
 @MultipartConfig // IMPORTANTE: Sin esto, el Servlet no puede leer el FormData con imágenes
 public class EdicionServlet extends HttpServlet {
-    private final IControlador ic = Fabrica.getInstance().getIControlador();
-//    private final IBridgeSOAP ic = Fabrica.getConexion();
+//    private final IControlador ic = Fabrica.getInstance().getIControlador();
+    private final IBridgeSOAP ic = Fabrica.getConexion();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -111,8 +111,7 @@ public class EdicionServlet extends HttpServlet {
 
                  if (todasLasInscripciones != null) {
                      for (DtInscripcionEdicion ins : todasLasInscripciones) {
-//                         if (ins.getValorEstado() == 2) {
-                         if (ins.getEstado()== 2) {
+                         if (ins.getEstado() == 2) {
                              aceptadas.add(ins);
                          }
                      }
@@ -217,9 +216,9 @@ public class EdicionServlet extends HttpServlet {
 
                 // 6. Instanciar el DtEdicion
                     // ************************* Descomentar para ejecutar ************************
-                DtEdicion dt = new DtEdicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen);
+//                DtEdicion dt = new DtEdicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen);
 //                     ************************** Comentar para compilar **************************
-//                DtEdicion dt = Remux.DtEdicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen);
+                DtEdicion dt = Remux.DtEdicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen);
                     // ****************************************************************************
 
                 // 7. Impactar en base de datos
