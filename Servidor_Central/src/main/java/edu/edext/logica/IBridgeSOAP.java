@@ -180,6 +180,12 @@ public interface IBridgeSOAP {
     edu.edext.datatypes.DtActaEstudio getActaEstudio(
             @WebParam(name="nicknameEstudiante") String nicknameEstudiante,
             @WebParam(name="nombrePrograma") String nombrePrograma) throws Exception;
+//************************** Listado de tendencias (7.3) **********************//
+    @WebMethod(operationName="registrarVisitaCurso")
+    boolean registrarVisitaCurso(
+            @WebParam(name="nombreCurso") String nombreCurso) throws Exception;
+    @WebMethod(operationName="listarCursosMasVisitados")
+    List<edu.edext.datatypes.DtCursoVisitas> listarCursosMasVisitados() throws Exception;
     @WebMethod(operationName="setInscripcionPrograma")
     int setInscripcionPrograma(
             @WebParam(name="nomEstudiante") String nomEstudiante,

@@ -1996,6 +1996,26 @@ function descargarActaEstudio(enlace) {
         });
 }
 
+// =====================================================================
+// REQUERIMIENTO 7.3: LISTADO DE TENDENCIAS (cursos más visitados)
+// Las visitas las cuenta un filtro del servidor (VisitasCursoFilter) al consultar un curso
+// =====================================================================
+
+function cargarTendencias() {
+    fetch('TendenciasServlet')
+        .then(response => {
+            if (!response.ok) throw new Error("No se pudo obtener el listado de tendencias.");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA();
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
+        });
+}
+
 function cargarResultadosInscripciones() {
     fetch('InscripcionServlet?accion=misResultados')
         .then(response => {
