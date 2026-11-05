@@ -153,6 +153,35 @@
                     </execution>
                 </executions>
             </plugin>
+            
+<plugin>
+    <groupId>com.sun.xml.ws</groupId>
+    <artifactId>jaxws-maven-plugin</artifactId>
+    <version>4.0.2</version>
+    <executions>
+        <execution>
+            <id>generar-wsdl-central</id>
+            <phase>process-classes</phase> 
+            <goals>
+                <goal>wsgen</goal>
+            </goals>
+            <configuration>
+                <sei>edu.edext.logica.BridgeSOAP</sei> 
+                <genWsdl>true</genWsdl>
+                <keep>true</keep>
+                <resourceDestDir>${user.home}/.edEXT/tmp/shared-wsdl</resourceDestDir>
+            </configuration>
+        </execution>
+    </executions>
+    <dependencies>
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-tools</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+    </dependencies>
+</plugin>
+
         </plugins>
     </build>
 </project>

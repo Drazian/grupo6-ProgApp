@@ -28,7 +28,7 @@ public class cfg {
     public static void init(){
         if(!Utils.Disk.isExist(PATH_FILE))
             crearCFG();
-        crearProperties(PATH_FILE_PROPERTIES);
+//        crearProperties(PATH_FILE_PROPERTIES);
     }
     
     public static void init(String imagen, String url, String puerto){
@@ -36,7 +36,7 @@ public class cfg {
 //            new File(PATH_FILE).delete();
         Utils.Disk.delete(PATH_FILE);
         crearCFG(imagen, url, puerto);
-        crearProperties(PATH_FILE_PROPERTIES);
+//        crearProperties(PATH_FILE_PROPERTIES);
 //        }
     }
     
@@ -62,8 +62,29 @@ public class cfg {
             if(cfgDB.clave().equals("ip"))
                 ip=cfgDB.valor();
             else if(cfgDB.clave().equals("puerto"))
-                port=cfgDB.valor();
+                port=isFreePort(cfgDB.valor());
         ret="http://"+ip+":"+port+"/servidor_central";
+        return ret;
+    }
+    
+    private static String isFreePort(String puerto){
+        if(!Utils.OS.isPortFree(puerto))
+            puerto=Utils.Cast.valueOf(Utils.OS.getPortFree());
+        return puerto;
+    }
+    
+    public int getPuerto(){ return Utils.Cast.valueof(getValor(CLAVE_PORT)); }
+    
+    public String getIP(){ return getValor(CLAVE_IP); }
+    
+    public String getImagen(){ return getValor(CLAVE_IMAGE); }
+    
+    public String getValor(String clave){
+        String ret=null;
+        CfgDB[] tmp=Utils.Disk.loadCFG(PATH_FILE);
+        for (CfgDB cfgDB : tmp)
+            if(cfgDB.clave().equals(clave))
+               ret=cfgDB.valor();
         return ret;
     }
     

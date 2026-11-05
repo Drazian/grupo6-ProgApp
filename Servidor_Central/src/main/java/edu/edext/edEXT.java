@@ -36,7 +36,7 @@ public class edEXT {
                 System.out.println("Servicio SOAP detenido.");
                 Logger.info("Servicio SOAP detenido.");
             }
-            Utils.Disk.delete(cfg.PATH_FILE_PROPERTIES);
+//            Utils.Disk.delete(cfg.PATH_FILE_PROPERTIES);
             System.gc();
             System.exit(0);
         }
