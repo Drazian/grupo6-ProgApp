@@ -1,0 +1,48 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- Datos básicos de la edición (request attribute "edicion"). Se incluye estático desde
+     tablaActaEdicion.jsp y tablaIngresoResultados.jsp, que ya declaran los taglibs c y fn.
+     El pageEncoding es necesario: sin él Jasper lee los .jspf como ISO-8859-1 y rompe los acentos. --%>
+<c:if test="${not empty edicion}">
+    <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0; flex-wrap: wrap;">
+        <img src="ImagenServlet?nombre=${fn:escapeXml(empty edicion.imagen ? 'usr.png' : edicion.imagen)}"
+             alt="Portada Edición"
+             style="width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
+
+        <div style="flex: 1; min-width: 250px; line-height: 1.6;">
+            <h3 style="margin: 0 0 5px 0; color: #2c3e50;">
+                <a href="#" data-edicion="${fn:escapeXml(edicion.nombre)}" onclick="cargarConsultaEdicion(this.dataset.edicion); return false;" style="color: #2c3e50; text-decoration: none;">
+                    <c:out value="${edicion.nombre}"/>
+                </a>
+                <c:choose>
+                    <c:when test="${edicion.cerrada}">
+                        <span style="background: #8e44ad; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; vertical-align: middle; margin-left: 8px;">Cerrada</span>
+                    </c:when>
+                    <c:otherwise>
+                        <span style="background: #27ae60; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; vertical-align: middle; margin-left: 8px;">Abierta</span>
+                    </c:otherwise>
+                </c:choose>
+            </h3>
+            <div>
+                <a href="#" data-curso="${fn:escapeXml(edicion.curso.nombre)}" onclick="verDetallesCurso(this.dataset.curso); return false;" style="color: #2980b9; font-weight: bold; text-decoration: underline; font-size: 14px;">
+                    Ver información del Curso (<c:out value="${edicion.curso.nombre}"/>)
+                </a>
+            </div>
+            <div style="font-size: 13px; color: #34495e; margin-top: 8px; display: flex; gap: 15px; flex-wrap: wrap;">
+                <span><strong>Fecha inicio:</strong> ${edicion.fechaInicio}</span>
+                <span><strong>Fecha fin:</strong> ${edicion.fechaFin}</span>
+                <span><strong>Cupo:</strong> ${empty edicion.cupo or edicion.cupo lt 1 ? 'Sin límite' : edicion.cupo}</span>
+                <c:if test="${edicion.cerrada}">
+                    <span><strong>Fecha de cierre:</strong> ${edicion.fechaCierre}</span>
+                </c:if>
+            </div>
+            <c:if test="${not empty edicion.docentes}">
+                <div style="font-size: 13px; color: #34495e; margin-top: 4px;">
+                    <strong>Docentes:</strong>
+                    <c:forEach var="doc" items="${edicion.docentes}" varStatus="st">
+                        <c:out value="${doc.nombre} ${doc.apellido}"/><c:if test="${not st.last}">, </c:if>
+                    </c:forEach>
+                </div>
+            </c:if>
+        </div>
+    </div>
+</c:if>

@@ -1562,14 +1562,47 @@ function cargarTablaAceptados(nombreEdicion) {
 }
 
 // =====================================================================
-// CU: VER RESULTADOS DE EVALUACIONES EN EDICIONES DE CURSOS (DOCENTE)
-// Instituto -> Curso -> Edición cerrada (en la que participa) -> Acta
+// CU: INGRESAR RESULTADOS DE EVALUACIONES y VER RESULTADOS DE EVALUACIONES (DOCENTE)
+// Las dos pantallas comparten la cascada Instituto -> Curso -> Edición:
+//  - 'ingresar': ediciones ABIERTAS del docente -> planilla de notas (guardar / cerrar edición)
+//  - 'ver':      ediciones CERRADAS del docente -> acta
 // =====================================================================
 
-const MENSAJE_INICIAL_ACTA = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione un Instituto, un Curso y una Edición cerrada para visualizar el acta con los resultados de las evaluaciones.</p>';
+const PANTALLAS_RESULTADOS = {
+    ingresar: {
+        curso: 'cursoIngreso',
+        edicion: 'edicionIngreso',
+        contenedor: 'contenedor-ingreso-resultados',
+        accionEdiciones: 'listarEdicionesAbiertas',
+        textoSinEdiciones: 'No hay ediciones abiertas',
+        mensajeSinEdiciones: 'Este curso no tiene ediciones abiertas en las que usted participe como docente.',
+        mensajeInicial: 'Seleccione un Instituto, un Curso y una Edición para ingresar las notas de los estudiantes aceptados.',
+        cargar: nombreEdicion => cargarTablaIngresoResultados(nombreEdicion)
+    },
+    ver: {
+        curso: 'cursoResultados',
+        edicion: 'edicionResultados',
+        contenedor: 'contenedor-acta-resultados',
+        accionEdiciones: 'listarEdicionesCerradas',
+        textoSinEdiciones: 'No hay ediciones cerradas',
+        mensajeSinEdiciones: 'Este curso no tiene ediciones cerradas en las que usted participe como docente.',
+        mensajeInicial: 'Seleccione un Instituto, un Curso y una Edición cerrada para visualizar el acta con los resultados de las evaluaciones.',
+        cargar: nombreEdicion => cargarActaEdicion(nombreEdicion)
+    }
+};
 
-function cargarFormVerResultados() {
-    fetch('InscripcionServlet?accion=formularioResultados')
+function mensajeResultados(texto) {
+    return `<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">${texto}</p>`;
+}
+
+function escaparTextoHtml(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto == null ? '' : String(texto);
+    return div.innerHTML;
+}
+
+function cargarFormResultados(accion) {
+    fetch(`InscripcionServlet?accion=${accion}`)
         .then(response => {
             if (!response.ok) throw new Error("Acceso denegado. Función exclusiva para Docentes.");
             return response.text();
@@ -1582,6 +1615,9 @@ function cargarFormVerResultados() {
             document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
         });
 }
+
+function cargarFormIngresarResultados() { cargarFormResultados('formularioIngresoResultados'); }
+function cargarFormVerResultados() { cargarFormResultados('formularioResultados'); }
 
 // Llena un <select> creando los <option> con el DOM (los nombres pueden tener comillas u otros caracteres especiales)
 function llenarSelectResultados(select, textoInicial, valores) {
@@ -1598,14 +1634,15 @@ function llenarSelectResultados(select, textoInicial, valores) {
     });
 }
 
-function cargarCursosParaResultados(nombreInstituto) {
-    const selectCurso = document.getElementById('cursoResultados');
-    const selectEdicion = document.getElementById('edicionResultados');
-    const contenedor = document.getElementById('contenedor-acta-resultados');
+function cargarCursosResultados(pantalla, nombreInstituto) {
+    const cfg = PANTALLAS_RESULTADOS[pantalla];
+    const selectCurso = document.getElementById(cfg.curso);
+    const selectEdicion = document.getElementById(cfg.edicion);
+    const contenedor = document.getElementById(cfg.contenedor);
 
     llenarSelectResultados(selectEdicion, 'Primero seleccione un curso', []);
     selectEdicion.disabled = true;
-    contenedor.innerHTML = MENSAJE_INICIAL_ACTA;
+    contenedor.innerHTML = mensajeResultados(cfg.mensajeInicial);
 
     if (!nombreInstituto) {
         llenarSelectResultados(selectCurso, 'Primero seleccione un instituto', []);
@@ -1627,11 +1664,12 @@ function cargarCursosParaResultados(nombreInstituto) {
         .catch(err => console.log(err));
 }
 
-function cargarEdicionesParaResultados(nombreCurso) {
-    const selectEdicion = document.getElementById('edicionResultados');
-    const contenedor = document.getElementById('contenedor-acta-resultados');
+function cargarEdicionesResultados(pantalla, nombreCurso) {
+    const cfg = PANTALLAS_RESULTADOS[pantalla];
+    const selectEdicion = document.getElementById(cfg.edicion);
+    const contenedor = document.getElementById(cfg.contenedor);
 
-    contenedor.innerHTML = MENSAJE_INICIAL_ACTA;
+    contenedor.innerHTML = mensajeResultados(cfg.mensajeInicial);
 
     if (!nombreCurso) {
         llenarSelectResultados(selectEdicion, 'Primero seleccione un curso', []);
@@ -1639,23 +1677,23 @@ function cargarEdicionesParaResultados(nombreCurso) {
         return;
     }
 
-    fetch(`InscripcionServlet?accion=listarEdicionesCerradas&curso=${encodeURIComponent(nombreCurso)}`)
+    fetch(`InscripcionServlet?accion=${cfg.accionEdiciones}&curso=${encodeURIComponent(nombreCurso)}`)
         .then(response => {
-            if (!response.ok) throw new Error("No se pudieron obtener las ediciones cerradas.");
+            if (!response.ok) throw new Error("No se pudieron obtener las ediciones del curso.");
             return response.json();
         })
         .then(ediciones => {
             if (ediciones.length === 0) {
-                llenarSelectResultados(selectEdicion, 'No hay ediciones cerradas', []);
+                llenarSelectResultados(selectEdicion, cfg.textoSinEdiciones, []);
                 selectEdicion.disabled = true;
-                contenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Este curso no tiene ediciones cerradas en las que usted participe como docente.</p>';
+                contenedor.innerHTML = mensajeResultados(cfg.mensajeSinEdiciones);
             } else {
                 llenarSelectResultados(selectEdicion, 'Seleccione la Edición...', ediciones);
                 selectEdicion.disabled = false;
-                // Si hay una sola edición cerrada, se muestra su acta directamente
+                // Si hay una sola edición, se muestra directamente
                 if (ediciones.length === 1) {
                     selectEdicion.value = ediciones[0];
-                    cargarActaEdicion(ediciones[0]);
+                    cfg.cargar(ediciones[0]);
                 }
             }
         })
@@ -1664,19 +1702,22 @@ function cargarEdicionesParaResultados(nombreCurso) {
         });
 }
 
-function cargarActaEdicion(nombreEdicion) {
-    const contenedor = document.getElementById('contenedor-acta-resultados');
-
+function seleccionarEdicionResultados(pantalla, nombreEdicion) {
+    const cfg = PANTALLAS_RESULTADOS[pantalla];
     if (!nombreEdicion) {
-        contenedor.innerHTML = MENSAJE_INICIAL_ACTA;
+        document.getElementById(cfg.contenedor).innerHTML = mensajeResultados(cfg.mensajeInicial);
         return;
     }
+    cfg.cargar(nombreEdicion);
+}
 
-    contenedor.innerHTML = '<h4 style="text-align:center; color: #8e44ad;">Cargando el acta de la edición...</h4>';
+function cargarFragmentoResultados(idContenedor, url, textoCargando, textoError) {
+    const contenedor = document.getElementById(idContenedor);
+    contenedor.innerHTML = `<h4 style="text-align:center; color: #8e44ad;">${textoCargando}</h4>`;
 
-    fetch(`InscripcionServlet?accion=verActa&edicion=${encodeURIComponent(nombreEdicion)}`)
+    return fetch(url)
         .then(response => {
-            if (!response.ok) throw new Error("No se pudo obtener el acta.");
+            if (!response.ok) throw new Error(textoError);
             return response.text();
         })
         .then(html => {
@@ -1684,8 +1725,94 @@ function cargarActaEdicion(nombreEdicion) {
             guardarEstadoActualSPA();
         })
         .catch(() => {
-            contenedor.innerHTML = '<p style="color:red; text-align:center;">Error al cargar el acta de la edición.</p>';
+            contenedor.innerHTML = `<p style="color:red; text-align:center;">${textoError}</p>`;
         });
+}
+
+function cargarActaEdicion(nombreEdicion) {
+    return cargarFragmentoResultados('contenedor-acta-resultados',
+        `InscripcionServlet?accion=verActa&edicion=${encodeURIComponent(nombreEdicion)}`,
+        'Cargando el acta de la edición...', 'Error al cargar el acta de la edición.');
+}
+
+function cargarTablaIngresoResultados(nombreEdicion) {
+    return cargarFragmentoResultados('contenedor-ingreso-resultados',
+        `InscripcionServlet?accion=tablaIngresoResultados&edicion=${encodeURIComponent(nombreEdicion)}`,
+        'Cargando los estudiantes aceptados...', 'Error al cargar los estudiantes de la edición.')
+        .then(() => actualizarContadorNotas());
+}
+
+function actualizarContadorNotas() {
+    const selects = [...document.querySelectorAll('#formIngresoResultados .select-nota')];
+    const contador = document.getElementById('contador-notas');
+    if (contador) contador.textContent = selects.filter(s => s.value !== '').length;
+    selects.forEach(s => { if (s.value !== '') s.style.borderColor = '#bdc3c7'; });
+}
+
+function mostrarMensajeIngreso(ok, texto) {
+    const msgDiv = document.getElementById('mensaje-ingreso');
+    if (!msgDiv) return;
+    msgDiv.style.display = 'block';
+    msgDiv.style.backgroundColor = ok ? '#dff0d8' : '#f2dede';
+    msgDiv.style.color = ok ? '#3c763d' : '#a94442';
+    msgDiv.innerHTML = (ok ? '✔ ' : '<strong>Error:</strong> ') + escaparTextoHtml(texto);
+}
+
+// Validación en el navegador antes de cerrar: todos los estudiantes deben tener nota (7.5)
+function confirmarCierreEdicion() {
+    const selects = [...document.querySelectorAll('#formIngresoResultados .select-nota')];
+    const sinNota = selects.filter(s => s.value === '');
+    if (sinNota.length > 0) {
+        sinNota.forEach(s => s.style.borderColor = '#e74c3c');
+        sinNota[0].focus();
+        mostrarMensajeIngreso(false, `Para cerrar la edición todos los estudiantes deben tener nota (faltan ${sinNota.length}).`);
+        return;
+    }
+
+    const nombreEdicion = document.querySelector('#formIngresoResultados input[name="edicion"]').value;
+    const htmlCuerpo = `
+        <div style="text-align: center; padding: 10px;">
+            <p style="font-size: 15px; color: #2c3e50;">Se guardarán las notas y se cerrará la edición <strong>${escaparTextoHtml(nombreEdicion)}</strong>.</p>
+            <p style="font-size: 14px; color: #c0392b;">Una vez cerrada, las notas ya no se podrán modificar.</p>
+        </div>
+    `;
+    const htmlBotones = `
+        <button class="btn-moderno" style="background-color: #95a5a6; color: white;" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn-moderno" id="btnConfirmarCierre" style="background-color: #8e44ad; margin-left: 10px;" onclick="cerrarModal(); guardarResultados(null, true)">Sí, cerrar edición</button>
+    `;
+    mostrarModal('Confirmar cierre de la edición', htmlCuerpo, htmlBotones);
+}
+
+function guardarResultados(event, cerrar) {
+    if (event) event.preventDefault();
+    const form = document.getElementById('formIngresoResultados');
+    if (!form) return;
+    const botones = [document.getElementById('btnGuardarNotas'), document.getElementById('btnCerrarEdicion')];
+
+    const nombreEdicion = form.querySelector('input[name="edicion"]').value;
+    const datos = new URLSearchParams(new FormData(form));
+    datos.append('accion', 'guardarResultados');
+    if (cerrar) datos.append('cerrar', 'true');
+
+    botones.forEach(b => { if (b) b.disabled = true; });
+    document.getElementById('mensaje-ingreso').style.display = 'none';
+
+    fetch('InscripcionServlet', { method: 'POST', body: datos })
+        .then(response => response.text().then(texto => ({ ok: response.ok, texto })))
+        .then(({ ok, texto }) => {
+            if (!ok) throw new Error(texto);
+            if (cerrar) {
+                // La edición cerrada ya no se puede editar: se quita de la lista y se avisa
+                mostrarModal('Edición cerrada', `<p style="text-align:center; font-size: 15px; color: #2c3e50;">${escaparTextoHtml(texto)}</p>`);
+                const cursoActual = document.getElementById('cursoIngreso').value;
+                cargarEdicionesResultados('ingresar', cursoActual);
+            } else {
+                // Se recarga la planilla para que refleje lo guardado (y quede así en el historial SPA)
+                return cargarTablaIngresoResultados(nombreEdicion).then(() => mostrarMensajeIngreso(true, texto));
+            }
+        })
+        .catch(error => mostrarMensajeIngreso(false, error.message))
+        .finally(() => botones.forEach(b => { if (b && document.body.contains(b)) b.disabled = false; }));
 }
 
 function cargarResultadosInscripciones() {

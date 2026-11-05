@@ -281,6 +281,8 @@ public class InscripcionEdicionHelper {
             
             Edicion edicionObj = db.find(Edicion.class, this.nombre);
             if (edicionObj == null) throw new Exception("La edición '" + this.nombre + "' ya no existe.");
+            if (edicionObj.isCerrada())
+                throw new IllegalArgumentException("La edición '" + this.nombre + "' ya fue cerrada: no se pueden modificar sus inscripciones.");
 
             for (Map.Entry<String, Integer> entry : evaluaciones.entrySet()) {
                 String nicknameEstudiante = entry.getKey();
@@ -365,43 +367,131 @@ public class InscripcionEdicionHelper {
     public List<DtInscripcionEdicion> getActaEdicion(String nicknameDocente) throws Exception {
         db = DB.createEntityManager();
         try {
-            Edicion ed = db.find(Edicion.class, this.nombre);
-            if (ed == null)
-                throw new IllegalArgumentException("La edición '" + this.nombre + "' no existe.");
-
-            boolean esDocenteDeLaEdicion = false;
-            if (ed.getDocentes() != null)
-                for (Docente d : ed.getDocentes())
-                    if (d.getNickname().equals(nicknameDocente)) esDocenteDeLaEdicion = true;
-            if (!esDocenteDeLaEdicion)
-                throw new IllegalArgumentException("Usted no es docente de la edición '" + this.nombre + "'.");
-
+            Edicion ed = getEdicionDelDocente(nicknameDocente);
             if (!ed.isCerrada())
                 throw new IllegalArgumentException("La edición '" + this.nombre + "' todavía no fue cerrada, por lo que sus resultados no son definitivos.");
-
-            List<InscripcionEdicion> participantes = db.createQuery(
-                "SELECT i FROM InscripcionEdicion i WHERE i.edicion.nombre = :ed AND i.estado = :est " +
-                "ORDER BY i.estudiante.apellido, i.estudiante.nombre", InscripcionEdicion.class)
-                .setParameter("ed", this.nombre)
-                .setParameter("est", ACEPTADO)
-                .getResultList();
-
-            DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), ed.getCurso().getImagen());
-            DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, ed.getImagen());
-            dtEd.setFechaCierre(ed.getFechaCierre());
-
-            List<DtInscripcionEdicion> acta = new ArrayList<>();
-            for (InscripcionEdicion i : participantes) {
-                Estudiante e = i.getEstudiante();
-                DtUsuario dtEst = new DtUsuario(e.getNickname(), null, e.getEmail(), e.getNombre(), e.getApellido(), e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
-                DtInscripcionEdicion dtIns = new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0, i.getVideoURL());
-                dtIns.setNota(i.getNota());
-                acta.add(dtIns);
-            }
-            return acta;
+            return toDtParticipantes(ed, getAceptadas());
         } finally {
             if (db != null && db.isOpen()) db.close();
             db = null;
         }
+    }
+
+    /**
+     * CU "Ingresar resultados de evaluaciones de estudiantes en ediciones de cursos" (Docente).
+     * Devuelve los estudiantes aceptados en esta edición con la nota que tengan cargada hasta el momento.
+     * Solo se permite si la edición existe, el docente está asignado a ella y todavía no fue cerrada.
+     */
+    public List<DtInscripcionEdicion> getParticipantesParaEvaluar(String nicknameDocente) throws Exception {
+        db = DB.createEntityManager();
+        try {
+            Edicion ed = getEdicionDelDocente(nicknameDocente);
+            if (ed.isCerrada())
+                throw new IllegalArgumentException("La edición '" + this.nombre + "' ya fue cerrada: las notas no se pueden modificar.");
+            return toDtParticipantes(ed, getAceptadas());
+        } finally {
+            if (db != null && db.isOpen()) db.close();
+            db = null;
+        }
+    }
+
+    /**
+     * CU "Ingresar resultados de evaluaciones de estudiantes en ediciones de cursos" (Docente).
+     * Registra las notas (escala 1 al 12) de los estudiantes aceptados en esta edición.
+     * @param notas         Key = nickname del estudiante, Value = nota (null borra la nota cargada)
+     * @param cerrarEdicion si es true, además cierra la edición (fecha de cierre = hoy). Para cerrar,
+     *                      todos los estudiantes aceptados deben tener nota; después ya no se pueden modificar.
+     */
+    public void ingresarResultados(String nicknameDocente, Map<String, Integer> notas, boolean cerrarEdicion) throws Exception {
+        db = DB.createEntityManager();
+        try {
+            db.getTransaction().begin();
+
+            Edicion ed = getEdicionDelDocente(nicknameDocente);
+            if (ed.isCerrada())
+                throw new IllegalArgumentException("La edición '" + this.nombre + "' ya fue cerrada: las notas no se pueden modificar.");
+
+            Map<String, InscripcionEdicion> aceptadas = new java.util.LinkedHashMap<>();
+            for (InscripcionEdicion i : getAceptadas())
+                aceptadas.put(i.getEstudiante().getNickname(), i);
+
+            if (notas != null) {
+                for (Map.Entry<String, Integer> entry : notas.entrySet()) {
+                    InscripcionEdicion inscripcion = aceptadas.get(entry.getKey());
+                    if (inscripcion == null)
+                        throw new IllegalArgumentException("El estudiante '" + entry.getKey() + "' no está aceptado en la edición '" + this.nombre + "'.");
+                    Integer nota = entry.getValue();
+                    if (nota != null && (nota < 1 || nota > 12))
+                        throw new IllegalArgumentException("La nota de '" + entry.getKey() + "' debe estar entre 1 y 12.");
+                    inscripcion.setNota(nota);
+                }
+            }
+
+            if (cerrarEdicion) {
+                if (aceptadas.isEmpty())
+                    throw new IllegalArgumentException("La edición '" + this.nombre + "' no tiene estudiantes aceptados para evaluar.");
+                List<String> sinNota = new ArrayList<>();
+                for (InscripcionEdicion i : aceptadas.values())
+                    if (i.getNota() == null) sinNota.add(i.getEstudiante().getNickname());
+                if (!sinNota.isEmpty())
+                    throw new IllegalArgumentException("Para cerrar la edición todos los estudiantes deben tener nota. Falta la nota de: " + String.join(", ", sinNota) + ".");
+                ed.setFechaCierre(LocalDate.now());
+            }
+
+            db.getTransaction().commit();
+            Logger.info("Resultados ingresados para la edición " + this.nombre + (cerrarEdicion ? " (edición cerrada)" : ""));
+        } catch (IllegalArgumentException e) {
+            if (db.getTransaction().isActive()) db.getTransaction().rollback();
+            throw e;
+        } catch (Exception e) {
+            if (db.getTransaction().isActive()) db.getTransaction().rollback();
+            Logger.error(e, "Error al ingresar resultados: ");
+            throw new Exception("Ocurrió un error al guardar las notas de los estudiantes.");
+        } finally {
+            if (db != null && db.isOpen()) db.close();
+            db = null;
+        }
+    }
+
+    //********************* resultados de evaluaciones *************************
+    // Busca esta edición (con el EntityManager abierto) y verifica que el docente esté asignado a ella.
+    private Edicion getEdicionDelDocente(String nicknameDocente) {
+        Edicion ed = db.find(Edicion.class, this.nombre);
+        if (ed == null)
+            throw new IllegalArgumentException("La edición '" + this.nombre + "' no existe.");
+
+        boolean esDocenteDeLaEdicion = false;
+        if (ed.getDocentes() != null)
+            for (Docente d : ed.getDocentes())
+                if (d.getNickname().equals(nicknameDocente)) esDocenteDeLaEdicion = true;
+        if (!esDocenteDeLaEdicion)
+            throw new IllegalArgumentException("Usted no es docente de la edición '" + this.nombre + "'.");
+        return ed;
+    }
+
+    // Inscripciones "Aceptada" de esta edición (los participantes), ordenadas por apellido y nombre.
+    private List<InscripcionEdicion> getAceptadas() {
+        return db.createQuery(
+            "SELECT i FROM InscripcionEdicion i WHERE i.edicion.nombre = :ed AND i.estado = :est " +
+            "ORDER BY i.estudiante.apellido, i.estudiante.nombre", InscripcionEdicion.class)
+            .setParameter("ed", this.nombre)
+            .setParameter("est", ACEPTADO)
+            .getResultList();
+    }
+
+    private List<DtInscripcionEdicion> toDtParticipantes(Edicion ed, List<InscripcionEdicion> participantes) {
+        DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), ed.getCurso().getImagen());
+        DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, ed.getImagen());
+        dtEd.setFechaCierre(ed.getFechaCierre());
+
+        List<DtInscripcionEdicion> ret = new ArrayList<>();
+        for (InscripcionEdicion i : participantes) {
+            Estudiante e = i.getEstudiante();
+            DtUsuario dtEst = new DtUsuario(e.getNickname(), null, e.getEmail(), e.getNombre(), e.getApellido(), e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
+            DtInscripcionEdicion dtIns = new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0, i.getVideoURL());
+            dtIns.setNota(i.getNota());
+            ret.add(dtIns);
+        }
+        return ret;
     }
 }

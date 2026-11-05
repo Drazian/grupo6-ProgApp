@@ -15,7 +15,7 @@
     <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 220px;">
             <label for="instResultados" style="font-weight: bold; color: #34495e;">Instituto:</label>
-            <select id="instResultados" onchange="cargarCursosParaResultados(this.value)" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #bdc3c7;">
+            <select id="instResultados" onchange="cargarCursosResultados('ver', this.value)" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #bdc3c7;">
                 <option value="">Seleccione un Instituto...</option>
                 <c:forEach var="inst" items="${institutos}">
                     <option value="${fn:escapeXml(inst.nombre)}"><c:out value="${inst.nombre}"/></option>
@@ -25,14 +25,14 @@
 
         <div style="flex: 1; min-width: 220px;">
             <label for="cursoResultados" style="font-weight: bold; color: #34495e;">Curso:</label>
-            <select id="cursoResultados" onchange="cargarEdicionesParaResultados(this.value)" disabled style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #bdc3c7;">
+            <select id="cursoResultados" onchange="cargarEdicionesResultados('ver', this.value)" disabled style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #bdc3c7;">
                 <option value="">Primero seleccione un instituto</option>
             </select>
         </div>
 
         <div style="flex: 1; min-width: 220px;">
             <label for="edicionResultados" style="font-weight: bold; color: #34495e;">Edición cerrada:</label>
-            <select id="edicionResultados" onchange="cargarActaEdicion(this.value)" disabled style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #bdc3c7;">
+            <select id="edicionResultados" onchange="seleccionarEdicionResultados('ver', this.value)" disabled style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #bdc3c7;">
                 <option value="">Primero seleccione un curso</option>
             </select>
         </div>

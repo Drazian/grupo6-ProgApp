@@ -76,6 +76,7 @@
                             <li><a href="#" onclick="cargarAltaEdicion()">Alta Edición de Curso</a></li>
                             <li><a href="#" onclick="cargarFormSeleccionEstudiantes()">Evaluar Inscripciones</a></li>
                             <li><a href="#" onclick="cargarFormListarAceptados()">Listar Aceptados a Edición</a></li>
+                            <li><a href="#" onclick="cargarFormIngresarResultados(); return false;">Ingresar Resultados de Evaluaciones</a></li>
                             <li><a href="#" onclick="cargarFormVerResultados(); return false;">Ver Resultados de Evaluaciones</a></li>
                         </ul>                      
                     </details>

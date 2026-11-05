@@ -219,17 +219,7 @@ public class InscripcionServlet extends HttpServlet {
 
                 try {
                     // Solo las ediciones cerradas del curso en las que el docente logueado participa
-                    List<String> ediciones = ic.listarEdicionesCerradasDeDocente(docente.getNickname(), request.getParameter("curso"));
-
-                    StringBuilder json = new StringBuilder("[");
-                    for (int i = 0; i < ediciones.size(); i++) {
-                        if (i > 0) json.append(",");
-                        json.append("\"").append(escaparJson(ediciones.get(i))).append("\"");
-                    }
-                    json.append("]");
-
-                    response.setContentType("application/json; charset=UTF-8");
-                    response.getWriter().write(json.toString());
+                    escribirJson(response, ic.listarEdicionesCerradasDeDocente(docente.getNickname(), request.getParameter("curso")));
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo las ediciones cerradas.");
                 }
@@ -265,6 +255,62 @@ public class InscripcionServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/fragmentos/tablaActaEdicion.jsp").forward(request, response);
                 break;
             }
+
+            // =====================================================================
+            // CASO DE USO: "INGRESAR RESULTADOS DE EVALUACIONES DE ESTUDIANTES EN EDICIONES DE CURSOS" (DOCENTE)
+            // =====================================================================
+
+            case "formularioIngresoResultados": {
+                DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo Docentes pueden ingresar resultados de evaluaciones.");
+                    return;
+                }
+
+                try {
+                    request.setAttribute("institutos", ic.listarInstitutos());
+                    request.getRequestDispatcher("/WEB-INF/fragmentos/ingresarResultados.jsp").forward(request, response);
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                }
+                break;
+            }
+
+            case "listarEdicionesAbiertas": {
+                DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
+                    return;
+                }
+
+                try {
+                    // Solo las ediciones todavia abiertas del curso en las que el docente logueado participa
+                    escribirJson(response, ic.listarEdicionesAbiertasDeDocente(docente.getNickname(), request.getParameter("curso")));
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo las ediciones del docente.");
+                }
+                break;
+            }
+
+            case "tablaIngresoResultados": {
+                DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
+                    return;
+                }
+
+                String edicion = request.getParameter("edicion");
+                try {
+                    // El Central valida que la edicion exista, siga abierta y que el docente participe en ella
+                    List<DtInscripcionEdicion> participantes = ic.getParticipantesParaEvaluar(edicion, docente.getNickname());
+                    request.setAttribute("edicion", ic.getEdicion(edicion));
+                    request.setAttribute("participantes", participantes);
+                } catch (Exception e) {
+                    request.setAttribute("errorIngreso", e.getMessage());
+                }
+                request.getRequestDispatcher("/WEB-INF/fragmentos/tablaIngresoResultados.jsp").forward(request, response);
+                break;
+            }
         }
     }
 
@@ -274,6 +320,19 @@ public class InscripcionServlet extends HttpServlet {
                     .replace("\"", "\\\"")
                     .replace("\n", "\\n")
                     .replace("\r", "\\r");
+    }
+
+    // Responde una lista de textos como arreglo JSON
+    private static void escribirJson(HttpServletResponse response, List<String> valores) throws IOException {
+        StringBuilder json = new StringBuilder("[");
+        for (int i = 0; i < valores.size(); i++) {
+            if (i > 0) json.append(",");
+            json.append("\"").append(escaparJson(valores.get(i))).append("\"");
+        }
+        json.append("]");
+
+        response.setContentType("application/json; charset=UTF-8");
+        response.getWriter().write(json.toString());
     }
 
     @Override
@@ -369,6 +428,51 @@ public class InscripcionServlet extends HttpServlet {
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Error al guardar: " + e.getMessage());
+            }
+        }
+        // CASO DE USO: "INGRESAR RESULTADOS DE EVALUACIONES DE ESTUDIANTES EN EDICIONES DE CURSOS" (DOCENTE)
+        else if ("guardarResultados".equals(accion)) {
+            DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
+
+            if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("La sesión expiró o no tienes permisos de Docente.");
+                return;
+            }
+
+            String nombreEdicion = request.getParameter("edicion");
+            boolean cerrar = "true".equals(request.getParameter("cerrar"));
+
+            // Cada select del formulario viaja como nota_<nickname>; vacio = sin nota
+            Map<String, Integer> notas = new HashMap<>();
+            Enumeration<String> paramNames = request.getParameterNames();
+            while (paramNames.hasMoreElements()) {
+                String paramName = paramNames.nextElement();
+                if (!paramName.startsWith("nota_")) continue;
+                String nickname = paramName.substring(5);
+                String valor = request.getParameter(paramName);
+                if (valor == null || valor.trim().isEmpty()) {
+                    notas.put(nickname, null);
+                    continue;
+                }
+                try {
+                    notas.put(nickname, Integer.valueOf(valor.trim()));
+                } catch (NumberFormatException e) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write("La nota de '" + nickname + "' no es un número válido.");
+                    return;
+                }
+            }
+
+            try {
+                ic.ingresarResultados(nombreEdicion, docente.getNickname(), notas, cerrar);
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(cerrar
+                        ? "Notas guardadas y edición cerrada. Ya puede consultar el acta en \"Ver Resultados de Evaluaciones\"."
+                        : "Notas guardadas con éxito.");
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(e.getMessage());
             }
         }
     }
