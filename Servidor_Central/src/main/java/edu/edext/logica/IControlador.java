@@ -70,6 +70,8 @@ public interface IControlador {
     List<DtInscripcionEdicion> getInscripcionesCompletas(String nombreEdicion) throws Exception;         // exporta a Web
     void evaluarInscripciones(String nombreEdicion, Map<String, Integer> evaluaciones) throws Exception; // exporta a Web
     List<DtInscripcionEdicion> getInscripcionesDeEstudiante(String nicknameEstudiante) throws Exception; // exporta a Web
+    List<String> listarEdicionesCerradasDeDocente(String nicknameDocente, String nombreCurso) throws Exception; // exporta a Web
+    List<DtInscripcionEdicion> getActaEdicion(String nombreEdicion, String nicknameDocente) throws Exception;   // exporta a Web
     int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception;  // exporta a Web
 
 //**************************** ProgramaFormacion *****************************//

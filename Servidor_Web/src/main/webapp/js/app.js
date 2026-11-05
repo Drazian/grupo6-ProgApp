@@ -1561,6 +1561,133 @@ function cargarTablaAceptados(nombreEdicion) {
         });
 }
 
+// =====================================================================
+// CU: VER RESULTADOS DE EVALUACIONES EN EDICIONES DE CURSOS (DOCENTE)
+// Instituto -> Curso -> Edición cerrada (en la que participa) -> Acta
+// =====================================================================
+
+const MENSAJE_INICIAL_ACTA = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione un Instituto, un Curso y una Edición cerrada para visualizar el acta con los resultados de las evaluaciones.</p>';
+
+function cargarFormVerResultados() {
+    fetch('InscripcionServlet?accion=formularioResultados')
+        .then(response => {
+            if (!response.ok) throw new Error("Acceso denegado. Función exclusiva para Docentes.");
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById('contenido-dinamico').innerHTML = html;
+            crearNuevoEstadoSPA();
+        })
+        .catch(error => {
+            document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red; text-align:center;'>${error.message}</h3>`;
+        });
+}
+
+// Llena un <select> creando los <option> con el DOM (los nombres pueden tener comillas u otros caracteres especiales)
+function llenarSelectResultados(select, textoInicial, valores) {
+    select.innerHTML = '';
+    const inicial = document.createElement('option');
+    inicial.value = '';
+    inicial.textContent = textoInicial;
+    select.appendChild(inicial);
+    (valores || []).forEach(valor => {
+        const opcion = document.createElement('option');
+        opcion.value = valor;
+        opcion.textContent = valor;
+        select.appendChild(opcion);
+    });
+}
+
+function cargarCursosParaResultados(nombreInstituto) {
+    const selectCurso = document.getElementById('cursoResultados');
+    const selectEdicion = document.getElementById('edicionResultados');
+    const contenedor = document.getElementById('contenedor-acta-resultados');
+
+    llenarSelectResultados(selectEdicion, 'Primero seleccione un curso', []);
+    selectEdicion.disabled = true;
+    contenedor.innerHTML = MENSAJE_INICIAL_ACTA;
+
+    if (!nombreInstituto) {
+        llenarSelectResultados(selectCurso, 'Primero seleccione un instituto', []);
+        selectCurso.disabled = true;
+        return;
+    }
+
+    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${encodeURIComponent(nombreInstituto)}`)
+        .then(response => response.json())
+        .then(cursos => {
+            if (cursos.length === 0) {
+                llenarSelectResultados(selectCurso, 'El instituto no tiene cursos', []);
+                selectCurso.disabled = true;
+            } else {
+                llenarSelectResultados(selectCurso, 'Seleccione un Curso...', cursos);
+                selectCurso.disabled = false;
+            }
+        })
+        .catch(err => console.log(err));
+}
+
+function cargarEdicionesParaResultados(nombreCurso) {
+    const selectEdicion = document.getElementById('edicionResultados');
+    const contenedor = document.getElementById('contenedor-acta-resultados');
+
+    contenedor.innerHTML = MENSAJE_INICIAL_ACTA;
+
+    if (!nombreCurso) {
+        llenarSelectResultados(selectEdicion, 'Primero seleccione un curso', []);
+        selectEdicion.disabled = true;
+        return;
+    }
+
+    fetch(`InscripcionServlet?accion=listarEdicionesCerradas&curso=${encodeURIComponent(nombreCurso)}`)
+        .then(response => {
+            if (!response.ok) throw new Error("No se pudieron obtener las ediciones cerradas.");
+            return response.json();
+        })
+        .then(ediciones => {
+            if (ediciones.length === 0) {
+                llenarSelectResultados(selectEdicion, 'No hay ediciones cerradas', []);
+                selectEdicion.disabled = true;
+                contenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Este curso no tiene ediciones cerradas en las que usted participe como docente.</p>';
+            } else {
+                llenarSelectResultados(selectEdicion, 'Seleccione la Edición...', ediciones);
+                selectEdicion.disabled = false;
+                // Si hay una sola edición cerrada, se muestra su acta directamente
+                if (ediciones.length === 1) {
+                    selectEdicion.value = ediciones[0];
+                    cargarActaEdicion(ediciones[0]);
+                }
+            }
+        })
+        .catch(error => {
+            contenedor.innerHTML = `<p style="color:red; text-align:center;">${error.message}</p>`;
+        });
+}
+
+function cargarActaEdicion(nombreEdicion) {
+    const contenedor = document.getElementById('contenedor-acta-resultados');
+
+    if (!nombreEdicion) {
+        contenedor.innerHTML = MENSAJE_INICIAL_ACTA;
+        return;
+    }
+
+    contenedor.innerHTML = '<h4 style="text-align:center; color: #8e44ad;">Cargando el acta de la edición...</h4>';
+
+    fetch(`InscripcionServlet?accion=verActa&edicion=${encodeURIComponent(nombreEdicion)}`)
+        .then(response => {
+            if (!response.ok) throw new Error("No se pudo obtener el acta.");
+            return response.text();
+        })
+        .then(html => {
+            contenedor.innerHTML = html;
+            guardarEstadoActualSPA();
+        })
+        .catch(() => {
+            contenedor.innerHTML = '<p style="color:red; text-align:center;">Error al cargar el acta de la edición.</p>';
+        });
+}
+
 function cargarResultadosInscripciones() {
     fetch('InscripcionServlet?accion=misResultados')
         .then(response => {

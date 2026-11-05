@@ -168,6 +168,14 @@ public class BridgeSOAP implements IBridgeSOAP{
         return bridge.getInscripcionesDeEstudiante(nicknameEstudiante);
     }
     @Override
+    public List<String> listarEdicionesCerradasDeDocente(String nicknameDocente, String nombreCurso) throws Exception {
+        return bridge.listarEdicionesCerradasDeDocente(nicknameDocente, nombreCurso);
+    }
+    @Override
+    public List<DtInscripcionEdicion> getActaEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
+        return bridge.getActaEdicion(nombreEdicion, nicknameDocente);
+    }
+    @Override
     public int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception {
         return bridge.setInscripcionPrograma(nomEstudiante, nomPrograma);
     }

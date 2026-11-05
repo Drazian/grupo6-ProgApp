@@ -1,11 +1,14 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%-- Version de los recursos estaticos: cambia en cada despliegue. Maven arma el war con fecha fija (1980)
+     y sin esto el navegador sigue usando el app.js / estilos.css viejos despues de redesplegar. --%>
+<%! private static final long VERSION_RECURSOS = System.currentTimeMillis(); %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>EDEXT</title> 
-    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/estilos.css?v=<%= VERSION_RECURSOS %>">
 </head>
 <body>
 
@@ -73,6 +76,7 @@
                             <li><a href="#" onclick="cargarAltaEdicion()">Alta Edición de Curso</a></li>
                             <li><a href="#" onclick="cargarFormSeleccionEstudiantes()">Evaluar Inscripciones</a></li>
                             <li><a href="#" onclick="cargarFormListarAceptados()">Listar Aceptados a Edición</a></li>
+                            <li><a href="#" onclick="cargarFormVerResultados(); return false;">Ver Resultados de Evaluaciones</a></li>
                         </ul>                      
                     </details>
                     <hr style="opacity: 0.2; margin: 10px 0;">
@@ -164,7 +168,7 @@
         </main>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=<%= VERSION_RECURSOS %>"></script>
     
     <!-- CONTENEDOR MAESTRO DE MODALES (Pop-ups modernos) -->
     <div id="modal-global" class="modal-oculto">

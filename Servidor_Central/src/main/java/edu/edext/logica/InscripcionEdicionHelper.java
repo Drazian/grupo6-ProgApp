@@ -1,6 +1,7 @@
 package edu.edext.logica;
 //**************************** Capa Logica *************************************
 import edu.edext.entitys.Usuario;
+import edu.edext.entitys.Docente;
 import edu.edext.entitys.InscripcionEdicion;
 import edu.edext.entitys.Estudiante;
 import edu.edext.entitys.InscripcionEdicionID;
@@ -250,12 +251,15 @@ public class InscripcionEdicionHelper {
                 
                 
                 DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, "usr.png");
+                dtEd.setFechaCierre(ed.getFechaCierre());
 
                 // Cálculo en caliente del requerimiento 7.5
                 double prioridad = calcularPrioridad(e.getNickname(), ed.getCurso().getNombre());
 
                 // Se pasa i.getVideoURL() como 6to argumento al DTO
-                ret.add(new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), prioridad, i.getVideoURL()));
+                DtInscripcionEdicion dtIns = new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), prioridad, i.getVideoURL());
+                dtIns.setNota(i.getNota());
+                ret.add(dtIns);
             }
         } catch (Exception e) {
             Logger.error("Error al obtener inscripciones completas: " + e.getMessage());
@@ -337,8 +341,11 @@ public class InscripcionEdicionHelper {
                 String imgEdicion = (ed.getImagen() != null && !ed.getImagen().isEmpty()) 
                         ? ed.getImagen() : "usr.png";
                 DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, imgEdicion);
+                dtEd.setFechaCierre(ed.getFechaCierre());
 
-                ret.add(new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0, i.getVideoURL()));
+                DtInscripcionEdicion dtIns = new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0, i.getVideoURL());
+                dtIns.setNota(i.getNota());
+                ret.add(dtIns);
             }
         } catch (Exception e) {
             Logger.error("Error al obtener inscripciones del estudiante " + this.nombre + ": " + e.getMessage());
@@ -347,9 +354,54 @@ public class InscripcionEdicionHelper {
             db = null;
         }
         return ret;
-    }  
-    
-    
-    
-    
+    }
+
+    /**
+     * CU "Ver resultados de evaluaciones en ediciones de cursos" (Docente).
+     * Devuelve el acta de esta edición: los estudiantes participantes (inscripción "Aceptada")
+     * con la nota obtenida, ordenados por apellido y nombre.
+     * Solo se permite si la edición existe, está cerrada y el docente está asignado a ella.
+     */
+    public List<DtInscripcionEdicion> getActaEdicion(String nicknameDocente) throws Exception {
+        db = DB.createEntityManager();
+        try {
+            Edicion ed = db.find(Edicion.class, this.nombre);
+            if (ed == null)
+                throw new IllegalArgumentException("La edición '" + this.nombre + "' no existe.");
+
+            boolean esDocenteDeLaEdicion = false;
+            if (ed.getDocentes() != null)
+                for (Docente d : ed.getDocentes())
+                    if (d.getNickname().equals(nicknameDocente)) esDocenteDeLaEdicion = true;
+            if (!esDocenteDeLaEdicion)
+                throw new IllegalArgumentException("Usted no es docente de la edición '" + this.nombre + "'.");
+
+            if (!ed.isCerrada())
+                throw new IllegalArgumentException("La edición '" + this.nombre + "' todavía no fue cerrada, por lo que sus resultados no son definitivos.");
+
+            List<InscripcionEdicion> participantes = db.createQuery(
+                "SELECT i FROM InscripcionEdicion i WHERE i.edicion.nombre = :ed AND i.estado = :est " +
+                "ORDER BY i.estudiante.apellido, i.estudiante.nombre", InscripcionEdicion.class)
+                .setParameter("ed", this.nombre)
+                .setParameter("est", ACEPTADO)
+                .getResultList();
+
+            DtCurso dtCurso = new DtCurso(ed.getCurso().getNombre(), ed.getCurso().getImagen());
+            DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(), dtCurso, ed.getImagen());
+            dtEd.setFechaCierre(ed.getFechaCierre());
+
+            List<DtInscripcionEdicion> acta = new ArrayList<>();
+            for (InscripcionEdicion i : participantes) {
+                Estudiante e = i.getEstudiante();
+                DtUsuario dtEst = new DtUsuario(e.getNickname(), null, e.getEmail(), e.getNombre(), e.getApellido(), e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
+                DtInscripcionEdicion dtIns = new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0, i.getVideoURL());
+                dtIns.setNota(i.getNota());
+                acta.add(dtIns);
+            }
+            return acta;
+        } finally {
+            if (db != null && db.isOpen()) db.close();
+            db = null;
+        }
+    }
 }

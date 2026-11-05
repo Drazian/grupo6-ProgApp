@@ -1380,6 +1380,30 @@ public class Controlador implements IControlador {
             helper.kill();
         }
     }
+
+    // CU "Ver resultados de evaluaciones en ediciones de cursos" (Docente)
+    @Override
+    public List<String> listarEdicionesCerradasDeDocente(String nicknameDocente, String nombreCurso) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                "SELECT e.nombre FROM Edicion e JOIN e.docentes d " +
+                "WHERE e.curso.nombre = :curso AND d.nickname = :docente AND e.fechaCierre IS NOT NULL " +
+                "ORDER BY e.fechaCierre DESC, e.nombre", String.class)
+                .setParameter("curso", nombreCurso)
+                .setParameter("docente", nicknameDocente)
+                .getResultList();
+        }
+    }
+
+    @Override
+    public List<edu.edext.datatypes.DtInscripcionEdicion> getActaEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            return helper.getActaEdicion(nicknameDocente);
+        } finally {
+            helper.kill();
+        }
+    }
     
     @Override
     public int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception {

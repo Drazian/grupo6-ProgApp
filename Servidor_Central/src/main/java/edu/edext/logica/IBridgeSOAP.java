@@ -137,6 +137,14 @@ public interface IBridgeSOAP {
     @WebMethod(operationName="getInscripcionesDeEstudiante")
     List<DtInscripcionEdicion> getInscripcionesDeEstudiante(
             @WebParam(name="nicknameEstudiante") String nicknameEstudiante) throws Exception;
+    @WebMethod(operationName="listarEdicionesCerradasDeDocente")
+    List<String> listarEdicionesCerradasDeDocente(
+            @WebParam(name="nicknameDocente") String nicknameDocente,
+            @WebParam(name="nombreCurso") String nombreCurso) throws Exception;
+    @WebMethod(operationName="getActaEdicion")
+    List<DtInscripcionEdicion> getActaEdicion(
+            @WebParam(name="nombreEdicion") String nombreEdicion,
+            @WebParam(name="nicknameDocente") String nicknameDocente) throws Exception;
     @WebMethod(operationName="setInscripcionPrograma")
     int setInscripcionPrograma(
             @WebParam(name="nomEstudiante") String nomEstudiante,
