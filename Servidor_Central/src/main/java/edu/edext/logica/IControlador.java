@@ -78,6 +78,7 @@ public interface IControlador {
     List<String> listarEdicionesAbiertasDeDocente(String nicknameDocente, String nombreCurso) throws Exception; // exporta a Web
     List<DtInscripcionEdicion> getParticipantesParaEvaluar(String nombreEdicion, String nicknameDocente) throws Exception; // exporta a Web
     void ingresarResultados(String nombreEdicion, String nicknameDocente, Map<String, Integer> notas, boolean cerrarEdicion) throws Exception; // exporta a Web
+    List<DtInscripcionEdicion> listarResultadosEvaluaciones(String nicknameEstudiante) throws Exception;   // exporta a Web
 
 //******************************* Valoraciones *******************************//
     List<String> listarCursosParaValorar(String nicknameEstudiante) throws Exception;                       // exporta a Web

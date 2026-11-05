@@ -187,6 +187,10 @@ public class BridgeSOAP implements IBridgeSOAP{
     public void ingresarResultados(String nombreEdicion, String nicknameDocente, Map<String, Integer> notas, boolean cerrarEdicion) throws Exception {
         bridge.ingresarResultados(nombreEdicion, nicknameDocente, notas, cerrarEdicion);
     }
+    @Override
+    public List<DtInscripcionEdicion> listarResultadosEvaluaciones(String nicknameEstudiante) throws Exception {
+        return bridge.listarResultadosEvaluaciones(nicknameEstudiante);
+    }
 //******************************* Valoraciones *******************************//
     @Override
     public List<String> listarCursosParaValorar(String nicknameEstudiante) throws Exception {

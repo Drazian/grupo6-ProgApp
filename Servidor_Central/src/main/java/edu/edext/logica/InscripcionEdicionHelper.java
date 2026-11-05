@@ -494,4 +494,47 @@ public class InscripcionEdicionHelper {
         }
         return ret;
     }
+
+    /**
+     * CU "Listar resultados de evaluaciones en ediciones de cursos" (Estudiante).
+     * Devuelve todas las inscripciones del estudiante (this.nombre = nickname) a ediciones de cursos cerradas,
+     * con la nota y el resultado de la evaluacion (Aprobado / No aprobado), de la edicion cerrada mas reciente a la mas vieja.
+     * Las inscripciones que no fueron aceptadas no tienen evaluacion: nota y resultado quedan en null.
+     */
+    public List<DtInscripcionEdicion> getResultadosEvaluacionesDeEstudiante() {
+        db = DB.createEntityManager();
+        try {
+            Estudiante e = db.find(Estudiante.class, this.nombre);
+            if (e == null)
+                throw new IllegalArgumentException("Solo los estudiantes pueden consultar sus resultados de evaluaciones.");
+
+            List<InscripcionEdicion> inscripciones = db.createQuery(
+                "SELECT i FROM InscripcionEdicion i WHERE i.estudiante.nickname = :nick AND i.edicion.fechaCierre IS NOT NULL " +
+                "ORDER BY i.edicion.fechaCierre DESC, i.edicion.nombre", InscripcionEdicion.class)
+                .setParameter("nick", this.nombre)
+                .getResultList();
+
+            DtUsuario dtEst = new DtUsuario(e.getNickname(), null, e.getEmail(), e.getNombre(), e.getApellido(), e.getImagen(), e.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
+            List<DtInscripcionEdicion> ret = new ArrayList<>();
+            for (InscripcionEdicion i : inscripciones) {
+                Edicion ed = i.getEdicion();
+                String imgCurso = (ed.getCurso().getImagen() != null && !ed.getCurso().getImagen().isEmpty()) ? ed.getCurso().getImagen() : "usr.png";
+                String imgEdicion = (ed.getImagen() != null && !ed.getImagen().isEmpty()) ? ed.getImagen() : "usr.png";
+                DtEdicion dtEd = new DtEdicion(ed.getNombre(), ed.getCupo(), ed.getFechaInicio(), ed.getFechaFin(), ed.getFechaPublicacion(),
+                        new DtCurso(ed.getCurso().getNombre(), imgCurso), imgEdicion);
+                dtEd.setFechaCierre(ed.getFechaCierre());
+
+                DtInscripcionEdicion dtIns = new DtInscripcionEdicion(dtEst, dtEd, i.getFechaInscripcion(), i.getEstado(), 0.0, i.getVideoURL());
+                if (i.getEstado() == ACEPTADO && i.getNota() != null) {
+                    dtIns.setNota(i.getNota());
+                    dtIns.setResultado(i.getNota() >= ActaEstudioHelper.NOTA_MINIMA_APROBACION ? "Aprobado" : "No aprobado");
+                }
+                ret.add(dtIns);
+            }
+            return ret;
+        } finally {
+            if (db != null && db.isOpen()) db.close();
+            db = null;
+        }
+    }
 }
