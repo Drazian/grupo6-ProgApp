@@ -1384,15 +1384,7 @@ public class Controlador implements IControlador {
     // CU "Ver resultados de evaluaciones en ediciones de cursos" (Docente)
     @Override
     public List<String> listarEdicionesCerradasDeDocente(String nicknameDocente, String nombreCurso) throws Exception {
-        try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery(
-                "SELECT e.nombre FROM Edicion e JOIN e.docentes d " +
-                "WHERE e.curso.nombre = :curso AND d.nickname = :docente AND e.fechaCierre IS NOT NULL " +
-                "ORDER BY e.fechaCierre DESC, e.nombre", String.class)
-                .setParameter("curso", nombreCurso)
-                .setParameter("docente", nicknameDocente)
-                .getResultList();
-        }
+        return listarEdicionesDeDocente(nicknameDocente, nombreCurso, true);
     }
 
     @Override
@@ -1402,6 +1394,45 @@ public class Controlador implements IControlador {
             return helper.getActaEdicion(nicknameDocente);
         } finally {
             helper.kill();
+        }
+    }
+
+    // CU "Ingresar resultados de evaluaciones de estudiantes en ediciones de cursos" (Docente)
+    @Override
+    public List<String> listarEdicionesAbiertasDeDocente(String nicknameDocente, String nombreCurso) throws Exception {
+        return listarEdicionesDeDocente(nicknameDocente, nombreCurso, false);
+    }
+
+    @Override
+    public List<edu.edext.datatypes.DtInscripcionEdicion> getParticipantesParaEvaluar(String nombreEdicion, String nicknameDocente) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            return helper.getParticipantesParaEvaluar(nicknameDocente);
+        } finally {
+            helper.kill();
+        }
+    }
+
+    @Override
+    public void ingresarResultados(String nombreEdicion, String nicknameDocente, Map<String, Integer> notas, boolean cerrarEdicion) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            helper.ingresarResultados(nicknameDocente, notas, cerrarEdicion);
+        } finally {
+            helper.kill();
+        }
+    }
+
+    // Ediciones del curso en las que participa el docente: cerradas (mas reciente primero) o abiertas (mas nueva primero)
+    private List<String> listarEdicionesDeDocente(String nicknameDocente, String nombreCurso, boolean cerradas) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                "SELECT e.nombre FROM Edicion e JOIN e.docentes d " +
+                "WHERE e.curso.nombre = :curso AND d.nickname = :docente AND e.fechaCierre IS " + (cerradas ? "NOT NULL " : "NULL ") +
+                "ORDER BY " + (cerradas ? "e.fechaCierre" : "e.fechaInicio") + " DESC, e.nombre", String.class)
+                .setParameter("curso", nombreCurso)
+                .setParameter("docente", nicknameDocente)
+                .getResultList();
         }
     }
     

@@ -145,6 +145,21 @@ public interface IBridgeSOAP {
     List<DtInscripcionEdicion> getActaEdicion(
             @WebParam(name="nombreEdicion") String nombreEdicion,
             @WebParam(name="nicknameDocente") String nicknameDocente) throws Exception;
+    @WebMethod(operationName="listarEdicionesAbiertasDeDocente")
+    List<String> listarEdicionesAbiertasDeDocente(
+            @WebParam(name="nicknameDocente") String nicknameDocente,
+            @WebParam(name="nombreCurso") String nombreCurso) throws Exception;
+    @WebMethod(operationName="getParticipantesParaEvaluar")
+    List<DtInscripcionEdicion> getParticipantesParaEvaluar(
+            @WebParam(name="nombreEdicion") String nombreEdicion,
+            @WebParam(name="nicknameDocente") String nicknameDocente) throws Exception;
+    @WebMethod(operationName="ingresarResultados")
+    void ingresarResultados(
+            @WebParam(name="nombreEdicion") String nombreEdicion,
+            @WebParam(name="nicknameDocente") String nicknameDocente,
+            @WebParam(name="notas")
+            @XmlJavaTypeAdapter(MapAdapter.class) Map<String, Integer> notas,
+            @WebParam(name="cerrarEdicion") boolean cerrarEdicion) throws Exception;
     @WebMethod(operationName="setInscripcionPrograma")
     int setInscripcionPrograma(
             @WebParam(name="nomEstudiante") String nomEstudiante,
