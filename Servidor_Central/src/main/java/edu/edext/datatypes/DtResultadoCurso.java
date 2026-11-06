@@ -50,7 +50,8 @@ public class DtResultadoCurso {
     
     public boolean isAprobado(){ 
         //return ResultadoCurso.APROBADO.equals(this.resultado); 
-        return tipoResultado.equals(this.resultado);
+        // tipoResultado todavia no se asigna (queda null): se compara con el texto del enum para no tirar NullPointerException
+        return ResultadoCurso.APROBADO.toString().equals(this.resultado);
     }
     
 }

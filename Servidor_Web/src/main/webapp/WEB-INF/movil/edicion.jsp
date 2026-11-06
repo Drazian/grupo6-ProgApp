@@ -17,9 +17,9 @@
 
         <div class="card-body pt-2">
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Fecha de inicio: ${empty edicion.fechaInicio ? '-' : edicion.fechaInicio.format(fmtFecha)}</li>
-                <li class="list-group-item">Fecha de fin: ${empty edicion.fechaFin ? '-' : edicion.fechaFin.format(fmtFecha)}</li>
-                <li class="list-group-item">Fecha de publicación: ${empty edicion.fechaPublicacion ? '-' : edicion.fechaPublicacion.format(fmtFecha)}</li>
+                <li class="list-group-item">Fecha de inicio: ${empty edicion.fechaInicio ? '-' : edicion.fechaInicio}</li>
+                <li class="list-group-item">Fecha de fin: ${empty edicion.fechaFin ? '-' : edicion.fechaFin}</li>
+                <li class="list-group-item">Fecha de publicación: ${empty edicion.fechaPublicacion ? '-' : edicion.fechaPublicacion}</li>
                 <li class="list-group-item">Cupo: ${empty edicion.cupo or edicion.cupo lt 1 ? 'Sin límite' : edicion.cupo}</li>
                 <li class="list-group-item">Estado: ${edicion.cerrada ? 'Cerrada' : 'Abierta'}</li>
             </ul>

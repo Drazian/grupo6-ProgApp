@@ -27,7 +27,6 @@ import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
-import edu.edext.controlador.ws.ResultadoCurso;
 import edu.edext.tools.Utils;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,6 +41,11 @@ import java.time.format.DateTimeFormatter;
 public final class ActaEstudioPdf {
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy 'a las' HH:mm");
+    // Texto que manda el Servidor Central en DtResultadoCurso.resultado (el enum ResultadoCurso del Web Service
+    // trae los nombres APROBADO, NO_APROBADO..., que no coinciden con ese texto)
+    private static final String APROBADO = "Aprobado";
+    private static final String NO_APROBADO = "No aprobado";
+    private static final String EN_CURSO = "En curso";
 
     private static final Color AZUL_OSCURO = new DeviceRgb(0x2c, 0x3e, 0x50);
     private static final Color GRIS_TEXTO = new DeviceRgb(0x7f, 0x8c, 0x8d);
@@ -214,9 +218,9 @@ public final class ActaEstudioPdf {
 //        if (DtResultadoCurso.NO_APROBADO.equals(resultado)) return ROJO;
 //        if (DtResultadoCurso.EN_CURSO.equals(resultado)) return NARANJA;
 //        return GRIS_TEXTO;
-        if (ResultadoCurso.APROBADO.equals(resultado)) return VERDE;
-        if (ResultadoCurso.NO_APROBADO.equals(resultado)) return ROJO;
-        if (ResultadoCurso.EN_CURSO.equals(resultado)) return NARANJA;
+        if (APROBADO.equals(resultado)) return VERDE;
+        if (NO_APROBADO.equals(resultado)) return ROJO;
+        if (EN_CURSO.equals(resultado)) return NARANJA;
         return GRIS_TEXTO;
     }
 

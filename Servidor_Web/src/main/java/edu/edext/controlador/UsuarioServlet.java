@@ -270,7 +270,9 @@ public class UsuarioServlet extends HttpServlet {
 
             try {
 //                Date fecha = Date.valueOf(fechaNacimiento);
-                LocalDate fecha = Utils.Cast.valueOf(fechaNacimiento);
+                LocalDate fecha = leerFecha(fechaNacimiento);
+                if (fecha == null)
+                    throw new IllegalArgumentException("Ingrese una fecha de nacimiento válida.");
                 TipoUsuario tipo = TipoUsuario.valueOf(tipoUsuario);
 
 // ************************ Descomentar para ejecutar **************************
@@ -327,7 +329,9 @@ public class UsuarioServlet extends HttpServlet {
 
             try {
 //                Date fecha = Date.valueOf(fechaNacimiento);
-                LocalDate fecha = Utils.Cast.valueOf(fechaNacimiento);
+                LocalDate fecha = leerFecha(fechaNacimiento);
+                if (fecha == null)   // si no llega una fecha válida se conserva la que tenía (no se borra)
+                    fecha = Utils.Cast.valueOf(usuarioActual.getFNacimiento());
 
                 String passwordParaControlador = (nuevaPassword != null && !nuevaPassword.trim().isEmpty()) 
                     ? nuevaPassword.trim() 
@@ -586,6 +590,16 @@ public class UsuarioServlet extends HttpServlet {
             );
                     // ****************************************************************************
             request.getSession().setAttribute("usuarioLogueado", sinPassword);
+        }
+    }
+
+    // El <input type="date"> del navegador manda yyyy-MM-dd; también se acepta dd/MM/yyyy. Si no es válida: null
+    private static LocalDate leerFecha(String valor) {
+        if (valor == null || valor.isBlank()) return null;
+        try {
+            return LocalDate.parse(valor.trim());
+        } catch (Exception e) {
+            return Utils.Cast.valueOf(valor.trim());
         }
     }
 }
