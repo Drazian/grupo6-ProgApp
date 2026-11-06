@@ -1068,47 +1068,116 @@ function cargarFormInscripcion() {
         .catch(error => document.getElementById('contenido-dinamico').innerHTML = `<h3 style='color:red;'>${error.message}</h3>`);
 }
 
-function cargarCursosParaInscripcion(nombreInstituto) {
-    const selectCurso = document.getElementById('cursoInscripcion');
-    const selectEdicion = document.getElementById('edicionInscripcion');
-    selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
-    selectEdicion.disabled = true;
+// Inscripción a edición: el curso se busca por instituto o por categoría (letra 6.1).
+// Las opciones se arman con new Option(texto, valor): así un nombre con comillas no rompe el value.
+function cambiarFiltroInscripcion(tipo) {
+    const inst = document.getElementById('instInscripcion');
+    const cat = document.getElementById('catInscripcion');
+    if (!inst || !cat) return;
+    const porCategoria = tipo === 'categoria';
+    inst.style.display = porCategoria ? 'none' : '';
+    cat.style.display = porCategoria ? '' : 'none';
+    inst.required = !porCategoria;
+    cat.required = porCategoria;
+    inst.value = '';
+    cat.value = '';
+    reiniciarCursosInscripcion(porCategoria ? 'Primero seleccione una categoría' : 'Primero seleccione un instituto');
+}
 
+function reiniciarCursosInscripcion(texto) {
+    const selectCurso = document.getElementById('cursoInscripcion');
+    selectCurso.replaceChildren(new Option(texto, ''));
+    selectCurso.disabled = true;
+    reiniciarEdicionesInscripcion('Primero seleccione un curso');
+}
+
+function reiniciarEdicionesInscripcion(texto) {
+    const selectEdicion = document.getElementById('edicionInscripcion');
+    selectEdicion.replaceChildren(new Option(texto, ''));
+    selectEdicion.disabled = true;
+    edicionesVigentesInscripcion = {};
+    mostrarDatosEdicionInscripcion('');
+}
+
+function llenarCursosInscripcion(url) {
+    const selectCurso = document.getElementById('cursoInscripcion');
+    reiniciarEdicionesInscripcion('Primero seleccione un curso');
+    selectCurso.replaceChildren(new Option('Cargando cursos...', ''));
+    selectCurso.disabled = true;
+    fetch(url)
+        .then(response => { if (!response.ok) throw new Error(); return response.json(); })
+        .then(cursos => {
+            if (cursos.length === 0) {
+                selectCurso.replaceChildren(new Option('No hay cursos', ''));
+                return;
+            }
+            selectCurso.replaceChildren(new Option('Seleccione un Curso...', ''), ...cursos.map(c => new Option(c, c)));
+            selectCurso.disabled = false;
+        })
+        .catch(() => selectCurso.replaceChildren(new Option('No se pudieron cargar los cursos', '')));
+}
+
+function cargarCursosParaInscripcion(nombreInstituto) {
     if (!nombreInstituto) {
-        selectCurso.innerHTML = '<option value="">Primero seleccione un instituto</option>';
-        selectCurso.disabled = true;
+        reiniciarCursosInscripcion('Primero seleccione un instituto');
         return;
     }
-
-    fetch(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${nombreInstituto}`)
-        .then(response => response.json())
-        .then(cursos => {
-            selectCurso.innerHTML = '<option value="">Seleccione un Curso...</option>';
-            cursos.forEach(c => selectCurso.innerHTML += `<option value="${c}">${c}</option>`);
-            selectCurso.disabled = false;
-        });
+    llenarCursosInscripcion(`EdicionServlet?accion=listarCursosPorInstituto&instituto=${encodeURIComponent(nombreInstituto)}`);
 }
+
+function cargarCursosPorCategoriaParaInscripcion(categoria) {
+    if (!categoria) {
+        reiniciarCursosInscripcion('Primero seleccione una categoría');
+        return;
+    }
+    llenarCursosInscripcion(`InscripcionServlet?accion=cursosPorCategoria&categoria=${encodeURIComponent(categoria)}`);
+}
+
+// Ediciones vigentes del curso (no cerradas y que no terminaron) con sus datos básicos: fechas, cupo y docentes
+var edicionesVigentesInscripcion = {};
 
 function cargarEdicionesParaInscripcion(nombreCurso) {
     const selectEdicion = document.getElementById('edicionInscripcion');
     if (!nombreCurso) {
-        selectEdicion.innerHTML = '<option value="">Primero seleccione un curso</option>';
-        selectEdicion.disabled = true;
+        reiniciarEdicionesInscripcion('Primero seleccione un curso');
         return;
     }
-
-    fetch(`InscripcionServlet?accion=listarEdiciones&curso=${nombreCurso}`)
-        .then(response => response.json())
+    reiniciarEdicionesInscripcion('Cargando ediciones...');
+    fetch(`InscripcionServlet?accion=edicionesVigentes&curso=${encodeURIComponent(nombreCurso)}`)
+        .then(response => { if (!response.ok) throw new Error(); return response.json(); })
         .then(ediciones => {
-            if(ediciones.length === 0) {
-                selectEdicion.innerHTML = '<option value="">No hay ediciones disponibles</option>';
-                selectEdicion.disabled = true;
-            } else {
-                selectEdicion.innerHTML = '<option value="">Seleccione la Edición...</option>';
-                ediciones.forEach(e => selectEdicion.innerHTML += `<option value="${e}">${e}</option>`);
-                selectEdicion.disabled = false;
+            if (ediciones.length === 0) {
+                selectEdicion.replaceChildren(new Option('El curso no tiene ediciones vigentes', ''));
+                return;
             }
-        });
+            ediciones.forEach(e => edicionesVigentesInscripcion[e.nombre] = e);
+            selectEdicion.replaceChildren(new Option('Seleccione la Edición...', ''), ...ediciones.map(e => new Option(e.nombre, e.nombre)));
+            selectEdicion.disabled = false;
+            if (ediciones.length === 1) {   // si hay una sola edición vigente, se muestra directamente
+                selectEdicion.value = ediciones[0].nombre;
+                mostrarDatosEdicionInscripcion(ediciones[0].nombre);
+            }
+        })
+        .catch(() => selectEdicion.replaceChildren(new Option('No se pudieron cargar las ediciones', '')));
+}
+
+function mostrarDatosEdicionInscripcion(nombreEdicion) {
+    const caja = document.getElementById('datos-edicion-inscripcion');
+    if (!caja) return;
+    const ed = edicionesVigentesInscripcion[nombreEdicion];
+    if (!ed) {
+        caja.style.display = 'none';
+        caja.innerHTML = '';
+        return;
+    }
+    const dato = (titulo, valor) => valor ? `<div><strong>${titulo}:</strong> ${escaparTextoHtml(valor)}</div>` : '';
+    caja.innerHTML = `<div style="font-weight: bold; margin-bottom: 4px;">${escaparTextoHtml(ed.nombre)}</div>`
+        + dato('Fecha de inicio', ed.fechaInicio)
+        + dato('Fecha de fin', ed.fechaFin)
+        + dato('Fecha de publicación', ed.fechaPublicacion)
+        + dato('Cupo', ed.cupo != null ? ed.cupo + ' estudiantes' : 'Sin límite')
+        + dato('Docentes', ed.docentes);
+    caja.style.display = 'block';
 }
 
 function inscribirEdicion(event) {
@@ -1126,8 +1195,7 @@ function inscribirEdicion(event) {
                 msgDiv.style.color = '#3c763d';
                 msgDiv.innerHTML = "✔ " + msg;
                 form.reset();
-                document.getElementById('cursoInscripcion').disabled = true;
-                document.getElementById('edicionInscripcion').disabled = true;
+                cambiarFiltroInscripcion('instituto');   // vuelve a "por instituto", sin curso ni edición elegidos
                 guardarEstadoActualSPA(); // FIX: Guardar tras limpieza
             });
         } else {

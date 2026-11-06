@@ -84,7 +84,7 @@
                         </td>
 
                         <td style="padding: 12px 10px; color: #666; font-size: 13px; vertical-align: top;">
-                            ${item.fechaPublicacion}
+                            ${item.fechaTexto}
                         </td>
 
                         <td style="padding: 12px 10px; text-align: center; vertical-align: top;">
