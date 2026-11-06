@@ -1398,7 +1398,7 @@ public class Controlador implements IControlador {
     }
     
     @Override
- public void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
+    public void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
      EntityManager em = emf.createEntityManager();
      try {
          em.getTransaction().begin();
@@ -1426,7 +1426,7 @@ public class Controlador implements IControlador {
      }
  }
  
- @Override
+    @Override
     public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
         EntityManager em = emf.createEntityManager();
         try {
@@ -1456,5 +1456,31 @@ public class Controlador implements IControlador {
     }
 
 
+    @Override
+    public boolean existeCurso(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            Curso curso = em.find(Curso.class, nombre);
+            return curso != null;
+        }
+    }
+    
+    @Override
+    
+    public boolean existeProgramaFormacion(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
+            return programa != null;
+        }
+    }
+    
+    @Override
+    public boolean existeEdicion(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            Edicion edicion = em.find(Edicion.class, nombre);
+            return edicion != null;
+        }
+    }
+    
+    
     
 }

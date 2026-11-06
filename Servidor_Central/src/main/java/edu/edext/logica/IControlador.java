@@ -95,4 +95,14 @@ public interface IControlador {
     int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception;
     public void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception;
     public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception;
+    
+    public boolean existeCurso(String nombre) throws Exception;
+    public boolean existeProgramaFormacion(String nombre) throws Exception;
+    public boolean existeEdicion(String nombre) throws Exception;
+    
+    
+    
+    
+    
+    
 }
