@@ -186,6 +186,20 @@ public class CursoServlet extends HttpServlet {
                 }
                 break;
                 
+            case "existeCurso": {
+                String nombreCurso = request.getParameter("nombre");
+                try{
+                    boolean existe = ic.existeCurso(nombreCurso);
+                    response.setContentType("text/plain");
+                    response.getWriter().write(String.valueOf(existe));
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al comprobar nombre: " + e.getMessage() + "</h3>");
+                }
+               
+            }
+            break;
+                
             case "altaCurso": 
                 HttpSession session = request.getSession();
                 DtUsuario usuarioLogueado = (DtUsuario) session.getAttribute("usuarioLogueado");

@@ -61,6 +61,31 @@ public class UsuarioServlet extends HttpServlet {
         } else if ("formAlta".equals(accion)) {
             request.getRequestDispatcher("/fragmentos/altaUsuario.jsp").forward(request, response);
 
+        } else if ("existeNickname".equals(accion)) {
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            String nickname = request.getParameter("nickname");
+            try{
+                boolean existe = ic.existeUsuario(nickname);
+                response.setContentType("text/plain");
+                response.getWriter().write(String.valueOf(existe));
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al comprobar nickname: " + e.getMessage() + "</h3>");
+            }
+        
+        } else if ("existeCorreo".equals(accion)) {
+            IControlador ic = Fabrica.getInstance().getIControlador();
+            String correo = request.getParameter("correo");
+            try{
+                boolean existe = ic.existeEmail(correo);
+                response.setContentType("text/plain");
+                response.getWriter().write(String.valueOf(existe));
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al comprobar email: " + e.getMessage() + "</h3>");
+            }        
+        
+        
         } else if ("cargarSocial".equals(accion)) {
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("usuarioLogueado") == null) {

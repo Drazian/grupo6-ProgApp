@@ -114,6 +114,20 @@ public class EdicionServlet extends HttpServlet {
              }
              break; 
              
+            case "existeEdicion": {
+                String nombreEdicion = request.getParameter("nombre");
+                try{
+                    boolean existe = ic.existeEdicion(nombreEdicion);
+                    response.setContentType("text/plain");
+                    response.getWriter().write(String.valueOf(existe));
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al comprobar nombre: " + e.getMessage() + "</h3>");
+                }
+                
+            }
+            break;
+             
              case "listarDocentesJSON":
              try {
                  // Reutilizamos la misma lista de tu Alta Edición
