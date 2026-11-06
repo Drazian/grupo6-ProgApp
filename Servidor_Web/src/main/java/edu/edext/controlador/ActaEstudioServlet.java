@@ -57,7 +57,12 @@ public class ActaEstudioServlet extends HttpServlet {
             // El Central valida que el estudiante este inscripto en el programa y arma los resultados de cada curso
             acta = ic.getActaEstudio(estudiante.getNickname(), programa);
         } catch (Exception e) {
-            error(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            if (sinConexion(e)) {
+                Logger.error(e, "Acta de estudio: no se pudo conectar con el Servidor Central: ");
+                error(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "No se pudo conectar con el Servidor Central. Intente nuevamente más tarde.");
+            } else {
+                error(response, HttpServletResponse.SC_BAD_REQUEST, mensajeDelCentral(e));
+            }
             return;
         }
 
@@ -79,6 +84,23 @@ public class ActaEstudioServlet extends HttpServlet {
         response.setHeader("Cache-Control", "no-store");
         response.setContentLength(pdf.size());
         pdf.writeTo(response.getOutputStream());
+    }
+
+    // El cliente del Web Service envuelve el mensaje del Central ("Client received SOAP Fault from server: <mensaje>
+    // Please see the server log to find more detail..."): al estudiante se le muestra solo <mensaje>
+    private static String mensajeDelCentral(Exception e) {
+        String mensaje = e.getMessage() == null ? "" : e.getMessage();
+        mensaje = mensaje.replaceFirst("(?s)^Client received SOAP Fault from server:\\s*", "")
+                         .replaceFirst("(?s)\\s*Please see the server log.*$", "")
+                         .trim();
+        return mensaje.isEmpty() ? "No se pudo generar el acta de estudio." : mensaje;
+    }
+
+    // El Servidor Central no está levantado (o no se llega a su puerto)
+    private static boolean sinConexion(Throwable e) {
+        for (Throwable t = e; t != null; t = t.getCause())
+            if (t instanceof java.net.ConnectException) return true;
+        return false;
     }
 
     private static void error(HttpServletResponse response, int codigo, String mensaje) throws IOException {
