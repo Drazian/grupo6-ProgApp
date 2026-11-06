@@ -13,6 +13,7 @@
             <label for="nombre" style="display: block; font-weight: bold; margin-bottom: 5px; color: #444; font-size: 14px;">Nombre:</label>
             <input type="text" id="nombre" name="nombre" placeholder="Programita" required 
                    style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
+            <span id="errorNombre" style="font-size: 12px; display: block; margin-top: 5px;"></span>
         </div>
 
         <!-- Descripción -->

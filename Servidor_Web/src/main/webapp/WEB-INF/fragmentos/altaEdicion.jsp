@@ -32,6 +32,7 @@
         <div class="form-group">
             <label for="nombreEdicion">Nombre de la Edición:</label>
             <input type="text" id="nombreEdicion" name="nombre" required placeholder="Ej: Edición 2026 - Semestre 1">
+            <span id="errorNombre" style="font-size: 12px; display: block; margin-top: 5px;"></span>
         </div>
 
         <div style="display: flex; gap: 15px;">

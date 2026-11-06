@@ -104,6 +104,30 @@ public class UsuarioServlet extends HttpServlet {
                 response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al cargar la red social: " + e.getMessage() + "</h3>");
             }
 
+        } else if ("existeNickname".equals(accion)) {
+            //IBridgeSOAP ic = Fabrica.getConexion();
+            String nickname = request.getParameter("nickname");
+            try{
+                boolean existe = ic.existeUsuario(nickname);
+                response.setContentType("text/plain");
+                response.getWriter().write(String.valueOf(existe));
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al comprobar nickname: " + e.getMessage() + "</h3>");
+            }
+        
+        } else if ("existeCorreo".equals(accion)) {
+            //IBridgeSOAP ic = Fabrica.getConexion();
+            String correo = request.getParameter("correo");
+            try{
+                boolean existe = ic.existeEmail(correo);
+                response.setContentType("text/plain");
+                response.getWriter().write(String.valueOf(existe));
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al comprobar email: " + e.getMessage() + "</h3>");
+            }
+            
         } else if ("verPerfil".equals(accion)) {
             String nickname = request.getParameter("nickname");
 

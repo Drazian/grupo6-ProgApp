@@ -212,4 +212,13 @@ public interface IBridgeSOAP {
             @WebParam(name="bytesImagen") byte[] bytesImagen,
             @WebParam(name="nombreOriginal") String nombreOriginal) throws Exception;
 
+    @WebMethod(operationName="existeCurso")
+    boolean existeCurso(@WebParam(name="nombre") String nombre) throws Exception;
+
+    @WebMethod(operationName="existeProgramaFormacion")
+    boolean existeProgramaFormacion(@WebParam(name="nombre") String nombre) throws Exception;
+    
+        @WebMethod(operationName="existeEdicion")
+    boolean existeEdicion(@WebParam(name="nombre") String nombre) throws Exception;
+
 }

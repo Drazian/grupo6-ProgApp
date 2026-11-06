@@ -107,4 +107,9 @@ public interface IControlador {
 //***************************** Datos de Prueba ******************************//
     int cargarDatosDePrueba() throws Exception;
     
+    
+    public boolean existeCurso(String nombre) throws Exception;
+    public boolean existeProgramaFormacion(String nombre) throws Exception;
+    public boolean existeEdicion(String nombre) throws Exception;
+    
 }

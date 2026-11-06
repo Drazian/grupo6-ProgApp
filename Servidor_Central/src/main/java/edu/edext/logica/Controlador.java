@@ -1617,5 +1617,28 @@ public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente)
     }
 }
 
+    @Override
+    public boolean existeCurso(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            Curso curso = em.find(Curso.class, nombre);
+            return curso != null;
+        }
+    }
+    
+    @Override
+    public boolean existeProgramaFormacion(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
+            return programa != null;
+        }
+    }
+    
+    @Override
+    public boolean existeEdicion(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            Edicion edicion = em.find(Edicion.class, nombre);
+            return edicion != null;
+        }
+    }
     
 }
