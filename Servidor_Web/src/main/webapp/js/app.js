@@ -441,8 +441,47 @@ function ProgramaServlet(opcion) {
             if (opcion === 'formAgregarCurso') inicializarEventosAgregarCursoAPrograma();
             
             crearNuevoEstadoSPA(); // FIX: Nuevo estado
+            
+            if (opcion === 'formCrear') inicializarValidacionNombrePrograma();
         })
         .catch(error => console.error('Error al cargar la sección:', error));
+}
+
+function inicializarValidacionNombrePrograma() {
+    const inputPrograma = document.getElementById('nombre');
+    const errorPrograma = document.getElementById('errorNombre');
+
+    if (!inputPrograma || !errorPrograma) return;
+
+    let timeoutId;
+
+    inputPrograma.addEventListener('input', function() {
+        const nombrePrograma = inputPrograma.value.trim();
+        
+        if (nombrePrograma === '') {
+            errorPrograma.innerText = '';
+            return;
+        }
+
+        clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => {
+            fetch(`ProgramaServlet?accion=existePrograma&nombre=${encodeURIComponent(nombrePrograma)}`)
+                .then(response => response.text())
+                .then(existe => {
+                    if (existe.trim() === 'true') {
+                        errorPrograma.style.color = '#c0392b'; // Rojo
+                        errorPrograma.innerText = '⚠️ Este programa de formación ya existe.';
+                    } else {
+                        errorPrograma.style.color = '#27ae60'; // Verde
+                        errorPrograma.innerText = '✔ Nombre de programa disponible.';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al verificar el programa:", error);
+                });
+        }, 400);
+    });
 }
 
 function crearPrograma(){
@@ -654,10 +693,48 @@ function cargarAltaCurso() {
         .then(htmlString => {
             document.getElementById('contenido-dinamico').innerHTML = htmlString;
             crearNuevoEstadoSPA(); // FIX: Nuevo estado
+            inicializarValidacionNombreCurso();
         })
         .catch(error => {
             document.getElementById('contenido-dinamico').innerHTML = "<h3 style='color:red;'>No tienes permisos para ver esta sección.</h3>";
         });
+}
+
+function inicializarValidacionNombreCurso() {
+    const inputNombre = document.getElementById('nombre');
+    const errorNombre = document.getElementById('errorNombre');
+
+    if (!inputNombre || !errorNombre) return;
+
+    let timeoutId;
+
+    inputNombre.addEventListener('input', function() {
+        const nombreCurso = inputNombre.value.trim();
+        
+        if (nombreCurso === '') {
+            errorNombre.innerText = '';
+            return;
+        }
+
+        clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => {
+            fetch(`CursoServlet?accion=existeCurso&nombre=${encodeURIComponent(nombreCurso)}`)
+                .then(response => response.text())
+                .then(existe => {
+                    if (existe.trim() === 'true') {
+                        errorNombre.style.color = '#c0392b'; // Rojo
+                        errorNombre.innerText = '⚠️ Este curso ya existe.';
+                    } else {
+                        errorNombre.style.color = '#27ae60'; // Verde
+                        errorNombre.innerText = '✔ Nombre disponible.';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al verificar el curso:", error);
+                });
+        }, 400);
+    });
 }
 
 function cargarAltaUsuario() {
@@ -676,10 +753,121 @@ function cargarAltaUsuario() {
             document.getElementById('contenido-dinamico').innerHTML = html;
             inicializarEventosUsuario(); 
             crearNuevoEstadoSPA(); // FIX: Nuevo estado
+            inicializarValidacionContrasenas();
+            inicializarValidacionNickname();
+            inicializarValidacionCorreo();
         })
         .catch(error => console.error("Error al cargar la vista:", error));
 
 }
+
+function inicializarValidacionContrasenas() {
+    const password = document.getElementById('password');
+    const confirmar = document.getElementById('confirmarPassword');
+    const errorMsg = document.getElementById('errorPassword');
+
+    if (!password || !confirmar) return; // Por si acaso
+
+    function validar() {
+        if (password.value === '' && confirmar.value === '') {
+            errorMsg.innerText = '';
+            return;
+        }
+
+        if (confirmar.value !== password.value) {
+            errorMsg.style.color = '#c0392b';
+            errorMsg.innerText = '⚠️ Las contraseñas no coinciden.';
+        } else {
+            errorMsg.style.color = '#27ae60';
+            errorMsg.innerText = '✔ Las contraseñas coinciden.';
+        }
+    }
+
+    password.addEventListener('input', validar);
+    confirmar.addEventListener('input', validar);
+}
+
+function inicializarValidacionNickname() {
+    const inputNickname = document.getElementById('nickname');
+    const errorNickname = document.getElementById('errorNickname');
+
+    if (!inputNickname || !errorNickname) return;
+
+    let timeoutId; // Variable para guardar el temporizador
+
+    // Cambiamos 'blur' por 'input'
+    inputNickname.addEventListener('input', function() {
+        const nick = inputNickname.value.trim();
+        
+        if (nick === '') {
+            errorNickname.innerText = '';
+            return;
+        }
+
+        // Limpiamos el temporizador anterior si sigue escribiendo
+        clearTimeout(timeoutId);
+
+        // Esperamos 400ms desde que dejó de escribir para hacer la consulta
+        timeoutId = setTimeout(() => {
+            fetch(`UsuarioServlet?accion=existeNickname&nickname=${encodeURIComponent(nick)}`)
+                .then(response => response.text())
+                .then(existe => {
+                    if (existe.trim() === 'true') {
+                        errorNickname.style.color = '#c0392b';
+                        errorNickname.innerText = '⚠️ Este nickname ya está registrado.';
+                    } else {
+                        errorNickname.style.color = '#27ae60';
+                        errorNickname.innerText = '✔ Nickname disponible.';
+                    }
+                })
+                .catch(error => console.error("Error al verificar:", error));
+        }, 400); // 400 milisegundos de pausa
+    });
+}
+
+function inicializarValidacionCorreo() {
+    const inputCorreo = document.getElementById('email');
+    const errorCorreo = document.getElementById('errorCorreo');
+
+    if (!inputCorreo || !errorCorreo) return;
+
+    let timeoutId; // Variable para el temporizador de debounce
+
+    // Cambiamos 'blur' por 'input'
+    inputCorreo.addEventListener('input', function() {
+        const correo = inputCorreo.value.trim();
+        
+        // Si está vacío, limpiamos el mensaje
+        if (correo === '') {
+            errorCorreo.innerText = '';
+            return;
+        }
+
+        // Limpiamos el temporizador anterior si sigue escribiendo
+        clearTimeout(timeoutId);
+
+        // Esperamos 400ms desde que dejó de escribir para hacer la consulta
+        timeoutId = setTimeout(() => {
+            // Hacemos el fetch al servlet consultando la existencia
+            fetch(`UsuarioServlet?accion=existeCorreo&correo=${encodeURIComponent(correo)}`)
+                .then(response => response.text())
+                .then(existe => {
+                    if (existe.trim() === 'true') {
+                        errorCorreo.style.color = '#c0392b'; // Rojo
+                        errorCorreo.innerText = '⚠️ Este correo ya está registrado.';
+                    } else {
+                        errorCorreo.style.color = '#27ae60'; // Verde
+                        errorCorreo.innerText = '✔ Correo disponible.';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al verificar el correo:", error);
+                });
+        }, 400); // 400 milisegundos de pausa
+    });
+}
+
+
 
 function inicializarEventosUsuario() {
     fetch("UsuarioServlet?accion=listarInstitutos")
@@ -902,10 +1090,48 @@ function cargarAltaEdicion() {
         .then(html => {
             document.getElementById('contenido-dinamico').innerHTML = html;
             crearNuevoEstadoSPA(); // FIX: Nuevo estado
+            inicializarValidacionNombreEdicion();
         })
         .catch(error => {
             document.getElementById('contenido-dinamico').innerHTML = `<h3 style="color:red; text-align:center;">${error.message}</h3>`;
         });
+}
+
+function inicializarValidacionNombreEdicion() {
+    const inputEdicion = document.getElementById('nombreEdicion');
+    const errorEdicion = document.getElementById('errorNombre');
+
+    if (!inputEdicion || !errorEdicion) return;
+
+    let timeoutId;
+
+    inputEdicion.addEventListener('input', function() {
+        const nombreEdicion = inputEdicion.value.trim();
+        
+        if (nombreEdicion === '') {
+            errorEdicion.innerText = '';
+            return;
+        }
+
+        clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => {
+            fetch(`EdicionServlet?accion=existeEdicion&nombre=${encodeURIComponent(nombreEdicion)}`)
+                .then(response => response.text())
+                .then(existe => {
+                    if (existe.trim() === 'true') {
+                        errorEdicion.style.color = '#c0392b'; // Rojo
+                        errorEdicion.innerText = '⚠️ Esta edición ya existe.';
+                    } else {
+                        errorEdicion.style.color = '#27ae60'; // Verde
+                        errorEdicion.innerText = '✔ Nombre de edición disponible.';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al verificar la edición:", error);
+                });
+        }, 400);
+    });
 }
 
 function cargarCursosDeInstituto(nombreInstituto) {

@@ -8,6 +8,7 @@
         <div class="form-group">
             <label for="nickname">Nickname:</label>
             <input type="text" id="nickname" required>
+            <span id="errorNickname" style="font-size: 12px; display: block; margin-top: 5px;"></span>
         </div>
 
         <div class="form-group">
@@ -23,6 +24,7 @@
         <div class="form-group">
             <label for="email">Correo electrónico:</label>
             <input type="email" id="email" required>
+            <span id="errorCorreo" style="font-size: 12px; display: block; margin-top: 5px;"></span>
         </div>
 
         <div class="form-group">
@@ -33,6 +35,7 @@
         <div class="form-group">
             <label for="confirmarPassword">Confirmar contraseña:</label>
             <input type="password" id="confirmarPassword" required>
+            <span id="errorPassword" style="font-size: 12px; display: block; margin-top: 5px;"></span>
         </div>
         
         <div class="form-group">
