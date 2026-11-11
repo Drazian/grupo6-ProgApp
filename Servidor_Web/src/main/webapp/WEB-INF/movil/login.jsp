@@ -36,6 +36,11 @@
             </div>
 
             <button class="btn btn-primary btn-login w-100" type="submit">Login</button>
+
+            <%-- Desde el celular se entra por /web/ y se llega acá; los docentes (u otros) pueden pedir el sitio web --%>
+            <p class="mt-3 mb-0 small text-center">
+                <a href="${ctx}/?version=escritorio" id="link-version-escritorio">Ver versión de escritorio</a>
+            </p>
         </form>
     </main>
 
