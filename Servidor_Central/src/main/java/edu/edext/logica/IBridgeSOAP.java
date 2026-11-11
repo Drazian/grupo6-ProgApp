@@ -123,6 +123,11 @@ public interface IBridgeSOAP {
     int delInscripcion(
             @WebParam(name="estudiante") String estudiante,
             @WebParam(name="edicion") String edicion) throws Exception;
+    @WebMethod(operationName="modificarInscripcion")
+    int modificarInscripcion(
+            @WebParam(name="nomEstudiante") String nomEstudiante,
+            @WebParam(name="nomEdicion") String nomEdicion,
+            @WebParam(name="videoURL") String videoURL) throws Exception;
     @WebMethod(operationName="getInscripcionesCompletas")
     List<DtInscripcionEdicion> getInscripcionesCompletas(
             @WebParam(name="nombreEdicion") String nombreEdicion) throws Exception;

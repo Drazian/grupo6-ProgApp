@@ -66,6 +66,7 @@ public interface IControlador {
     int setInscripcion(String estudiante, String edicion) throws Exception;
     int setInscripcion(String nomEstudiante, String nomEdicion, String videoURL) throws Exception;   // exporta a Web
     int delInscripcion(String estudiante, String edicion) throws Exception; // exporta a Web
+    int modificarInscripcion(String nomEstudiante, String nomEdicion, String videoURL) throws Exception;   // exporta a Web
     List<String> getEstudiantesInscriptosEdicion(String nombre) throws Exception;
     List<String> getEstudiantesCandidatosEdicion(String nombre) throws Exception;
     List<DtUsuario> getEstudiantesInscriptosPrograma(String nombre) throws Exception;

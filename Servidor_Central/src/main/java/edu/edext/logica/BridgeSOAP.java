@@ -160,6 +160,10 @@ public class BridgeSOAP implements IBridgeSOAP{
         return bridge.delInscripcion(estudiante, edicion);
     }
     @Override
+    public int modificarInscripcion(String nomEstudiante, String nomEdicion, String videoURL) throws Exception{
+        return bridge.modificarInscripcion(nomEstudiante, nomEdicion, videoURL);
+    }
+    @Override
     public List<DtInscripcionEdicion> getInscripcionesCompletas(String nombreEdicion) throws Exception {
         return bridge.getInscripcionesCompletas(nombreEdicion);
     }

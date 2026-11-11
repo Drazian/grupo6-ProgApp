@@ -757,6 +757,19 @@ public class Controlador implements IControlador {
             cancel=null; }
         return ret;
     }
+    // Si el estudiante ya está inscripto a la edición, modifica los datos de su inscripción (el video). Códigos en InscripcionEdicionHelper
+    @Override
+    public int modificarInscripcion(String nomEstudiante, String nomEdicion, String videoURL) throws Exception{
+        InscripcionEdicionHelper modif=new InscripcionEdicionHelper(emf, "");
+        int ret=-1;
+        try {
+            ret=modif.modificarInscripcion(nomEstudiante, nomEdicion, videoURL);
+        } catch (Exception e) {}
+        finally{
+            modif.kill();
+            modif=null; }
+        return ret;
+    }
     @Override
     public List<String> getEstudiantesInscriptosEdicion(String nombre) throws Exception{
         List<String> ret;

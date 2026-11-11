@@ -149,6 +149,39 @@ public class InscripcionServlet extends HttpServlet {
                 break;
             }
 
+            // Inscripción a edición (letra 6.1): si el estudiante ya está inscripto a la edición elegida, responde los datos
+            // de su inscripción, para ofrecerle modificarlos o cancelar. Responde null si no está inscripto.
+            case "miInscripcion": {
+                DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los Estudiantes pueden realizar inscripciones.");
+                    return;
+                }
+                try {
+                    String edicion = request.getParameter("edicion");
+                    DtInscripcionEdicion mia = null;
+                    List<DtInscripcionEdicion> inscripciones = ic.getInscripcionesDeEstudiante(estudiante.getNickname());
+                    if (inscripciones != null && edicion != null)
+                        for (DtInscripcionEdicion ins : inscripciones)
+                            if (ins.getEdicion() != null && edicion.equals(ins.getEdicion().getNombre())) { mia = ins; break; }
+
+                    String json = "null";
+                    if (mia != null) {
+                        String[] estados = {"No inscripto", "Inscripto", "Aceptado", "Rechazado"};
+                        int estado = mia.getEstado();
+                        json = "{\"fecha\":" + textoJson(mia.getFechaInscripcion())
+                             + ",\"estado\":" + textoJson(estado >= 0 && estado < estados.length ? estados[estado] : String.valueOf(estado))
+                             + ",\"modificable\":" + (estado == 1)   // solo mientras el docente no la evaluó
+                             + ",\"videoURL\":" + textoJson(mia.getVideoURL()) + "}";
+                    }
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write(json);
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo tu inscripción a la edición.");
+                }
+                break;
+            }
+
             // =====================================================================
             // CASO DE USO: "SELECCIONAR ESTUDIANTES" (DOCENTE)
             // =====================================================================
@@ -477,12 +510,42 @@ public class InscripcionServlet extends HttpServlet {
                 } else if (resultado == 4) {
                      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                      response.getWriter().write("Error: La edición seleccionada ya finalizó.");
+                } else if (resultado == 3) {
+                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                     response.getWriter().write("Ya estás inscripto en esta edición: podés modificar los datos de tu inscripción o cancelar.");
                 } else {
                      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                     response.getWriter().write("Atención: Ya estás inscripto en esta edición.");
-//                     response.getWriter().write("No se pudo procesar. Es posible que ya estés inscripto a esta edición.");
+                     response.getWriter().write("No se pudo realizar la inscripción. Intente nuevamente.");
                 }
 
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("Error del sistema: " + e.getMessage());
+            }
+        }
+        // Inscripción a edición (letra 6.1): el estudiante que ya está inscripto modifica los datos de su inscripción (el video)
+        else if ("modificarInscripcion".equals(accion)) {
+            DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
+
+            if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("La sesión expiró o no tienes permisos de Estudiante.");
+                return;
+            }
+
+            try {
+                int resultado = ic.modificarInscripcion(estudiante.getNickname(), request.getParameter("edicion"), request.getParameter("videoURL"));
+                String mensaje;
+                switch (resultado) {
+                    case 0:  mensaje = "Se guardaron los cambios de tu inscripción."; break;
+                    case 1:  mensaje = "No estás inscripto en esta edición."; break;
+                    case 2:  mensaje = "Error: La edición de curso no existe."; break;
+                    case 3:  mensaje = "El docente ya evaluó tu inscripción: no se pueden modificar sus datos."; break;
+                    case 4:  mensaje = "La edición ya finalizó o fue cerrada: no se pueden modificar los datos de la inscripción."; break;
+                    default: mensaje = "No se pudo modificar la inscripción. Intente nuevamente.";
+                }
+                response.setStatus(resultado == 0 ? HttpServletResponse.SC_OK : HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(mensaje);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Error del sistema: " + e.getMessage());

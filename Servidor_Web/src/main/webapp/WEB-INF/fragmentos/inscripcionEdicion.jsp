@@ -48,6 +48,8 @@
                 <option value="">Primero seleccione un curso</option>
             </select>
             <div id="datos-edicion-inscripcion" style="display: none; margin-top: 10px; padding: 10px 12px; background: #f4f8fb; border: 1px solid #d6e4f0; border-radius: 4px; font-size: 14px; color: #2c3e50; line-height: 1.6;"></div>
+            <!-- Si ya está inscripto a la edición: puede modificar los datos de su inscripción o cancelar (letra 6.1) -->
+            <div id="aviso-inscripcion-existente" style="display: none; margin-top: 10px; padding: 10px 12px; border-radius: 4px; font-size: 14px; line-height: 1.6;"></div>
         </div>
 
         <!-- 4. Video de Motivación (Opcional) -->
@@ -57,7 +59,8 @@
         </div>
 
         <div class="form-actions" style="margin-top: 25px; text-align: right;">
-            <button type="submit" style="background-color: #3498db; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Confirmar Inscripción</button>
+            <button type="button" id="btnCancelarInscripcion" onclick="cancelarModificacionInscripcion()" style="display: none; background-color: #95a5a6; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; margin-right: 8px;">Cancelar</button>
+            <button type="submit" id="btnConfirmarInscripcion" style="background-color: #3498db; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Confirmar Inscripción</button>
         </div>
     </form>
 </div>
