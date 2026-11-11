@@ -253,4 +253,22 @@ public class BridgeSOAP implements IBridgeSOAP{
         return bridge.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);
     }
     
+    
+    
+    
+    @Override
+    public boolean existeCurso(String nombre) throws Exception{
+        return bridge.existeCurso(nombre);
+    }
+    
+    @Override
+    public boolean existeProgramaFormacion(String nombre) throws Exception{
+        return bridge.existeProgramaFormacion(nombre);
+    }
+    
+    @Override
+    public boolean existeEdicion(String nombre) throws Exception{
+        return bridge.existeEdicion(nombre);
+    }
+    
 }

@@ -87,6 +87,21 @@ public class ProgramaServlet extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/fragmentos/error.jsp").forward(request, response);
                 }
             break;
+
+            case "existePrograma": {
+                String nombre = request.getParameter("nombre");
+                try{
+                    boolean existe = ic.existeProgramaFormacion(nombre);
+                    response.setContentType("text/plain");
+                    response.getWriter().write(String.valueOf(existe));
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().write("<h3 style='color:red; text-align:center;'>Error al comprobar nombre: " + e.getMessage() + "</h3>");
+                }
+            }
+            break;
+
+
             
             case "detallePrograma":
                 try {

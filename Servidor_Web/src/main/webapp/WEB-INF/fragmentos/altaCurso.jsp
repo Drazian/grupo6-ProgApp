@@ -24,6 +24,7 @@
         <div class="form-group">
             <label for="nombre">Nombre del Curso:</label>
             <input type="text" id="nombre" name="nombre" required placeholder="Ej: Programación Avanzada">
+            <span id="errorNombre" style="font-size: 12px; display: block; margin-top: 5px;"></span>
         </div>
 
         <div class="form-group">
