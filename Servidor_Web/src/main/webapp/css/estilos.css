@@ -260,7 +260,5 @@ input[type="file"] {
     text-align: right;
     border-top: 1px solid #ecf0f1;
 }
-
-
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes scaleUp { to { transform: scale(1); } }

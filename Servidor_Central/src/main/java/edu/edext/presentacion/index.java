@@ -1,5 +1,7 @@
 package edu.edext.presentacion;
 
+import edu.edext.edEXT;
+import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
 import edu.edext.tools.indexHelper;
@@ -21,7 +23,6 @@ public class index extends javax.swing.JFrame {
         initComponents();
         form=new indexHelper(dpIndex);
         form.assignScroll();
-//        cfg.init();
         form.setScroll(true);  // Activa o desactiva el Scroll de la ventana padre
         form.setLimiteMin(true);  // true = Impide que el formulario salga fuera de la ventana del lado izquierdo
     }
@@ -63,7 +64,9 @@ public class index extends javax.swing.JFrame {
         jmcargarDatosPrueba = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        jMViewLogs = new javax.swing.JMenuItem();
+        jMAboutSOAP = new javax.swing.JMenuItem();
+        jMReboot = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(700, 437));
@@ -198,9 +201,17 @@ public class index extends javax.swing.JFrame {
         jMenuItem2.addActionListener(this::jMenuItem2ActionPerformed);
         jMenu1.add(jMenuItem2);
 
-        jMenuItem1.setText("About SOAP");
-        jMenuItem1.addActionListener(this::jMenuItem1ActionPerformed);
-        jMenu1.add(jMenuItem1);
+        jMViewLogs.setText("Ver logs");
+        jMViewLogs.addActionListener(this::jMViewLogsActionPerformed);
+        jMenu1.add(jMViewLogs);
+
+        jMAboutSOAP.setText("About SOAP");
+        jMAboutSOAP.addActionListener(this::jMAboutSOAPActionPerformed);
+        jMenu1.add(jMAboutSOAP);
+
+        jMReboot.setText("Reiniciar");
+        jMReboot.addActionListener(this::jMRebootActionPerformed);
+        jMenu1.add(jMReboot);
 
         mbIndex.add(jMenu1);
 
@@ -308,17 +319,26 @@ public class index extends javax.swing.JFrame {
         mouse.MouseDragged(evt);
     }//GEN-LAST:event_dpIndexMouseDragged
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void jMAboutSOAPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAboutSOAPActionPerformed
         try {
-            Desktop.getDesktop().browse(URI.create(cfg.wsdl()));
+            Desktop.getDesktop().browse(URI.create(cfg.getWSDL()));
         } catch (IOException ex) {
-            System.getLogger(index.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            Logger.error(ex, "Error al abrir en navegador");
         }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_jMAboutSOAPActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         form.cargarPanel("Configuracion",new Config(), true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMRebootActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMRebootActionPerformed
+        System.gc();
+        System.exit(edEXT.exit(edEXT.CODE_RESET));
+    }//GEN-LAST:event_jMRebootActionPerformed
+
+    private void jMViewLogsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMViewLogsActionPerformed
+        Utils.OS.open(cfg.PATH+"/logs");
+    }//GEN-LAST:event_jMViewLogsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -366,6 +386,9 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenuItem consultaCurso;
     private javax.swing.JMenuItem crearEdicion;
     private javax.swing.JDesktopPane dpIndex;
+    private javax.swing.JMenuItem jMAboutSOAP;
+    private javax.swing.JMenuItem jMReboot;
+    private javax.swing.JMenuItem jMViewLogs;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;

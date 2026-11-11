@@ -3,7 +3,7 @@ package edu.edext.controlador;
 import edu.edext.controlador.ws.IBridgeSOAPService;
 import edu.edext.controlador.ws.IBridgeSOAP;
 import jakarta.xml.ws.BindingProvider;
-import edu.edext.tools.cfg;
+import edu.edext.tools.cfgw;
 import org.tinylog.Logger;
 
 /**
@@ -16,8 +16,8 @@ public class Fabrica {
         IBridgeSOAPService service=new IBridgeSOAPService();
         IBridgeSOAP ret=service.getBridgeSOAPPort();
         BindingProvider tmp=(BindingProvider)ret;
-        tmp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, cfg.wsdl());
-        Logger.info("Conectando con : "+cfg.wsdl());
+        tmp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, cfgw.getWSDL());
+        Logger.info("Conectando con : "+cfgw.getWSDL());
         return ret;
     }
     

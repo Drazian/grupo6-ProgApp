@@ -541,7 +541,7 @@ public class Utils {
 //                    || pathOrigen.endsWith("#@.jpeg")
 //                    || pathOrigen.endsWith("#@.jpg")){
         public static void extractImage(String nombre){
-            save("#@."+cfg.PATH_INTERNAL+nombre, nombre);
+            save("#@."+cfg.PATH_INTERNAL_IMG+nombre, nombre);
         }
                     
         
@@ -558,7 +558,7 @@ public class Utils {
                     if(path.startsWith("#@."))
                         Origen=Origen.substring(3);
                     else
-                        Origen=cfg.PATH_INTERNAL+cfg.IMAGE_USER;                    
+                        Origen=cfg.PATH_INTERNAL_IMG+cfg.IMAGE_USER;                    
                     InputStream tmp = Imagen.class.getResourceAsStream(Origen);
                     if(tmp!=null){
                         Files.copy(tmp, Path.of(Destino), StandardCopyOption.REPLACE_EXISTING);
@@ -610,6 +610,7 @@ public class Utils {
             if(isExist(rutaFile))
                 new File(rutaFile).delete();
         }
+        
     /**
      * @param path      Ruta a ser analizada
      * @return          Devuelve un vector donde:
@@ -808,7 +809,7 @@ public class Utils {
         }
         public static void saveCfg(String ruta, String clave, String valor, boolean modo){
             createFolder(cfg.PATH);
-            if(Validate.isEmpty(ruta)) ruta=cfg.PATH_FILE;
+            if(Validate.isEmpty(ruta)) ruta=cfg.PATH_CONFIG_FILE;
             try (BufferedWriter tmpLog = new BufferedWriter(new FileWriter(ruta, modo))) {
                 // mas adelante tengo que agregar busqueda y remplazo del parametro
                 if("\n".equals(clave))
@@ -819,7 +820,7 @@ public class Utils {
                     tmpLog.write(valor);
                 else
                     tmpLog.write(clave+" : "+valor);
-//                Logger.debug("Archivo CFG guardado en ..: {}",cfg.PATH_FILE);
+//                Logger.debug("Archivo CFG guardado en ..: {}",cfg.PATH_CONFIG_FILE);
                 tmpLog.close();
             } catch (IOException e) {
                 Logger.error(e.getMessage(),"Error al guardar CFG... ");
@@ -831,6 +832,34 @@ public class Utils {
     public final class OS {
 
         public static final String SymHome="~";
+
+        public static void run(String comando){
+            if(!Utils.Validate.isEmpty(comando)){
+                try {
+                    Runtime.getRuntime().exec(comando); }
+                catch (Exception ex) { System.err.println(ex); } }
+        }
+
+        public static void open(String comando){
+            if(!Utils.Validate.isEmpty(comando)){
+                if(!comando.startsWith("http://") || !comando.startsWith("https://") || !comando.startsWith("www.")){
+                    comando=comando.replace(getSeparador()+"~"+getSeparador(), getHomePath()+getSeparador());
+                    comando=comando.replace("~"+getSeparador(), getHomePath()+getSeparador());
+                    if(!comando.startsWith(getSeparador()))
+                        if(comando.startsWith(getHomePath().substring(1)+getSeparador()))
+                            comando=getSeparador()+comando;
+                }else
+                    if(comando.startsWith("www."))  comando=comando.replace("www.", "https://www.");
+                if(isLinux())
+                    run("xdg-open "+comando);
+                if(isMac())
+                    run("open "+comando);
+                if(isWindows())
+                    run("rundll32 SHELL32.DLL,ShellExec_RunDLL "+comando);
+            }
+        }
+
+
         
     ///@return   Devuelve el nombre del paquete
         public static String getPaqueteName(Object obj){
@@ -893,6 +922,32 @@ public class Utils {
                 Logger.error("Error al Abrir el link");
             }
         }
+        
+        public static int scanPortFree(String puerto){
+            return scanPortFree(Cast.valuOf(puerto));
+        }
+        public static int scanPortFree(int puerto){
+            boolean flag=true;
+            int ret;
+            for(ret=puerto; ret<65536; ret++){
+//                System.out.println("Puesto testeado : "+ret);
+                if(isPortFree(ret)){
+                    flag=false;
+                    break; } }
+            if(flag)
+                for(ret=puerto-1; ret>1023; ret--){
+//                    System.out.println("Puesto testeado : "+ret);
+                    if(isPortFree(ret))
+                        break; }
+            if(ret>65525 || ret<1024){
+                ret=-1;
+                System.err.println("Sin puertos disponibles.");
+                Logger.error("Sin puertos disponibles.");
+            }//else
+               // System.err.println("Puertos disponible :"+ret);
+            return ret;
+        }
+        
         public static int getPortFree(){
             try (ServerSocket ret=new ServerSocket(0)){
                 return ret.getLocalPort();

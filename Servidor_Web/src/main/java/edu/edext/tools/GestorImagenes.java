@@ -1,6 +1,6 @@
 package edu.edext.tools;
 
-import edu.edext.tools.cfg;
+import edu.edext.tools.cfgw;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.io.IOException;
 public class GestorImagenes {
 
     // Ruta absoluta en el disco del sistema (ej: C:\Users\TuUsuario\edext_imagenes\ en Windows)
-    private static final String RUTA_BASE = cfg.fullpathImagen();
+    private static final String RUTA_BASE = cfgw.fullpathImagen();
 //            System.getProperty("user.home") 
 //            + File.separator + "edext_imagenes" + File.separator;
  

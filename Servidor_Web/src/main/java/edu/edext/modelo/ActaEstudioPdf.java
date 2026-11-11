@@ -27,6 +27,7 @@ import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
+import edu.edext.controlador.ws.ResultadoCurso;
 import edu.edext.tools.Utils;
 import java.io.IOException;
 import java.io.OutputStream;

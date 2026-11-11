@@ -17,6 +17,7 @@ import edu.edext.controlador.ws.TipoUsuario;
 
 import edu.edext.controlador.ws.MapEntry;
 import edu.edext.controlador.ws.MapWrapper;
+import edu.edext.modelo.Remux;
 import edu.edext.tools.Utils;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -587,7 +588,7 @@ public class InscripcionServlet extends HttpServlet {
 //                    evaluar.getEntry().add(entryCliente);
 //                }
                 
-                ic.evaluarInscripciones(nombreEdicion, toWrapper(evaluaciones));
+                ic.evaluarInscripciones(nombreEdicion, Remux.Map(evaluaciones));
 //                ic.evaluarInscripciones(nombreEdicion, evaluaciones);
                 
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -633,7 +634,7 @@ public class InscripcionServlet extends HttpServlet {
             }
 
             try {
-                ic.ingresarResultados(nombreEdicion, docente.getNickname(), toWrapper(notas), cerrar);
+                ic.ingresarResultados(nombreEdicion, docente.getNickname(), Remux.Map(notas), cerrar);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write(cerrar
                         ? "Notas guardadas y edición cerrada. Ya puede consultar el acta en \"Ver Resultados de Evaluaciones\"."
@@ -645,17 +646,6 @@ public class InscripcionServlet extends HttpServlet {
         }
     }
     
-    private MapWrapper toWrapper(Map<String, Integer>  map){
-        MapWrapper ret = new MapWrapper();
-        for(Map.Entry<String, Integer> entry : map.entrySet()){
-            MapEntry entryCliente = new MapEntry();
-            entryCliente.setKey(entry.getKey());
-            entryCliente.setValue(entry.getValue());
-            ret.getEntry().add(entryCliente);
-        }
-        return ret;
-    }
-
     // Texto como valor JSON (entre comillas y escapado); null -> null
     private static String textoJson(String valor){
         if (valor == null) return "null";
@@ -674,5 +664,5 @@ public class InscripcionServlet extends HttpServlet {
         }
         return sb.append('"').toString();
     }
-
+    
 }
