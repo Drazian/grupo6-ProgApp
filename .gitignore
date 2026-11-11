@@ -1,4 +1,7 @@
 /target/
 /Servidor_Central/target/
 /Servidor_Web/target/
-/Servidor_Movil/target/
+/Daemons/target/
+/Daemons/Central/target/
+/Daemons/Cli/target/
+/Daemons/Web/target/

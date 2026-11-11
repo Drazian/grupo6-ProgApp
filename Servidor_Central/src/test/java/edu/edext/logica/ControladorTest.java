@@ -804,7 +804,7 @@ public class ControladorTest {
         ic.crearUsuario(usuario, null, "imagen.png");
 
         //*********************** Nuevo ****************************************
-        String pathImage=cfg.PATH_INTERNAL.substring(1)+"benkenobi.jpg";
+        String pathImage=cfg.PATH_INTERNAL_IMG.substring(1)+"benkenobi.jpg";
         byte[] imagen=null;
           InputStream tmpImage = ControladorTest.class.getClassLoader().getResourceAsStream(pathImage);
           assertNotNull(tmpImage, "Error cargando la imagen "+pathImage);
@@ -939,7 +939,7 @@ public class ControladorTest {
         LocalDate fecha=LocalDate.now();
         String nickname="NICKNAME", nickname2="NICKNAME_DOCENTE", email="nick@gamil.com";
         String email2="nick_docente@gamil.com";   // el email es unico por usuario: el docente no puede usar el del estudiante
-        String pathImage=cfg.PATH_INTERNAL.substring(1)+"benkenobi.jpg";
+        String pathImage=cfg.PATH_INTERNAL_IMG.substring(1)+"benkenobi.jpg";
         institutos.add("Física");
         institutos.add("Eléctrica");
         

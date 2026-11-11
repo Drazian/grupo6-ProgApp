@@ -1,17 +1,20 @@
 package edu.edext.modelo;
 
-import edu.edext.tools.Utils;
 import edu.edext.controlador.ws.DtInscripcionEdicion;
 import edu.edext.controlador.ws.TipoUsuario;
 import edu.edext.controlador.ws.DtCategoria;
 import edu.edext.controlador.ws.DtInstituto;
 import edu.edext.controlador.ws.DtPrograma;
+import edu.edext.controlador.ws.MapWrapper;
 import edu.edext.controlador.ws.DtUsuario;
 import edu.edext.controlador.ws.DtEdicion;
+import edu.edext.controlador.ws.MapEntry;
 import edu.edext.controlador.ws.DtCurso;
+import edu.edext.tools.Utils;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -125,4 +128,16 @@ public class Remux {
         ret.setNombre(nombre);
         return ret;
     }
+    
+    public static MapWrapper Map(Map<String, Integer>  map){
+        MapWrapper ret = new MapWrapper();
+        for(Map.Entry<String, Integer> entry : map.entrySet()){
+            MapEntry entryCliente = new MapEntry();
+            entryCliente.setKey(entry.getKey());
+            entryCliente.setValue(entry.getValue());
+            ret.getEntry().add(entryCliente);
+        }
+        return ret;
+    }
+
 }

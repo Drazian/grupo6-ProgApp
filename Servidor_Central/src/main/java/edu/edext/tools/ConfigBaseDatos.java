@@ -28,22 +28,39 @@ import org.w3c.dom.NodeList;
  */
 public final class ConfigBaseDatos {
 
-    public static final String ARCHIVO = "servidor.properties";
+//    public static final String ARCHIVO = "servidor.properties";
+
+//    public static final String ARCHIVO = cfg.PATH_CONFIG_DB.substring(cfg.PATH_CONFIG_DB.lastIndexOf(Utils.OS.getSeparador())+1);
 
     // clave en servidor.properties -> propiedad JPA de persistence.xml, con su descripcion para el archivo
+//    private static final String[][] CLAVES = {
+//        {"db.url",      "jakarta.persistence.jdbc.url",      "URL de conexion JDBC (servidor, puerto y nombre de la base)"},
+//        {"db.driver",   "jakarta.persistence.jdbc.driver",   "Driver JDBC"},
+//        {"db.usuario",  "jakarta.persistence.jdbc.user",     "Usuario de la base de datos"},
+//        {"db.password", "jakarta.persistence.jdbc.password", "Contrasena del usuario"},
+//        {"db.esquema",  "jakarta.persistence.schema-generation.database.action", "Creacion de tablas al iniciar: none | create | drop-and-create | update"},
+//    };
     private static final String[][] CLAVES = {
-        {"db.url",      "jakarta.persistence.jdbc.url",      "URL de conexion JDBC (servidor, puerto y nombre de la base)"},
-        {"db.driver",   "jakarta.persistence.jdbc.driver",   "Driver JDBC"},
-        {"db.usuario",  "jakarta.persistence.jdbc.user",     "Usuario de la base de datos"},
-        {"db.password", "jakarta.persistence.jdbc.password", "Contrasena del usuario"},
-        {"db.esquema",  "jakarta.persistence.schema-generation.database.action", "Creacion de tablas al iniciar: none | create | drop-and-create | update"},
+        {"db.url",      "jakarta.persistence.jdbc.url",      "URL de conexion JDBC.\n"+
+                        "# Para mariaDB : jdbc:mariadb://localhost:3306/edext?createDatabaseIfNotExist=true\n"+
+                        "# Para mySQL : jdbc:mysql://localhost:3306/edext?createDatabaseIfNotExist=true&amp;allowPublicKeyRetrieval=true&amp;useSSL=false&amp;serverTimezone=UTC"},
+        {"db.driver",   "jakarta.persistence.jdbc.driver",   "Driver JDBC\n# Para mariaDB : org.mariadb.jdbc.Driver\n# Para mySQL : com.mysql.cj.jdbc.Driver"},
+        {"db.usuario",  "jakarta.persistence.jdbc.user",     "Usuario\n# Usuario en el laboratorio 16 : tecnologo"},
+        {"db.password", "jakarta.persistence.jdbc.password", "Contrasena\n# Contraseña en el laboratorio 16 : tecnologo"},
+        {"db.esquema",  "jakarta.persistence.schema-generation.database.action", "Modo de Inicializacion: none | create | drop-and-create | update\n"+
+                        "# • none: No modifica el esquema de la DB ni la genera en caso su ausencia.\n" +
+                        "# • create: Crea las tablas y estructuras cada vez que se inicialice la aplicacion.\n" +
+                        "# • drop-and-create: Elimina todas las tablas existentes y las vuelve a crear.\n" +
+                        "# • update: Actualiza la estructura de la DB, agregando a ella las nuevas tablas y estructuras."},
     };
 
     private ConfigBaseDatos() { }
 
-    /** Ruta del archivo: ~/.edEXT/servidor.properties */
     public static Path archivo() {
-        return Path.of(System.getProperty("user.home"), ".edEXT", ARCHIVO);
+//        System.out.println(ARCHIVO);
+//        System.out.println(cfg.PATH_CONFIG_DB);
+        return Path.of(cfg.PATH_CONFIG_DB);
+        //return Path.of(cfg.PATH, cfg.PATH_CONFIG_DB.substring(cfg.PATH_CONFIG_DB.lastIndexOf(Utils.OS.getSeparador())));
     }
 
     /**
@@ -64,9 +81,9 @@ public final class ConfigBaseDatos {
                 if (valor != null && !valor.isBlank())
                     ret.put(c[1], valor.trim());
             }
-            Logger.info("Base de datos: {} (usuario {}). Configuracion: {}",
-                    ret.getOrDefault(CLAVES[0][1], defecto.get(CLAVES[0][1])),
-                    ret.getOrDefault(CLAVES[2][1], defecto.get(CLAVES[2][1])), ruta);
+//            Logger.info("Base de datos: {} (usuario {}). Configuracion: {}",
+//                    ret.getOrDefault(CLAVES[0][1], defecto.get(CLAVES[0][1])),
+//                    ret.getOrDefault(CLAVES[2][1], defecto.get(CLAVES[2][1])), ruta);
         } catch (Exception e) {
             // Sin el archivo se usa persistence.xml, como antes
             Logger.error(e, "No se pudo leer la configuracion de la base de datos en {}: se usa la de persistence.xml", ruta);
@@ -86,9 +103,11 @@ public final class ConfigBaseDatos {
         StringBuilder sb = new StringBuilder();
         String nl = System.lineSeparator();
         if (!existe) {
-            sb.append("# edEXT - Servidor Central: conexion a la base de datos").append(nl)
-              .append("# Se puede modificar sin volver a generar servidor.jar; reiniciar el Servidor Central para aplicar los cambios.").append(nl)
-              .append("# La carpeta de imagenes y la direccion del Web Service estan en edEXT.cfg.").append(nl);
+//            sb.append("# edEXT - Servidor Central: conexion a la base de datos").append(nl)
+//              .append("# Se puede modificar sin volver a generar servidor.jar; reiniciar el Servidor Central para aplicar los cambios.").append(nl)
+//              .append("# La carpeta de imagenes y la direccion del Web Service estan en edEXT.cfg.").append(nl);
+            sb.append("# Configuracion de conexion de la dase de datos").append(nl)
+              .append("# Si se modifica, por favor reiniciar el servicio edEXT para aplicar los cambios.").append(nl);
         }
         boolean faltan = false;
         for (String[] c : CLAVES) {
@@ -105,7 +124,7 @@ public final class ConfigBaseDatos {
         if (existe && !terminaEnSalto(ruta)) sb.insert(0, nl);
         Files.writeString(ruta, sb.toString(), StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        Logger.info("{} {}", existe ? "Se agregaron claves de la base de datos a" : "Se creo", ruta);
+//        Logger.info("{} {}", existe ? "Se agregaron claves de la base de datos a" : "Se creo", ruta);
     }
 
     // Valores por defecto: las propiedades de META-INF/persistence.xml (unidad "edext")
