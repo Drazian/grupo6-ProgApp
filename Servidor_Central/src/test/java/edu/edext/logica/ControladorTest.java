@@ -729,6 +729,32 @@ public class ControladorTest {
         // 0 = cancelada; -1 = error al cancelar
         assertEquals(1, resultado, "Un estudiante inexistente no tiene inscripción para cancelar");
     }
+
+    @Test
+    public void testModificarInscripcion() throws Exception {
+        // Letra 6.1: si ya está inscripto, el estudiante puede modificar los datos (el video) de su inscripción
+        String estudiante = "weiss";
+        String edicion = "MicroBit - 2026";
+        ic.delInscripcion(estudiante, edicion);
+        try {
+            assertEquals(1, ic.modificarInscripcion(estudiante, edicion, "https://youtu.be/nuevo"), "Sin inscripción no hay nada que modificar");
+            assertEquals(2, ic.modificarInscripcion(estudiante, "", "https://youtu.be/nuevo"), "La edición no existe");
+
+            assertEquals(0, ic.setInscripcion(estudiante, edicion, "https://youtu.be/viejo"));
+            assertEquals(3, ic.setInscripcion(estudiante, edicion, "https://youtu.be/otro"), "Inscribirse de nuevo no cambia la inscripción");
+            assertEquals(0, ic.modificarInscripcion(estudiante, edicion, "https://youtu.be/nuevo"));
+            DtInscripcionEdicion inscripcion = ic.getInscripcionesDeEstudiante(estudiante).stream()
+                    .filter(i -> i.getEdicion().getNombre().equals(edicion)).findFirst().orElseThrow();
+            assertEquals("https://youtu.be/nuevo", inscripcion.getVideoURL(), "Se guarda el video nuevo");
+            assertEquals(InscripcionEdicionHelper.INSCRIPTO, inscripcion.getEstado(), "Sigue en estado Inscripto");
+
+            // Una vez evaluada por el docente ya no se puede modificar
+            ic.evaluarInscripciones(edicion, Map.of(estudiante, InscripcionEdicionHelper.ACEPTADO));
+            assertEquals(3, ic.modificarInscripcion(estudiante, edicion, "https://youtu.be/otro"), "Ya fue evaluada");
+        } finally {
+            ic.delInscripcion(estudiante, edicion);
+        }
+    }
     
     @Test
     public void testAltaCategoria() throws Exception {

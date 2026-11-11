@@ -200,6 +200,8 @@ public class ProgramaServlet extends HttpServlet {
                     // ************************** Comentar para compilar **************************
                 DtPrograma programa = Remux.DtPrograma(nombre, desc, fechaRegistro, fechaInicio, fechaFin);
                     // ****************************************************************************
+                // El programa queda asociado al docente que lo crea (el Central lo toma de DtPrograma.docente)
+                programa.setDocente(logueado.getNickname());
                 
                 try {
                     boolean resultado = ic.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);

@@ -8,6 +8,7 @@ package edu.edext.controlador;
 //import edu.edext.logica.IBridgeSOAP;
 //import edu.edext.logica.IControlador;
 
+import edu.edext.controlador.ws.DtConsultaCurso;
 import edu.edext.controlador.ws.DtEdicion;
 import edu.edext.controlador.ws.DtInscripcionEdicion;
 import edu.edext.controlador.ws.DtUsuario;
@@ -16,7 +17,10 @@ import edu.edext.controlador.ws.TipoUsuario;
 
 import edu.edext.controlador.ws.MapEntry;
 import edu.edext.controlador.ws.MapWrapper;
+import edu.edext.tools.Utils;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Comparator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -52,6 +56,8 @@ public class InscripcionServlet extends HttpServlet {
 
                 try {
                     request.setAttribute("institutos", ic.listarInstitutos());
+                    // El estudiante puede buscar el curso por instituto o por categoría
+                    request.setAttribute("categorias", ic.listarCategorias());
                     request.getRequestDispatcher("/WEB-INF/fragmentos/inscripcionEdicion.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -75,6 +81,103 @@ public class InscripcionServlet extends HttpServlet {
                     response.getWriter().write(json.toString());
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo ediciones.");
+                }
+                break;
+            }
+
+            // Inscripción a edición: cursos de una categoría (el estudiante busca por instituto o por categoría)
+            case "cursosPorCategoria": {
+                try {
+                    List<String> cursos = new ArrayList<>();
+                    List<String> delCentral = ic.listarCursosPorCategoria(request.getParameter("categoria"));
+                    if (delCentral != null) cursos.addAll(delCentral);
+                    cursos.sort(String.CASE_INSENSITIVE_ORDER);
+                    StringBuilder json = new StringBuilder("[");
+                    for (int i = 0; i < cursos.size(); i++) {
+                        if (i > 0) json.append(",");
+                        json.append(textoJson(cursos.get(i)));
+                    }
+                    json.append("]");
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write(json.toString());
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo los cursos de la categoría.");
+                }
+                break;
+            }
+
+            // Inscripción a edición: ediciones vigentes del curso (no cerradas y que todavía no terminaron)
+            // con sus datos básicos, para mostrarlos antes de confirmar la inscripción
+            case "edicionesVigentes": {
+                try {
+                    DtConsultaCurso curso = ic.obtenerDatosCurso(request.getParameter("curso"));
+                    LocalDate hoy = LocalDate.now();
+                    List<DtEdicion> vigentes = new ArrayList<>();
+                    if (curso != null && curso.getEdiciones() != null)
+                        for (DtEdicion ed : curso.getEdiciones()) {
+                            boolean cerrada = ed.isCerrada() || (ed.getFechaCierre() != null && !ed.getFechaCierre().isBlank());
+                            LocalDate fin = Utils.Cast.valueOf(ed.getFechaFin());
+                            if (!cerrada && (fin == null || !fin.isBefore(hoy)))
+                                vigentes.add(ed);
+                        }
+                    vigentes.sort(Comparator.comparing((DtEdicion ed) -> Utils.Cast.valueOf(ed.getFechaInicio()),
+                            Comparator.nullsLast(Comparator.naturalOrder())));
+
+                    StringBuilder json = new StringBuilder("[");
+                    for (int i = 0; i < vigentes.size(); i++) {
+                        DtEdicion ed = vigentes.get(i);
+                        List<String> docentes = new ArrayList<>();
+                        for (DtUsuario d : ed.getDocentes()) {
+                            String nombre = ((d.getNombre() == null ? "" : d.getNombre()) + " " + (d.getApellido() == null ? "" : d.getApellido())).trim();
+                            docentes.add(nombre.isEmpty() ? d.getNickname() : nombre);
+                        }
+                        if (i > 0) json.append(",");
+                        json.append("{\"nombre\":").append(textoJson(ed.getNombre()))
+                            .append(",\"fechaInicio\":").append(textoJson(ed.getFechaInicio()))
+                            .append(",\"fechaFin\":").append(textoJson(ed.getFechaFin()))
+                            .append(",\"fechaPublicacion\":").append(textoJson(ed.getFechaPublicacion()))
+                            .append(",\"cupo\":").append(ed.getCupo() == null ? "null" : String.valueOf(ed.getCupo()))
+                            .append(",\"docentes\":").append(textoJson(String.join(", ", docentes)))
+                            .append("}");
+                    }
+                    json.append("]");
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write(json.toString());
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo las ediciones del curso.");
+                }
+                break;
+            }
+
+            // Inscripción a edición (letra 6.1): si el estudiante ya está inscripto a la edición elegida, responde los datos
+            // de su inscripción, para ofrecerle modificarlos o cancelar. Responde null si no está inscripto.
+            case "miInscripcion": {
+                DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
+                if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los Estudiantes pueden realizar inscripciones.");
+                    return;
+                }
+                try {
+                    String edicion = request.getParameter("edicion");
+                    DtInscripcionEdicion mia = null;
+                    List<DtInscripcionEdicion> inscripciones = ic.getInscripcionesDeEstudiante(estudiante.getNickname());
+                    if (inscripciones != null && edicion != null)
+                        for (DtInscripcionEdicion ins : inscripciones)
+                            if (ins.getEdicion() != null && edicion.equals(ins.getEdicion().getNombre())) { mia = ins; break; }
+
+                    String json = "null";
+                    if (mia != null) {
+                        String[] estados = {"No inscripto", "Inscripto", "Aceptado", "Rechazado"};
+                        int estado = mia.getEstado();
+                        json = "{\"fecha\":" + textoJson(mia.getFechaInscripcion())
+                             + ",\"estado\":" + textoJson(estado >= 0 && estado < estados.length ? estados[estado] : String.valueOf(estado))
+                             + ",\"modificable\":" + (estado == 1)   // solo mientras el docente no la evaluó
+                             + ",\"videoURL\":" + textoJson(mia.getVideoURL()) + "}";
+                    }
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write(json);
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo tu inscripción a la edición.");
                 }
                 break;
             }
@@ -407,12 +510,42 @@ public class InscripcionServlet extends HttpServlet {
                 } else if (resultado == 4) {
                      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                      response.getWriter().write("Error: La edición seleccionada ya finalizó.");
+                } else if (resultado == 3) {
+                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                     response.getWriter().write("Ya estás inscripto en esta edición: podés modificar los datos de tu inscripción o cancelar.");
                 } else {
                      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                     response.getWriter().write("Atención: Ya estás inscripto en esta edición.");
-//                     response.getWriter().write("No se pudo procesar. Es posible que ya estés inscripto a esta edición.");
+                     response.getWriter().write("No se pudo realizar la inscripción. Intente nuevamente.");
                 }
 
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("Error del sistema: " + e.getMessage());
+            }
+        }
+        // Inscripción a edición (letra 6.1): el estudiante que ya está inscripto modifica los datos de su inscripción (el video)
+        else if ("modificarInscripcion".equals(accion)) {
+            DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
+
+            if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("La sesión expiró o no tienes permisos de Estudiante.");
+                return;
+            }
+
+            try {
+                int resultado = ic.modificarInscripcion(estudiante.getNickname(), request.getParameter("edicion"), request.getParameter("videoURL"));
+                String mensaje;
+                switch (resultado) {
+                    case 0:  mensaje = "Se guardaron los cambios de tu inscripción."; break;
+                    case 1:  mensaje = "No estás inscripto en esta edición."; break;
+                    case 2:  mensaje = "Error: La edición de curso no existe."; break;
+                    case 3:  mensaje = "El docente ya evaluó tu inscripción: no se pueden modificar sus datos."; break;
+                    case 4:  mensaje = "La edición ya finalizó o fue cerrada: no se pueden modificar los datos de la inscripción."; break;
+                    default: mensaje = "No se pudo modificar la inscripción. Intente nuevamente.";
+                }
+                response.setStatus(resultado == 0 ? HttpServletResponse.SC_OK : HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(mensaje);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Error del sistema: " + e.getMessage());
@@ -522,5 +655,24 @@ public class InscripcionServlet extends HttpServlet {
         }
         return ret;
     }
-    
+
+    // Texto como valor JSON (entre comillas y escapado); null -> null
+    private static String textoJson(String valor){
+        if (valor == null) return "null";
+        StringBuilder sb = new StringBuilder("\"");
+        for (char c : valor.toCharArray()) {
+            switch (c) {
+                case '"':  sb.append("\\\""); break;
+                case '\\': sb.append("\\\\"); break;
+                case '\n': sb.append("\\n"); break;
+                case '\r': sb.append("\\r"); break;
+                case '\t': sb.append("\\t"); break;
+                default:
+                    if (c < 0x20) sb.append(String.format("\\u%04x", (int) c));
+                    else sb.append(c);
+            }
+        }
+        return sb.append('"').toString();
+    }
+
 }

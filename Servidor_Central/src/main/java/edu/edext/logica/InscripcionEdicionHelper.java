@@ -154,7 +154,44 @@ public class InscripcionEdicionHelper {
     // 4 la edicion ya finalizo
     // -1 error
     public static final int INSCRIPTO=1, ACEPTADO=2, RECHAZADO=3;
-    
+
+    /**
+     * Inscripción a edición (letra 6.1): si el estudiante ya está inscripto, puede modificar los datos
+     * de su inscripción (el video de motivación). Se permite mientras el docente no la haya evaluado
+     * (sigue en estado Inscripto) y la edición no haya terminado ni esté cerrada. La fecha de inscripción no cambia.
+     * @param videoURL nuevo video; vacío o null lo quita
+     * @return 0 éxito, 1 no está inscripto, 2 la edición no existe, 3 ya fue evaluada (Aceptado o Rechazado),
+     *         4 la edición ya finalizó o está cerrada, -1 error
+     */
+    public int modificarInscripcion(String nomEstudiante, String nomEdicion, String videoURL){
+        int ret=-1;
+        db=DB.createEntityManager();
+        try {
+            db.getTransaction().begin();
+            Edicion edicion = db.find(Edicion.class, nomEdicion);
+            if (edicion==null){ db.getTransaction().rollback(); return 2; }
+            InscripcionEdicion inscripcion = db.find(InscripcionEdicion.class, new InscripcionEdicionID(nomEstudiante, nomEdicion));
+            if (inscripcion==null){ db.getTransaction().rollback(); return 1; }
+            if (edicion.isCerrada() || (edicion.getFechaFin()!=null && edicion.getFechaFin().isBefore(LocalDate.now()))){
+                db.getTransaction().rollback();
+                return 4;
+            }
+            if (inscripcion.getEstado()!=INSCRIPTO){ db.getTransaction().rollback(); return 3; }
+            inscripcion.setVideoURL(videoURL==null || videoURL.isBlank() ? null : videoURL.trim());
+            db.getTransaction().commit();
+            Logger.info("El estudiante {} modificó su inscripción a la edición {}", nomEstudiante, nomEdicion);
+            ret=0;
+        } catch (Exception e) {
+            if(db.getTransaction().isActive()) db.getTransaction().rollback();
+            Logger.error(e, "Error al modificar la inscripción del estudiante {} a la edición {}", nomEstudiante, nomEdicion);
+            ret=-1;
+        } finally {
+            db.close();
+            db=null;
+        }
+        return ret;
+    }
+
     public int cancelarInscripcion(String nomEstudiante, String nomEdicion){ // incompleta falta aislacion y modularizacion
         int ret=-1;
         db=DB.createEntityManager();

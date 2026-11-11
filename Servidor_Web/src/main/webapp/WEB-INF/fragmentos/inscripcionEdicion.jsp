@@ -10,13 +10,25 @@
 
     <form id="formInscripcionEdicion" onsubmit="inscribirEdicion(event)">
          
-        <!-- 1. Selección de Instituto -->
+        <!-- 1. El curso se busca por Instituto o por Categoría (letra 6.1) -->
         <div class="form-group">
-            <label for="instInscripcion" style="font-weight: bold;">1. Seleccione el Instituto:</label>
-            <select id="instInscripcion" onchange="cargarCursosParaInscripcion(this.value)" required style="width: 100%; padding: 8px;">
+            <span style="font-weight: bold;">1. Buscar el curso por:</span>
+            <label style="margin-left: 12px; cursor: pointer;">
+                <input type="radio" name="filtroInscripcion" value="instituto" checked onchange="cambiarFiltroInscripcion(this.value)"> Instituto
+            </label>
+            <label style="margin-left: 12px; cursor: pointer;">
+                <input type="radio" name="filtroInscripcion" value="categoria" onchange="cambiarFiltroInscripcion(this.value)"> Categoría
+            </label>
+            <select id="instInscripcion" onchange="cargarCursosParaInscripcion(this.value)" required style="width: 100%; padding: 8px; margin-top: 8px;">
                 <option value="">Seleccione un Instituto...</option>
                 <c:forEach var="inst" items="${institutos}">
-                    <option value="${inst.nombre}">${inst.nombre}</option>
+                    <option value="<c:out value='${inst.nombre}'/>"><c:out value="${inst.nombre}"/></option>
+                </c:forEach>
+            </select>
+            <select id="catInscripcion" onchange="cargarCursosPorCategoriaParaInscripcion(this.value)" style="display: none; width: 100%; padding: 8px; margin-top: 8px;">
+                <option value="">Seleccione una Categoría...</option>
+                <c:forEach var="cat" items="${categorias}">
+                    <option value="<c:out value='${cat.nombre}'/>"><c:out value="${cat.nombre}"/></option>
                 </c:forEach>
             </select>
         </div>
@@ -29,12 +41,15 @@
             </select>
         </div>
 
-        <!-- 3. Selección de Edición Vigente (Habilitado por AJAX) -->
+        <!-- 3. Edición vigente del curso, con sus datos básicos (Habilitado por AJAX) -->
         <div class="form-group" style="margin-top: 15px;">
-            <label for="edicionInscripcion" style="font-weight: bold;">3. Seleccione la Edición:</label>
-            <select id="edicionInscripcion" name="edicion" required disabled style="width: 100%; padding: 8px;">
+            <label for="edicionInscripcion" style="font-weight: bold;">3. Seleccione la Edición vigente:</label>
+            <select id="edicionInscripcion" name="edicion" onchange="mostrarDatosEdicionInscripcion(this.value)" required disabled style="width: 100%; padding: 8px;">
                 <option value="">Primero seleccione un curso</option>
             </select>
+            <div id="datos-edicion-inscripcion" style="display: none; margin-top: 10px; padding: 10px 12px; background: #f4f8fb; border: 1px solid #d6e4f0; border-radius: 4px; font-size: 14px; color: #2c3e50; line-height: 1.6;"></div>
+            <!-- Si ya está inscripto a la edición: puede modificar los datos de su inscripción o cancelar (letra 6.1) -->
+            <div id="aviso-inscripcion-existente" style="display: none; margin-top: 10px; padding: 10px 12px; border-radius: 4px; font-size: 14px; line-height: 1.6;"></div>
         </div>
 
         <!-- 4. Video de Motivación (Opcional) -->
@@ -44,7 +59,8 @@
         </div>
 
         <div class="form-actions" style="margin-top: 25px; text-align: right;">
-            <button type="submit" style="background-color: #3498db; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Confirmar Inscripción</button>
+            <button type="button" id="btnCancelarInscripcion" onclick="cancelarModificacionInscripcion()" style="display: none; background-color: #95a5a6; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; margin-right: 8px;">Cancelar</button>
+            <button type="submit" id="btnConfirmarInscripcion" style="background-color: #3498db; color: white; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Confirmar Inscripción</button>
         </div>
     </form>
 </div>

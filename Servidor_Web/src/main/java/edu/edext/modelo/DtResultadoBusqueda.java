@@ -1,6 +1,7 @@
 package edu.edext.modelo;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class DtResultadoBusqueda {
     private String nombre; //En caso de usuario es nickname
@@ -24,6 +25,8 @@ public class DtResultadoBusqueda {
     public String getDescripcion(){return descripcion;}
     public String getTipo(){return tipo;}
     public LocalDate getFechaPublicacion(){return fechaPublicacion;}
+    // Para mostrar: dd/MM/yyyy, como en el resto del sitio (getFechaPublicacion queda en ISO para ordenar)
+    public String getFechaTexto(){return fechaPublicacion == null ? "" : fechaPublicacion.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));}
     public String getImagen(){return imagen;}
     public double getPromedioValoracion(){return promedioValoracion;}
     public int getCantidadValoraciones(){return cantidadValoraciones;}
