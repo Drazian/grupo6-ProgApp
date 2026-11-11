@@ -104,6 +104,10 @@
                             <keep>true</keep>
                             <packageName>edu.edext.controlador.ws</packageName>
                             <sourceDestDir>${project.build.directory}/generated-sources/wsimport</sourceDestDir>
+                            <!-- El cliente carga la WSDL desde adentro del war (WEB-INF/classes/wsdl, ver maven-resources-plugin)
+                                 y no desde la ruta del disco de la PC donde se compilo: asi el web.war funciona en cualquier
+                                 nodo, y recompilar otra version no rompe un war ya desplegado. -->
+                            <wsdlLocation>/wsdl/IBridgeSOAPService.wsdl</wsdlLocation>
                         </configuration>
                     </execution>
                 </executions>
@@ -114,6 +118,33 @@
                         <version>4.0.2</version>
                     </dependency>
                 </dependencies> 
+            </plugin>
+            <plugin>
+                <!-- Copia la WSDL que genero el Central (y su esquema .xsd) adentro del war, en WEB-INF/classes/wsdl -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>copiar-wsdl-al-war</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/wsdl</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${user.home}/.edEXT/tmp/shared-wsdl</directory>
+                                    <includes>
+                                        <include>IBridgeSOAPService.wsdl</include>
+                                        <include>*.xsd</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
