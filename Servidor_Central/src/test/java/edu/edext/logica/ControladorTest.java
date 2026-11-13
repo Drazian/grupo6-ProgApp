@@ -983,6 +983,20 @@ public class ControladorTest {
 //    }
 
     @Test
+    public void testLoginUsuarioCreado() throws Exception {
+        // Un usuario dado de alta (la contraseña se guarda cifrada con AES) tiene que poder iniciar sesión con la contraseña que eligió
+        String nickname = "LOGIN" + System.currentTimeMillis(), email = nickname.toLowerCase() + "@test.uy", pass = "Clave123";
+        ic.crearUsuario(new DtUsuario(nickname, pass, email, "nombre", "apellido", "imagen", LocalDate.of(2000, 1, 1),
+                new ArrayList<>(), TipoUsuario.ESTUDIANTE), null, "imagen.png");
+        assertNotNull(ic.validarNick(nickname, pass), "Entra con el nickname y la contraseña del alta");
+        assertNotNull(ic.validarEmail(email, pass), "Entra con el email y la contraseña del alta");
+        assertNull(ic.validarNick(nickname, "otraClave"), "Con otra contraseña no entra");
+        // los usuarios con la contraseña en bcrypt (datos de prueba) siguen entrando
+        assertNotNull(ic.validarNick("chechi", "1234"), "Usuario con contraseña bcrypt");
+        assertNull(ic.validarNick("chechi", "otraClave"), "Usuario bcrypt con otra contraseña");
+    }
+
+    @Test
     void testAgregaryQuitarDocenteAEdicion() throws Exception {
         String nameEddion="Talleres plenarios - 2026", 
                 nickname="benkenobi";
