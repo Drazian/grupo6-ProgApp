@@ -7,6 +7,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <%-- Puerta única de entrada: a los celulares y tabletas los lleva a /movil/ el DispositivoMovilFilter.
+         El iPad con iPadOS se presenta como una Mac: se lo reconoce acá por la pantalla táctil. --%>
+    <c:if test="${not sessionScope.versionEscritorio}">
+    <script>
+        if (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1) location.replace('movil/');
+    </script>
+    </c:if>
     <title>EDEXT</title> 
     <link rel="stylesheet" href="css/estilos.css?v=<%= VERSION_RECURSOS %>">
 </head>
@@ -55,6 +62,11 @@
         <!-- SECTOR 2: Menú Lateral -->
         <aside class="sector-2">
             <nav>
+                <!-- Solo si desde un celular eligió "Ver versión de escritorio": volver a la aplicación móvil -->
+                <c:if test="${sessionScope.versionEscritorio}">
+                    <a href="?version=movil" id="link-version-movil" style="display: block; margin-bottom: 10px; font-weight: bold;">Ver versión móvil</a>
+                    <hr style="opacity: 0.2; margin: 10px 0;">
+                </c:if>
                 <!-- Menú Usuarios -->
                 <c:if test="${not empty sessionScope.usuarioLogueado}">
                     <details open>

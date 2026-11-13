@@ -152,7 +152,7 @@ public class MovilServlet extends HttpServlet {
             return;
         }
         if (usuario.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
-            loginConError(request, response, identificador, "La aplicación móvil es para estudiantes. Los docentes deben usar el sitio web.");
+            loginConError(request, response, identificador, "La aplicación móvil es para estudiantes. Los docentes pueden entrar al sitio web con \"Ver versión de escritorio\".");
             return;
         }
 
