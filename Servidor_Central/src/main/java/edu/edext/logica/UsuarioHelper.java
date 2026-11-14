@@ -87,8 +87,8 @@ public class UsuarioHelper {
         boolean ret;
         if(passDB.startsWith("$2a$") || passDB.startsWith("$2b$") || passDB.startsWith("$2y$"))
             ret=Utils.Crypt.compareBCrypt(password, passDB);
-        else
-            ret=password.equals(Utils.Crypt.descifrarAES(password));
+        else    // el alta guarda la contraseña cifrada con AES: se descifra la guardada y se compara con la ingresada
+            ret=password.equals(Utils.Crypt.descifrarAES(passDB));
         return ret;
     }
     //***************************** pipeline ***********************************

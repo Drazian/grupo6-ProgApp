@@ -192,7 +192,7 @@ public class Config extends javax.swing.JPanel {
     }//GEN-LAST:event_formMouseDragged
 
     private void loadConf(){
-        confDB=Utils.Disk.loadCFG(cfg.PATH_FILE);
+        confDB=Utils.Disk.loadCFG(cfg.PATH_CONFIG_FILE);
         for(CfgDB cfgDB : confDB){
             if(cfgDB.clave().equals(cfg.CLAVE_IMAGE)){
                 tmpImagen=cfgDB.valor();
