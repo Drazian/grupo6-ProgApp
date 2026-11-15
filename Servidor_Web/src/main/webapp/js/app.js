@@ -1671,7 +1671,11 @@ function cargarTablaInscripciones(nombreEdicion) {
     const tablaContenedor = document.getElementById('contenedor-tabla-inscripciones');
     const btnGuardar = document.getElementById('btnGuardarSeleccion');
     const inputOculto = document.getElementById('edicionOculta');
-    
+
+    // Si ya no se está en "Evaluar Inscripciones" (por ejemplo, la recarga que se programa 1,5 s después de
+    // "Guardar Selección" y el usuario ya abrió otra pantalla), no hay tabla que actualizar.
+    if (!tablaContenedor || !inputOculto) return;
+
     if (!nombreEdicion) {
         tablaContenedor.innerHTML = '<p style="text-align: center; color: #7f8c8d; font-style: italic; margin-top: 40px;">Seleccione Instituto, Curso y Edición para ver las inscripciones.</p>';
         if(btnGuardar) btnGuardar.disabled = true;
