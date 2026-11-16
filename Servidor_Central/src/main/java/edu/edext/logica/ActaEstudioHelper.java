@@ -17,13 +17,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * CU "Tramitar Acta de Estudio" (Estudiante) y requerimiento 7.4.
- * Arma, para un programa de formacion en el que el estudiante esta inscripto, el resultado de cada curso del programa:
- * nota, aprobacion y fecha de resultado (fecha de cierre de la edicion). El PDF lo genera el Servidor Web.
- */
 public class ActaEstudioHelper {
-    /** Nota minima de aprobacion en la escala 1 a 12. */
     public static final int NOTA_MINIMA_APROBACION = 6;
     private static final int ACEPTADO = 2;
 

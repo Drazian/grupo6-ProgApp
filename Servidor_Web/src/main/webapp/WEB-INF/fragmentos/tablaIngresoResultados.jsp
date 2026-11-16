@@ -38,7 +38,7 @@
                             <c:forEach var="ins" items="${participantes}">
                                 <tr>
                                     <td style="padding: 10px; border: 1px solid #ddd; background: #fff; text-align: center;">
-                                        <img src="ImagenServlet?nombre=${fn:escapeXml(empty ins.estudiante.imagen ? 'usr.png' : ins.estudiante.imagen)}"
+                                        <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${fn:escapeXml(empty ins.estudiante.imagen ? 'usr.png' : ins.estudiante.imagen)}"
                                              alt="Avatar"
                                              style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
                                     </td>

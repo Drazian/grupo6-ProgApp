@@ -1,37 +1,67 @@
 package edu.edext.logica;
 
-import edu.edext.entitys.Usuario;
-import edu.edext.entitys.InscripcionPrograma;
-import edu.edext.entitys.Docente;
-import edu.edext.entitys.Estudiante;
-import edu.edext.entitys.Curso;
-import edu.edext.entitys.Categoria;
-import edu.edext.entitys.Instituto;
-import edu.edext.entitys.ProgramaFormacion;
-import edu.edext.entitys.Edicion;
+import edu.edext.datatypes.DtActaEstudio;
 import jakarta.persistence.EntityManagerFactory;
+import edu.edext.entitys.InscripcionPrograma;
 import edu.edext.datatypes.DtConsultaCurso;
+import edu.edext.entitys.ProgramaFormacion;
 import jakarta.persistence.EntityManager;
-import edu.edext.datatypes.DtCategoria;
 import edu.edext.datatypes.DtInstituto;
 import jakarta.persistence.Persistence;
+import edu.edext.tools.ConfigBaseDatos;
 import edu.edext.datatypes.TipoUsuario;
+import edu.edext.datatypes.DtCategoria;
 import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtEdicion;
+import edu.edext.entitys.Estudiante;
+import edu.edext.entitys.Instituto;
+import edu.edext.entitys.Categoria;
 import edu.edext.datatypes.DtCurso;
+import edu.edext.datatypes.DtCursoVisitas;
+import edu.edext.datatypes.DtInscripcionEdicion;
+import edu.edext.datatypes.DtValoracionesCurso;
+import edu.edext.edEXT;
+import edu.edext.entitys.Usuario;
+import edu.edext.entitys.Docente;
+import edu.edext.entitys.Edicion;
+import edu.edext.entitys.Curso;
 import edu.edext.tools.Utils;
-import edu.edext.tools.ConfigBaseDatos;
+import edu.edext.tools.cfg;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import org.tinylog.Logger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class Controlador implements IControlador {
-    // La conexion a la base se toma de ~/.edEXT/servidor.properties (requerimiento 7.8); persistence.xml queda como valor por defecto
-    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("edext", ConfigBaseDatos.propiedadesJPA());
+    private static final EntityManagerFactory emf = getConexionDB();
 
+    
+    private static EntityManagerFactory getConexionDB(){
+        EntityManagerFactory ret=null;
+        System.out.println("Conectandose a la base de datos.....");
+        Logger.info("Conectandose a la base de datos.....");
+        try {
+            ret=Persistence.createEntityManagerFactory("edext", ConfigBaseDatos.propiedadesJPA());
+        } catch (Exception e) {
+            Logger.error(e, "Error de conexion con la base de datos. ");
+        }
+        if(ret!=null){
+            Logger.info("Conexion exitosa.");
+            System.out.println("Conexion exitosa."); }
+        else{
+            System.err.println("Error de conexion con la base de datos.\nPor favor revise la configuracion en "+cfg.PATH_CONFIG_DB);
+            edEXT.exit(edEXT.CODE_ERROR_DB); }
+        return ret;
+    }
+    
 //******************************** Institutos ********************************//
     @Override
     public void crearInstituto(String nombre) throws Exception{
@@ -62,19 +92,6 @@ public class Controlador implements IControlador {
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
     @Override
-    public List<DtInstituto> listarInstitutos() throws Exception{
-        EntityManager em = emf.createEntityManager();
-        try {
-            List<DtInstituto> resultado = new ArrayList<>();
-            
-            List<Instituto> listaAux = em.createQuery("SELECT i FROM Instituto i",Instituto.class).getResultList();
-            for (Instituto aux: listaAux){
-                resultado.add(new DtInstituto(aux.getNombre()));
-            }
-            return resultado;     
-        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
-    }
-    @Override
     public String obtenerInstitutoPorCurso(String nombreCurso) throws Exception {
         try (EntityManager em = emf.createEntityManager()) {
             return em.createQuery(
@@ -87,7 +104,20 @@ public class Controlador implements IControlador {
             .getSingleResult();
         }
     }    
-
+    @Override
+    public List<DtInstituto> listarInstitutos() throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try {
+            List<DtInstituto> resultado = new ArrayList<>();
+            
+            List<Instituto> listaAux = em.createQuery("SELECT i FROM Instituto i",Instituto.class).getResultList();
+            for (Instituto aux: listaAux){
+                resultado.add(new DtInstituto(aux.getNombre()));
+            }
+            return resultado;     
+        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
+    }
+    
 //******************************** Categrias *********************************//
     @Override
     public void crearCategoria(String nombre) throws Exception{
@@ -118,43 +148,6 @@ public class Controlador implements IControlador {
     }
     
 //********************************* Usuarios *********************************//
-    @Override
-    public void modificarUsuario(DtUsuario usuario)throws Exception{
-        EntityManager em = emf.createEntityManager();
-        try{
-            em.getTransaction().begin();
-            Usuario usuarioModificado = em.find(Usuario.class, usuario.getNickname());
-            if(!usuarioModificado.getApellido().equals(usuario.getApellido()))
-                usuarioModificado.setApellido(usuario.getApellido());
-            if(!usuarioModificado.getNombre().equals(usuario.getNombre()))
-                usuarioModificado.setNombre(usuario.getNombre());
-            if(!usuarioModificado.getfNacimiento().equals(usuario.getfNacimiento()))
-                usuarioModificado.setfNacimiento(usuario.getfNacimiento());
-            if(!usuarioModificado.getImagen().equals(usuario.getImagen()))
-                usuarioModificado.setImagen(usuario.getImagen());
-            if(!usuarioModificado.getEmail().equals(usuario.getEmail()))
-                if(!existeEmail(usuario.getEmail()))
-                    usuarioModificado.setEmail(usuario.getEmail());
-            
-            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
-                List<Instituto> institutos = new ArrayList<>();
-                for(String aux: usuario.getInstitutos()){
-                    Instituto instituto = em.find(Instituto.class,aux);
-                    if (instituto == null) throw new Exception("No existe el instituto '" + aux + "'.");
-                    institutos.add(instituto);
-                }
-                ((Docente) usuarioModificado).setInstitutos(institutos);
-            }
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw e;   
-        }finally{
-            em.close();
-        }
-    }
     @Override
     public void crearUsuario(DtUsuario usuario) throws Exception{
         EntityManager em = emf.createEntityManager();
@@ -229,23 +222,153 @@ public class Controlador implements IControlador {
             em.close();
         }
     }
+    @Override 
+    public void crearUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception {
+        String nombreImagen = usuario.getImagen();
+
+        if (existeUsuario(usuario.getNickname())) {
+            throw new Exception("Ya existe un usuario con el nickname '" + usuario.getNickname() + "'.");
+        }
+
+        if (existeEmail(usuario.getEmail())) {
+            throw new Exception("Ya existe un usuario con el correo '" + usuario.getEmail() + "'.");
+        }
+
+        if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
+            nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, usuario.getNickname());
+        }
+
+        DtUsuario usuarioConImagen = new DtUsuario(
+            usuario.getNickname(),
+            usuario.getPassword(),
+            usuario.getEmail(),
+            usuario.getNombre(),
+            usuario.getApellido(),
+            nombreImagen,
+            usuario.getfNacimiento(),
+            usuario.getInstitutos(),
+            usuario.getTipoUsuario()
+        );
+
+        crearUsuario(usuarioConImagen);
+    }
     @Override
-    public DtUsuario obtenerUsuario(String nickname) {
-        if (nickname == null) return null;
-        try (EntityManager em = emf.createEntityManager()) {
-            Usuario aux = em.find(Usuario.class, nickname);
-            if (aux == null)
-                aux = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
-                        .setParameter("email", nickname).getResultStream().findFirst().orElse(null);
-            if (aux == null) return null;
-            if (aux instanceof Docente) {
-                List<String> institutos = new ArrayList<>();
-                for (Instituto instituto : ((Docente) aux).getInstitutos()) institutos.add(instituto.getNombre());
-                return new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
-                        aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), institutos, TipoUsuario.DOCENTE);
+    public void modificarUsuario(DtUsuario usuario)throws Exception{
+        EntityManager em = emf.createEntityManager();
+        try{
+            em.getTransaction().begin();
+            Usuario usuarioModificado = em.find(Usuario.class, usuario.getNickname());
+            if(!usuarioModificado.getApellido().equals(usuario.getApellido()))
+                usuarioModificado.setApellido(usuario.getApellido());
+            if(!usuarioModificado.getNombre().equals(usuario.getNombre()))
+                usuarioModificado.setNombre(usuario.getNombre());
+            if(!usuarioModificado.getfNacimiento().equals(usuario.getfNacimiento()))
+                usuarioModificado.setfNacimiento(usuario.getfNacimiento());
+            if(!usuarioModificado.getImagen().equals(usuario.getImagen()))
+                usuarioModificado.setImagen(usuario.getImagen());
+            if(!usuarioModificado.getEmail().equals(usuario.getEmail()))
+                if(!existeEmail(usuario.getEmail()))
+                    usuarioModificado.setEmail(usuario.getEmail());
+            
+            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE) {
+                List<Instituto> institutos = new ArrayList<>();
+                for(String aux: usuario.getInstitutos()){
+                    Instituto instituto = em.find(Instituto.class,aux);
+                    if (instituto == null) throw new Exception("No existe el instituto '" + aux + "'.");
+                    institutos.add(instituto);
+                }
+                ((Docente) usuarioModificado).setInstitutos(institutos);
             }
-            return new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
-                    aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;   
+        }finally{
+            em.close();
+        }
+    }
+    @Override 
+    public void modificarUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+
+            Usuario usuarioModificado = em.find(Usuario.class, usuario.getNickname());
+            if (usuarioModificado == null) {
+                throw new Exception("El usuario '" + usuario.getNickname() + "' no existe.");
+            }
+
+            usuarioModificado.setApellido(usuario.getApellido());
+            usuarioModificado.setNombre(usuario.getNombre());
+            usuarioModificado.setfNacimiento(usuario.getfNacimiento());
+
+            if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
+                
+                String hashPassword = Utils.Crypt.encodeBCrypt(usuario.getPassword().trim());   //  bis
+                //String hashPassword = Utils.Crypt.cifrarAES(usuario.getPassword().trim());  //  bis 2
+                usuarioModificado.setPassword(hashPassword);
+            }
+
+            if (usuario.getEmail() != null && !usuario.getEmail().isBlank()
+                    && !usuario.getEmail().equalsIgnoreCase(usuarioModificado.getEmail())) {
+                Usuario otro = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
+                        .setParameter("email", usuario.getEmail()).getResultStream().findFirst().orElse(null);
+                if (otro != null && !otro.getNickname().equals(usuarioModificado.getNickname()))
+                    throw new Exception("Ya existe un usuario con el Email '" + usuario.getEmail() + "'.");
+                usuarioModificado.setEmail(usuario.getEmail());
+            }
+
+            if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
+                String nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, usuario.getNickname());
+                usuarioModificado.setImagen(nombreImagen);
+            } else if (usuario.getImagen() != null) {
+                usuarioModificado.setImagen(usuario.getImagen());
+            }
+
+            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE && usuario.getInstitutos() != null) {
+                List<Instituto> institutos = new ArrayList<>();
+                for (String aux : usuario.getInstitutos()) {
+                    Instituto instituto = em.find(Instituto.class, aux);
+                    if (instituto != null) {
+                        institutos.add(instituto);
+                    }
+                }
+                ((Docente) usuarioModificado).setInstitutos(institutos);
+            }
+
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+    @Override
+    public boolean existeUsuario(String nickname) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            Usuario usuario = em.find(Usuario.class, nickname);
+            return usuario != null;
+        }
+    }
+    @Override
+    public boolean existeEmail(String email) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            Usuario usuario = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.email = :email",
+                Usuario.class
+            )
+            .setParameter("email", email)
+            .getResultStream()
+            .findFirst()
+            .orElse(null);
+            return usuario != null;
         }
     }
     @Override
@@ -276,43 +399,57 @@ public class Controlador implements IControlador {
             return em.createQuery("SELECT d.nickname FROM Docente d", String.class).getResultList();
         }
     }
-    @Override
-    public boolean existeUsuario(String nickname) throws Exception {
-        try (EntityManager em = emf.createEntityManager()) {
+    @Override 
+    public List<String> listarSeguidos(String nickname) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
             Usuario usuario = em.find(Usuario.class, nickname);
-            return usuario != null;
+            List<String> res = new ArrayList<>();
+            if (usuario != null && usuario.getSeguidos() != null) {
+                for (Usuario u : usuario.getSeguidos()) {
+                    res.add(u.getNickname());
+                }
+            }
+            return res;
+        } finally {
+            em.close();
+        }
+    }
+    @Override 
+    public List<String> listarSeguidores(String nickname) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            Usuario usuario = em.find(Usuario.class, nickname);
+            List<String> res = new ArrayList<>();
+            if (usuario != null && usuario.getSeguidores() != null) {
+                for (Usuario u : usuario.getSeguidores()) {
+                    res.add(u.getNickname());
+                }
+            }
+            return res;
+        } finally {
+            em.close();
         }
     }
     @Override
-    public boolean existeEmail(String email) throws Exception {
+    public DtUsuario obtenerUsuario(String nickname) {
+        if (nickname == null) return null;
         try (EntityManager em = emf.createEntityManager()) {
-            Usuario usuario = em.createQuery(
-                "SELECT u FROM Usuario u WHERE u.email = :email",
-                Usuario.class
-            )
-            .setParameter("email", email)
-            .getResultStream()
-            .findFirst()
-            .orElse(null);
-            return usuario != null;
+            Usuario aux = em.find(Usuario.class, nickname);
+            if (aux == null)
+                aux = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
+                        .setParameter("email", nickname).getResultStream().findFirst().orElse(null);
+            if (aux == null) return null;
+            if (aux instanceof Docente) {
+                List<String> institutos = new ArrayList<>();
+                for (Instituto instituto : ((Docente) aux).getInstitutos()) institutos.add(instituto.getNombre());
+                return new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
+                        aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), institutos, TipoUsuario.DOCENTE);
+            }
+            return new DtUsuario(aux.getNickname(), aux.getPassword(), aux.getEmail(), aux.getNombre(),
+                    aux.getApellido(), aux.getImagen(), aux.getfNacimiento(), null, TipoUsuario.ESTUDIANTE);
         }
     }
-//    @Override
-//    public DtSessionUsuario validarNick(String nickname, String password) throws Exception{
-//        DtSessionUsuario ret;
-//        UsuarioHelper tmp=new UsuarioHelper(emf);
-//        ret=tmp.validaNick(nickname, password);
-//        tmp=null;
-//        return ret;
-//    }
-//    @Override
-//    public DtSessionUsuario validarEmail(String email, String password) throws Exception{
-//        DtSessionUsuario ret;
-//        UsuarioHelper tmp=new UsuarioHelper(emf);
-//        ret=tmp.validarEmail(email, password);
-//        tmp=null;
-//        return ret;
-//    }
     @Override
     public DtUsuario validarNick(String nickname, String password) throws Exception{
         DtUsuario ret;
@@ -331,7 +468,76 @@ public class Controlador implements IControlador {
         tmp=null;
         return ret;
     }
+    @Override 
+    public void seguirUsuario(String nicknameSeguidor, String nicknameASeguir) throws Exception {
+        if (nicknameSeguidor.equalsIgnoreCase(nicknameASeguir)) {
+            throw new Exception("Un usuario no puede seguirse a sí mismo.");
+        }
 
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Usuario seguidor = em.find(Usuario.class, nicknameSeguidor);
+            Usuario seguido = em.find(Usuario.class, nicknameASeguir);
+
+            if (seguidor == null || seguido == null) {
+                throw new Exception("Uno de los usuarios no existe.");
+            }
+
+            seguidor.agregarSeguido(seguido);
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+    @Override 
+    public void dejarDeSeguirUsuario(String nicknameSeguidor, String nicknameADejar) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Usuario seguidor = em.find(Usuario.class, nicknameSeguidor);
+            Usuario seguido = em.find(Usuario.class, nicknameADejar);
+
+            if (seguidor == null || seguido == null) {
+                throw new Exception("Uno de los usuarios no existe.");
+            }
+
+            seguidor.removerSeguido(seguido);
+
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+    @Override
+    public byte[] getImageBytes(String nombre) {
+        try {
+            Path ruta=Paths.get(cfg.fullpathImagen()+nombre);
+            if(Files.exists(ruta) && Files.isRegularFile(ruta))
+                return Files.readAllBytes(ruta); }
+        catch (IOException e) {
+            Logger.error(e, "Error al leer la imagen {}", nombre); }
+        return new byte[0];
+    }
+    @Override
+    public String guardarImagen(byte[] bytesImagen, String nombreOriginal, String nickname) throws IOException{
+        return GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, nickname);
+    }
+
+    
 //********************************* Cursos ***********************************//
     @Override
     public void altaCurso(DtCurso curso, String nombreInstituto) throws Exception {
@@ -572,6 +778,13 @@ public class Controlador implements IControlador {
             return resultado;          
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
+    @Override
+    public boolean existeCurso(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            Curso curso = em.find(Curso.class, nombre);
+            return curso != null;
+        }
+    }
 
 //********************************* Edicion **********************************//
     @Override
@@ -723,10 +936,87 @@ public class Controlador implements IControlador {
             return resultado;
         }
     }    
-//    @Override
-//    public DtEdicion buscarEdicion(String nombre) throws Exception{
-//        return getEdicion(nombre);
-//    }
+    @Override
+    public boolean existeEdicion(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            Edicion edicion = em.find(Edicion.class, nombre);
+            return edicion != null;
+        }
+    }    
+    @Override
+    public void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
+     EntityManager em = emf.createEntityManager();
+     try {
+         em.getTransaction().begin();
+
+         Edicion edicion = em.find(Edicion.class, nombreEdicion);
+         Docente docente = em.find(Docente.class, nicknameDocente);
+
+         if (edicion == null) throw new Exception("La edición no existe.");
+         if (docente == null) throw new Exception("El docente no existe.");
+
+         // Si el docente no está en la lista de la edición, lo agregamos
+         if (!edicion.getDocentes().contains(docente)) {
+             edicion.getDocentes().add(docente);
+             em.merge(edicion); // Actualizamos la base de datos
+         } else {
+             throw new Exception("Este docente ya está asignado a esta edición.");
+         }
+
+         em.getTransaction().commit();
+     } catch (Exception e) {
+         if (em.getTransaction().isActive()) em.getTransaction().rollback();
+         throw e;
+     } finally {
+         em.close();
+     }
+ }
+    @Override
+    public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
+    EntityManager em = emf.createEntityManager();
+    try {
+        em.getTransaction().begin();
+        
+        Edicion edicion = em.find(Edicion.class, nombreEdicion);
+        if (edicion == null) throw new Exception("La edición no existe.");
+
+        // Buscamos manualmente al docente usando los nicknames (Strings), que se comparan de forma segura
+        Docente docenteAEliminar = null;
+        for (Docente d : edicion.getDocentes()) {
+            if (d.getNickname().equals(nicknameDocente)) {
+                docenteAEliminar = d;
+                break;
+            }
+        }
+
+        // Si lo encontramos en la lista, lo removemos usando la misma instancia encontrada
+        if (docenteAEliminar != null) {
+            edicion.getDocentes().remove(docenteAEliminar);
+            em.merge(edicion); // Se sincroniza correctamente la tabla intermedia 'Organiza'
+        } else {
+            throw new Exception("Este docente no está asignado a esta edición.");
+        }
+        
+        em.getTransaction().commit();
+    } catch (Exception e) {
+        if (em.getTransaction().isActive()) em.getTransaction().rollback();
+        throw e;
+    } finally {
+        em.close();
+    }
+}
+
+    private List<String> listarEdicionesDeDocente(String nicknameDocente, String nombreCurso, boolean cerradas) {
+        try (EntityManager em = emf.createEntityManager()) {
+            return em.createQuery(
+                "SELECT e.nombre FROM Edicion e JOIN e.docentes d " +
+                "WHERE e.curso.nombre = :curso AND d.nickname = :docente AND e.fechaCierre IS " + (cerradas ? "NOT NULL " : "NULL ") +
+                "ORDER BY " + (cerradas ? "e.fechaCierre" : "e.fechaInicio") + " DESC, e.nombre", String.class)
+                .setParameter("curso", nombreCurso)
+                .setParameter("docente", nicknameDocente)
+                .getResultList();
+        }
+    }
 
 //******************************* Inscripcion ********************************//
     @Override
@@ -757,7 +1047,6 @@ public class Controlador implements IControlador {
             cancel=null; }
         return ret;
     }
-    // Si el estudiante ya está inscripto a la edición, modifica los datos de su inscripción (el video). Códigos en InscripcionEdicionHelper
     @Override
     public int modificarInscripcion(String nomEstudiante, String nomEdicion, String videoURL) throws Exception{
         InscripcionEdicionHelper modif=new InscripcionEdicionHelper(emf, "");
@@ -793,7 +1082,6 @@ public class Controlador implements IControlador {
         }
         return ret;
     }
-
     @Override
     public List<DtUsuario> getEstudiantesInscriptosPrograma(String nombre) throws Exception{
     List<DtUsuario> ret;
@@ -805,7 +1093,6 @@ public class Controlador implements IControlador {
             inscrip=null; }
         return  ret;
     }
-    
     @Override
     public List<DtUsuario> getEstudiantesIncriptosEdicion(String nombre) throws Exception{
     List<DtUsuario> ret;
@@ -817,7 +1104,148 @@ public class Controlador implements IControlador {
             inscrip=null; }
         return  ret;
     }
-    
+    @Override 
+    public List<DtInscripcionEdicion> getInscripcionesCompletas(String nombreEdicion) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            return helper.getInscripcionesCompletas();
+        } finally {
+            helper.kill();
+        }
+    }
+    @Override 
+    public void evaluarInscripciones(String nombreEdicion, Map<String, Integer> evaluaciones) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            helper.evaluarInscripciones(evaluaciones);
+        } finally {
+            helper.kill();
+        }
+    }
+    @Override
+    public List<DtInscripcionEdicion> getInscripcionesDeEstudiante(String nicknameEstudiante) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nicknameEstudiante);
+        try {
+            return helper.getInscripcionesDeEstudiante();
+        } finally {
+            helper.kill();
+        }
+    }
+    @Override
+    public List<String> listarEdicionesCerradasDeDocente(String nicknameDocente, String nombreCurso) throws Exception {
+        return listarEdicionesDeDocente(nicknameDocente, nombreCurso, true);
+    }
+    @Override
+    public List<DtInscripcionEdicion> getActaEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            return helper.getActaEdicion(nicknameDocente);
+        } finally {
+            helper.kill();
+        }
+    }
+    @Override
+    public List<String> listarEdicionesAbiertasDeDocente(String nicknameDocente, String nombreCurso) throws Exception {
+        return listarEdicionesDeDocente(nicknameDocente, nombreCurso, false);
+    }
+    @Override
+    public List<DtInscripcionEdicion> getParticipantesParaEvaluar(String nombreEdicion, String nicknameDocente) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            return helper.getParticipantesParaEvaluar(nicknameDocente);
+        } finally {
+            helper.kill();
+        }
+    }
+    @Override
+    public void ingresarResultados(String nombreEdicion, String nicknameDocente, Map<String, Integer> notas, boolean cerrarEdicion) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
+        try {
+            helper.ingresarResultados(nicknameDocente, notas, cerrarEdicion);
+        } finally {
+            helper.kill();
+        }
+    }
+    @Override
+    public List<DtInscripcionEdicion> listarResultadosEvaluaciones(String nicknameEstudiante) throws Exception {
+        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nicknameEstudiante);
+        try {
+            return helper.getResultadosEvaluacionesDeEstudiante();
+        } finally {
+            helper.kill();
+        }
+    }
+
+//******************************* Valoraciones *******************************//
+    @Override
+    public List<String> listarCursosParaValorar(String nicknameEstudiante) throws Exception {
+        return new ValoracionHelper(emf).listarCursosQueParticipa(nicknameEstudiante);
+    }
+    @Override
+    public DtValoracionesCurso getValoracionesCurso(String nombreCurso, String nicknameEstudiante) throws Exception {
+        return new ValoracionHelper(emf).getValoraciones(nombreCurso, nicknameEstudiante);
+    }
+    @Override
+    public void valorarCurso(String nicknameEstudiante, String nombreCurso, int puntaje) throws Exception {
+        new ValoracionHelper(emf).valorar(nicknameEstudiante, nombreCurso, puntaje);
+    }
+    @Override
+    public List<DtValoracionesCurso> listarResumenesValoraciones() throws Exception {
+        return new ValoracionHelper(emf).listarResumenes();
+    }
+
+//****************************** Acta de Estudio *****************************//
+    @Override
+    public DtActaEstudio getActaEstudio(String nicknameEstudiante, String nombrePrograma) throws Exception {
+        return new ActaEstudioHelper(emf).getActa(nicknameEstudiante, nombrePrograma);
+    }
+
+//**************************** Listado de tendencias *************************//
+    @Override
+    public boolean registrarVisitaCurso(String nombreCurso) throws Exception {
+        return new TendenciasHelper(emf).registrarVisita(nombreCurso);
+    }
+    @Override
+    public List<DtCursoVisitas> listarCursosMasVisitados() throws Exception {
+        return new TendenciasHelper(emf).listarMasVisitados();
+    }
+    @Override
+    public int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+
+            Estudiante est = em.find(Estudiante.class, nomEstudiante);
+            ProgramaFormacion prog = em.find(ProgramaFormacion.class, nomPrograma);
+
+            if (est == null || prog == null) {
+                throw new Exception("El estudiante o el programa no existen.");
+            }
+
+            List<InscripcionPrograma> existentes = em.createQuery(
+                "SELECT ip FROM InscripcionPrograma ip WHERE ip.estudiante.nickname = :est AND ip.programa.nombre = :prog",
+                InscripcionPrograma.class)
+                .setParameter("est", nomEstudiante)
+                .setParameter("prog", nomPrograma)
+                .getResultList();
+
+            if (!existentes.isEmpty()) {
+                em.getTransaction().rollback();
+                return 1;
+            }
+
+            InscripcionPrograma nuevaInscripcion = new InscripcionPrograma(est, prog, java.time.LocalDate.now(), 1);
+            em.persist(nuevaInscripcion);
+
+            em.getTransaction().commit();
+            return 0;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
     
 //**************************** ProgramaFormacion *****************************//
     @Override
@@ -835,6 +1263,33 @@ public class Controlador implements IControlador {
             manage=null; }
         return flag;
     }
+    @Override 
+    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
+        return setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, programa != null ? programa.getDocente() : null);
+    }
+    @Override 
+    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception {
+    String nombreImagen = programa.getImagen();
+
+            if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
+                nombreImagen = GestorImagenes.guardarImagen(bytesImagen, "Programa_" + nombreOriginal, "Programa_" + programa.getNombre());
+            }
+
+            DtPrograma programaConImagen = new DtPrograma(
+                    programa.getNombre(),
+                    programa.getDescripcion(),
+                    programa.getFechaRegistro(),
+                    programa.getFechaInicio(),
+                    programa.getFechaFin(),
+                    programa.getCursos(),
+                    programa.getNameCursos(),
+                    nombreImagen,
+                    docente
+            );
+
+            boolean resultado = setCrearProgramaFormacion(programaConImagen);
+            return resultado;
+        }
     @Override
     public void agregarProgramaCurso(String programa, String curso) throws Exception{
         EntityManager em = emf.createEntityManager();
@@ -852,20 +1307,6 @@ public class Controlador implements IControlador {
             em.getTransaction().commit();
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
-
-//    @Override
-//    public List<DtPrograma> listarProgramas() throws Exception{
-//        EntityManager em = emf.createEntityManager();
-//        try{
-//            List<DtPrograma> resultado = new ArrayList<>();
-//            List<ProgramaFormacion> listaAux = em.createQuery("SELECT i FROM ProgramaFormacion i", ProgramaFormacion.class).getResultList();
-//            for (ProgramaFormacion aux: listaAux){
-//                resultado.add(new DtPrograma(aux.getNombre(), aux.getDescripcion(),aux.getFechaRegistro(),aux.getFechaInicio(),aux.getFechaFin()));
-//            }
-//            return resultado;          
-//        } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
-//    }
-    
     @Override
     public List<DtPrograma> listarProgramas() throws Exception {
         EntityManager em = emf.createEntityManager();
@@ -930,7 +1371,6 @@ public class Controlador implements IControlador {
             em.close();
         }
     }
-
     @Override
     public List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception{//
         EntityManager em = emf.createEntityManager();
@@ -970,7 +1410,6 @@ public class Controlador implements IControlador {
             return resultado;
         } catch (Exception e) {if (em.getTransaction().isActive()) {em.getTransaction().rollback();}throw e;} finally {em.close();}
     }
-    
     @Override
     public List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception {
         try (EntityManager em = emf.createEntityManager()) {
@@ -1050,7 +1489,6 @@ public class Controlador implements IControlador {
             return resultado;
         }
     }
-    
     @Override
     public DtPrograma buscarPrograma(String nombre) throws Exception {
         EntityManager em = emf.createEntityManager();
@@ -1104,33 +1542,16 @@ public class Controlador implements IControlador {
             em.close();
         }
     }
-
-    //Metodo auxiliar para implementar buscarPrograma().
-    //Hubiera estado bueno ponerse de acuerdo para usar LocalDate O Date pero no ambas a la vez.
-    //Respuesta:  Date esa marcada como obsoleta desde 1997, arrastra fallos internos,
-    //            como la total carencia de zonas, es inconsistente e inherentemente inestable
-    //            al ser mutable, posee complejidad interna innecesaria y muchos metodos obsoletos
-    //            para mitigarlo habia dejado un metodo sobrecargado en la clase libreria
-    //            Utils.Cast.valueOf(fecha) la cual convierte Date->localDate y localDate->Date
-    //            esta ultima es para facilitar la conversion para los que 
-    //            prefieran seguir utilizando algo que lleva obsoleto 29 años
-//    private java.time.LocalDate parseToLocalDate(Object fecha) {
-//        if (fecha == null) return null;
-//        if (fecha instanceof java.time.LocalDate) {
-//            return (java.time.LocalDate) fecha;
-//        }
-//        if (fecha instanceof String) {
-//            String str = (String) fecha;
-//            return str.isEmpty() ? null : java.time.LocalDate.parse(str);
-//        }
-//        if (fecha instanceof java.util.Date) {
-//            return ((java.util.Date) fecha).toInstant()
-//                    .atZone(java.time.ZoneId.systemDefault())
-//                    .toLocalDate();
-//        }
-//        return null;
-//    }
-
+    @Override
+    public boolean existeProgramaFormacion(String nombre) throws Exception {
+        try (EntityManager em = emf.createEntityManager()) {
+            ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
+            return programa != null;
+        }
+    }
+    
+    
+    
 //***************************** Datos de Prueba ******************************//
     @Override
     public int cargarDatosDePrueba() throws Exception{
@@ -1145,513 +1566,8 @@ public class Controlador implements IControlador {
         return ret;
     }
 
-//******************************* Nueva probar *******************************//
-    
+//***************************** Nuevas a probar ******************************//
 
-    @Override 
-    public void modificarUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception {
-        EntityManager em = emf.createEntityManager();
 
-        try {
-            em.getTransaction().begin();
 
-            Usuario usuarioModificado = em.find(Usuario.class, usuario.getNickname());
-            if (usuarioModificado == null) {
-                throw new Exception("El usuario '" + usuario.getNickname() + "' no existe.");
-            }
-
-            usuarioModificado.setApellido(usuario.getApellido());
-            usuarioModificado.setNombre(usuario.getNombre());
-            usuarioModificado.setfNacimiento(usuario.getfNacimiento());
-
-            if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
-                
-                String hashPassword = Utils.Crypt.encodeBCrypt(usuario.getPassword().trim());   //  bis
-                //String hashPassword = Utils.Crypt.cifrarAES(usuario.getPassword().trim());  //  bis 2
-                usuarioModificado.setPassword(hashPassword);
-            }
-
-            if (usuario.getEmail() != null && !usuario.getEmail().isBlank()
-                    && !usuario.getEmail().equalsIgnoreCase(usuarioModificado.getEmail())) {
-                Usuario otro = em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
-                        .setParameter("email", usuario.getEmail()).getResultStream().findFirst().orElse(null);
-                if (otro != null && !otro.getNickname().equals(usuarioModificado.getNickname()))
-                    throw new Exception("Ya existe un usuario con el Email '" + usuario.getEmail() + "'.");
-                usuarioModificado.setEmail(usuario.getEmail());
-            }
-
-            if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
-                String nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, usuario.getNickname());
-                usuarioModificado.setImagen(nombreImagen);
-            } else if (usuario.getImagen() != null) {
-                usuarioModificado.setImagen(usuario.getImagen());
-            }
-
-            if (usuario.getTipoUsuario() == TipoUsuario.DOCENTE && usuario.getInstitutos() != null) {
-                List<Instituto> institutos = new ArrayList<>();
-                for (String aux : usuario.getInstitutos()) {
-                    Instituto instituto = em.find(Instituto.class, aux);
-                    if (instituto != null) {
-                        institutos.add(instituto);
-                    }
-                }
-                ((Docente) usuarioModificado).setInstitutos(institutos);
-            }
-
-            em.getTransaction().commit();
-
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-    
-    
-
-    @Override 
-    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
-        return setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal, programa != null ? programa.getDocente() : null);
-    }
-
-    @Override 
-    public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception {
-    String nombreImagen = programa.getImagen();
-
-            if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
-                nombreImagen = GestorImagenes.guardarImagen(bytesImagen, "Programa_" + nombreOriginal, "Programa_" + programa.getNombre());
-            }
-
-            DtPrograma programaConImagen = new DtPrograma(
-                    programa.getNombre(),
-                    programa.getDescripcion(),
-                    programa.getFechaRegistro(),
-                    programa.getFechaInicio(),
-                    programa.getFechaFin(),
-                    programa.getCursos(),
-                    programa.getNameCursos(),
-                    nombreImagen,
-                    docente
-            );
-
-            boolean resultado = setCrearProgramaFormacion(programaConImagen);
-            return resultado;
-        }
-    
-    
-    
-    @Override 
-    public void crearUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception {
-        String nombreImagen = usuario.getImagen();
-
-        if (existeUsuario(usuario.getNickname())) {
-            throw new Exception("Ya existe un usuario con el nickname '" + usuario.getNickname() + "'.");
-        }
-
-        if (existeEmail(usuario.getEmail())) {
-            throw new Exception("Ya existe un usuario con el correo '" + usuario.getEmail() + "'.");
-        }
-
-        if (bytesImagen != null && bytesImagen.length > 0 && nombreOriginal != null) {
-            nombreImagen = GestorImagenes.guardarImagen(bytesImagen, nombreOriginal, usuario.getNickname());
-        }
-
-        DtUsuario usuarioConImagen = new DtUsuario(
-            usuario.getNickname(),
-            usuario.getPassword(),
-            usuario.getEmail(),
-            usuario.getNombre(),
-            usuario.getApellido(),
-            nombreImagen,
-            usuario.getfNacimiento(),
-            usuario.getInstitutos(),
-            usuario.getTipoUsuario()
-        );
-
-        crearUsuario(usuarioConImagen);
-    }
-    
-
-   
-    @Override 
-    public void seguirUsuario(String nicknameSeguidor, String nicknameASeguir) throws Exception {
-        if (nicknameSeguidor.equalsIgnoreCase(nicknameASeguir)) {
-            throw new Exception("Un usuario no puede seguirse a sí mismo.");
-        }
-
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-
-            Usuario seguidor = em.find(Usuario.class, nicknameSeguidor);
-            Usuario seguido = em.find(Usuario.class, nicknameASeguir);
-
-            if (seguidor == null || seguido == null) {
-                throw new Exception("Uno de los usuarios no existe.");
-            }
-
-            seguidor.agregarSeguido(seguido);
-
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override 
-    public void dejarDeSeguirUsuario(String nicknameSeguidor, String nicknameADejar) throws Exception {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-
-            Usuario seguidor = em.find(Usuario.class, nicknameSeguidor);
-            Usuario seguido = em.find(Usuario.class, nicknameADejar);
-
-            if (seguidor == null || seguido == null) {
-                throw new Exception("Uno de los usuarios no existe.");
-            }
-
-            seguidor.removerSeguido(seguido);
-
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override 
-    public List<String> listarSeguidos(String nickname) throws Exception {
-        EntityManager em = emf.createEntityManager();
-        try {
-            Usuario usuario = em.find(Usuario.class, nickname);
-            List<String> res = new ArrayList<>();
-            if (usuario != null && usuario.getSeguidos() != null) {
-                for (Usuario u : usuario.getSeguidos()) {
-                    res.add(u.getNickname());
-                }
-            }
-            return res;
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override 
-    public List<String> listarSeguidores(String nickname) throws Exception {
-        EntityManager em = emf.createEntityManager();
-        try {
-            Usuario usuario = em.find(Usuario.class, nickname);
-            List<String> res = new ArrayList<>();
-            if (usuario != null && usuario.getSeguidores() != null) {
-                for (Usuario u : usuario.getSeguidores()) {
-                    res.add(u.getNickname());
-                }
-            }
-            return res;
-        } finally {
-            em.close();
-        }
-    }
-
-    @Override 
-    public java.util.List<edu.edext.datatypes.DtInscripcionEdicion> getInscripcionesCompletas(String nombreEdicion) throws Exception {
-        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
-        try {
-            return helper.getInscripcionesCompletas();
-        } finally {
-            helper.kill();
-        }
-    }
-
-    @Override 
-    public void evaluarInscripciones(String nombreEdicion, Map<String, Integer> evaluaciones) throws Exception {
-        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
-        try {
-            helper.evaluarInscripciones(evaluaciones);
-        } finally {
-            helper.kill();
-        }
-    }
-
-    @Override
-    public java.util.List<edu.edext.datatypes.DtInscripcionEdicion> getInscripcionesDeEstudiante(String nicknameEstudiante) throws Exception {
-        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nicknameEstudiante);
-        try {
-            return helper.getInscripcionesDeEstudiante();
-        } finally {
-            helper.kill();
-        }
-    }
-
-    // CU "Ver resultados de evaluaciones en ediciones de cursos" (Docente)
-    @Override
-    public List<String> listarEdicionesCerradasDeDocente(String nicknameDocente, String nombreCurso) throws Exception {
-        return listarEdicionesDeDocente(nicknameDocente, nombreCurso, true);
-    }
-
-    @Override
-    public List<edu.edext.datatypes.DtInscripcionEdicion> getActaEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
-        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
-        try {
-            return helper.getActaEdicion(nicknameDocente);
-        } finally {
-            helper.kill();
-        }
-    }
-
-    // CU "Ingresar resultados de evaluaciones de estudiantes en ediciones de cursos" (Docente)
-    @Override
-    public List<String> listarEdicionesAbiertasDeDocente(String nicknameDocente, String nombreCurso) throws Exception {
-        return listarEdicionesDeDocente(nicknameDocente, nombreCurso, false);
-    }
-
-    @Override
-    public List<edu.edext.datatypes.DtInscripcionEdicion> getParticipantesParaEvaluar(String nombreEdicion, String nicknameDocente) throws Exception {
-        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
-        try {
-            return helper.getParticipantesParaEvaluar(nicknameDocente);
-        } finally {
-            helper.kill();
-        }
-    }
-
-    @Override
-    public void ingresarResultados(String nombreEdicion, String nicknameDocente, Map<String, Integer> notas, boolean cerrarEdicion) throws Exception {
-        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nombreEdicion);
-        try {
-            helper.ingresarResultados(nicknameDocente, notas, cerrarEdicion);
-        } finally {
-            helper.kill();
-        }
-    }
-
-    // CU "Listar resultados de evaluaciones en ediciones de cursos" (Estudiante)
-    @Override
-    public List<edu.edext.datatypes.DtInscripcionEdicion> listarResultadosEvaluaciones(String nicknameEstudiante) throws Exception {
-        InscripcionEdicionHelper helper = new InscripcionEdicionHelper(emf, nicknameEstudiante);
-        try {
-            return helper.getResultadosEvaluacionesDeEstudiante();
-        } finally {
-            helper.kill();
-        }
-    }
-
-    // CU "Valorar un Curso" (Estudiante) y requerimiento 7.6
-    @Override
-    public List<String> listarCursosParaValorar(String nicknameEstudiante) throws Exception {
-        return new ValoracionHelper(emf).listarCursosQueParticipa(nicknameEstudiante);
-    }
-
-    @Override
-    public edu.edext.datatypes.DtValoracionesCurso getValoracionesCurso(String nombreCurso, String nicknameEstudiante) throws Exception {
-        return new ValoracionHelper(emf).getValoraciones(nombreCurso, nicknameEstudiante);
-    }
-
-    @Override
-    public void valorarCurso(String nicknameEstudiante, String nombreCurso, int puntaje) throws Exception {
-        new ValoracionHelper(emf).valorar(nicknameEstudiante, nombreCurso, puntaje);
-    }
-
-    @Override
-    public List<edu.edext.datatypes.DtValoracionesCurso> listarResumenesValoraciones() throws Exception {
-        return new ValoracionHelper(emf).listarResumenes();
-    }
-
-    // CU "Tramitar Acta de Estudio" (Estudiante) y requerimiento 7.4
-    @Override
-    public edu.edext.datatypes.DtActaEstudio getActaEstudio(String nicknameEstudiante, String nombrePrograma) throws Exception {
-        return new ActaEstudioHelper(emf).getActa(nicknameEstudiante, nombrePrograma);
-    }
-
-    // Requerimiento 7.3 "Listado de tendencias"
-    @Override
-    public boolean registrarVisitaCurso(String nombreCurso) throws Exception {
-        return new TendenciasHelper(emf).registrarVisita(nombreCurso);
-    }
-
-    @Override
-    public List<edu.edext.datatypes.DtCursoVisitas> listarCursosMasVisitados() throws Exception {
-        return new TendenciasHelper(emf).listarMasVisitados();
-    }
-
-    // Ediciones del curso en las que participa el docente: cerradas (mas reciente primero) o abiertas (mas nueva primero)
-    private List<String> listarEdicionesDeDocente(String nicknameDocente, String nombreCurso, boolean cerradas) {
-        try (EntityManager em = emf.createEntityManager()) {
-            return em.createQuery(
-                "SELECT e.nombre FROM Edicion e JOIN e.docentes d " +
-                "WHERE e.curso.nombre = :curso AND d.nickname = :docente AND e.fechaCierre IS " + (cerradas ? "NOT NULL " : "NULL ") +
-                "ORDER BY " + (cerradas ? "e.fechaCierre" : "e.fechaInicio") + " DESC, e.nombre", String.class)
-                .setParameter("curso", nombreCurso)
-                .setParameter("docente", nicknameDocente)
-                .getResultList();
-        }
-    }
-    
-    @Override
-    public int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-
-            Estudiante est = em.find(Estudiante.class, nomEstudiante);
-            ProgramaFormacion prog = em.find(ProgramaFormacion.class, nomPrograma);
-
-            if (est == null || prog == null) {
-                throw new Exception("El estudiante o el programa no existen.");
-            }
-
-            List<InscripcionPrograma> existentes = em.createQuery(
-                "SELECT ip FROM InscripcionPrograma ip WHERE ip.estudiante.nickname = :est AND ip.programa.nombre = :prog",
-                InscripcionPrograma.class)
-                .setParameter("est", nomEstudiante)
-                .setParameter("prog", nomPrograma)
-                .getResultList();
-
-            if (!existentes.isEmpty()) {
-                em.getTransaction().rollback();
-                return 1;
-            }
-
-            InscripcionPrograma nuevaInscripcion = new InscripcionPrograma(est, prog, java.time.LocalDate.now(), 1);
-            em.persist(nuevaInscripcion);
-
-            em.getTransaction().commit();
-            return 0;
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-    
-    @Override
- public void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
-     EntityManager em = emf.createEntityManager();
-     try {
-         em.getTransaction().begin();
-
-         Edicion edicion = em.find(Edicion.class, nombreEdicion);
-         Docente docente = em.find(Docente.class, nicknameDocente);
-
-         if (edicion == null) throw new Exception("La edición no existe.");
-         if (docente == null) throw new Exception("El docente no existe.");
-
-         // Si el docente no está en la lista de la edición, lo agregamos
-         if (!edicion.getDocentes().contains(docente)) {
-             edicion.getDocentes().add(docente);
-             em.merge(edicion); // Actualizamos la base de datos
-         } else {
-             throw new Exception("Este docente ya está asignado a esta edición.");
-         }
-
-         em.getTransaction().commit();
-     } catch (Exception e) {
-         if (em.getTransaction().isActive()) em.getTransaction().rollback();
-         throw e;
-     } finally {
-         em.close();
-     }
- }
- 
-// @Override
-//    public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
-//        EntityManager em = emf.createEntityManager();
-//        try {
-//            em.getTransaction().begin();
-//            
-//            Edicion edicion = em.find(Edicion.class, nombreEdicion);
-//            Docente docente = em.find(Docente.class, nicknameDocente);
-//            
-//            if (edicion == null) throw new Exception("La edición no existe.");
-//            if (docente == null) throw new Exception("El docente no existe.");
-//
-//            // Verificamos que el docente realmente esté en la lista antes de quitarlo
-//            if (edicion.getDocentes().contains(docente)) {
-//                edicion.getDocentes().remove(docente);
-//                em.merge(edicion); // Actualizamos la base de datos
-//            } else {
-//                throw new Exception("Este docente no está asignado a esta edición.");
-//            }
-//            
-//            em.getTransaction().commit();
-//        } catch (Exception e) {
-//            if (em.getTransaction().isActive()) em.getTransaction().rollback();
-//            throw e;
-//        } finally {
-//            em.close();
-//        }
-//    }
-
-public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
-    EntityManager em = emf.createEntityManager();
-    try {
-        em.getTransaction().begin();
-        
-        Edicion edicion = em.find(Edicion.class, nombreEdicion);
-        if (edicion == null) throw new Exception("La edición no existe.");
-
-        // Buscamos manualmente al docente usando los nicknames (Strings), que se comparan de forma segura
-        Docente docenteAEliminar = null;
-        for (Docente d : edicion.getDocentes()) {
-            if (d.getNickname().equals(nicknameDocente)) {
-                docenteAEliminar = d;
-                break;
-            }
-        }
-
-        // Si lo encontramos en la lista, lo removemos usando la misma instancia encontrada
-        if (docenteAEliminar != null) {
-            edicion.getDocentes().remove(docenteAEliminar);
-            em.merge(edicion); // Se sincroniza correctamente la tabla intermedia 'Organiza'
-        } else {
-            throw new Exception("Este docente no está asignado a esta edición.");
-        }
-        
-        em.getTransaction().commit();
-    } catch (Exception e) {
-        if (em.getTransaction().isActive()) em.getTransaction().rollback();
-        throw e;
-    } finally {
-        em.close();
-    }
-}
-
-    @Override
-    public boolean existeCurso(String nombre) throws Exception {
-        try (EntityManager em = emf.createEntityManager()) {
-            Curso curso = em.find(Curso.class, nombre);
-            return curso != null;
-        }
-    }
-    
-    @Override
-    public boolean existeProgramaFormacion(String nombre) throws Exception {
-        try (EntityManager em = emf.createEntityManager()) {
-            ProgramaFormacion programa = em.find(ProgramaFormacion.class, nombre);
-            return programa != null;
-        }
-    }
-    
-    @Override
-    public boolean existeEdicion(String nombre) throws Exception {
-        try (EntityManager em = emf.createEntityManager()) {
-            Edicion edicion = em.find(Edicion.class, nombre);
-            return edicion != null;
-        }
-    }
-    
 }

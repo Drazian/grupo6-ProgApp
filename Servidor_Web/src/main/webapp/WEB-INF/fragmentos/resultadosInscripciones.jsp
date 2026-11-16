@@ -37,7 +37,7 @@
                         <tr class="fila-mi-inscripcion" data-estado="${ins.estado}">
                             <!-- Imagen de la Edición (Req. 7.2) -->
                             <td style="padding: 10px; border: 1px solid #ddd; background: #fff; text-align: center;">
-                                <img src="ImagenServlet?nombre=${empty ins.edicion.imagen ? 'usr.png' : ins.edicion.imagen}" 
+                                <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty ins.edicion.imagen ? 'usr.png' : ins.edicion.imagen}" 
                                      alt="Portada" 
                                      style="width: 55px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
                             </td>

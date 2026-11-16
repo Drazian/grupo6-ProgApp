@@ -465,12 +465,7 @@ public class CrearProgramaForm extends javax.swing.JPanel {
         File tmp=Utils.Imagen.openSO();
         if(tmp!=null){
             imagen=tmp;
-            lblImagen.setIcon(
-                Utils.Imagen.resize(
-                    lblImagen.getWidth(),
-                    lblImagen.getHeight(),
-                    Utils.Imagen.loadSO(
-                        imagen.getAbsolutePath())));
+            lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(imagen.getAbsolutePath())));
         }
     }//GEN-LAST:event_btnAgregarImagenActionPerformed
 

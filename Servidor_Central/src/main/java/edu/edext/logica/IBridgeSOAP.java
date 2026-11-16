@@ -13,6 +13,8 @@ import edu.edext.datatypes.DtCurso;
 import jakarta.jws.WebService;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +22,7 @@ import java.util.Map;
  *
  * @author vdraco
  */
-//@WebService(serviceName="IBridgeSOAP")
+
 @WebService
 public interface IBridgeSOAP {
 
@@ -83,6 +85,14 @@ public interface IBridgeSOAP {
     void quitarDocenteDeEdicion(
             @WebParam(name="nombreEdicion") String nombreEdicion,
             @WebParam(name="nicknameDocente") String nicknameDocente) throws Exception;
+    @WebMethod(operationName="getImageBytes")
+    byte[] getImageBytes(
+            @WebParam(name="nombre") String nombre) throws Exception;
+    @WebMethod(operationName="guardarImagen")
+    String guardarImagen(
+            @WebParam(name="bytesImagen") byte[] bytesImagen,
+            @WebParam(name="nombreOriginal") String nombreOriginal,
+            @WebParam(name="nickname") String nickname) throws IOException;
 //********************************* Cursos ***********************************//
     @WebMethod(operationName="altaCurso")
     void altaCurso(

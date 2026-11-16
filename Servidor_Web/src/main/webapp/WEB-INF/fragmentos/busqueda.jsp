@@ -56,7 +56,7 @@
                         onmouseout="this.style.backgroundColor='transparent';">
 
                         <td style="padding: 12px 10px; text-align: center; vertical-align: top;">
-                            <img src="ImagenServlet?nombre=${empty item.imagen ? 'usr.png' : item.imagen}" 
+                            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty item.imagen ? 'usr.png' : item.imagen}" 
                                  alt="Imagen" 
                                  style="width: 38px; height: 38px; object-fit: cover; border-radius: 50%; border: 1px solid #ccc;">
                         </td>

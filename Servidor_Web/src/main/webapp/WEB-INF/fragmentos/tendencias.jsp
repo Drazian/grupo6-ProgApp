@@ -34,7 +34,7 @@
                                 ${t.posicion}
                             </td>
                             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                <img src="ImagenServlet?nombre=${fn:escapeXml(empty t.imagen ? 'usr.png' : t.imagen)}" alt=""
+                                <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${fn:escapeXml(empty t.imagen ? 'usr.png' : t.imagen)}" alt=""
                                      onerror="this.onerror=null; this.src='ImagenServlet?nombre=usr.png'"
                                      style="width: 48px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
                             </td>

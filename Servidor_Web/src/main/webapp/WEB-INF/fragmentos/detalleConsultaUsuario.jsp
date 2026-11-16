@@ -13,7 +13,7 @@
     <!-- ========================================================================= -->
     <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
         <div style="display: flex; gap: 20px; align-items: center;">
-            <img src="ImagenServlet?nombre=${empty requestScope.usuarioPerfil.imagen ? 'usr.png' : requestScope.usuarioPerfil.imagen}" 
+            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty requestScope.usuarioPerfil.imagen ? 'usr.png' : requestScope.usuarioPerfil.imagen}" 
                  alt="Foto Perfil" 
                  style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;">
             

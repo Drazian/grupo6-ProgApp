@@ -6,6 +6,7 @@ import edu.edext.datatypes.DtUsuario;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
 import edu.edext.tools.Utils;
+import edu.edext.tools.cfg;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JOptionPane;
@@ -189,6 +190,7 @@ public class ConsultaPrograma extends javax.swing.JPanel {
         lblImagen.setFocusable(false);
         lblImagen.setRequestFocusEnabled(false);
 
+        txtCategorias.setEditable(false);
         txtCategorias.setColumns(20);
         txtCategorias.setRows(5);
         jScrollPane6.setViewportView(txtCategorias);
@@ -292,14 +294,11 @@ public class ConsultaPrograma extends javax.swing.JPanel {
 
     private void cbProgramaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProgramaActionPerformed
         try{            
-            //TODO: cargar labels
             if (cbPrograma.getItemCount() < 0){
-            //Si no hay ningun programa creado, no hay nada que cargar.
-            return;
+                return;
             }
             
             if (cbPrograma.getSelectedItem() == null){
-                //Validamos que haya un item seleccionado.
                 return;
             }
             
@@ -320,15 +319,16 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                                     : "Sin categorías";
             txtCategorias.setText(categoriasStr);
             List<DtUsuario> inscriptos=ic.getEstudiantesInscriptosPrograma(programa);
-            //System.out.println();
+            Utils.GUI.clear(tblInscriptos);
             for (DtUsuario ins : inscriptos)
                 Utils.GUI.addRow(tblInscriptos, new Object[]{ins.getNickname(), ins.getNombre(), ins.getApellido(), ins.getEmail()});
-            Utils.GUI.getModel(tblInscriptos).setRowCount(8);
+            if(Utils.GUI.getModel(tblInscriptos).getRowCount()<8)
+                Utils.GUI.getModel(tblInscriptos).setRowCount(8);
+            
+            int width=lblImagen.getWidth()<160?160:lblImagen.getWidth(),
+            height=lblImagen.getHeight()<160?160:lblImagen.getHeight();            
+            lblImagen.setIcon(Utils.Imagen.resize(width, height, Utils.Imagen.loadSO(cfg.fullpathImagen()+aux.getImagen())));
 
-            
-            
-            
-            
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al obtener los datos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }
@@ -393,12 +393,14 @@ public class ConsultaPrograma extends javax.swing.JPanel {
                         aux.getDuracion(),
                         aux.getCantidadHoras(),
                         aux.getCreditos(),
-                        aux.getFechaRegistro(),
+                        Utils.Fecha.assignFormato(aux.getFechaRegistro()),
                         aux.getUrl(),
                         strPrevias,
                         strCategorias
                     });   
             }
+            if(Utils.GUI.getModel(tblCursos).getRowCount()<8)
+                Utils.GUI.getModel(tblCursos).setRowCount(8);
 
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al obtener Cursos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);

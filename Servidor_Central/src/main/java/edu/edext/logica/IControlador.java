@@ -11,6 +11,8 @@ import edu.edext.datatypes.DtPrograma;
 import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtCurso;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -29,22 +31,22 @@ public interface IControlador {
 //********************************* Usuarios *********************************//
     void crearUsuario(DtUsuario usuario) throws Exception;
     void crearUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception;     // exporta a Web
-    boolean existeUsuario(String nickname) throws Exception;    // exporta a Web
-    boolean existeEmail(String email) throws Exception;         // exporta a Web
     void modificarUsuario(DtUsuario usuarioModificado)throws Exception;
     void modificarUsuario(DtUsuario usuario, byte[] bytesImagen, String nombreOriginal) throws Exception; // exporta a Web
+    boolean existeUsuario(String nickname) throws Exception;    // exporta a Web
+    boolean existeEmail(String email) throws Exception;         // exporta a Web
     List<DtUsuario> listarUsuarios()throws Exception;           // exporta a Web
-    DtUsuario obtenerUsuario(String nicknameOEmail) throws Exception;   // exporta a Web
     List<String> listarDocentes() throws Exception;             // exporta a Web
+    List<String> listarSeguidos(String nickname) throws Exception;   // exporta a Web
+    List<String> listarSeguidores(String nickname) throws Exception; // exporta a Web
+    DtUsuario obtenerUsuario(String nicknameOEmail) throws Exception;   // exporta a Web
     DtUsuario validarNick(String nickname, String password) throws Exception; // exporta a Web
     DtUsuario validarEmail(String email, String password) throws Exception;   // exporta a Web
     void seguirUsuario(String nicknameSeguidor, String nicknameASeguir) throws Exception;       // exporta a Web
     void dejarDeSeguirUsuario(String nicknameSeguidor, String nicknameADejar) throws Exception; // exporta a Web
-    List<String> listarSeguidos(String nickname) throws Exception;   // exporta a Web
-    List<String> listarSeguidores(String nickname) throws Exception; // exporta a Web
-    void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception; // exporta a Web
-    void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception; // exporta a Web
-
+    byte[] getImageBytes(String nombre); // exporta a Web
+    String guardarImagen(byte[] bytesImagen, String nombreOriginal, String nickname) throws IOException;
+    
 //********************************* Cursos ***********************************//
     void altaCurso(DtCurso curso, String nombreInstituto) throws Exception; // exporta a Web
     DtConsultaCurso obtenerDatosCurso(String nombreCurso) throws Exception; // exporta a Web
@@ -53,6 +55,7 @@ public interface IControlador {
     List<String> listarCursosPorInstituto(String nombreInstituto) throws Exception; // exporta a Web
     List<String> listarCursosPorCategoria(String nombreInstituto) throws Exception; // exporta a Web
     List<DtCurso> listarCursos() throws Exception;              // exporta a Web
+    boolean existeCurso(String nombre) throws Exception;
 
 //********************************* Edicion **********************************//
     void altaEdicionCurso(String nombreCurso, DtEdicion dt) throws Exception;   // exporta a Web
@@ -60,7 +63,9 @@ public interface IControlador {
     List<String> listaEdicionPorCurso(String curso) throws Exception;   // exporta a Web
     List<DtEdicion> listarEdicionPorCurso(String curso) throws Exception;
     List<DtEdicion> listarEdicionesPorUsuario(String nickname) throws Exception;    // exporta a Web
-//    DtEdicion buscarEdicion(String nombre) throws Exception;
+    boolean existeEdicion(String nombre) throws Exception;
+    void agregarDocenteAEdicion(String nombreEdicion, String nicknameDocente) throws Exception; // exporta a Web
+    void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception; // exporta a Web
 
 //******************************* Inscripcion ********************************//
     int setInscripcion(String estudiante, String edicion) throws Exception;
@@ -90,27 +95,23 @@ public interface IControlador {
 //****************************** Acta de Estudio *****************************//
     DtActaEstudio getActaEstudio(String nicknameEstudiante, String nombrePrograma) throws Exception;       // exporta a Web
 
-//************************** Listado de tendencias (7.3) **********************//
+//**************************** Listado de tendencias *************************//
     boolean registrarVisitaCurso(String nombreCurso) throws Exception;                 // exporta a Web
     List<DtCursoVisitas> listarCursosMasVisitados() throws Exception;                  // exporta a Web
     int setInscripcionPrograma(String nomEstudiante, String nomPrograma) throws Exception;  // exporta a Web
 
 //**************************** ProgramaFormacion *****************************//
     boolean setCrearProgramaFormacion(DtPrograma programa) throws Exception;
+    boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception; // exporta a Web
     boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal, String docente) throws Exception;
     void agregarProgramaCurso(String programa, String curso) throws Exception; // exporta a Web
     DtPrograma buscarPrograma(String nombre) throws Exception;  // exporta a Web
     List<DtCurso> listarCursosPorPrograma(String nombre) throws Exception;
     List<DtPrograma> listarProgramasPorUsuario(String nickname) throws Exception;   // exporta a Web
     List<DtPrograma> listarProgramas() throws Exception;        // exporta a Web
-    boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception; // exporta a Web
+    boolean existeProgramaFormacion(String nombre) throws Exception;
 
 //***************************** Datos de Prueba ******************************//
     int cargarDatosDePrueba() throws Exception;
-    
-    
-    public boolean existeCurso(String nombre) throws Exception;
-    public boolean existeProgramaFormacion(String nombre) throws Exception;
-    public boolean existeEdicion(String nombre) throws Exception;
     
 }

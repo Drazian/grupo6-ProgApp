@@ -1,6 +1,7 @@
 package edu.edext.tools;
 //************************ Capa presentacion ***********************************
 
+import edu.edext.datatypes.DtUsuario;
 import edu.edext.logica.Fabrica;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class InscripcionEdicionHelper {
         tmp=null;
         return  ret;
     }
-    
+
     private List<String> getCandidatos(String nombre){
         Pipe tmp=new Pipe();
         List<String> ret;

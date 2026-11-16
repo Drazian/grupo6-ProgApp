@@ -10,17 +10,13 @@ import edu.edext.controlador.ws.DtUsuario;
 import edu.edext.controlador.ws.DtEdicion;
 import edu.edext.controlador.ws.MapEntry;
 import edu.edext.controlador.ws.DtCurso;
-import edu.edext.tools.Utils;
+import edu.edext.tools.Utilsw;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- *
- * @author vdraco
- */
 public class Remux {
 
     public static DtUsuario DtUsuario(String nickname, String password, String email, String nombre, String apellido, String imagen, LocalDate fNacimiento, 
@@ -36,7 +32,7 @@ public class Remux {
         ret.setNombre(nombre);
         ret.setApellido(apellido);
         ret.setImagen(imagen);
-        ret.setFNacimiento(Utils.Fecha.assignFormato(fNacimiento));
+        ret.setFNacimiento(Utilsw.Fecha.assignFormato(fNacimiento));
         if(institutos!=null)
             ret.getInstitutos().addAll(institutos);
         ret.setTipoUsuario(tipoUsuario);
@@ -55,9 +51,9 @@ public class Remux {
         DtPrograma ret=new DtPrograma();
         ret.setNombre(nombre);
         ret.setDescripcion(descripcion);
-        ret.setFechaRegistro(Utils.Fecha.assignFormato(fechaRegistro));
-        ret.setFechaInicio(Utils.Fecha.assignFormato(fechaInicio));
-        ret.setFechaFin(Utils.Fecha.assignFormato(fechaFin));
+        ret.setFechaRegistro(Utilsw.Fecha.assignFormato(fechaRegistro));
+        ret.setFechaInicio(Utilsw.Fecha.assignFormato(fechaInicio));
+        ret.setFechaFin(Utilsw.Fecha.assignFormato(fechaFin));
         if(cursos!=null)
             ret.getCursos().addAll(cursos);
         if(nameCursos!=null)
@@ -79,7 +75,7 @@ public class Remux {
         ret.setCantidadHoras(cantidadHoras);
         ret.setCreditos(creditos);
         ret.setUrl(url);
-        ret.setFechaRegistro(Utils.Fecha.assignFormato(fechaRegistro));
+        ret.setFechaRegistro(Utilsw.Fecha.assignFormato(fechaRegistro));
         ret.setInstituto(instituto);
         if(previas!=null)
             ret.getPrevias().addAll(previas);
@@ -101,9 +97,9 @@ public class Remux {
         DtEdicion ret=new DtEdicion();
         ret.setNombre(nombre);
         ret.setCupo(cupo);
-        ret.setFechaInicio(Utils.Fecha.assignFormato(fechaInicio));
-        ret.setFechaFin(Utils.Fecha.assignFormato(fechaFin));
-        ret.setFechaPublicacion(Utils.Fecha.assignFormato(fechaPublicacion));
+        ret.setFechaInicio(Utilsw.Fecha.assignFormato(fechaInicio));
+        ret.setFechaFin(Utilsw.Fecha.assignFormato(fechaFin));
+        ret.setFechaPublicacion(Utilsw.Fecha.assignFormato(fechaPublicacion));
         ret.setCurso(curso);
         if(docentes!=null)
             ret.getDocentes().addAll(docentes);
@@ -117,7 +113,7 @@ public class Remux {
         DtInscripcionEdicion ret=new DtInscripcionEdicion();
         ret.setEstudiante(estudiante);
         ret.setEdicion(edicion);
-        ret.setFechaInscripcion(Utils.Fecha.assignFormato(fechaInscripcion));
+        ret.setFechaInscripcion(Utilsw.Fecha.assignFormato(fechaInscripcion));
         ret.setEstado(estado);
         ret.setPrioridad(prioridad);
         return ret;

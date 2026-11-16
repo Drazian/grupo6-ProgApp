@@ -21,10 +21,8 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
      */
     public agregarCursoPrograma() {
         initComponents();
-//        Utils.GUI.sizeColumn(tbl, , , Utils.ALIGN_CENTER),;        Utils.GUI.sizeColumn(tbl, 3, 35, Utils.ALIGN_CENTER);
-        Utils.GUI.sizeColumn(tbl, 3, 35, Utils.ALIGN_CENTER);
-        //Utils.Crypt.compareBCrypt(passIN, passDB)
-        
+        Utils.GUI.sizeColumn(tbl, 3, 40, Utils.ALIGN_CENTER);
+        Utils.GUI.sizeColumn(tbl, 4, 55, Utils.ALIGN_CENTER);
         cargarProgramas();
         cargarCursos();
     }
@@ -50,8 +48,18 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         cbPrograma = new javax.swing.JComboBox<>();
         lblPrograma = new javax.swing.JLabel();
 
-        setMinimumSize(new java.awt.Dimension(610, 380));
-        setPreferredSize(new java.awt.Dimension(730, 490));
+        setMinimumSize(new java.awt.Dimension(730, 440));
+        setPreferredSize(new java.awt.Dimension(730, 440));
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                formMouseDragged(evt);
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+        });
 
         tbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -79,9 +87,17 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        tbl.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                tblMouseDragged(evt);
+            }
+        });
         tbl.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tblMousePressed(evt);
             }
         });
         jScrollPane1.setViewportView(tbl);
@@ -128,9 +144,20 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(20, 12, 21, 97);
         jPanel1.add(btnAgregar, gridBagConstraints);
 
+        jPanel3.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jPanel3MouseDragged(evt);
+            }
+        });
+        jPanel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jPanel3MousePressed(evt);
+            }
+        });
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
-        cbPrograma.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbPrograma.setMinimumSize(new java.awt.Dimension(120, 34));
+        cbPrograma.setPreferredSize(new java.awt.Dimension(120, 34));
         cbPrograma.addActionListener(this::cbProgramaActionPerformed);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -203,6 +230,8 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     }
     
     private void cargarCursos(){
+        Utils.GUI.sizeColumn(tbl, 3, 40, Utils.ALIGN_CENTER);
+        Utils.GUI.sizeColumn(tbl, 4, 55, Utils.ALIGN_CENTER);
         try{
             txtCurso.setText(""); 
             
@@ -225,13 +254,15 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
                         aux.getDuracion(),
                         aux.getCantidadHoras(),
                         aux.getCreditos(),
-                        aux.getFechaRegistro(),
+                        Utils.Fecha.assignFormato(aux.getFechaRegistro()),
                         aux.getUrl(),
                         strPrevias,
                         strCategorias
                     });   
             }
-            
+            if(Utils.GUI.getModel(tbl).getRowCount()<14)
+                Utils.GUI.getModel(tbl).setRowCount(14);
+
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al obtener Cursos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }
@@ -272,6 +303,30 @@ public class agregarCursoPrograma extends javax.swing.JPanel {
     private void jPanel1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseDragged
         mouse.MouseContenedorDragged(evt);
     }//GEN-LAST:event_jPanel1MouseDragged
+
+    private void jPanel3MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel3MousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_jPanel3MousePressed
+
+    private void jPanel3MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel3MouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_jPanel3MouseDragged
+
+    private void tblMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_tblMousePressed
+
+    private void tblMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_tblMouseDragged
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_formMouseDragged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

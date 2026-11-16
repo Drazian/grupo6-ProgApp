@@ -343,12 +343,7 @@ public class AltaUsuario extends javax.swing.JPanel {
         File tmp=Utils.Imagen.openSO();
         if(tmp!=null){
             imagenSeleccionada=tmp;
-            lblImagen.setIcon(
-                    Utils.Imagen.resize(
-                            lblImagen.getWidth(), 
-                            lblImagen.getHeight(), 
-                            Utils.Imagen.loadSO(
-                                    imagenSeleccionada.getAbsolutePath())));
+            lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(imagenSeleccionada.getAbsolutePath())));
         }
         //loadImagen();
     }//GEN-LAST:event_btnAgregarImagenActionPerformed
@@ -547,12 +542,6 @@ public class AltaUsuario extends javax.swing.JPanel {
         cargarImagen(pathImagen+Utils.OS.getSeparador()+usuario.getImagen());
 
         imagenSeleccionada =new File(pathImagen, usuario.getImagen()); 
-        //System.out.println("muestro : "+pathImagen+Utils.OS.getSeparador()+usuario.getImagen());
-        //System.out.println("file : "+ imagenSeleccionada.getAbsolutePath());
-        //System.out.println(RUTADEFAULT.substring(0, RUTADEFAULT.length()-1)); 
-        //System.out.println(RUTADEFAULT); 
-//        imagenSeleccionada =
-//                new File("imagenes", usuario.getImagen()); 
         
     }
     //carga una imagen generica de usuario en el formulario

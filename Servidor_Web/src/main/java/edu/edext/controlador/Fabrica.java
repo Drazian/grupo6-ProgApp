@@ -6,10 +6,6 @@ import jakarta.xml.ws.BindingProvider;
 import edu.edext.tools.cfgw;
 import org.tinylog.Logger;
 
-/**
- *
- * @author vdraco
- */
 public class Fabrica {
 
     public static IBridgeSOAP getConexion(){
@@ -20,5 +16,5 @@ public class Fabrica {
         Logger.info("Conectando con : "+cfgw.getWSDL());
         return ret;
     }
-    
+
 }

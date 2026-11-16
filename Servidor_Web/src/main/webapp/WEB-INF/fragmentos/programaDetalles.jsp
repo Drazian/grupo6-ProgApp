@@ -20,7 +20,7 @@
         
         <!-- Imagen del Programa -->
         <div style="flex-shrink: 0; text-align: center;">
-            <img src="ImagenServlet?nombre=${empty programa.imagen ? 'usr.png' : programa.imagen}" 
+            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty programa.imagen ? 'usr.png' : programa.imagen}" 
                  alt="Imagen del Programa" 
                  style="width: 140px; height: 140px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc; background: #f8f9fa;">
         </div>
@@ -80,7 +80,7 @@
                                     onmouseout="this.style.backgroundColor='transparent';">
                                     
                                     <td style="padding: 10px; text-align: center;">
-                                        <img src="ImagenServlet?nombre=${empty curso.imagen ? 'usr.png' : curso.imagen}" 
+                                        <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty curso.imagen ? 'usr.png' : curso.imagen}" 
                                              alt="Curso" 
                                              style="width: 38px; height: 38px; object-fit: cover; border-radius: 50%; border: 1px solid #ccc;">
                                     </td>

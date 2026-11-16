@@ -12,7 +12,6 @@ import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
 import edu.edext.tools.jTable;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JOptionPane;
@@ -41,7 +40,10 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         tableEdiciones=new jTable(tblEdiciones);
         tableProgramas=new jTable(tblProgramas);
         tableCategorias=new jTable(tblCategorias);
-        
+        Utils.GUI.getModel(tblPrevias).setRowCount(8);
+        Utils.GUI.getModel(tblEdiciones).setRowCount(8);
+        Utils.GUI.getModel(tblProgramas).setRowCount(8);
+        Utils.GUI.getModel(tblCategorias).setRowCount(8);   
         // Inicializar la conexión con la lógica y cargar datos
         control = Fabrica.getInstance().getIControlador();
         cargarInstitutos();
@@ -75,8 +77,14 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         textoCreditos.setText("");
         textoURL.setText("");
         textoFechaAlta.setText("");
-//        tablePrevias.clear();
         Utils.GUI.clear(tblPrevias);
+        Utils.GUI.clear(tblEdiciones);
+        Utils.GUI.clear(tblProgramas);
+        Utils.GUI.clear(tblCategorias);
+        Utils.GUI.getModel(tblPrevias).setRowCount(8);
+        Utils.GUI.getModel(tblEdiciones).setRowCount(8);
+        Utils.GUI.getModel(tblProgramas).setRowCount(8);
+        Utils.GUI.getModel(tblCategorias).setRowCount(8); 
         tableEdiciones.clear();
         tableProgramas.clear();
         tableCategorias.clear();
@@ -149,17 +157,13 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         institutoLabel.setText("Instituto .:");
         institutoLabel.setMaximumSize(new java.awt.Dimension(200, 22));
 
-        institutoSeleccion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         institutoSeleccion.setMaximumSize(new java.awt.Dimension(200, 22));
-        institutoSeleccion.setMinimumSize(null);
         institutoSeleccion.addActionListener(this::institutoSeleccionActionPerformed);
 
         cursoLabel.setText("Curso .:");
         cursoLabel.setMaximumSize(new java.awt.Dimension(200, 22));
 
-        cursoSeleccion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cursoSeleccion.setMaximumSize(new java.awt.Dimension(200, 22));
-        cursoSeleccion.setMinimumSize(null);
         cursoSeleccion.addActionListener(this::cursoSeleccionActionPerformed);
 
         nombreLabel.setText("Nombre .:");
@@ -214,12 +218,6 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         tblPrevias.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null}
             },
             new String [] {
@@ -241,7 +239,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        tblPrevias.setColumnSelectionAllowed(true);
+        tblPrevias.setCellSelectionEnabled(false);
         tblPrevias.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblPreviasMouseClicked(evt);
@@ -264,12 +262,6 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
 
         tblEdiciones.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null}
             },
@@ -316,12 +308,6 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         tblProgramas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
                 {null, null, null, null, null, null}
             },
             new String [] {
@@ -367,12 +353,6 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
         tblCategorias.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null},
-                {null},
-                {null},
-                {null},
-                {null},
-                {null},
-                {null},
                 {null}
             },
             new String [] {
@@ -415,6 +395,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
 
         listasAsociadas.addTab("Categorias", jPanel3);
 
+        textoDescripcion.setEditable(false);
         textoDescripcion.setColumns(20);
         textoDescripcion.setLineWrap(true);
         textoDescripcion.setRows(5);
@@ -447,7 +428,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(urlLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(45, 45, 45)
-                                .addComponent(textoURL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(textoURL, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(descripcionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(50, 50, 50)
@@ -576,8 +557,9 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
                 textoURL.setText(dt.getUrl());
                 lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(cfg.fullpathImagen()+dt.getImagen())));
                 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                textoFechaAlta.setText(sdf.format(dt.getFechaRegistro()));
+//                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+//                textoFechaAlta.setText(sdf.format(dt.getFechaRegistro()));
+                  textoFechaAlta.setText(Utils.Fecha.assignFormato(dt.getFechaRegistro(), "dd/MM/yyyy"));
 
                 //DefaultTableModel modelPrevias=(DefaultTableModel) tblCursos.getModel();
                 //DefaultTableCellRenderer CENTRO= new DefaultTableCellRenderer();
@@ -597,8 +579,10 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
 //                Utils.GUI.sizeColumn(tblPrevias, 4, 20, Utils.ALIGN_CENTER);
 //                Utils.GUI.sizeColumn(tblPrevias, 5, Utils.ALIGN_LEFT);
 //                tableEdiciones.sizeColumn(1, 20, tableEdiciones.ALIGN_CENTER);
-//                tableEdiciones.sizeColumn(2, 60, tableEdiciones.ALIGN_CENTER);
-//                tableEdiciones.sizeColumn(3, 60, tableEdiciones.ALIGN_CENTER);
+//                Utils.GUI.sizeColumn(tblPrevias, 1, 20, Utils.ALIGN_CENTER);
+//                //tableEdiciones.sizeColumn(2, 60, tableEdiciones.ALIGN_LEFT);
+////                tableEdiciones.sizeColumn(3, 60, tableEdiciones.ALIGN_CENTER);
+//                Utils.GUI.sizeColumn(tblPrevias, 3, 60, tableEdiciones.ALIGN_CENTER);
 //                tableEdiciones.sizeColumn(4, 60, tableEdiciones.ALIGN_RIGHT);
 //                tableEdiciones.alignment(5, tableEdiciones.ALIGN_LEFT);
 //                tableProgramas.sizeColumn(1, 60, tableProgramas.ALIGN_CENTER);
@@ -614,30 +598,34 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
                     for(DtCurso p : dt.getPrevias())
                         Utils.GUI.addRow(tblPrevias, new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), Utils.Fecha.assignFormato(p.getFechaRegistro()), concatena(dt.getNamePrevias()), p.getDescripcion()}); 
                     Utils.GUI.getModel(tblPrevias).setRowCount(8);
+                    if(Utils.GUI.getModel(tblPrevias).getRowCount()<8)
+                        Utils.GUI.getModel(tblPrevias).setRowCount(8);
                 }
-        //(new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), p.getFechaRegistro(), concatena(dt.getNamePrevias()), p.getDescripcion()});
-                    //tablePrevias.assignData(); }
-
-
-
-//                if(dt.getPrevias()!=null){
-//                    for(DtCurso p : dt.getPrevias())
-//                        tablePrevias.addRow(new Object[]{p.getNombre(), p.getDuracion(), p.getCantidadHoras(), p.getCreditos(), p.getFechaRegistro(), concatena(dt.getNamePrevias()), p.getDescripcion()});
-//                    tablePrevias.assignData(); }
                 if(dt.getEdiciones()!=null){ 
+                    Utils.GUI.clear(tblEdiciones);
                     for(DtEdicion p : dt.getEdiciones())
-                        tableEdiciones.addRow(new Object[]{p.getNombre(), p.getCupo()!=-1?p.getCupo():"Sin cupo" , p.getFechaInicio(), p.getFechaFin(), p.getFechaPublicacion(), concatena(p.getNameDocentes())});
-                    tableEdiciones.assignData(); }
+                        tableEdiciones.addRow(new Object[]{p.getNombre(), p.getCupo()!=-1?p.getCupo():"Sin cupo" , Utils.Fecha.assignFormato(p.getFechaInicio()), Utils.Fecha.assignFormato(p.getFechaFin()), Utils.Fecha.assignFormato(p.getFechaPublicacion()), concatena(p.getNameDocentes())});
+                    tableEdiciones.assignData();
+                    if(Utils.GUI.getModel(tblEdiciones).getRowCount()<8)
+                        Utils.GUI.getModel(tblEdiciones).setRowCount(8);
+                }
                 if(dt.getProgramas()!=null){
+                    Utils.GUI.clear(tblProgramas);
                     for(DtPrograma p : dt.getProgramas())
-                        tableProgramas.addRow(new Object[]{p.getNombre(), p.getFechaInicio(), p.getFechaFin(), p.getFechaRegistro(), concatena(p.getCategorias()), p.getDescripcion()});
-                    tableProgramas.assignData(); }
+                        tableProgramas.addRow(new Object[]{p.getNombre(), Utils.Fecha.assignFormato(p.getFechaInicio()), Utils.Fecha.assignFormato(p.getFechaFin()), Utils.Fecha.assignFormato(p.getFechaRegistro()), concatena(p.getCategorias()), p.getDescripcion()});
+                    tableProgramas.assignData();
+                    if(Utils.GUI.getModel(tblProgramas).getRowCount()<8)
+                        Utils.GUI.getModel(tblProgramas).setRowCount(8);
+                }
                 if(dt.getCategorias()!=null){
+                    Utils.GUI.clear(tblCategorias);
                     for(DtCategoria p : dt.getCategorias()){
                         tableCategorias.addRow(new Object[]{p.getNombre()});
                     }
-                    
-                    tableCategorias.assignData(); }
+                    tableCategorias.assignData();
+                    if(Utils.GUI.getModel(tblCategorias).getRowCount()<8)
+                        Utils.GUI.getModel(tblCategorias).setRowCount(8);
+                }
                     
                     
                     
@@ -683,6 +671,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
 //
 //            ventana.cargarCurso(nombreCurso);
 //
+//
 //            // Buscar el JDesktopPane que contiene a ConsultaUsuario
 //            JDesktopPane desktop = (JDesktopPane) SwingUtilities.getAncestorOfClass(
 //                JDesktopPane.class, this);
@@ -698,6 +687,7 @@ public class ConsultaCurso extends javax.swing.JInternalFrame {
 //                }
 //            }
 //        }
+    
 
     }//GEN-LAST:event_tblPreviasMouseClicked
 

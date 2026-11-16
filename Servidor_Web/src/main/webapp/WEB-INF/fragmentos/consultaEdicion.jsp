@@ -12,7 +12,7 @@
         
         <!-- Izquierda: Portada (Ocupa hasta 400px) -->
         <div style="flex: 1; min-width: 300px; max-width: 400px;">
-            <img src="ImagenServlet?nombre=${edicion.imagen}" alt="Portada" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${edicion.imagen}" alt="Portada" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
         </div>
 
         <!-- Derecha: Estudiantes Aceptados (Toma el resto del espacio) -->
@@ -36,7 +36,7 @@
                                 <c:forEach var="ins" items="${inscripcionesAceptadas}">
                                     <tr>
                                         <td style="padding: 8px; border-bottom: 1px solid #eee; background: #fff; text-align: center;">
-                                            <img src="ImagenServlet?nombre=${empty ins.estudiante.imagen ? 'usr.png' : ins.estudiante.imagen}" 
+                                            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty ins.estudiante.imagen ? 'usr.png' : ins.estudiante.imagen}" 
                                                  alt="Avatar" 
                                                  style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
                                         </td>
@@ -110,7 +110,7 @@
                                 <div style="display: flex; align-items: center;">
                                     <c:choose>
                                         <c:when test="${not empty docente.imagen}">
-                                            <img src="ImagenServlet?nombre=${docente.imagen}" alt="Foto" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${docente.imagen}" alt="Foto" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                         </c:when>
                                         <c:otherwise>
                                             <div style="width: 45px; height: 45px; border-radius: 50%; background: #bdc3c7; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; margin-right: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
