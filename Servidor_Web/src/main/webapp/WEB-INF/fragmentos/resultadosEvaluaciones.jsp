@@ -50,7 +50,7 @@
                         <c:forEach var="ins" items="${resultadosEvaluaciones}">
                             <tr class="fila-resultado-evaluacion" data-edicion="${fn:escapeXml(ins.edicion.nombre)}">
                                 <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    <img src="ImagenServlet?nombre=${fn:escapeXml(empty ins.edicion.imagen ? 'usr.png' : ins.edicion.imagen)}" alt="Portada"
+                                    <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${fn:escapeXml(empty ins.edicion.imagen ? 'usr.png' : ins.edicion.imagen)}" alt="Portada"
                                          style="width: 48px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
                                 </td>
                                 <td style="padding: 10px; border: 1px solid #ddd;">

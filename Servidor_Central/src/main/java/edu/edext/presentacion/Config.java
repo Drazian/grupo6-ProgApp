@@ -5,9 +5,11 @@ import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
 import java.io.IOException;
 import edu.edext.tools.cfg;
+import edu.edext.tools.cronometroHelper;
 import java.awt.Desktop;
 import java.awt.Color;
 import java.io.File;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -15,20 +17,24 @@ import java.io.File;
  */
 public class Config extends javax.swing.JPanel {
     private final String VERIFICAR="Verificar",
-                         DISPONIBLE="Disponible";
+                         DISPONIBLE="Disponible",
+                         OCUPADO="Ocupado";
     private final Color resetColor;
     private final Mouse mouse=new Mouse();
     private String tmpImagen, tmpIP, tmpPort;
+    private final cronometroHelper reloj;
     private CfgDB[] confDB;
     /**
      * Creates new form Config
      */
     public Config() {
         initComponents();
+        reloj=new cronometroHelper(500, jLUsadoxServer, jLUsadoxServer);
         Utils.GUI.soloNumeros(jTPort);
         resetColor=jBPort.getBackground();
         loadConf();
         jBGuardar.setEnabled(false);
+        reloj.kill();
     }
 
     /**
@@ -52,6 +58,7 @@ public class Config extends javax.swing.JPanel {
         jButton3 = new javax.swing.JButton();
         jBGuardar = new javax.swing.JButton();
         jBCancelar = new javax.swing.JButton();
+        jLUsadoxServer = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(510, 220));
         setPreferredSize(new java.awt.Dimension(510, 220));
@@ -71,10 +78,10 @@ public class Config extends javax.swing.JPanel {
         add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 23, -1, -1));
 
         jLabel2.setText("Puerto ....:");
-        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 119, -1, -1));
+        add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 108, -1, -1));
 
         jLabel3.setText("IP ...:");
-        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 69, -1, -1));
+        add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 66, -1, -1));
 
         jTImagen.addCaretListener(this::jTImagenCaretUpdate);
         jTImagen.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -85,10 +92,10 @@ public class Config extends javax.swing.JPanel {
         add(jTImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(174, 20, 197, -1));
 
         jTIP.addCaretListener(this::jTIPCaretUpdate);
-        add(jTIP, new org.netbeans.lib.awtextra.AbsoluteConstraints(86, 66, 218, -1));
+        add(jTIP, new org.netbeans.lib.awtextra.AbsoluteConstraints(86, 62, 218, -1));
 
         jTPort.addCaretListener(this::jTPortCaretUpdate);
-        add(jTPort, new org.netbeans.lib.awtextra.AbsoluteConstraints(101, 116, 124, -1));
+        add(jTPort, new org.netbeans.lib.awtextra.AbsoluteConstraints(101, 102, 124, -1));
 
         jButton1.setText("....");
         jButton1.addActionListener(this::jButton1ActionPerformed);
@@ -100,19 +107,25 @@ public class Config extends javax.swing.JPanel {
 
         jBPort.setText("Disponible");
         jBPort.addActionListener(this::jBPortActionPerformed);
-        add(jBPort, new org.netbeans.lib.awtextra.AbsoluteConstraints(237, 110, -1, -1));
+        add(jBPort, new org.netbeans.lib.awtextra.AbsoluteConstraints(237, 102, -1, -1));
 
         jButton3.setText("Abrir");
         jButton3.addActionListener(this::jButton3ActionPerformed);
-        add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(316, 64, -1, 28));
+        add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(316, 60, -1, 28));
 
         jBGuardar.setText("Guardar");
         jBGuardar.addActionListener(this::jBGuardarActionPerformed);
-        add(jBGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(293, 164, -1, -1));
+        add(jBGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(293, 148, -1, -1));
 
         jBCancelar.setText("Cancelar");
         jBCancelar.addActionListener(this::jBCancelarActionPerformed);
-        add(jBCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(389, 164, -1, -1));
+        add(jBCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(389, 148, -1, -1));
+
+        jLUsadoxServer.setFont(new java.awt.Font("Ubuntu", 1, 14)); // NOI18N
+        jLUsadoxServer.setForeground(new java.awt.Color(177, 0, 0));
+        jLUsadoxServer.setText("Usado por el Server");
+        jLUsadoxServer.setName(""); // NOI18N
+        add(jLUsadoxServer, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 110, 140, 18));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -122,8 +135,13 @@ public class Config extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        String tmp=jTImagen.getText().trim();
+        String tmp=jTImagen.getText().trim(), separador=Utils.OS.getSeparador(), work=Utils.OS.getWorkPath();
         if(tmp.startsWith("~")) tmp=Utils.OS.getHomePath()+tmp.substring(1);
+        else if(tmp.startsWith(".."+separador)) tmp=work.substring(0, work.lastIndexOf(separador))+tmp.substring(2);
+        else if(tmp.startsWith("."+separador)) tmp=work+tmp.substring(2);
+        if(!Utils.Disk.isExist(tmp))
+            JOptionPane.showMessageDialog(this, "No existe la carpeta.","Error",JOptionPane.ERROR_MESSAGE);
+        System.out.println(tmp);
         File tmpFile=new File(tmp);
         if(tmpFile.exists())
             try {
@@ -136,18 +154,25 @@ public class Config extends javax.swing.JPanel {
     private void jBPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBPortActionPerformed
         int tmp;
         if(jBPort.getText().equals(VERIFICAR)){
-            if(Utils.OS.isPortFree(jTPort.getText()))
-                jBPort.setBackground(Color.green);
-            else
+            if(!Utils.OS.isPortFree(jTPort.getText())){
+//                jBPort.setBackground(Color.green);
+//            else{
                 jBPort.setBackground(Color.red);
-        }else
-            if((tmp=Utils.OS.getPortFree())!=-1)
-                jTPort.setText(Utils.Cast.valueOf(tmp));
+                jBPort.setText(OCUPADO);
+                reloj.enabled(true);
+                reloj.alarm(true, "Usado por el Server");
+            }
+        }
+//        else
+//            if((tmp=Utils.OS.getPortFree())!=-1)
+//                jTPort.setText(Utils.Cast.valueOf(tmp));
     }//GEN-LAST:event_jBPortActionPerformed
 
     private void jTPortCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_jTPortCaretUpdate
         refreshBGuardar();
         jBPort.setBackground(resetColor);
+        reloj.kill();
+
         if(!Utils.Validate.isEmpty(jTPort.getText()))
             jBPort.setText(VERIFICAR);
         else
@@ -221,6 +246,7 @@ public class Config extends javax.swing.JPanel {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JLabel jLUsadoxServer;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

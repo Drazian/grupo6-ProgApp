@@ -1,64 +1,46 @@
 package edu.edext.controlador;
 
-//import edu.edext.datatypes.DtEdicion;
-//import edu.edext.datatypes.DtInscripcionEdicion;
-//import edu.edext.datatypes.DtUsuario;
-//import edu.edext.datatypes.TipoUsuario;
-//import edu.edext.logica.Fabrica;
-//import edu.edext.logica.IBridgeSOAP;
-//import edu.edext.logica.IControlador;
-
-import edu.edext.controlador.ws.DtConsultaCurso;
+import jakarta.servlet.http.HttpSession;
 import edu.edext.controlador.ws.DtEdicion;
-import edu.edext.controlador.ws.DtInscripcionEdicion;
 import edu.edext.controlador.ws.DtUsuario;
-import edu.edext.controlador.ws.IBridgeSOAP;
-import edu.edext.controlador.ws.TipoUsuario;
-
-import edu.edext.controlador.ws.MapEntry;
-import edu.edext.controlador.ws.MapWrapper;
-import edu.edext.modelo.Remux;
-import edu.edext.tools.Utils;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Comparator;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import edu.edext.controlador.ws.DtInscripcionEdicion;
+import edu.edext.controlador.ws.DtConsultaCurso;
+import jakarta.servlet.annotation.WebServlet;
+import edu.edext.controlador.ws.TipoUsuario;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import edu.edext.modelo.Remux;
+import java.util.Enumeration; 
+import edu.edext.tools.Utilsw;
+import java.util.Comparator;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Enumeration; 
 
 @WebServlet("/InscripcionServlet")
 public class InscripcionServlet extends HttpServlet {
-    private final IBridgeSOAP ic = Fabrica.getConexion();
-//    private final IControlador ic = Fabrica.getInstance().getIControlador();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String accion = request.getParameter("accion");
         if (accion == null) accion = "error";
-
         HttpSession session = request.getSession();
 
         switch (accion) {
             case "formulario": {
                 DtUsuario usuario = (DtUsuario) session.getAttribute("usuarioLogueado");
-                
                 if (usuario == null || usuario.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los Estudiantes pueden realizar inscripciones.");
                     return;
                 }
-
                 try {
-                    request.setAttribute("institutos", ic.listarInstitutos());
-                    // El estudiante puede buscar el curso por instituto o por categoría
-                    request.setAttribute("categorias", ic.listarCategorias());
+                    request.setAttribute("institutos", Fabrica.getConexion().listarInstitutos());
+                    request.setAttribute("categorias", Fabrica.getConexion().listarCategorias());
                     request.getRequestDispatcher("/WEB-INF/fragmentos/inscripcionEdicion.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -69,7 +51,7 @@ public class InscripcionServlet extends HttpServlet {
             case "listarEdiciones": {
                 try {
                     String curso = request.getParameter("curso");
-                    List<String> ediciones = ic.listaEdicionPorCurso(curso);
+                    List<String> ediciones = Fabrica.getConexion().listaEdicionPorCurso(curso);
                     
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < ediciones.size(); i++) {
@@ -86,11 +68,10 @@ public class InscripcionServlet extends HttpServlet {
                 break;
             }
 
-            // Inscripción a edición: cursos de una categoría (el estudiante busca por instituto o por categoría)
             case "cursosPorCategoria": {
                 try {
                     List<String> cursos = new ArrayList<>();
-                    List<String> delCentral = ic.listarCursosPorCategoria(request.getParameter("categoria"));
+                    List<String> delCentral = Fabrica.getConexion().listarCursosPorCategoria(request.getParameter("categoria"));
                     if (delCentral != null) cursos.addAll(delCentral);
                     cursos.sort(String.CASE_INSENSITIVE_ORDER);
                     StringBuilder json = new StringBuilder("[");
@@ -107,21 +88,19 @@ public class InscripcionServlet extends HttpServlet {
                 break;
             }
 
-            // Inscripción a edición: ediciones vigentes del curso (no cerradas y que todavía no terminaron)
-            // con sus datos básicos, para mostrarlos antes de confirmar la inscripción
             case "edicionesVigentes": {
                 try {
-                    DtConsultaCurso curso = ic.obtenerDatosCurso(request.getParameter("curso"));
+                    DtConsultaCurso curso = Fabrica.getConexion().obtenerDatosCurso(request.getParameter("curso"));
                     LocalDate hoy = LocalDate.now();
                     List<DtEdicion> vigentes = new ArrayList<>();
                     if (curso != null && curso.getEdiciones() != null)
                         for (DtEdicion ed : curso.getEdiciones()) {
                             boolean cerrada = ed.isCerrada() || (ed.getFechaCierre() != null && !ed.getFechaCierre().isBlank());
-                            LocalDate fin = Utils.Cast.valueOf(ed.getFechaFin());
+                            LocalDate fin = Utilsw.Cast.valueOf(ed.getFechaFin());
                             if (!cerrada && (fin == null || !fin.isBefore(hoy)))
                                 vigentes.add(ed);
                         }
-                    vigentes.sort(Comparator.comparing((DtEdicion ed) -> Utils.Cast.valueOf(ed.getFechaInicio()),
+                    vigentes.sort(Comparator.comparing((DtEdicion ed) -> Utilsw.Cast.valueOf(ed.getFechaInicio()),
                             Comparator.nullsLast(Comparator.naturalOrder())));
 
                     StringBuilder json = new StringBuilder("[");
@@ -150,8 +129,6 @@ public class InscripcionServlet extends HttpServlet {
                 break;
             }
 
-            // Inscripción a edición (letra 6.1): si el estudiante ya está inscripto a la edición elegida, responde los datos
-            // de su inscripción, para ofrecerle modificarlos o cancelar. Responde null si no está inscripto.
             case "miInscripcion": {
                 DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
                 if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
@@ -161,7 +138,7 @@ public class InscripcionServlet extends HttpServlet {
                 try {
                     String edicion = request.getParameter("edicion");
                     DtInscripcionEdicion mia = null;
-                    List<DtInscripcionEdicion> inscripciones = ic.getInscripcionesDeEstudiante(estudiante.getNickname());
+                    List<DtInscripcionEdicion> inscripciones = Fabrica.getConexion().getInscripcionesDeEstudiante(estudiante.getNickname());
                     if (inscripciones != null && edicion != null)
                         for (DtInscripcionEdicion ins : inscripciones)
                             if (ins.getEdicion() != null && edicion.equals(ins.getEdicion().getNombre())) { mia = ins; break; }
@@ -186,7 +163,6 @@ public class InscripcionServlet extends HttpServlet {
             // =====================================================================
             // CASO DE USO: "SELECCIONAR ESTUDIANTES" (DOCENTE)
             // =====================================================================
-
             case "formularioSeleccion": {
                 DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
                 if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
@@ -195,7 +171,7 @@ public class InscripcionServlet extends HttpServlet {
                 }
 
                 try {
-                    request.setAttribute("institutos", ic.listarInstitutos());
+                    request.setAttribute("institutos", Fabrica.getConexion().listarInstitutos());
                     request.getRequestDispatcher("/WEB-INF/fragmentos/seleccionEstudiantes.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -211,8 +187,8 @@ public class InscripcionServlet extends HttpServlet {
                 }
                 try {
                     String edicion = request.getParameter("edicion");
-                    DtEdicion dtEdicion = ic.getEdicion(edicion);
-                    List<DtInscripcionEdicion> inscripciones = ic.getInscripcionesCompletas(edicion);
+                    DtEdicion dtEdicion = Fabrica.getConexion().getEdicion(edicion);
+                    List<DtInscripcionEdicion> inscripciones = Fabrica.getConexion().getInscripcionesCompletas(edicion);
                     
                     request.setAttribute("edicion", dtEdicion);
                     request.setAttribute("inscripciones", inscripciones);
@@ -226,7 +202,6 @@ public class InscripcionServlet extends HttpServlet {
             // =====================================================================
             // CASO DE USO: "LISTAR ACEPTADOS A UNA EDICIÓN DE CURSO" (DOCENTE)
             // =====================================================================
-
             case "formularioAceptados": {
                 DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
                 if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
@@ -235,7 +210,7 @@ public class InscripcionServlet extends HttpServlet {
                 }
 
                 try {
-                    request.setAttribute("institutos", ic.listarInstitutos());
+                    request.setAttribute("institutos", Fabrica.getConexion().listarInstitutos());
                     request.getRequestDispatcher("/WEB-INF/fragmentos/listarAceptados.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -249,12 +224,10 @@ public class InscripcionServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
                     return;
                 }
-
                 try {
                     String edicion = request.getParameter("edicion");
-                    DtEdicion dtEdicion = ic.getEdicion(edicion);
-                    List<DtInscripcionEdicion> todas = ic.getInscripcionesCompletas(edicion);
-                    
+                    DtEdicion dtEdicion = Fabrica.getConexion().getEdicion(edicion);
+                    List<DtInscripcionEdicion> todas = Fabrica.getConexion().getInscripcionesCompletas(edicion);
                     List<DtInscripcionEdicion> aceptadas = new ArrayList<>();
                     if (todas != null) {
                         for (DtInscripcionEdicion ins : todas) {
@@ -263,7 +236,6 @@ public class InscripcionServlet extends HttpServlet {
                             }
                         }
                     }
-
                     request.setAttribute("edicion", dtEdicion);
                     request.setAttribute("inscripcionesAceptadas", aceptadas);
                     request.getRequestDispatcher("/WEB-INF/fragmentos/tablaAceptados.jsp").forward(request, response);
@@ -276,16 +248,14 @@ public class InscripcionServlet extends HttpServlet {
             // =====================================================================
             // NUEVO CASO DE USO: "LISTAR RESULTADOS DE INSCRIPCIONES" (ESTUDIANTE)
             // =====================================================================
-
             case "misResultados": {
                 DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
                 if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los Estudiantes pueden consultar sus resultados de inscripción.");
                     return;
                 }
-
                 try {
-                    List<DtInscripcionEdicion> misInscripciones = ic.getInscripcionesDeEstudiante(estudiante.getNickname());
+                    List<DtInscripcionEdicion> misInscripciones = Fabrica.getConexion().getInscripcionesDeEstudiante(estudiante.getNickname());
                     request.setAttribute("misInscripciones", misInscripciones);
                     request.getRequestDispatcher("/WEB-INF/fragmentos/resultadosInscripciones.jsp").forward(request, response);
                 } catch (Exception e) {
@@ -297,18 +267,14 @@ public class InscripcionServlet extends HttpServlet {
             // =====================================================================
             // CASO DE USO: "LISTAR RESULTADOS DE EVALUACIONES EN EDICIONES DE CURSOS" (ESTUDIANTE)
             // =====================================================================
-
             case "misEvaluaciones": {
                 DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
                 if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los Estudiantes pueden consultar sus resultados de evaluaciones.");
                     return;
                 }
-
                 try {
-                    // Inscripciones a ediciones cerradas, con nota y resultado (Aprobado / No aprobado)
-                    List<DtInscripcionEdicion> resultados = ic.listarResultadosEvaluaciones(estudiante.getNickname());
-
+                    List<DtInscripcionEdicion> resultados = Fabrica.getConexion().listarResultadosEvaluaciones(estudiante.getNickname());
                     int evaluadas = 0, aprobadas = 0, suma = 0;
                     for (DtInscripcionEdicion r : resultados) {
                         if (r.getNota() != null) {
@@ -332,16 +298,14 @@ public class InscripcionServlet extends HttpServlet {
             // =====================================================================
             // CASO DE USO: "VER RESULTADOS DE EVALUACIONES EN EDICIONES DE CURSOS" (DOCENTE)
             // =====================================================================
-
             case "formularioResultados": {
                 DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
                 if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo Docentes pueden ver los resultados de las evaluaciones.");
                     return;
                 }
-
                 try {
-                    request.setAttribute("institutos", ic.listarInstitutos());
+                    request.setAttribute("institutos", Fabrica.getConexion().listarInstitutos());
                     request.getRequestDispatcher("/WEB-INF/fragmentos/verResultadosEdicion.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -355,10 +319,8 @@ public class InscripcionServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
                     return;
                 }
-
                 try {
-                    // Solo las ediciones cerradas del curso en las que el docente logueado participa
-                    escribirJson(response, ic.listarEdicionesCerradasDeDocente(docente.getNickname(), request.getParameter("curso")));
+                    escribirJson(response, Fabrica.getConexion().listarEdicionesCerradasDeDocente(docente.getNickname(), request.getParameter("curso")));
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo las ediciones cerradas.");
                 }
@@ -371,11 +333,9 @@ public class InscripcionServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
                     return;
                 }
-
                 String edicion = request.getParameter("edicion");
                 try {
-                    // El Central valida que la edicion exista, este cerrada y que el docente participe en ella
-                    List<DtInscripcionEdicion> acta = ic.getActaEdicion(edicion, docente.getNickname());
+                    List<DtInscripcionEdicion> acta = Fabrica.getConexion().getActaEdicion(edicion, docente.getNickname());
 
                     int conNota = 0, suma = 0;
                     for (DtInscripcionEdicion ins : acta) {
@@ -385,7 +345,7 @@ public class InscripcionServlet extends HttpServlet {
                         }
                     }
 
-                    request.setAttribute("edicion", ic.getEdicion(edicion));
+                    request.setAttribute("edicion", Fabrica.getConexion().getEdicion(edicion));
                     request.setAttribute("acta", acta);
                     if (conNota > 0) request.setAttribute("promedioActa", String.format(java.util.Locale.ROOT, "%.2f", (double) suma / conNota));
                 } catch (Exception e) {
@@ -398,16 +358,14 @@ public class InscripcionServlet extends HttpServlet {
             // =====================================================================
             // CASO DE USO: "INGRESAR RESULTADOS DE EVALUACIONES DE ESTUDIANTES EN EDICIONES DE CURSOS" (DOCENTE)
             // =====================================================================
-
             case "formularioIngresoResultados": {
                 DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
                 if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo Docentes pueden ingresar resultados de evaluaciones.");
                     return;
                 }
-
                 try {
-                    request.setAttribute("institutos", ic.listarInstitutos());
+                    request.setAttribute("institutos", Fabrica.getConexion().listarInstitutos());
                     request.getRequestDispatcher("/WEB-INF/fragmentos/ingresarResultados.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -421,10 +379,8 @@ public class InscripcionServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
                     return;
                 }
-
                 try {
-                    // Solo las ediciones todavia abiertas del curso en las que el docente logueado participa
-                    escribirJson(response, ic.listarEdicionesAbiertasDeDocente(docente.getNickname(), request.getParameter("curso")));
+                    escribirJson(response, Fabrica.getConexion().listarEdicionesAbiertasDeDocente(docente.getNickname(), request.getParameter("curso")));
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error obteniendo las ediciones del docente.");
                 }
@@ -437,12 +393,10 @@ public class InscripcionServlet extends HttpServlet {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado.");
                     return;
                 }
-
                 String edicion = request.getParameter("edicion");
                 try {
-                    // El Central valida que la edicion exista, siga abierta y que el docente participe en ella
-                    List<DtInscripcionEdicion> participantes = ic.getParticipantesParaEvaluar(edicion, docente.getNickname());
-                    request.setAttribute("edicion", ic.getEdicion(edicion));
+                    List<DtInscripcionEdicion> participantes = Fabrica.getConexion().getParticipantesParaEvaluar(edicion, docente.getNickname());
+                    request.setAttribute("edicion", Fabrica.getConexion().getEdicion(edicion));
                     request.setAttribute("participantes", participantes);
                 } catch (Exception e) {
                     request.setAttribute("errorIngreso", e.getMessage());
@@ -461,7 +415,6 @@ public class InscripcionServlet extends HttpServlet {
                     .replace("\r", "\\r");
     }
 
-    // Responde una lista de textos como arreglo JSON
     private static void escribirJson(HttpServletResponse response, List<String> valores) throws IOException {
         StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < valores.size(); i++) {
@@ -478,27 +431,21 @@ public class InscripcionServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain; charset=UTF-8");
-        
         String accion = request.getParameter("accion");
         HttpSession session = request.getSession();
 
         if ("inscribir".equals(accion)) {
             DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
-
             if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("La sesión expiró o no tienes permisos de Estudiante.");
                 return;
             }
-
             try {
                 String nombreEdicion = request.getParameter("edicion");
                 String videoURL = request.getParameter("videoURL");   
              	String nicknameEstudiante = estudiante.getNickname();
-
-                // Invocación corregida pasando los 3 parámetros
-                int resultado = ic.setInscripcion(nicknameEstudiante, nombreEdicion, videoURL);
-
+                int resultado = Fabrica.getConexion().setInscripcion(nicknameEstudiante, nombreEdicion, videoURL);
                 if (resultado == 0) {
                      response.setStatus(HttpServletResponse.SC_OK);
                      response.getWriter().write("¡Inscripción realizada con éxito!");
@@ -524,18 +471,16 @@ public class InscripcionServlet extends HttpServlet {
                 response.getWriter().write("Error del sistema: " + e.getMessage());
             }
         }
-        // Inscripción a edición (letra 6.1): el estudiante que ya está inscripto modifica los datos de su inscripción (el video)
+
         else if ("modificarInscripcion".equals(accion)) {
             DtUsuario estudiante = (DtUsuario) session.getAttribute("usuarioLogueado");
-
             if (estudiante == null || estudiante.getTipoUsuario() != TipoUsuario.ESTUDIANTE) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("La sesión expiró o no tienes permisos de Estudiante.");
                 return;
             }
-
             try {
-                int resultado = ic.modificarInscripcion(estudiante.getNickname(), request.getParameter("edicion"), request.getParameter("videoURL"));
+                int resultado = Fabrica.getConexion().modificarInscripcion(estudiante.getNickname(), request.getParameter("edicion"), request.getParameter("videoURL"));
                 String mensaje;
                 switch (resultado) {
                     case 0:  mensaje = "Se guardaron los cambios de tu inscripción."; break;
@@ -552,25 +497,22 @@ public class InscripcionServlet extends HttpServlet {
                 response.getWriter().write("Error del sistema: " + e.getMessage());
             }
         }
+
         else if ("guardarSeleccion".equals(accion)) {
             DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
-            
             if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("La sesión expiró o no tienes permisos de Docente.");
                 return;
             }
-
             try {
                 String nombreEdicion = request.getParameter("edicion");
                 Map<String, Integer> evaluaciones = new HashMap<>();
-                
                 Enumeration<String> paramNames = request.getParameterNames();
                 while (paramNames.hasMoreElements()) {
                     String paramName = paramNames.nextElement();
                     if (paramName.startsWith("estado_")) {
                         String valorParam = request.getParameter(paramName);
-                        //Verificamos que se haya seleccionado un estado
                         if (valorParam != null && !valorParam.trim().isEmpty()) {
 	                   String nickname = paramName.substring(7);
 			   int estado = Integer.parseInt(request.getParameter(paramName));
@@ -578,31 +520,17 @@ public class InscripcionServlet extends HttpServlet {
                         }
                     }
                 }
-                
-                
-//                MapWrapper evaluar = new MapWrapper();
-//                for(Map.Entry<String, Integer> entry : evaluaciones.entrySet()){
-//                    MapEntry entryCliente = new MapEntry();
-//                    entryCliente.setKey(entry.getKey());
-//                    entryCliente.setValue(entry.getValue());
-//                    evaluar.getEntry().add(entryCliente);
-//                }
-                
-                ic.evaluarInscripciones(nombreEdicion, Remux.Map(evaluaciones));
-//                ic.evaluarInscripciones(nombreEdicion, evaluaciones);
-                
+                Fabrica.getConexion().evaluarInscripciones(nombreEdicion, Remux.Map(evaluaciones));
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("Selección de estudiantes guardada con éxito.");
-                
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Error al guardar: " + e.getMessage());
             }
         }
-        // CASO DE USO: "INGRESAR RESULTADOS DE EVALUACIONES DE ESTUDIANTES EN EDICIONES DE CURSOS" (DOCENTE)
+
         else if ("guardarResultados".equals(accion)) {
             DtUsuario docente = (DtUsuario) session.getAttribute("usuarioLogueado");
-
             if (docente == null || docente.getTipoUsuario() != TipoUsuario.DOCENTE) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.getWriter().write("La sesión expiró o no tienes permisos de Docente.");
@@ -611,8 +539,6 @@ public class InscripcionServlet extends HttpServlet {
 
             String nombreEdicion = request.getParameter("edicion");
             boolean cerrar = "true".equals(request.getParameter("cerrar"));
-
-            // Cada select del formulario viaja como nota_<nickname>; vacio = sin nota
             Map<String, Integer> notas = new HashMap<>();
             Enumeration<String> paramNames = request.getParameterNames();
             while (paramNames.hasMoreElements()) {
@@ -632,9 +558,8 @@ public class InscripcionServlet extends HttpServlet {
                     return;
                 }
             }
-
             try {
-                ic.ingresarResultados(nombreEdicion, docente.getNickname(), Remux.Map(notas), cerrar);
+                Fabrica.getConexion().ingresarResultados(nombreEdicion, docente.getNickname(), Remux.Map(notas), cerrar);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write(cerrar
                         ? "Notas guardadas y edición cerrada. Ya puede consultar el acta en \"Ver Resultados de Evaluaciones\"."

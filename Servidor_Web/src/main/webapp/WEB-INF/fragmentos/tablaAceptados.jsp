@@ -4,7 +4,7 @@
 <!-- Datos básicos de la Edición de Curso -->
 <c:if test="${not empty edicion}">
     <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0; flex-wrap: wrap;">
-        <img src="ImagenServlet?nombre=${empty edicion.imagen ? 'usr.png' : edicion.imagen}" 
+        <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty edicion.imagen ? 'usr.png' : edicion.imagen}" 
              alt="Portada Edición" 
              style="width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
         
@@ -50,7 +50,7 @@
                 <c:forEach var="ins" items="${inscripcionesAceptadas}">
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd; background: #fff; text-align: center;">
-                            <img src="ImagenServlet?nombre=${empty ins.estudiante.imagen ? 'usr.png' : ins.estudiante.imagen}" 
+                            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty ins.estudiante.imagen ? 'usr.png' : ins.estudiante.imagen}" 
                                  alt="Avatar" 
                                  style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;">
                         </td>

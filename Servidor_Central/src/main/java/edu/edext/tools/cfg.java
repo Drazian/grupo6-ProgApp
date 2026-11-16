@@ -12,7 +12,7 @@ public class cfg {
     public static final String PATH_CONFIG_FILE=PATH+getSeparador()+"edEXT.cfg";
     public static final String PATH_JAXWS_PROPERTIES=PATH+getSeparador()+"jaxws.properties";
     public static final String PATH_CONFIG_DB=PATH+getSeparador()+"database.properties";
-    public static final String PATH_TEMPORAL_PORT=PATH+getSeparador()+"Puerto.en.uso";
+//    public static final String PATH_TEMPORAL_PORT=PATH+getSeparador()+"Puerto.en.uso";
     public static final String PATH_INTERNAL_IMG="/Images/";
     //public static final String IMAGE_USER = "%#@.png";
     //%#@.jpeg
@@ -21,15 +21,15 @@ public class cfg {
                                CLAVE_IP="ip",
                                CLAVE_PORT="puerto";
     private static final String SYM_HOME="~",
-                                VALOR_PORT="8080",
-                                VALOR_IP="localhost",
-                                VALOR_IMAGE="imagen";
-    private static final int posIMAGE=0,
-                             posIP=1,
-                             posPORT=2;
+                                VALOR_PORT="8081",
+                                VALOR_IP="0.0.0.0",
+                                VALOR_IMAGE=".."+getSeparador()+"resources"+getSeparador()+"imagen";
+//    private static final int posIMAGE=0,
+//                             posIP=1,
+//                             posPORT=2;
     private static String valorIMAGE=VALOR_IMAGE, valorIP=VALOR_IP, valorPORT=VALOR_PORT, valorWSDL;
     
- 
+
     
     public static void init(){
         if(!Utils.Disk.isExist(PATH_CONFIG_FILE))
@@ -54,7 +54,12 @@ public class cfg {
         for (CfgDB cfgDB : tmp)
             if(cfgDB.clave().equals("imagen"))
                 ret=cfgDB.valor();
-        ret=ret.replace(SYM_HOME, getHomePath());
+        if(ret.startsWith(SYM_HOME))
+            ret=ret.replace(SYM_HOME, getHomePath());
+        else if(ret.startsWith(".."+getSeparador()))
+            ret=ret.replace(".."+getSeparador(), Utils.OS.getWorkPath().substring(0,Utils.OS.getWorkPath().lastIndexOf(getSeparador())+1));
+        else if(ret.startsWith("."+getSeparador()))
+            ret=ret.replace("."+getSeparador(), Utils.OS.getWorkPath()+getSeparador());
         return ret;
     }
     
@@ -75,7 +80,7 @@ public class cfg {
                     port=isFreePort(cfgDB.valor());
                 }
             valorWSDL="http://"+ip+":"+port+"/servidor_central";
-            crearPortFile(port);
+//            crearPortFile();
         }
     }
     
@@ -135,7 +140,7 @@ public class cfg {
         valorIMAGE=!Utils.Validate.isEmpty(imagen)?imagen:valorIMAGE;
         valorIP=!Utils.Validate.isEmpty(url)?url:valorIP;
         valorPORT=!Utils.Validate.isEmpty(puerto)?puerto:valorPORT;
-        
+        Utils.Disk.delete(PATH_CONFIG_FILE);
         
 //        imagen=imagen.replaceAll("~"+getSeparador()+".edEXT"+getSeparador(),"");
 //        imagen=imagen.replaceAll("~"+getSeparador()+".edEXT","");
@@ -143,7 +148,8 @@ public class cfg {
 //        imagen=imagen.replaceAll("~","");
         if(img){
             Utils.Disk.saveCfg("#", "Carpeta de imagen\n");
-            Utils.Disk.saveCfg(CLAVE_IMAGE, "~"+getSeparador()+".edEXT"+getSeparador()+valorIMAGE+"\n");
+//            Utils.Disk.saveCfg(CLAVE_IMAGE, "~"+getSeparador()+".edEXT"+getSeparador()+valorIMAGE+"\n");
+            Utils.Disk.saveCfg(CLAVE_IMAGE, valorIMAGE+"\n");
             Utils.Disk.saveCfg("\n", "");
         }
         if(ip){
@@ -165,10 +171,11 @@ public class cfg {
         Utils.Disk.saveCfg(ruta, " ", "wsdl.url="+consultaWSDL());
     }
     
-    private static void crearPortFile(String puerto){
-        String ruta=PATH_TEMPORAL_PORT;
-        Utils.Disk.saveCfg(ruta, CLAVE_PORT, puerto, false);
-    }
+//    private static void crearPortFile(){
+//        String ruta=PATH_TEMPORAL_PORT, puerto=;
+//        
+//        Utils.Disk.saveCfg(ruta, CLAVE_PORT, puerto, false);
+//    }
    
     private static String getSeparador(){
         return java.io.File.separator;

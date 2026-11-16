@@ -1,7 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%-- Version de los recursos estaticos: cambia en cada despliegue. Maven arma el war con fecha fija (1980)
-     y sin esto el navegador sigue usando el app.js / estilos.css viejos despues de redesplegar. --%>
 <%! private static final long VERSION_RECURSOS = System.currentTimeMillis(); %>
 <!DOCTYPE html>
 <html lang="es">
@@ -32,11 +30,10 @@
         <div class="sesion" style="display: flex; align-items: center; gap: 15px;">
             <c:choose>
                 <c:when test="${not empty sessionScope.usuarioLogueado}">
-                    <!-- Si hay sesión: Mostramos Imagen, Saludo con Rol y botón Salir -->
                     <div style="display: flex; align-items: center; gap: 10px;">
                         
                         <!-- Foto de perfil  -->
-                        <img src="ImagenServlet?nombre=${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
+                        <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty sessionScope.usuarioLogueado.imagen ? 'usr.png' : sessionScope.usuarioLogueado.imagen}" 
                              alt="Foto de perfil" 
                              onclick="event.preventDefault(); cargarMiPerfil('${sessionScope.usuarioLogueado.nickname}');"
                              style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #ccc;cursor: pointer;">
@@ -50,6 +47,7 @@
                     </div>
                 </c:when>
                 <c:otherwise>
+
                     <!-- Botón Iniciar Sesión -->
                     <button onclick="cargarLogin()" style="background-color: #5cb85c; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;">Iniciar Sesión</button>
                     <button onclick="cargarAltaUsuario()" style="background-color: #0275d8; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;">Registrarse</button>
@@ -59,6 +57,7 @@
     </header>
 
     <div class="contenedor-inferior">
+
         <!-- SECTOR 2: Menú Lateral -->
         <aside class="sector-2">
             <nav>
@@ -131,7 +130,6 @@
                         <li style="margin-bottom: 5px;">
                             <a href="#" onclick="event.preventDefault(); cargarConsultaUsuario();">Ver información de usuarios</a>
                         </li>
-                        <!-- NUEVOS ENLACES DE CONSULTA AGREGADOS AQUÍ -->
                         <li style="margin-bottom: 5px;">
                             <a href="#" onclick="cargarSelectorConsultaCurso(); return false;">Consulta de Curso</a>
                         </li>
@@ -166,19 +164,6 @@
                         <li style="font-size: 12px; opacity: 0.7;">Cargando...</li>
                     </ul>
                 </details>
-
-                    <!-- Al ser legacy, queda comentado -->
-                    <!-- Funciones Generales / Legacy (Estatico) -->
-                    <!--                <details>
-                    <summary style="cursor: pointer; font-weight: bold; padding: 5px 0;">Opciones Generales</summary>
-                    <ul style="list-style: none; padding-left: 15px;">
-                        <li><a href="#" onclick="cargarSeccion('productos')">Ver Productos</a></li>
-                        <li><a href="#" onclick="cargarSeccion('abrirFormulario')">Agregar Producto</a></li>
-                        <li><a href="#" onclick="cargarSeccion('reportes')">Reportes</a></li>
-                        <li><a href="#" onclick="cargarSeccion('configuracion')">Configuración</a></li>
-                        <li><a href="#" onclick="testServlet()">TestTemporal</a></li>                     
-                    </ul>
-                </details>-->
             </nav>
         </aside>
 
@@ -191,7 +176,7 @@
 
     <script src="js/app.js?v=<%= VERSION_RECURSOS %>"></script>
     
-    <!-- CONTENEDOR MAESTRO DE MODALES (Pop-ups modernos) -->
+    <!-- CONTENEDOR MAESTRO DE MODALES -->
     <div id="modal-global" class="modal-oculto">
         <div class="modal-contenido">
             <div class="modal-cabecera">
@@ -199,7 +184,7 @@
                 <span class="modal-cerrar" onclick="cerrarModal()">&times;</span>
             </div>
             <div id="modal-cuerpo" class="modal-cuerpo">
-                <!-- El contenido dinámico se inyectará aquí -->
+                <!-- contenido dinámico -->
             </div>
             <div class="modal-pie" id="modal-pie">
                 <button class="btn-moderno" style="background-color: #bdc3c7;" onclick="cerrarModal()">Cerrar</button>

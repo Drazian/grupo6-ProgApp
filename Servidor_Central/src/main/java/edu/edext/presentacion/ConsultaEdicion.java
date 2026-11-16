@@ -6,6 +6,7 @@ import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
 import edu.edext.tools.cfg;
 import java.awt.HeadlessException;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import org.tinylog.Logger;
 
@@ -320,6 +321,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
     private void loadData(){
         ConsultaEdicionHelper ceh=new ConsultaEdicionHelper();
         String cupo, edicion=jLEdiciones.getSelectedValue();
+        clear();
         if(ceh.getData(edicion)){
             jTnombre.setText(ceh.getNombre());
             cupo=Utils.Cast.valueOf(ceh.getCupo());
@@ -332,6 +334,7 @@ public class ConsultaEdicion extends javax.swing.JPanel {
             //jTdocentej.setText(ceh.));
             if(!Utils.Validate.isEmpty(ceh.getImagen()))
                 lblImagen.setIcon(Utils.Imagen.resize(lblImagen.getWidth(), lblImagen.getHeight(), Utils.Imagen.loadSO(cfg.fullpathImagen()+ceh.getImagen())));
+            System.out.println(cfg.fullpathImagen()+ceh.getImagen());
             jLInscriptos.setListData(ceh.getListaInscriptos(edicion));
             jPData.setVisible(true);
         }
@@ -356,6 +359,17 @@ public class ConsultaEdicion extends javax.swing.JPanel {
         }else Logger.debug("Intitutos sin datos...");
     }
     
+    private void clear(){
+        jTnombre.setText("");
+        jTcurso.setText("");
+        jTcupo.setText("");
+        jTFechaFin.setText("");
+        jTFechaInicio.setText("");
+        jTffechaPublicacion.setText("");
+        jLdocentes.setListData(new String[0]);
+        jLInscriptos.setListData(new String[0]);
+        lblImagen.setIcon(null);
+    }
     
     
     //**/******************** Revisar contribucion de Diego*********************

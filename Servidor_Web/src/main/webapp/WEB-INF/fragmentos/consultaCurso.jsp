@@ -26,10 +26,10 @@
     <!-- Renderizado de la Portada del Curso -->
     <c:choose>
         <c:when test="${not empty curso.imagen}">
-            <img src="ImagenServlet?nombre=${curso.imagen}" alt="Portada" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${curso.imagen}" alt="Portada" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
         </c:when>
         <c:otherwise>
-            <img src="ImagenServlet?nombre=usr.png" alt="Portada" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+            <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=usr.png" alt="Portada" style="width: 100%; max-width: 400px; height: 250px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
         </c:otherwise>
     </c:choose>
 
@@ -41,12 +41,7 @@
         <p><strong>Duración:</strong> ${curso.duracion}</p>
         <p><strong>Cantidad de Horas:</strong> ${curso.cantidadHoras} hrs</p>
         <p><strong>Créditos:</strong> ${curso.creditos}</p>
-        <%-- Una URL sin http(s):// (ej. www.tmu.edu.uy) el navegador la toma como una página del propio sitio --%>
-        <c:set var="urlCurso" value="${curso.url}"/>
-        <c:if test="${not empty urlCurso and not fn:startsWith(fn:toLowerCase(urlCurso), 'http://') and not fn:startsWith(fn:toLowerCase(urlCurso), 'https://')}">
-            <c:set var="urlCurso" value="https://${curso.url}"/>
-        </c:if>
-        <p><strong>URL:</strong> <a href="<c:out value='${urlCurso}'/>" target="_blank" rel="noopener" style="color: #3498db;"><c:out value="${curso.url}"/></a></p>
+        <p><strong>URL:</strong> <a href="${curso.url}" target="_blank" style="color: #3498db;">${curso.url}</a></p>
         <p><strong>Fecha de Alta:</strong> ${curso.fechaRegistro}</p>
         <p><strong>Categorías:</strong>  
             <c:choose>

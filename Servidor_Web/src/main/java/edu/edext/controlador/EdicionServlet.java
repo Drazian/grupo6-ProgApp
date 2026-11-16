@@ -1,46 +1,30 @@
 package edu.edext.controlador;
 
-//import edu.edext.datatypes.DtEdicion;
-//import edu.edext.datatypes.DtUsuario;
-//import edu.edext.logica.IBridgeSOAP;
-//import edu.edext.datatypes.DtInscripcionEdicion;
-//import edu.edext.datatypes.TipoUsuario;
-//import edu.edext.logica.Fabrica;
-//import edu.edext.logica.IControlador;
-//import edu.edext.logica.GestorImagenes;
-
-import edu.edext.controlador.ws.DtEdicion;
-import edu.edext.controlador.ws.DtInscripcionEdicion;
-import edu.edext.controlador.ws.DtUsuario;
-import edu.edext.controlador.ws.IBridgeSOAP;
-import edu.edext.controlador.ws.TipoUsuario;
-import edu.edext.tools.GestorImagenes;
-
-import edu.edext.modelo.Remux;
-import java.io.IOException;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig; 
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
+import edu.edext.controlador.ws.DtUsuario;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
+import edu.edext.controlador.ws.DtInscripcionEdicion;
+import jakarta.servlet.annotation.MultipartConfig; 
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.format.DateTimeParseException;
+import edu.edext.controlador.ws.TipoUsuario;
+import edu.edext.controlador.ws.DtEdicion;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part; 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
+import edu.edext.modelo.Remux;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet; 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 @WebServlet("/EdicionServlet")
 @MultipartConfig // IMPORTANTE: Sin esto, el Servlet no puede leer el FormData con imágenes
 public class EdicionServlet extends HttpServlet {
-//    private final IControlador ic = Fabrica.getInstance().getIControlador();
-    private final IBridgeSOAP ic = Fabrica.getConexion();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -49,19 +33,15 @@ public class EdicionServlet extends HttpServlet {
 
         switch (accion) {
             case "altaEdicion":
-                // 1. Control de Seguridad: Solo docentes
                 HttpSession session = request.getSession();
                 DtUsuario usuarioLogueado = (DtUsuario) session.getAttribute("usuarioLogueado");
-                
                 if (usuarioLogueado == null || usuarioLogueado.getTipoUsuario() != TipoUsuario.DOCENTE) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado. Solo los docentes pueden realizar esta acción.");
                     return;
                 }
-
                 try {
-                    // 2. Cargar listas iniciales (Institutos y Docentes)
-                    request.setAttribute("institutos", ic.listarInstitutos());
-                    request.setAttribute("docentes", ic.listarDocentes());
+                    request.setAttribute("institutos", Fabrica.getConexion().listarInstitutos());
+                    request.setAttribute("docentes", Fabrica.getConexion().listarDocentes());
                     request.getRequestDispatcher("/WEB-INF/fragmentos/altaEdicion.jsp").forward(request, response);
                 } catch (Exception e) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -69,15 +49,12 @@ public class EdicionServlet extends HttpServlet {
                 break;
 
             case "listarCursosPorInstituto":
-                // Devuelve un JSON con los cursos asociados a un instituto seleccionado
                 try {
                     String instituto = request.getParameter("instituto");
-                    List<String> cursos = ic.listarCursosPorInstituto(instituto);
+                    List<String> cursos = Fabrica.getConexion().listarCursosPorInstituto(instituto);
                     
                     StringBuilder json = new StringBuilder("[");
                     for (int i = 0; i < cursos.size(); i++) {
-                        // FIX: Escapar caracteres problemáticos para construir un JSON válido y seguro.
-                        // Reemplazamos comillas dobles, barras invertidas y saltos de línea.
                         String cursoSanitizado = cursos.get(i)
                                 .replace("\\", "\\\\")
                                 .replace("\"", "\\\"")
@@ -99,14 +76,12 @@ public class EdicionServlet extends HttpServlet {
             case "consultaEdicion":
                 try {
                  String nombreEdicion = request.getParameter("nombre");
-                 DtEdicion edicion = ic.getEdicion(nombreEdicion);
-
+                 DtEdicion edicion = Fabrica.getConexion().getEdicion(nombreEdicion);
                  if (edicion == null) {
                      response.sendError(HttpServletResponse.SC_NOT_FOUND, "La edición no existe.");
                      return;
                  }
-
-                 List<DtInscripcionEdicion> todasLasInscripciones = ic.getInscripcionesCompletas(nombreEdicion);
+                 List<DtInscripcionEdicion> todasLasInscripciones = Fabrica.getConexion().getInscripcionesCompletas(nombreEdicion);
                  List<DtInscripcionEdicion> aceptadas = new ArrayList<>();
 
                  if (todasLasInscripciones != null) {
@@ -116,9 +91,8 @@ public class EdicionServlet extends HttpServlet {
                          }
                      }
                  }
-
                  request.setAttribute("edicion", edicion);
-                 request.setAttribute("inscripcionesAceptadas", aceptadas); // Pasamos la lista al JSP
+                 request.setAttribute("inscripcionesAceptadas", aceptadas);
                  request.getRequestDispatcher("/WEB-INF/fragmentos/consultaEdicion.jsp").forward(request, response);
              } catch (Exception e) {
                  response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error cargando la edición: " + e.getMessage());
@@ -128,7 +102,7 @@ public class EdicionServlet extends HttpServlet {
             case "existeEdicion": {
                 String nombreEdicion = request.getParameter("nombre");
                 try{
-                    boolean existe = ic.existeEdicion(nombreEdicion);
+                    boolean existe = Fabrica.getConexion().existeEdicion(nombreEdicion);
                     response.setContentType("text/plain");
                     response.getWriter().write(String.valueOf(existe));
                 } catch (Exception e) {
@@ -140,11 +114,9 @@ public class EdicionServlet extends HttpServlet {
 
              case "listarDocentesJSON":
              try {
-                 // Reutilizamos la misma lista de tu Alta Edición
-                 List<String> docentesList = ic.listarDocentes(); 
+                 List<String> docentesList = Fabrica.getConexion().listarDocentes(); 
                  StringBuilder jsonDoc = new StringBuilder("[");
                  for (int i = 0; i < docentesList.size(); i++) {
-                     // FIX: También aplicamos la sanitización aquí por seguridad.
                      String docenteSanitizado = docentesList.get(i)
                              .replace("\\", "\\\\")
                              .replace("\"", "\\\"")
@@ -167,7 +139,6 @@ public class EdicionServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/plain; charset=UTF-8");
-        
         String accion = request.getParameter("accion");
         HttpSession session = request.getSession(false);
         DtUsuario usuarioLogueado = (session != null) ? (DtUsuario) session.getAttribute("usuarioLogueado") : null;
@@ -179,31 +150,22 @@ public class EdicionServlet extends HttpServlet {
         
         if ("altaEdicion".equals(accion)) {
             try {
-                // 1. Extraer datos simples
                 String nombreCurso = request.getParameter("curso");
                 String nombreEdicion = request.getParameter("nombre");
                 String fechaInicioStr = request.getParameter("fechaInicio");
                 String fechaFinStr = request.getParameter("fechaFin");
                 String cupoStr = request.getParameter("cupo");
-                
-                // 2. Extraer docentes seleccionados
                 String[] docentesArray = request.getParameterValues("docentes");
                 Set<String> docentes = docentesArray != null ? new HashSet<>(Arrays.asList(docentesArray)) : new HashSet<>();
-
                 if (docentes.isEmpty()) {
                     throw new Exception("Debe seleccionar al menos un docente para dictar la edición.");
                 }
-
-                // 3. Parsear fechas al formato LocalDate
                 LocalDate fechaInicio = LocalDate.parse(fechaInicioStr);
                 LocalDate fechaFin = LocalDate.parse(fechaFinStr);
                 LocalDate fechaPublicacion = LocalDate.now();
-
                 if(fechaInicio.isAfter(fechaFin)) {
                      throw new Exception("La fecha de inicio no puede ser posterior a la fecha de fin.");
                 }
-
-                // 4. Procesar Cupo opcional
                 Integer cupo = null;
                 if (cupoStr != null && !cupoStr.trim().isEmpty()) {
                     cupo = Integer.parseInt(cupoStr.trim());
@@ -211,35 +173,18 @@ public class EdicionServlet extends HttpServlet {
                         throw new Exception("El cupo no puede ser negativo.");
                     }
                 }
-
-                // --- 5. Capturar y guardar la imagen de la edición ---
-                String nombreImagen = "usr.png"; // Imagen genérica por defecto
-                Part filePart = request.getPart("imagen"); // Asegúrate de que el input en tu JSP se llame name="imagen"
-                
+                String nombreImagen = "usr.png";
+                Part filePart = request.getPart("imagen");
                 if (filePart != null && filePart.getSize() > 0) {
                     byte[] imgBytes = filePart.getInputStream().readAllBytes();
                     String nombreOriginal = filePart.getSubmittedFileName();
-                    
-                    // Limpiamos los espacios del nombre de la edición para usarlo como identificador del archivo
                     String identificadorUnico = "Edicion_" + nombreEdicion.replaceAll("\\s+", "_");
-                    
-                    // Guardamos físicamente la imagen y obtenemos el nombre del archivo final
-                    nombreImagen = GestorImagenes.guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
+                    nombreImagen = Fabrica.getConexion().guardarImagen(imgBytes, nombreOriginal, identificadorUnico);
                 }
-
-                // 6. Instanciar el DtEdicion
-                    // ************************* Descomentar para ejecutar ************************
-//                DtEdicion dt = new DtEdicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen);
-//                     ************************** Comentar para compilar **************************
                 DtEdicion dt = Remux.DtEdicion(nombreEdicion, cupo, fechaInicio, fechaFin, fechaPublicacion, null, docentes, nombreImagen);
-                    // ****************************************************************************
-
-                // 7. Impactar en base de datos
-                ic.altaEdicionCurso(nombreCurso, dt);
-
+                Fabrica.getConexion().altaEdicionCurso(nombreCurso, dt);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("Edición de curso registrada exitosamente.");
-                
             } catch (DateTimeParseException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Formato de fecha inválido.");
@@ -252,13 +197,10 @@ public class EdicionServlet extends HttpServlet {
             }
             
         } else if ("agregarDocente".equals(accion)) {
-            // Recibe la petición del modal para guardar un docente en una edición
             try {
                 String edicion = request.getParameter("edicion");
                 String docente = request.getParameter("docente");
-                
-                ic.agregarDocenteAEdicion(edicion, docente);
-                
+                Fabrica.getConexion().agregarDocenteAEdicion(edicion, docente);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("Docente agregado exitosamente.");
             } catch (Exception e) {
@@ -266,13 +208,10 @@ public class EdicionServlet extends HttpServlet {
                 response.getWriter().write(e.getMessage());
             }
         } else if ("quitarDocente".equals(accion)) {
-            // Recibe la petición para quitar un docente
             try {
                 String edicion = request.getParameter("edicion");
                 String docente = request.getParameter("docente");
-                
-                ic.quitarDocenteDeEdicion(edicion, docente);
-                
+                Fabrica.getConexion().quitarDocenteDeEdicion(edicion, docente);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write("Docente removido exitosamente.");
             } catch (Exception e) {

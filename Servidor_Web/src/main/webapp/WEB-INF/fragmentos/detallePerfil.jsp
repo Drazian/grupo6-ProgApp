@@ -8,7 +8,7 @@
 
 <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px;">
     <!-- Imagen de perfil -->
-    <img src="ImagenServlet?nombre=${empty requestScope.usuarioPerfil.imagen ? 'usr.png' : requestScope.usuarioPerfil.imagen}" 
+    <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${empty requestScope.usuarioPerfil.imagen ? 'usr.png' : requestScope.usuarioPerfil.imagen}" 
          alt="Foto Perfil" 
          style="width: 85px; height: 85px; border-radius: 50%; object-fit: cover; border: 2px solid #ccc;">
 

@@ -11,8 +11,8 @@
     <modules>
         <module>Servidor_Central</module>
         <module>Servidor_Web</module>
-        <module>Daemons</module>
-        <module>Tools</module>
+        <module>centralCli</module>
+        <module>Test_Puertos</module>
     </modules>
      
     <properties>

@@ -35,22 +35,22 @@ public class ArbolHelper {
                 List<DtInstituto> institutos = Fabrica.getInstance().getIControlador().listarInstitutos();
                 if(!institutos.isEmpty())
                     for(DtInstituto inst : institutos){
-                        DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode(inst.getNombre());
+                        DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode("Instituto : "+inst.getNombre());
                         raiz.add(nodoInstituto);
                         List<String> cursos = Fabrica.getInstance().getIControlador().listarCursosPorInstituto(inst.getNombre());
                         if(!cursos.isEmpty())
                             for(String curso : cursos){
-                                DefaultMutableTreeNode nodoCurso = new DefaultMutableTreeNode(curso);
+                                DefaultMutableTreeNode nodoCurso = new DefaultMutableTreeNode("Curso : "+curso);
                                 nodoInstituto.add(nodoCurso);
                                 List<String> ediciones = Fabrica.getInstance().getIControlador().listaEdicionPorCurso(curso); 
                                 if(!ediciones.isEmpty())
                                     for(String edicion : ediciones){
-                                        DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode(edicion);
+                                        DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode("Edicion : "+edicion);
                                         nodoCurso.add(nodoEdicion);
                                         List<String> inscripciones = Fabrica.getInstance().getIControlador().getEstudiantesInscriptosEdicion(edicion);
                                         if(!inscripciones.isEmpty())
                                             for (String inscripcion : inscripciones){
-                                                DefaultMutableTreeNode nodoInscripcion = new DefaultMutableTreeNode(inscripcion);
+                                                DefaultMutableTreeNode nodoInscripcion = new DefaultMutableTreeNode("Estudiante : "+inscripcion);
                                                 nodoEdicion.add(nodoInscripcion);
                                             }else
                                             nodoEdicion.add(new DefaultMutableTreeNode("vacio"));
@@ -68,39 +68,39 @@ public class ArbolHelper {
     }
     
     //************************* Modelo Original ********************************
-    public boolean createArbol(JTree objTree){
-        return loadArbol(objTree);
-    }
-    
-    private boolean loadArbol(JTree obj){
-        boolean ret=false;
-        try {
-            DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Plataforma Educativa edEXT");  // modique de titulo para agregar el nombre de la aplicacion
-            List<DtInstituto> institutos = Fabrica.getInstance().getIControlador().listarInstitutos();
-            for (DtInstituto inst : institutos) {
-                DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode(inst.getNombre());
-                raiz.add(nodoInstituto);
-                List<String> cursos = Fabrica.getInstance().getIControlador().listarCursosPorInstituto(inst.getNombre());
-                for (String curso : cursos) {
-                    DefaultMutableTreeNode nodoCurso = new DefaultMutableTreeNode(curso);
-                    nodoInstituto.add(nodoCurso);
-                    List<String> ediciones = Fabrica.getInstance().getIControlador().listaEdicionPorCurso(curso); 
-                    for (String edicion : ediciones) {
-                        DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode(edicion);
-                        nodoCurso.add(nodoEdicion);
-                        List<String> inscripciones = Fabrica.getInstance().getIControlador().getEstudiantesInscriptosEdicion(edicion); // nueva 1
-                        for (String inscripcion : inscripciones) {                                                                  // nueva 2
-                            DefaultMutableTreeNode nodoInscripcion = new DefaultMutableTreeNode(inscripcion);                    // nueva 3
-                            nodoEdicion.add(nodoInscripcion);                                                                 // nueva 4
-                        }
-                    }
-                }
-            }
-            obj.setModel(new DefaultTreeModel(raiz));
-            for(int i = 0; i < obj.getRowCount(); i++) obj.expandRow(i);
-            ret=true;
-        } catch (Exception e) { Logger.error(e, "Error al rellenar el Arbol"); }
-        return ret;
-    }    
+//    public boolean createArbol(JTree objTree){
+//        return loadArbol(objTree);
+//    }
+//    
+//    private boolean loadArbol(JTree obj){
+//        boolean ret=false;
+//        try {
+//            DefaultMutableTreeNode raiz = new DefaultMutableTreeNode("Plataforma Educativa edEXT");  // modique de titulo para agregar el nombre de la aplicacion
+//            List<DtInstituto> institutos = Fabrica.getInstance().getIControlador().listarInstitutos();
+//            for (DtInstituto inst : institutos) {
+//                DefaultMutableTreeNode nodoInstituto = new DefaultMutableTreeNode(inst.getNombre());
+//                raiz.add(nodoInstituto);
+//                List<String> cursos = Fabrica.getInstance().getIControlador().listarCursosPorInstituto(inst.getNombre());
+//                for (String curso : cursos) {
+//                    DefaultMutableTreeNode nodoCurso = new DefaultMutableTreeNode(curso);
+//                    nodoInstituto.add(nodoCurso);
+//                    List<String> ediciones = Fabrica.getInstance().getIControlador().listaEdicionPorCurso(curso); 
+//                    for (String edicion : ediciones) {
+//                        DefaultMutableTreeNode nodoEdicion = new DefaultMutableTreeNode(edicion);
+//                        nodoCurso.add(nodoEdicion);
+//                        List<String> inscripciones = Fabrica.getInstance().getIControlador().getEstudiantesInscriptosEdicion(edicion); // nueva 1
+//                        for (String inscripcion : inscripciones) {                                                                  // nueva 2
+//                            DefaultMutableTreeNode nodoInscripcion = new DefaultMutableTreeNode(inscripcion);                    // nueva 3
+//                            nodoEdicion.add(nodoInscripcion);                                                                 // nueva 4
+//                        }
+//                    }
+//                }
+//            }
+//            obj.setModel(new DefaultTreeModel(raiz));
+//            for(int i = 0; i < obj.getRowCount(); i++) obj.expandRow(i);
+//            ret=true;
+//        } catch (Exception e) { Logger.error(e, "Error al rellenar el Arbol"); }
+//        return ret;
+//    }    
     //**************************************************************************
 }

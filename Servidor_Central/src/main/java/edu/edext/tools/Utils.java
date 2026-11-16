@@ -54,11 +54,18 @@ import java.util.Date;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Set;
 import java.io.File;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URI;
+import java.net.URL;
+import java.util.Scanner;
+import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
 /**
  *
@@ -87,6 +94,29 @@ public class Utils {
     }
     
     public final class GUI{
+
+        public static void numericSlider(JTextComponent obj, KeyEvent evt){
+            numericSlider(obj, evt, false);
+        }
+        public static void numericSlider(JTextComponent obj, KeyEvent evt, boolean loop){
+            numericSlider(obj, evt, -2147483646, 2147483645, loop);
+        }
+        public static void numericSlider(JTextComponent obj, KeyEvent evt, int limitMin, int limitMax){
+            numericSlider(obj, evt, limitMin, limitMax, true);
+        }
+        public static void numericSlider(JTextComponent obj, KeyEvent evt, int limitMin, int limitMax, boolean loop){
+            if(evt.getKeyCode()==KeyEvent.VK_UP || evt.getKeyCode()==KeyEvent.VK_DOWN){
+                int tmp=Cast.valueof(obj.getText());
+                if(evt.getKeyCode()==KeyEvent.VK_UP) tmp++;
+                if(evt.getKeyCode()==KeyEvent.VK_DOWN) tmp--;
+                if(tmp>limitMax){
+                    if(loop) tmp=limitMin;
+                    else tmp=limitMax; }
+                else if(tmp<limitMin)
+                    if(loop) tmp=limitMax;
+                    else tmp=limitMin;
+                obj.setText(Cast.valueOf(tmp)); }
+        }
 
         public static void sizeColumn(JTable obj, int column, int size){
             if(obj!=null)
@@ -135,6 +165,15 @@ public class Utils {
         }
 
         public static void setDisable(JList obj){
+            obj.setSelectionModel(new DefaultListSelectionModel(){
+                @Override
+                public void setSelectionInterval(int index0, int index1){}
+
+                @Override
+                public void addSelectionInterval(int index0, int index1){}
+            });
+        }
+        public static void setDisable(JTable obj){
             obj.setSelectionModel(new DefaultListSelectionModel(){
                 @Override
                 public void setSelectionInterval(int index0, int index1){}
@@ -793,14 +832,31 @@ public class Utils {
                         pos=tmpText.indexOf(":");
                         String clave=tmpText.substring(0,pos).trim();
                         String valor=tmpText.substring(pos+1).trim();
-                        tmp.add(new CfgDB(clave, valor));
-                    }
-                }
-                tmpCFG.close();
-            } catch (IOException e){  Logger.debug("Error abriendo archivo de configuracion : {}", e.getMessage());  }
+                        tmp.add(new CfgDB(clave, valor)); } }
+                tmpCFG.close(); }
+            catch (IOException e){  Logger.debug("Error abriendo archivo de configuracion : {}", e.getMessage());  }
             return tmp.toArray(CfgDB[]::new);
         }
 
+        public static List<String> loadFile(String pathFile){
+            List<String> tmp=new ArrayList<>();
+            try (BufferedReader tmpFile = new BufferedReader(new FileReader(pathFile))){
+                String tmpText; int pos=-1;
+                while((tmpText=tmpFile.readLine())!=null){
+//                    tmpText=tmpText.trim();
+//                    if(!tmpText.isEmpty()){
+//                        pos=tmpText.indexOf(":");
+//                        String clave=tmpText.substring(0,pos).trim();
+//                        String valor=tmpText.substring(pos+1).trim();
+                        tmp.add(tmpText);
+//                    }
+                }
+                tmpFile.close();
+            } catch (IOException e){  Logger.debug("Error abriendo archivo de configuracion : {}", e.getMessage());  }
+            return tmp;
+        }
+        
+        
         public static void saveCfg(String clave, String valor){
             saveCfg(null, clave, valor, true);
         }
@@ -821,10 +877,9 @@ public class Utils {
                 else
                     tmpLog.write(clave+" : "+valor);
 //                Logger.debug("Archivo CFG guardado en ..: {}",cfg.PATH_CONFIG_FILE);
-                tmpLog.close();
-            } catch (IOException e) {
-                Logger.error(e.getMessage(),"Error al guardar CFG... ");
-            }
+                tmpLog.close(); }
+            catch (IOException e) {
+                Logger.error(e.getMessage(),"Error al guardar CFG... "); }
         }// en faltan los demas parametros
        //******************************************************** 
     }
@@ -855,10 +910,46 @@ public class Utils {
                 if(isMac())
                     run("open "+comando);
                 if(isWindows())
-                    run("rundll32 SHELL32.DLL,ShellExec_RunDLL "+comando);
-            }
+                    run("rundll32 SHELL32.DLL,ShellExec_RunDLL "+comando); }
         }
 
+        public static ProcessBuilder exec(String comando){
+            ProcessBuilder pid=null;
+//                System.out.println("entre en exec con "+comando);
+            try {
+                String nombre, path;
+                if(comando.contains(getSeparador()) &&  !comando.contains("."+getSeparador()) && !comando.contains(".."+getSeparador())){
+                    int pos=comando.lastIndexOf(getSeparador());
+                    nombre=comando.substring(pos+1);
+                    path=comando.substring(0, pos); }
+                else{
+                    nombre=comando;
+                    path=getWorkPath(); }
+//                System.out.println("Path : "+path+", archivo : "+nombre);
+//                Path pathFile = Paths.get(path).normalize();
+                File pathFile= new File(path);
+//                System.out.println("File = "+pathFile);
+                List<String> comandos = new ArrayList<>();
+                if (isWindows()) {
+                    comandos.add("cmd.exe");
+                    comandos.add("/c");
+                    comandos.add("start");
+                    comandos.add("\"\"");
+                    comandos.add(nombre); }
+                else {
+                    comandos.add("sh");
+                    comandos.add("-c");
+                    comandos.add("nohup ./" + nombre); }
+                pid=new ProcessBuilder(comandos);
+                pid.directory(pathFile);
+                pid.start();
+//                System.out.println("lanzador funcionando");
+            }
+            catch (Exception e) {
+                System.out.println("Error en el lanzador");
+                Logger.error(e, "Error en el lanzador ");}
+            return pid;
+        }
 
         
     ///@return   Devuelve el nombre del paquete
@@ -917,10 +1008,9 @@ public class Utils {
             if(!url.startsWith("http://"))
                 url="http://"+url;
             try {
-                Desktop.getDesktop().browse(URI.create(url.trim()));
-            } catch (IOException ex) {
-                Logger.error("Error al Abrir el link");
-            }
+                Desktop.getDesktop().browse(URI.create(url.trim())); }
+            catch (IOException ex) {
+                Logger.error("Error al Abrir el link"); }
         }
         
         public static int scanPortFree(String puerto){
@@ -942,30 +1032,28 @@ public class Utils {
             if(ret>65525 || ret<1024){
                 ret=-1;
                 System.err.println("Sin puertos disponibles.");
-                Logger.error("Sin puertos disponibles.");
-            }//else
+                Logger.error("Sin puertos disponibles."); }
+            //else
                // System.err.println("Puertos disponible :"+ret);
             return ret;
         }
         
         public static int getPortFree(){
             try (ServerSocket ret=new ServerSocket(0)){
-                return ret.getLocalPort();
-            } catch (Exception e) {
+                return ret.getLocalPort(); }
+            catch (Exception e) {
                 System.err.println("Sin puertos disponibles.");
                 Logger.error("Sin puertos disponibles.");
-                return -1;
-            }
+                return -1; }
         }
         public static boolean isPortFree(String port){
             return isPortFree(Cast.valueof(port));
         }
         public static boolean isPortFree(int port){
             try (ServerSocket serverSocket = new ServerSocket(port)) {
-                return true;
-            } catch (IOException e) {
-                return false;
-            }
+                return true; } 
+            catch (IOException e) {
+                return false; }
         }
 
         public static ServerSocket denyPort(String port){
@@ -974,11 +1062,26 @@ public class Utils {
         public static ServerSocket denyPort(int port){
             try {
                 ServerSocket serverSocket = new ServerSocket(port);
-                return serverSocket;
-            } catch (IOException e) {
-                return null;
-            }
+                return serverSocket; } 
+            catch (IOException e) {
+                return null; }
         }
+        
+        public static String getIPPublic(){
+            try (Scanner ret = new Scanner(new URL("https://api.ipify.org").openStream(), "UTF-8").useDelimiter("\\A")){
+                return ret.next(); }
+            catch (java.io.IOException e) {
+                return null; }
+        }
+        
+        public static String getIPRed(){
+            try (final DatagramSocket socket = new DatagramSocket()) {
+                socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+                return socket.getLocalAddress().getHostAddress(); }
+            catch (Exception e) {
+                return null; }
+        }
+        
     }
     
     public static class Mouse {

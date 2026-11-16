@@ -1,7 +1,5 @@
 /target/
 /Servidor_Central/target/
 /Servidor_Web/target/
-/Daemons/target/
-/Daemons/Central/target/
-/Daemons/Cli/target/
-/Daemons/Web/target/
+/centralCli/target/
+/Test_Puertos/target/

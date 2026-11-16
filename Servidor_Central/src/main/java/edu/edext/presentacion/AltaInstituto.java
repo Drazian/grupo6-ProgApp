@@ -3,7 +3,9 @@ package edu.edext.presentacion;
 import edu.edext.datatypes.DtInstituto;
 import edu.edext.logica.Fabrica;
 import edu.edext.logica.IControlador;
+import edu.edext.tools.Utils;
 import edu.edext.tools.Utils.Mouse;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -14,6 +16,7 @@ public class AltaInstituto extends javax.swing.JPanel {
     private final Mouse mouse=new Mouse();
     public AltaInstituto() {
         initComponents();
+        Utils.GUI.setDisable(tbl);
         cargarTabla();
     }
     
@@ -32,12 +35,10 @@ public class AltaInstituto extends javax.swing.JPanel {
         btnCrear = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl = new javax.swing.JTable();
-        btnActualizar = new javax.swing.JButton();
-        btnEliminar = new javax.swing.JButton();
 
-        setMinimumSize(new java.awt.Dimension(320, 240));
+        setMinimumSize(new java.awt.Dimension(380, 270));
         setName(""); // NOI18N
-        setPreferredSize(new java.awt.Dimension(425, 318));
+        setPreferredSize(new java.awt.Dimension(380, 270));
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 formMouseDragged(evt);
@@ -50,6 +51,12 @@ public class AltaInstituto extends javax.swing.JPanel {
         });
 
         lblNombre.setText("Nombre:");
+
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtNombreKeyReleased(evt);
+            }
+        });
 
         btnCrear.setText("Crear");
         btnCrear.addActionListener(this::btnCrearActionPerformed);
@@ -84,20 +91,20 @@ public class AltaInstituto extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        tbl.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                tblMouseDragged(evt);
+            }
+        });
         tbl.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblMouseClicked(evt);
             }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tblMousePressed(evt);
+            }
         });
         jScrollPane1.setViewportView(tbl);
-
-        btnActualizar.setText("Actualizar");
-        btnActualizar.setEnabled(false);
-        btnActualizar.addActionListener(this::btnActualizarActionPerformed);
-
-        btnEliminar.setText("Eliminar");
-        btnEliminar.setEnabled(false);
-        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -109,14 +116,9 @@ public class AltaInstituto extends javax.swing.JPanel {
                         .addGap(17, 17, 17)
                         .addComponent(lblNombre)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtNombre)
+                        .addComponent(txtNombre, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnCrear))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnActualizar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 222, Short.MAX_VALUE)
-                        .addComponent(btnEliminar))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
@@ -131,16 +133,66 @@ public class AltaInstituto extends javax.swing.JPanel {
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCrear))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnActualizar)
-                    .addComponent(btnEliminar))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActionPerformed
+        crear();
+    }//GEN-LAST:event_btnCrearActionPerformed
+
+    private void tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMouseClicked
+        int filaSeleccionada = tbl.getSelectedRow();
+        
+        if (filaSeleccionada != -1){
+            String nombre = tbl.getValueAt(filaSeleccionada, 0).toString();
+            txtNombre.setText(nombre);
+        }
+    }//GEN-LAST:event_tblMouseClicked
+
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_formMouseDragged
+
+    private void txtNombreKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyReleased
+        if(evt.getKeyCode()==KeyEvent.VK_ENTER)
+            crear();
+    }//GEN-LAST:event_txtNombreKeyReleased
+
+    private void tblMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMousePressed
+        mouse.MousePressed(evt);
+    }//GEN-LAST:event_tblMousePressed
+
+    private void tblMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMouseDragged
+        mouse.MouseContenedorDragged(evt);
+    }//GEN-LAST:event_tblMouseDragged
+
+    private void cargarTabla(){
+        try{
+            IControlador ic = Fabrica.getInstance().getIControlador();
+        
+            List<DtInstituto> lista = ic.listarInstitutos();
+        
+            DefaultTableModel model = (DefaultTableModel) tbl.getModel();
+            model.setRowCount(0);
+        
+            for (DtInstituto aux: lista){
+            model.addRow(new Object[]{aux.getNombre()});
+            }
+            if(Utils.GUI.getModel(tbl).getRowCount()<9)
+                Utils.GUI.getModel(tbl).setRowCount(9);
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(this, "Error al actualizar la tabla: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }
+
+    private void crear(){
         try{
         String nombre=txtNombre.getText().trim();
 
@@ -161,9 +213,15 @@ public class AltaInstituto extends javax.swing.JPanel {
         } catch (Exception e){
             JOptionPane.showMessageDialog(this, "Error al guardar en la base de datos: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_btnCrearActionPerformed
-
-    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+    }
+    
+//****************************************************************************//
+    private void actualizar(){
+        cargarTabla();
+        txtNombre.setText("");
+    }
+    
+    private void eliminar(){
         try{
             String nombre = txtNombre.getText().trim();
             
@@ -184,53 +242,10 @@ public class AltaInstituto extends javax.swing.JPanel {
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al eliminar Instituto: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_btnEliminarActionPerformed
-
-    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        cargarTabla();
-        txtNombre.setText("");
-    }//GEN-LAST:event_btnActualizarActionPerformed
-
-    private void tblMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMouseClicked
-        int filaSeleccionada = tbl.getSelectedRow();
-        
-        if (filaSeleccionada != -1){
-            String nombre = tbl.getValueAt(filaSeleccionada, 0).toString();
-            txtNombre.setText(nombre);
-        }
-    }//GEN-LAST:event_tblMouseClicked
-
-    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
-        mouse.MousePressed(evt);
-    }//GEN-LAST:event_formMousePressed
-
-    private void formMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseDragged
-        mouse.MouseContenedorDragged(evt);
-    }//GEN-LAST:event_formMouseDragged
-
-    private void cargarTabla(){
-        try{
-            IControlador ic = Fabrica.getInstance().getIControlador();
-        
-            List<DtInstituto> lista = ic.listarInstitutos();
-        
-            DefaultTableModel model = (DefaultTableModel) tbl.getModel();
-            model.setRowCount(0);
-        
-            for (DtInstituto aux: lista){
-            model.addRow(new Object[]{aux.getNombre()});
-            }
-
-        } catch (Exception e){
-            JOptionPane.showMessageDialog(this, "Error al actualizar la tabla: "+e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
-        }
-        
     }
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnCrear;
-    private javax.swing.JButton btnEliminar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblNombre;
     private javax.swing.JTable tbl;

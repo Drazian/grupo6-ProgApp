@@ -10,14 +10,11 @@ import edu.edext.entitys.Categoria;
 import edu.edext.entitys.Instituto;
 import edu.edext.entitys.ProgramaFormacion;
 import edu.edext.entitys.Edicion;
-import edu.edext.entitys.ValoracionCurso;
-import edu.edext.entitys.VisitasCurso;
 import edu.edext.tools.Utils;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.tinylog.Logger;
 import java.util.List;
 
@@ -55,7 +52,6 @@ public class cargarDatosDePruebaHelper {
         em=null;
     }
     
-    
     // Inscripción del anexo de datos de prueba: estado, nota (null si no tiene) y video (null si no tiene)
     private void inscribir(Estudiante estudiante, Edicion edicion, LocalDate fecha, int estado, Integer nota, String video) {
         InscripcionEdicion inscripcion = new InscripcionEdicion(estudiante, edicion, fecha, estado, video);
@@ -66,7 +62,7 @@ public class cargarDatosDePruebaHelper {
     private static String video(String id) {
         return "https://www.youtube.com/watch?v=" + id;
     }
-
+    
     //**************************************************************************
     private void cargarDatosDePrueba() throws Exception {
 
@@ -881,6 +877,153 @@ public class cargarDatosDePruebaHelper {
 
             /*
              * ============================================================
+             * 6. INSCRIPCIONES A EDICIONES
+             * ============================================================
+             */
+//            
+//            em.persist(new InscripcionEdicion(
+//                    EL, e1, LocalDate.of(2010, 2, 20), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e1, LocalDate.of(2010, 2, 25), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CO, e2, LocalDate.of(2012, 7, 12), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e2, LocalDate.of(2012, 7, 15), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e2, LocalDate.of(2012, 7, 30), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e3, LocalDate.of(2025, 3, 10), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    JW, e3, LocalDate.of(2025, 3, 15), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e4, LocalDate.of(2024, 7, 25), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    EL, e4, LocalDate.of(2024, 7, 28), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e4, LocalDate.of(2024, 8, 2), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CO, e4, LocalDate.of(2024, 8, 10), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    JW, e4, LocalDate.of(2024, 8, 15), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CO, e5, LocalDate.of(2025, 7, 18), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e5, LocalDate.of(2025, 7, 20), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    EL, e5, LocalDate.of(2025, 7, 29), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e5, LocalDate.of(2025, 8, 5), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e6, LocalDate.of(2026, 2, 23), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e6, LocalDate.of(2026, 2, 25), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e6, LocalDate.of(2026, 2, 28), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    EL, e6, LocalDate.of(2026, 3, 3), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e7, LocalDate.of(2017, 2, 18), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e7, LocalDate.of(2024, 2, 20), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    EL, e7, LocalDate.of(2024, 3, 3), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e7, LocalDate.of(2024, 3, 5), 0));
+//
+//            em.persist(new InscripcionEdicion(
+//                    JW, e8, LocalDate.of(2026, 2, 18), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CO, e8, LocalDate.of(2026, 2, 22), ACEPTADO));
+//
+//            // E8 - RO no existe fecha en los datos de prueba 
+//            em.persist(new InscripcionEdicion(
+//                    RO, e8, LocalDate.of(2026, 3, 18), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e9, LocalDate.of(2026, 8, 18), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e9, LocalDate.of(2026, 8, 22), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e9, LocalDate.of(2026, 9, 3), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e10, LocalDate.of(2026, 7, 13), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e10, LocalDate.of(2026, 7, 20), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e10, LocalDate.of(2026, 7, 22), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e11, LocalDate.of(2026, 6, 4), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    EL, e11, LocalDate.of(2026, 7, 18), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    JW, e11, LocalDate.of(2026, 8, 20), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e12, LocalDate.of(2026, 7, 12), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e12, LocalDate.of(2026, 7, 14), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    EL, e12, LocalDate.of(2026, 7, 25), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    JW, e12, LocalDate.of(2026, 8, 5), INSCRIPTO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CO, e13, LocalDate.of(2026, 3, 5), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e13, LocalDate.of(2026, 3, 4), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e13, LocalDate.of(2026, 3, 7), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    WE, e14, LocalDate.of(2026, 7, 15), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CO, e14, LocalDate.of(2026, 7, 20), RECHAZADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    RO, e14, LocalDate.of(2026, 8, 6), ACEPTADO));
+//
+//            em.persist(new InscripcionEdicion(
+//                    CH, e14, LocalDate.of(2026, 8, 30), RECHAZADO));
+            /*
+             * ============================================================
              * 6. INSCRIPCIONES A EDICIONES (Anexo de Datos de Prueba - Tarea 3)
              *
              * Fecha, estado, evaluación (nota) y video de motivación tal como
@@ -897,6 +1040,7 @@ public class cargarDatosDePruebaHelper {
             // E1 - Flor del Ceibo - 2010
             inscribir(EL, e1, LocalDate.of(2010, 2, 20), ACEPTADO, 6, null);
             inscribir(CH, e1, LocalDate.of(2010, 2, 25), ACEPTADO, 8, video("c4ZoticPW1s"));
+//            inscribir(CH, e1, LocalDate.of(2010, 2, 25), ACEPTADO, 8, "https://www.youtube.com/watch?v=c4ZoticPW1s");
             // E2 - Flor del Ceibo - 2012
             inscribir(CO, e2, LocalDate.of(2012, 7, 12), ACEPTADO, 9, video("1qfw6Rd_-ic"));
             inscribir(RO, e2, LocalDate.of(2012, 7, 15), RECHAZADO, null, video("Ov4usZlSieM"));
@@ -962,7 +1106,6 @@ public class cargarDatosDePruebaHelper {
              */
             for (Edicion ed : new Edicion[]{ e1, e2, e3, e4, e5, e6, e7, e8, e10, e13, e14 })
                 ed.setFechaCierre(ed.getFechaFin());
-
             /*
              * ============================================================
              * 7. PROGRAMAS DE FORMACIÓN
@@ -1070,39 +1213,6 @@ public class cargarDatosDePruebaHelper {
             p3.getCursos().add(c7);
             p3.getCursos().add(c10);
 
-
-            /*
-             * ============================================================
-             * 11. VALORACIONES DE CURSOS (Anexo Tarea 3)
-             *     El anexo no indica fecha: se usa 01/11/2026.
-             * ============================================================
-             */
-            LocalDate fechaValoracion = LocalDate.of(2026, 11, 1);
-            Object[][] valoraciones = {
-                { EL, c6, 3 }, { CH, c6, 4 }, { CO, c6, 5 }, { WE, c6, 4 }, { RO, c6, 3 }, { JW, c6, 3 },
-                { CH, c3, 2 }, { RO, c3, 5 }, { CO, c3, 4 },
-                { CO, c4, 1 }, { CH, c4, 2 }, { EL, c4, 3 }, { WE, c4, 1 },
-                { RO, c5, 5 }, { CH, c5, 5 },
-                { EL, c7, 4 }, { JW, c7, 5 },
-                { CH, c8, 4 }, { WE, c8, 4 }, { RO, c8, 4 },
-                { WE, c1, 1 },
-                { RO, c2, 2 },
-            };
-            for (Object[] v : valoraciones)
-                em.persist(new ValoracionCurso((Estudiante) v[0], (Curso) v[1], (Integer) v[2], fechaValoracion));
-
-            /*
-             * ============================================================
-             * 12. VISITAS DE LOS CURSOS (Anexo Tarea 3) - Listado de tendencias
-             * ============================================================
-             */
-            LocalDateTime fechaVisita = LocalDateTime.of(2026, 11, 1, 0, 0);
-            Object[][] visitas = {
-                { c1, 150 }, { c2, 120 }, { c3, 132 }, { c4, 103 }, { c5, 98 },
-                { c6, 430 }, { c7, 318 }, { c8, 267 }, { c9, 169 }, { c10, 212 },
-            };
-            for (Object[] v : visitas)
-                em.persist(new VisitasCurso(((Curso) v[0]).getNombre(), (Integer) v[1], fechaVisita));
 
             em.getTransaction().commit();
             

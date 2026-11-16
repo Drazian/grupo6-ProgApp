@@ -1,19 +1,14 @@
 package edu.edext.modelo;
 
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.nio.charset.StandardCharsets;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
-/**
- * "Recordarme" del inicio de sesión del Dispositivo Móvil (requerimiento 7.1, Figura 2).
- * La cookie guarda el nickname y el vencimiento, firmados con HMAC-SHA256; nunca la contraseña.
- * La clave se genera al levantar el servidor: si el servidor se reinicia, hay que volver a iniciar sesión.
- */
 public final class RecordarmeMovil {
     public static final String COOKIE = "edext_movil_recordarme";
     public static final int DURACION_SEGUNDOS = 30 * 24 * 60 * 60;   // 30 días
@@ -25,14 +20,12 @@ public final class RecordarmeMovil {
 
     private RecordarmeMovil() {}
 
-    /** Token "nickname(base64).vencimiento.firma(base64)". */
     public static String crearToken(String nickname) {
         long vence = Instant.now().getEpochSecond() + DURACION_SEGUNDOS;
         String datos = codificar(nickname.getBytes(StandardCharsets.UTF_8)) + "." + vence;
         return datos + "." + codificar(firmar(datos));
     }
 
-    /** Devuelve el nickname si el token es válido y no venció; si no, null. */
     public static String nicknameDelToken(String token) {
         if (token == null) return null;
         String[] partes = token.split("\\.");

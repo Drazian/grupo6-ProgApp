@@ -52,7 +52,7 @@ public class edEXT {
     
     private static void close(){
         Utils.Disk.delete(cfg.PATH_JAXWS_PROPERTIES);
-        Utils.Disk.delete(cfg.PATH_TEMPORAL_PORT);
+//        Utils.Disk.delete(cfg.PATH_TEMPORAL_PORT);
         System.gc();
         System.exit(edEXT.estado);
     }

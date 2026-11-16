@@ -1,16 +1,16 @@
 package edu.edext.presentacion;
 
 import edu.edext.edEXT;
-import edu.edext.tools.Utils;
-import edu.edext.tools.Utils.Mouse;
-import edu.edext.tools.cfg;
-import edu.edext.tools.indexHelper;
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import javax.swing.JOptionPane;
 import org.tinylog.Logger;
- 
+import edu.edext.tools.cfg;
+import edu.edext.tools.Utils;
+import javax.swing.UIManager;
+import javax.swing.JOptionPane;
+import edu.edext.tools.Utils.Mouse;
+import edu.edext.tools.indexHelper;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import javax.swing.UnsupportedLookAndFeelException;
+
 public class index extends javax.swing.JFrame {
     
     private final indexHelper form;
@@ -320,11 +320,12 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_dpIndexMouseDragged
 
     private void jMAboutSOAPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMAboutSOAPActionPerformed
-        try {
-            Desktop.getDesktop().browse(URI.create(cfg.getWSDL()));
-        } catch (IOException ex) {
-            Logger.error(ex, "Error al abrir en navegador");
-        }
+//        try {
+//            Desktop.getDesktop().browse(URI.create(cfg.getWSDL()));
+//        } catch (IOException ex) {
+//            Logger.error(ex, "Error al abrir en navegador");
+//        }
+        form.cargarPanel(new About());
     }//GEN-LAST:event_jMAboutSOAPActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
@@ -351,6 +352,7 @@ public class index extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
+      
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -361,6 +363,15 @@ public class index extends javax.swing.JFrame {
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
             Logger.error(ex);
         }
+
+//        try {
+//            UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+//        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex) {
+//            Logger.error(ex);
+//        }
+            
+//        FlatMacDarkLaf.setup();
+ 
           //</editor-fold>
 
         /* Create and display the form */
@@ -390,7 +401,6 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMReboot;
     private javax.swing.JMenuItem jMViewLogs;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;

@@ -9,6 +9,7 @@ import edu.edext.datatypes.DtUsuario;
 import edu.edext.datatypes.DtEdicion;
 import edu.edext.datatypes.DtCurso;
 import jakarta.jws.WebService;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,6 @@ import java.util.Map;
  *
  * @author vdraco
  */
-//@WebService(endpointInterface = "edu.edext.logica.IBridgeSOAP")
 @WebService(
     serviceName = "IBridgeSOAPService", 
     endpointInterface = "edu.edext.logica.IBridgeSOAP"
@@ -101,7 +101,14 @@ public class BridgeSOAP implements IBridgeSOAP{
     public void quitarDocenteDeEdicion(String nombreEdicion, String nicknameDocente) throws Exception {
         bridge.quitarDocenteDeEdicion(nombreEdicion, nicknameDocente);
     }
-
+    @Override
+    public byte[] getImageBytes(String nombre){
+        return bridge.getImageBytes(nombre);
+    }
+    @Override
+    public String guardarImagen(byte[] bytesImagen, String nombreOriginal, String nickname) throws IOException{
+        return bridge.guardarImagen(bytesImagen, nombreOriginal, nickname);
+    }
 //********************************* Cursos ***********************************//
     @Override
     public void altaCurso(DtCurso curso, String nombreInstituto) throws Exception {
@@ -127,7 +134,11 @@ public class BridgeSOAP implements IBridgeSOAP{
     public List<DtCurso> listarCursos() throws Exception {
         return bridge.listarCursos();
     }
-
+    @Override
+    public boolean existeCurso(String nombre) throws Exception{
+        return bridge.existeCurso(nombre);
+    }
+    
 //********************************* Edicion **********************************//
     @Override
     public void altaEdicionCurso(String nombreCurso, DtEdicion dt) throws Exception {
@@ -144,6 +155,10 @@ public class BridgeSOAP implements IBridgeSOAP{
     @Override
     public List<DtEdicion> listarEdicionesPorUsuario(String nickname) throws Exception {
         return bridge.listarEdicionesPorUsuario(nickname);
+    }
+    @Override
+    public boolean existeEdicion(String nombre) throws Exception{
+        return bridge.existeEdicion(nombre);
     }
 
 //******************************* Inscripcion ********************************//
@@ -256,23 +271,9 @@ public class BridgeSOAP implements IBridgeSOAP{
     public boolean setCrearProgramaFormacion(DtPrograma programa, byte[] bytesImagen, String nombreOriginal) throws Exception {
         return bridge.setCrearProgramaFormacion(programa, bytesImagen, nombreOriginal);
     }
-    
-    
-    
-    
-    @Override
-    public boolean existeCurso(String nombre) throws Exception{
-        return bridge.existeCurso(nombre);
-    }
-    
     @Override
     public boolean existeProgramaFormacion(String nombre) throws Exception{
         return bridge.existeProgramaFormacion(nombre);
     }
-    
-    @Override
-    public boolean existeEdicion(String nombre) throws Exception{
-        return bridge.existeEdicion(nombre);
-    }
-    
+   
 }

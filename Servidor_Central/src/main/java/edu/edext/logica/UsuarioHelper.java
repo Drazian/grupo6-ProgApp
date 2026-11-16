@@ -11,6 +11,7 @@ import edu.edext.datatypes.TipoUsuario;
 import edu.edext.tools.Utils;
 import java.util.ArrayList;
 import java.util.List;
+import org.tinylog.Logger;
 
 /**
  *
@@ -85,10 +86,14 @@ public class UsuarioHelper {
 
     private boolean validate(String password, String passDB){
         boolean ret;
-        if(passDB.startsWith("$2a$") || passDB.startsWith("$2b$") || passDB.startsWith("$2y$"))
+        if(passDB.startsWith("$2a$") || passDB.startsWith("$2b$") || passDB.startsWith("$2y$")){
             ret=Utils.Crypt.compareBCrypt(password, passDB);
-        else    // el alta guarda la contraseña cifrada con AES: se descifra la guardada y se compara con la ingresada
+            //System.out.println("pass : "+password+", passDB : "+passDB);
+        }
+        else{
             ret=password.equals(Utils.Crypt.descifrarAES(passDB));
+            //System.out.println("pass : "+password+", passDB : "+passDB);
+        }
         return ret;
     }
     //***************************** pipeline ***********************************

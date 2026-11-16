@@ -4,7 +4,7 @@
      El pageEncoding es necesario: sin él Jasper lee los .jspf como ISO-8859-1 y rompe los acentos. --%>
 <c:if test="${not empty edicion}">
     <div style="display: flex; gap: 20px; align-items: center; background: #f4f6f7; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e0e0e0; flex-wrap: wrap;">
-        <img src="ImagenServlet?nombre=${fn:escapeXml(empty edicion.imagen ? 'usr.png' : edicion.imagen)}"
+        <img src="${pageContext.request.contextPath}/ImagenServlet?nombre=${fn:escapeXml(empty edicion.imagen ? 'usr.png' : edicion.imagen)}"
              alt="Portada Edición"
              style="width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
 

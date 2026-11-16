@@ -1,53 +1,40 @@
 package edu.edext.modelo;
 
-//import edu.edext.datatypes.DtActaEstudio;
-//import edu.edext.datatypes.DtResultadoCurso;
-
-import edu.edext.controlador.ws.DtActaEstudio;
-import edu.edext.controlador.ws.DtResultadoCurso;
- 
-import com.itextpdf.io.font.PdfEncodings;
-import com.itextpdf.io.font.constants.StandardFonts;
-import com.itextpdf.kernel.colors.Color;
-import com.itextpdf.kernel.colors.ColorConstants;
-import com.itextpdf.kernel.colors.DeviceRgb;
-import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfDocumentInfo;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.borders.Border;
-import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.element.Text;
-import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.UnitValue;
-import com.itextpdf.layout.properties.VerticalAlignment;
-import edu.edext.controlador.ws.ResultadoCurso;
-import edu.edext.tools.Utils;
+import java.time.LocalDate;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Text;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.borders.Border;
 import java.time.format.DateTimeFormatter;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.borders.SolidBorder;
+import com.itextpdf.layout.properties.UnitValue;
+import edu.edext.controlador.ws.DtResultadoCurso;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.VerticalAlignment;
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.pdf.PdfDocumentInfo;
+import edu.edext.controlador.ws.DtActaEstudio;
+import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.io.font.PdfEncodings;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.colors.Color;
+import com.itextpdf.layout.element.Cell;
 
-/**
- * Genera el Acta de Estudio en PDF con iText (requerimiento 7.4).
- * El documento se arma en el momento, cada vez que el estudiante lo pide desde el Sitio Web.
- */
 public final class ActaEstudioPdf {
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy 'a las' HH:mm");
-    // Texto que manda el Servidor Central en DtResultadoCurso.resultado (el enum ResultadoCurso del Web Service
-    // trae los nombres APROBADO, NO_APROBADO..., que no coinciden con ese texto)
     private static final String APROBADO = "Aprobado";
     private static final String NO_APROBADO = "No aprobado";
     private static final String EN_CURSO = "En curso";
-
     private static final Color AZUL_OSCURO = new DeviceRgb(0x2c, 0x3e, 0x50);
     private static final Color GRIS_TEXTO = new DeviceRgb(0x7f, 0x8c, 0x8d);
     private static final Color GRIS_FONDO = new DeviceRgb(0xf4, 0xf6, 0xf7);
@@ -58,11 +45,6 @@ public final class ActaEstudioPdf {
 
     private ActaEstudioPdf() {}
 
-    /**
-     * La letra (seccion 4) dice que el certificado de aprobacion se obtiene "una vez hayan aprobado los cursos que lo componen".
-     * Por eso, si el estudiante aprobo todos los cursos del programa el documento es un Certificado de Aprobacion;
-     * si no, es un Acta de Estudio que deja constancia de su avance.
-     */
     public static boolean esCertificado(DtActaEstudio acta) {
         return acta.isProgramaAprobado();
     }
@@ -80,11 +62,9 @@ public final class ActaEstudioPdf {
         info.setSubject("Acta de Estudio de " + acta.getNombreEstudiante() + " " + acta.getApellidoEstudiante());
         info.setAuthor("edEXT");
         info.setCreator("edEXT - Servidor Web");
-
         PdfFont normal = PdfFontFactory.createFont(StandardFonts.HELVETICA, PdfEncodings.WINANSI);
         PdfFont negrita = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD, PdfEncodings.WINANSI);
         PdfFont cursiva = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE, PdfEncodings.WINANSI);
-
         try (Document doc = new Document(pdf, PageSize.A4)) {
             doc.setMargins(40, 40, 45, 40);
             doc.setFont(normal).setFontSize(10).setFontColor(AZUL_OSCURO);
@@ -113,7 +93,6 @@ public final class ActaEstudioPdf {
                 filaDato(datos, "Período del programa", acta.getFechaInicioPrograma() + " al " + acta.getFechaFinPrograma(), negrita);
             filaDato(datos, "Fecha de emisión", acta.getFechaEmision(), negrita);
             doc.add(datos);
-
             if (acta.getDescripcionPrograma() != null && !acta.getDescripcionPrograma().isBlank())
                 doc.add(new Paragraph(acta.getDescripcionPrograma()).setFont(cursiva).setFontSize(9).setFontColor(GRIS_TEXTO).setMarginTop(6));
 
@@ -136,13 +115,11 @@ public final class ActaEstudioPdf {
 
             // ------------------------ Resultados por curso ---------------------------
             doc.add(new Paragraph("Resultados de los cursos del programa").setFont(negrita).setFontSize(12).setMarginTop(12).setMarginBottom(4));
-
             Table tabla = new Table(UnitValue.createPercentArray(new float[]{30, 25, 8, 8, 14, 15})).useAllAvailableWidth();
             for (String titulo : new String[]{"Curso", "Edición", "Créditos", "Nota", "Resultado", "Fecha de resultado"})
                 tabla.addHeaderCell(new Cell().add(new Paragraph(titulo).setFont(negrita).setFontSize(9).setFontColor(ColorConstants.WHITE))
                         .setBackgroundColor(AZUL_OSCURO).setBorder(new SolidBorder(AZUL_OSCURO, 0.5f)).setPadding(5)
                         .setTextAlignment(titulo.equals("Curso") || titulo.equals("Edición") ? TextAlignment.LEFT : TextAlignment.CENTER));
-
             if (acta.getCursos() == null || acta.getCursos().isEmpty()) {
                 tabla.addCell(new Cell(1, 6).add(new Paragraph("El programa no tiene cursos asociados.").setFont(cursiva).setFontSize(9))
                         .setTextAlignment(TextAlignment.CENTER).setFontColor(GRIS_TEXTO)
@@ -169,7 +146,6 @@ public final class ActaEstudioPdf {
                     .add(new Text("     Créditos aprobados: ").setFont(negrita))
                     .add(acta.getCreditosAprobados() + " de " + acta.getTotalCreditos())
                     .setMarginTop(10));
-
             boolean aprobado = acta.isProgramaAprobado();
             int faltan = acta.getTotalCursos() - acta.getCursosAprobados();
             String estado;
