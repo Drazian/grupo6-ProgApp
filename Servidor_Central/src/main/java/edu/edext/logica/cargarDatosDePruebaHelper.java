@@ -10,11 +10,14 @@ import edu.edext.entitys.Categoria;
 import edu.edext.entitys.Instituto;
 import edu.edext.entitys.ProgramaFormacion;
 import edu.edext.entitys.Edicion;
+import edu.edext.entitys.ValoracionCurso;
+import edu.edext.entitys.VisitasCurso;
 import edu.edext.tools.Utils;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.tinylog.Logger;
 import java.util.List;
 
@@ -1213,6 +1216,39 @@ public class cargarDatosDePruebaHelper {
             p3.getCursos().add(c7);
             p3.getCursos().add(c10);
 
+
+            /*
+             * ============================================================
+             * 11. VALORACIONES DE CURSOS (Anexo Tarea 3)
+             *     El anexo no indica fecha: se usa 01/11/2026.
+             * ============================================================
+             */
+            LocalDate fechaValoracion = LocalDate.of(2026, 11, 1);
+            Object[][] valoraciones = {
+                { EL, c6, 3 }, { CH, c6, 4 }, { CO, c6, 5 }, { WE, c6, 4 }, { RO, c6, 3 }, { JW, c6, 3 },
+                { CH, c3, 2 }, { RO, c3, 5 }, { CO, c3, 4 },
+                { CO, c4, 1 }, { CH, c4, 2 }, { EL, c4, 3 }, { WE, c4, 1 },
+                { RO, c5, 5 }, { CH, c5, 5 },
+                { EL, c7, 4 }, { JW, c7, 5 },
+                { CH, c8, 4 }, { WE, c8, 4 }, { RO, c8, 4 },
+                { WE, c1, 1 },
+                { RO, c2, 2 },
+            };
+            for (Object[] v : valoraciones)
+                em.persist(new ValoracionCurso((Estudiante) v[0], (Curso) v[1], (Integer) v[2], fechaValoracion));
+
+            /*
+             * ============================================================
+             * 12. VISITAS DE LOS CURSOS (Anexo Tarea 3) - Listado de tendencias
+             * ============================================================
+             */
+            LocalDateTime fechaVisita = LocalDateTime.of(2026, 11, 1, 0, 0);
+            Object[][] visitas = {
+                { c1, 150 }, { c2, 120 }, { c3, 132 }, { c4, 103 }, { c5, 98 },
+                { c6, 430 }, { c7, 318 }, { c8, 267 }, { c9, 169 }, { c10, 212 },
+            };
+            for (Object[] v : visitas)
+                em.persist(new VisitasCurso(((Curso) v[0]).getNombre(), (Integer) v[1], fechaVisita));
 
             em.getTransaction().commit();
             
