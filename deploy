@@ -1,24 +1,29 @@
 #!/bin/bash
 
 CFG_PRJ="$HOME/.edEXT"
-
 PRJ="${1:-edEXT}"
 DIR_PRJ="$HOME/$PRJ"
 DIR_TLS="$DIR_PRJ/tools"
 
-    if [[ ! -d "$CFG_PRJ" ]]; then
-        mkdir -p $CFG_PRJ
-    fi
-    if [[ ! -d "$DIR_TLS" ]]; then
-        mkdir -p $DIR_TLS
-    fi
+if [[ ! -d "$DIR_TLS" ]]; then
+    mkdir -p $DIR_TLS
+fi
+if [[ -f "web.war" ]]; then
+    mv -f "./web.war" "$DIR_PRJ/web.war"
+fi
+mv -f "./deploy" "$DIR_PRJ/deploy"
+if [[ -d "apache-tomcat-10.1.61" ]]; then
+    mv -f "./apache-tomcat-10.1.61" "$DIR_TLS/apache-tomcat-10.1.61"
+fi
+if [[ -f "testPort" ]]; then
+    mv -f "./testPort" "$DIR_TLS/testPort"
+fi
 
-mv -f "web.war" "$DIR_PRJ/web.war"
-cp -f "deploy" "$DIR_PRJ/deploy"
-mv -f "apache-tomcat-10.1.61" "$DIR_TLS/apache-tomcat-10.1.61"
-mv -f "testPort" "$DIR_TLS/testPort"
+read -p "¿Actualiza el S.O? (s/n): " opcion
 
-sudo apt-get update -y
+if [[ "$opcion" == "s" || "$opcion" == "S" ]]; then
+    sudo apt-get update -y
+fi
 sudo apt install curl -y
 sudo apt-get install -y openjdk-21-jdk
 
@@ -27,7 +32,7 @@ TOMCAT_DIR="$DIR_PRJ/tools/apache-tomcat-10.1.61"
 chmod +x "$TOMCAT_DIR/bin/"*.sh
 "$TOMCAT_DIR/bin/startup.sh"
 
-echo "Esperando a que Tomcat inicie en el puerto 8080..."
+echo "Tomcat iniciando......."
 intentos=0
 max_intentos=120
 
@@ -35,12 +40,13 @@ while ! curl -s http://localhost:8080 > /dev/null; do
   sleep 1
   intentos=$((intentos + 1))
   if [ $intentos -ge $max_intentos ]; then
-    echo "Error: Tomcat tardó más de $max_intentos segundos en iniciar."
+    echo "Error al inicializar tomcat, supero los $max_intentos segundos de espera."
     exit 1
   fi
 done
 
-echo "Tomcat iniciado en $intentos segundos. Desplegando aplicación..."
+echo "Tomcat iniciado en $intentos segundos."
+echo "Desplegando Servidor Web......."
 cd $DIR_PRJ
 curl -u admin:admin "http://localhost:8080/manager/text/deploy?path=/web&update=true" --upload-file ./web.war
 echo "¡Despliegue finalizado!"

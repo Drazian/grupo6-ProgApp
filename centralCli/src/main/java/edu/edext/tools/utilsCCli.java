@@ -291,6 +291,16 @@ public class utilsCCli {
             return ret;
         }
     
+        public static boolean isNumeric(String cadena){
+            boolean ret;
+            try {
+                Integer.parseInt(cadena);
+                ret=true; }
+            catch (NumberFormatException e) {
+                ret=false; }
+            return ret;
+        }
+        
     }
 
     public final class Fecha{

@@ -13,6 +13,8 @@ public class cfg {
     public static final String PATH_JAXWS_PROPERTIES=PATH+getSeparador()+"jaxws.properties";
     public static final String PATH_CONFIG_DB=PATH+getSeparador()+"database.properties";
 //    public static final String PATH_TEMPORAL_PORT=PATH+getSeparador()+"Puerto.en.uso";
+    public static final String PATH_FILE_LOCK=getHomePath()+getSeparador()+".config";
+    public static final String FILE_LOCK="edEXT.lock";
     public static final String PATH_INTERNAL_IMG="/Images/";
     //public static final String IMAGE_USER = "%#@.png";
     //%#@.jpeg

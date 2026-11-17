@@ -14,6 +14,7 @@ import java.nio.file.StandardCopyOption;
 import javax.crypto.BadPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.swing.JFormattedTextField;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.MaskFormatter;
 import javax.swing.SwingConstants;
 import java.net.URISyntaxException;
@@ -25,11 +26,15 @@ import java.text.SimpleDateFormat;
 import java.io.InputStreamReader;
 import java.awt.event.MouseEvent;
 import javax.swing.JFileChooser;
+import java.net.DatagramSocket;
+import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import java.net.ServerSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.awt.FileDialog;
 import java.io.IOException;
@@ -42,30 +47,25 @@ import javax.swing.JFrame;
 import org.tinylog.Logger;
 import javax.swing.JTable;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.MouseInfo;
 import java.io.FileReader;
 import java.io.FileWriter;
 import javax.swing.JList;
+import java.util.Scanner;
+import java.awt.Desktop;
 import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Set;
 import java.io.File;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URL;
-import java.util.Scanner;
-import javax.swing.JTextField;
-import javax.swing.text.JTextComponent;
+
 
 /**
  *
@@ -1081,7 +1081,7 @@ public class Utils {
             catch (Exception e) {
                 return null; }
         }
-        
+       
     }
     
     public static class Mouse {

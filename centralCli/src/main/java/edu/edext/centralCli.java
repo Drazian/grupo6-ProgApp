@@ -13,23 +13,23 @@ import java.net.Socket;
  * @author vdraco
  */
 public class centralCli {
-    private static final String HOST = "localhost";
+//    private static final String HOST = "localhost";
 //    private static final int PUERTO = 9999;    
-    private static final int CODE_START=40, CODE_GUI=42, CODE_STATUS=44, CODE_RESET=46, CODE_STOP=48, CODE_ERROR_DB=50, CODE_KILL=99;
+    private static final int CODE_START=40, CODE_GUI=42, CODE_STATUS=44, CODE_RESET=46, CODE_STOP=48, CODE_ERROR_DB=50, CODE_DUPLICIDAD=52, CODE_KILL=99;
     private static String comando, listen;
-    private static long pid;
+//    private static long pid;
     private static boolean kill;
 //    private static int puerto=PUERTO, reitentos=1;
     
     private static void preayuda(){
         System.out.println("Sintaxis : edEXT [opciones]");
-        System.out.println("\n\t-?     -h   -help\tmuestra la lista de comandos permitidos ");
+        System.out.println("\n\t -?     -h   -help\tmuestra la lista de comandos permitidos ");
         System.out.println("\t--?    --h  --help\t");
     }
 
     private static void ayuda(){
         preayuda();
-        System.out.println("\n");
+//        System.out.println("\n");
 //        System.out.println("\t-gui    -g  -form \tactiva la interfaz grafica");
         System.out.println("\tstart    |  encender\tInicia el Servidor ");
 //        System.out.println("\tstatus   |  estado\tMuestra los valores de los SOAP");
@@ -37,7 +37,7 @@ public class centralCli {
 //        System.out.println("\trestart  |  reiniciar\treinicia el Servidor");
 //        System.out.println("\tstop     |  apagar\tapaga el Servidor");
 //        System.out.println("\tkill     |  matar\t\ttermina el Servicio");
-        System.out.println("\tshared   |  compartir\t\tcomparte el directorio seleccionado");
+        System.out.println("\tshared   |  compartir\tcomparte el directorio seleccionado");
 
     }
     
@@ -59,7 +59,10 @@ public class centralCli {
         else if(args[0].toLowerCase().equals("start") || args[0].toLowerCase().equals("encender") ||
                 args[0].toLowerCase().equals("-start") || args[0].toLowerCase().equals("-encender") ||
                 args[0].toLowerCase().equals("--start") || args[0].toLowerCase().equals("--encender")){
-            Launcher.start();
+            if(args.length==1)
+                Launcher.start();
+            else
+                Launcher.start(args[1].toLowerCase().trim());
             comando=String.valueOf(CODE_START); }
         else if(args[0].toLowerCase().equals("status") || args[0].toLowerCase().equals("estado") ||
                 args[0].toLowerCase().equals("-status") || args[0].toLowerCase().equals("--estado") ||
@@ -78,19 +81,13 @@ public class centralCli {
                 args[0].toLowerCase().equals("--kill") || args[0].toLowerCase().equals("--matar")){
             kill=true;
             comando=String.valueOf(CODE_KILL); }
-        
-        // **************************** comandos ocultos ****************************
         else if(args[0].toLowerCase().equals("deploy") || args[0].toLowerCase().equals("desplegar")){
         }
         else if(args[0].toLowerCase().equals("shared") || args[0].toLowerCase().equals("compartir")){
             String path;
-            if(args.length==2)
-                path=args[1].toLowerCase().trim();
-            else
-                path=utilsCCli.Disk.openPathOS();
-            if(!utilsCCli.Validate.isEmpty(path)) 
+            path=utilsCCli.Disk.openPathOS();
+            if(!utilsCCli.Validate.isEmpty(path))
                 SimpleFTP.start(path);
-            
         }
         else preayuda();
 
