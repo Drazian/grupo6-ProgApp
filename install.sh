@@ -20,25 +20,22 @@ DIR_IMG="$DIR_RSC/imagen"
 DIR_TLS="$DIR_RSC/$TLS"
 rDIR_TLS="$rDIR_RSC/$TLS"
 DIR_TMP="$DIR_PRJ/temp"
-#DAEMON=" /dev/null 2>&1 &"
-DAEMON=" &"
-DEAMONS=("daemoncentral" "daemonweb") # Nombre del Directorio
-DEA_JAR=("daemon-central.jar" "daemon-web.jar")
-DEA_NOM=("daemonCentral" "daemonWeb") #Nombre del AppImage
-NODEAMONS=("edEXT_cli" "edEXT_web" "Servidor" "testport")
-NODEA_JAR=("edEXT.jar" "edEXTw.jar" "servidor.jar" "testPort.jar")
-NODEA_NOM=("edEXT" "edEXTw" "servidor" "testPort")
+
+NODEAMONS=("edEXT_cli" "Servidor" "testport")
+NODEAMONS=("edEXT_cli" "Servidor" "testport")
+NODEA_JAR=("edEXT.jar" "servidor.jar" "testPort.jar")
+NODEA_NOM=("edEXT" "servidor" "testPort")
 
 crear(){
-    mkdir $DIR_PRJ
-    mkdir $DIR_BIN
-    mkdir $DIR_LOG
-    mkdir $DIR_RSC
-    mkdir $DIR_IMG
-    mkdir $DIR_TLS
-    mkdir $DIR_TMP
-    mkdir $DIR_SHD
-    mkdir $DIR_JAR
+    mkdir -p $CFG_TMP
+    mkdir -p $DIR_BIN
+    mkdir -p $DIR_LOG
+    mkdir -p $DIR_RSC
+    mkdir -p $DIR_IMG
+    mkdir -p $DIR_TLS
+    mkdir -p $DIR_TMP
+    mkdir -p $DIR_SHD
+    mkdir -p $DIR_JAR
 }
 
 makeAppDir() {
@@ -72,17 +69,15 @@ makeAppImage(){
     ARCH=x86_64 ./appimagetool.AppImage "$1/" $2
 }
 
-
-
 checkDir(){
     if [[ ! -d "$CFG_PRJ" ]]; then
         mkdir -p $CFG_PRJ
     fi
-    if [[ ! -d "$CFG_TMP" ]]; then
-        mkdir -p $CFG_TMP
-    else
+    if [[ ! -d "$DIR_PRJ" ]]; then
+        mkdir $DIR_PRJ
+    fi
+    if [[ -d "$CFG_TMP" ]]; then
         rm -rf "$CFG_TMP"
-        mkdir -p $CFG_TMP
     fi
     if [[ -d "$CFG_WRK" ]]; then
         rm -rf "$CFG_WRK"
@@ -91,13 +86,6 @@ checkDir(){
         rm -rf "$CFG_TP"
     fi
 
-
-    if [[ ! -d "$DIR_PRJ" ]]; then
-        crear
-    else
-        rm -rf "$DIR_PRJ"
-        crear
-    fi
 }
 
 copy(){
@@ -106,23 +94,18 @@ copy(){
     cp -r "Servidor_Web" "$CFG_TMP/"
     cp -r "Test_Puertos" "$CFG_TMP/"
     cp "deploy" "$CFG_TMP/"
-#    cp "init-tomcat" "$CFG_TMP/"
     cp "pom.xml" "$CFG_TMP/"
     cp "tomcat-users.xml" "$CFG_TMP/"
     cp "miapp.png" "$CFG_TMP/"
 }
 
 compile(){
-#    cp -r ./* "$CFG_TMP/"
     cd $CFG_TMP || exit 1
     mvn clean install -DskipTests
 }
 
 renombrar(){
     mv $CFG_WRK/edEXT-jar-with-dependencies.jar $CFG_WRK/edEXT.jar
-    mv $CFG_WRK/edEXTw-jar-with-dependencies.jar $CFG_WRK/edEXTw.jar
-    mv $CFG_WRK/daemon-server-jar-with-dependencies.jar $CFG_WRK/daemon-central.jar
-    mv $CFG_WRK/daemon-web-jar-with-dependencies.jar $CFG_WRK/daemon-web.jar
     mv $CFG_WRK/servidor-jar-with-dependencies.jar $CFG_WRK/servidor.jar
     mv $CFG_WRK/test-port-jar-with-dependencies.jar $CFG_WRK/testPort.jar
 }
@@ -133,16 +116,8 @@ downloadApp(){
     FILE="releases/download/continuous/appimagetool-x86_64.AppImage"
     curl -fL -o appimagetool.AppImage "$HOST/$REPO/$FILE" && chmod +x appimagetool.AppImage
 }
-DEAMONS=("daemoncentral" "daemonweb") # Nombre del Directorio
-DEA_JAR=("daemon-central.jar" "daemon-web.jar")
-DEA_NOM=("daemonCentral" "daemonWeb") #Nombre del AppImage
 
 crearApp(){
-#    for((pos=0; pos<${#DEAMONS[@]}; pos++)); do
-#        makeAppDir "${DEAMONS[pos]}" "${DEA_JAR[pos]}" "$DAEMON"
-#        makeAppImage "${DEAMONS[pos]}" "${DEA_NOM[pos]}"
-#        rm -rf "${DEAMONS[pos]}"
-#    done
     for((pos=0; pos<${#NODEAMONS[@]}; pos++)); do
         makeAppDir "${NODEAMONS[pos]}" "${NODEA_JAR[pos]}"
         makeAppImage "${NODEAMONS[pos]}" "${NODEA_NOM[pos]}"
@@ -152,29 +127,46 @@ crearApp(){
 
 moverApp(){
     mv -f "edEXT" $DIR_PRJ
-#    mv -f "daemonCentral" "$DIR_BIN/daemonCentral"
     mv -f "servidor" "$DIR_BIN/servidor"
     cp -f "testPort" "$DIR_SHD/testPort"
     mv -f "testPort" "$DIR_TLS/testPort"
     ln -sf "resources/tools/testPort" "$DIR_PRJ/check-puertos"
 }
 
+clearSHD(){
+    if [[ -f "$DIR_SHD/web.war" ]]; then
+        rm -f "$DIR_SHD/web.war"
+    fi
+    if [[ -f "$DIR_SHD/deploy" ]]; then
+        rm -f "$DIR_SHD/deploy"
+    fi
+    if [[ -f "$DIR_SHD/testPort" ]]; then
+        rm -f "$DIR_SHD/testPort"
+    fi
+    if [[ -d "$DIR_SHD/apache-tomcat-10.1.61" ]]; then
+        rm -rf "$DIR_SHD/apache-tomcat-10.1.61"
+    fi
+}
+
 checkDir
+crear
 copy
 compile
 cd $CFG_TMP || exit 1
 renombrar
 downloadApp
 crearApp
+clearSHD
+if [[ -f "$DIR_SHD/serverWeb.tar.gz" ]]; then
+    rm -f "$DIR_SHD/serverWeb.tar.gz"
+fi
 moverApp
 
 wget -O tomcat.tar.gz https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.61/bin/apache-tomcat-10.1.61.tar.gz
 
 tar -xzvf tomcat.tar.gz
 mv -f "tomcat-users.xml" "apache-tomcat-10.1.61/conf/tomcat-users.xml"
-#tar -czvf "tomcat.tar.gz" "apache-tomcat-10.1.61/"
-
-#mv -f "tomcat.tar.gz" "$DIR_STMP/tomcat.tar.gz"
+        
 mv -f "apache-tomcat-10.1.61" "$DIR_SHD/apache-tomcat-10.1.61"
 mv -f "$CFG_WRK/web.war" "$DIR_SHD/web.war"
 mv -f "$CFG_WRK/testPort.jar" "$DIR_JAR/testPort.jar"
@@ -188,11 +180,12 @@ rm -rf "$CFG_TMP"
 rm -rf "$CFG_TP"
 rm -rf "$CFG_WRK"
 
+
+
+cd $DIR_SHD
+tar -czvf "serverWeb.tar.gz" *
 cd $DIR_PRJ
-tar -czvf "serverWeb.tar.gz" "shared/"
-rm -rf $DIR_SHD
-mkdir $DIR_SHD
-mv -f "serverWeb.tar.gz" "$DIR_SHD"
+clearSHD
 
 clear
 #╔╗╚╝║═

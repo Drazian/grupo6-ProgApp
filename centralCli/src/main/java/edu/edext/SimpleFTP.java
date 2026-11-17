@@ -10,21 +10,27 @@ import java.io.IOException;
  */
 public class SimpleFTP {
 
+
     public static void start(String ruta){
         boolean flag=true, reset=false;
-        String message, path=cfgCCli.PATH, puerto="8080", unionPath=" -d "+path+utilsCCli.OS.getSeparador()+"output", comando="python3 -m http.server ";
+        String message, path=cfgCCli.PATH, puerto="1050", unionPath=" -d ", comando="python3 -m http.server ";
         ProcessBuilder proc;
         Process pid;
         int exitPID;
+//        puerto=puerto!=null?puerto:PUERTO;
+//        System.out.println("puerto '"+puerto+"' , comando : "+comando);
         puerto=utilsCCli.Cast.valueOf(utilsCCli.OS.scanPortFree(puerto));
-        unionPath=utilsCCli.Validate.isEmpty(ruta)?ruta:unionPath;
-        comando=comando+puerto+unionPath;
+//        System.out.println("puerto '"+puerto+"' , comando : "+comando);
+//        unionPath=utilsCCli.Validate.isEmpty(ruta)?ruta:unionPath;
+//        System.out.println("puerto '"+puerto+"' , comando : "+comando);
+        comando=comando+puerto+unionPath+ruta;
+        System.out.println("Compartiendo : "+ruta);
             try {
+                System.out.println("");
                 proc=new ProcessBuilder(comando.split(" "));
                 proc.inheritIO();
                 pid=proc.start();
                 exitPID=pid.waitFor();
-                //Thread.sleep(30000);
                 pid.destroy();
                 System.out.println("Teminando...");
             } catch (IOException | InterruptedException e) {
