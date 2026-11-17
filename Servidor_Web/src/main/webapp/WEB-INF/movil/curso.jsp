@@ -17,7 +17,12 @@
 
         <div class="card-body pt-2">
             <c:if test="${not empty curso.url}">
-                <a href="<c:out value='${curso.url}'/>" target="_blank" rel="noopener" class="small">Ir al sitio del curso</a>
+                <%-- Una URL sin http(s):// (ej. www.tmu.edu.uy) el navegador la toma como una página del propio sitio --%>
+                <c:set var="urlCurso" value="${curso.url}"/>
+                <c:if test="${not fn:startsWith(fn:toLowerCase(urlCurso), 'http://') and not fn:startsWith(fn:toLowerCase(urlCurso), 'https://')}">
+                    <c:set var="urlCurso" value="https://${curso.url}"/>
+                </c:if>
+                <a href="<c:out value='${urlCurso}'/>" target="_blank" rel="noopener" class="small">Ir al sitio del curso</a>
             </c:if>
             <c:if test="${not empty curso.descripcion}">
                 <p class="small text-muted mt-2 mb-1"><c:out value="${curso.descripcion}"/></p>

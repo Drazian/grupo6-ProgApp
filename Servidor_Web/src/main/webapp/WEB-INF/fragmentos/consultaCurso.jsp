@@ -41,7 +41,12 @@
         <p><strong>Duración:</strong> ${curso.duracion}</p>
         <p><strong>Cantidad de Horas:</strong> ${curso.cantidadHoras} hrs</p>
         <p><strong>Créditos:</strong> ${curso.creditos}</p>
-        <p><strong>URL:</strong> <a href="${curso.url}" target="_blank" style="color: #3498db;">${curso.url}</a></p>
+        <%-- Una URL sin http(s):// (ej. www.tmu.edu.uy) el navegador la toma como una página del propio sitio --%>
+        <c:set var="urlCurso" value="${curso.url}"/>
+        <c:if test="${not empty urlCurso and not fn:startsWith(fn:toLowerCase(urlCurso), 'http://') and not fn:startsWith(fn:toLowerCase(urlCurso), 'https://')}">
+            <c:set var="urlCurso" value="https://${curso.url}"/>
+        </c:if>
+        <p><strong>URL:</strong> <a href="<c:out value='${urlCurso}'/>" target="_blank" rel="noopener" style="color: #3498db;"><c:out value="${curso.url}"/></a></p>
         <p><strong>Fecha de Alta:</strong> ${curso.fechaRegistro}</p>
         <p><strong>Categorías:</strong>  
             <c:choose>
